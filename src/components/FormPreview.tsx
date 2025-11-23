@@ -42,9 +42,9 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           className="w-full max-w-4xl mx-auto px-8"
         >
           {question.type === "welcome" ? (
-            <div className="flex items-center justify-center w-full h-full px-20">
-              <div className="flex items-center gap-16 max-w-[1400px] w-full">
-                <div className="flex-1 max-w-[520px]">
+            <div className="flex items-center justify-center w-full h-full px-8">
+              <div className="w-full max-w-[960px] grid grid-cols-[1.1fr_1fr] gap-9 items-center" style={{ padding: '72px 64px' }}>
+                <div>
                   <h1 className="font-bold mb-6 leading-[0.9]" style={{ 
                     color: '#F5CA3C', 
                     fontWeight: 700, 
@@ -79,11 +79,9 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                     <span>Takes X minutes</span>
                   </div>
                 </div>
-                <div className="flex-1 max-w-[560px]">
+                <div>
                   <div className="w-full overflow-hidden" style={{ 
-                    borderRadius: '44px',
-                    aspectRatio: '1.35/1',
-                    boxShadow: '0 40px 110px -35px rgba(0,0,0,0.75)'
+                    borderRadius: '32px'
                   }}>
                     <img
                       src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1200&h=890&fit=crop"
