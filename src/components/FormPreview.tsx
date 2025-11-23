@@ -640,7 +640,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                   press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                                 </span>
                               </button>
-                              <div className="inline-flex items-center gap-2.5 mt-4" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                              <div className="inline-flex items-center gap-2.5 mt-2" style={{ color: '#A89A8A', fontSize: '14px' }}>
                                 <Clock className="w-4 h-4" />
                                 <span>Takes X minutes</span>
                               </div>
