@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp } from "lucide-react";
+import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface SettingsPanelProps {
   question?: Question;
@@ -843,6 +844,47 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderEndingSettings = () => (
     <>
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Insert variable</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
+              <Tag className="w-3 h-3 mr-2" />
+              Add variable to text
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-2" align="start">
+            <div className="space-y-1">
+              <button
+                onClick={() => {
+                  const newTitle = question.title + " {{first_name}}";
+                  onUpdateQuestion?.(question.id, { title: newTitle });
+                }}
+                className="w-full text-left px-3 py-2 text-xs rounded hover:bg-muted transition-colors"
+              >
+                <div className="font-medium">First name</div>
+                <div className="text-muted-foreground text-[10px]">Inserts: {"{{first_name}}"}</div>
+              </button>
+              <button
+                onClick={() => {
+                  const newTitle = question.title + " {{email}}";
+                  onUpdateQuestion?.(question.id, { title: newTitle });
+                }}
+                className="w-full text-left px-3 py-2 text-xs rounded hover:bg-muted transition-colors"
+              >
+                <div className="font-medium">Email</div>
+                <div className="text-muted-foreground text-[10px]">Inserts: {"{{email}}"}</div>
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
+        <p className="text-[10px] text-muted-foreground mt-2">
+          Variables like {"{{first_name}}"} will be replaced with actual responses
+        </p>
+      </div>
+
+      <Separator className="my-4" />
+
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="social-toggle" className="text-xs font-normal">Social share icons</Label>

@@ -155,7 +155,7 @@ const defaultQuestions: Question[] = [
   {
     id: "ending",
     type: "ending",
-    title: "Thanks for your feedback!",
+    title: "Thanks for your feedback, {{first_name}}!",
     icon: "check"
   }
 ];
