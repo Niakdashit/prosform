@@ -532,23 +532,23 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         )}
 
                         <p 
-                          className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
+                          className={`text-[16px] ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
                           style={{ 
                             color: '#B8A892',
                             fontSize: viewMode === 'desktop' ? '16px' : '14px',
                             lineHeight: '1.6',
                             marginBottom: `${(question.blockSpacing || 1) * 32}px`,
-                            outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                            outline: !isPublicPreview && editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
                             padding: '4px',
                             marginTop: '-4px',
                             marginLeft: '-4px',
                             marginRight: '-4px',
                             borderRadius: '4px'
                           }}
-                          contentEditable
+                          contentEditable={!isPublicPreview}
                           suppressContentEditableWarning
-                          onFocus={() => setEditingField('welcome-subtitle')}
-                          onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                          onFocus={() => !isPublicPreview && setEditingField('welcome-subtitle')}
+                          onBlur={(e) => !isPublicPreview && handleSubtitleBlur(e.currentTarget.textContent || '')}
                         >
                           {question.subtitle}
                         </p>
@@ -1663,14 +1663,16 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     >
                       {question.title}
                     </h2>
-                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                      {question.type === 'dropdown' && <><List className="w-4 h-4" /><span>Dropdown</span></>}
-                      {question.type === 'yesno' && <><CheckCircle className="w-4 h-4" /><span>Yes/No</span></>}
-                      {question.type === 'picture-choice' && <><ImageIcon className="w-4 h-4" /><span>Picture Choice</span></>}
-                      {question.type === 'choice' && question.variant === 'multiple' && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
-                      {question.type === 'choice' && question.variant === 'checkbox' && <><CheckSquare className="w-4 h-4" /><span>Checkbox</span></>}
-                      {question.type === 'choice' && !question.variant && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
-                    </div>
+                    {!isPublicPreview && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        {question.type === 'dropdown' && <><List className="w-4 h-4" /><span>Dropdown</span></>}
+                        {question.type === 'yesno' && <><CheckCircle className="w-4 h-4" /><span>Yes/No</span></>}
+                        {question.type === 'picture-choice' && <><ImageIcon className="w-4 h-4" /><span>Picture Choice</span></>}
+                        {question.type === 'choice' && question.variant === 'multiple' && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
+                        {question.type === 'choice' && question.variant === 'checkbox' && <><CheckSquare className="w-4 h-4" /><span>Checkbox</span></>}
+                        {question.type === 'choice' && !question.variant && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-4">
                     {(question.choices || ["Yes", "No", "Sometimes"]).map((choice, index) => (
@@ -1924,18 +1926,18 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity"
+                      className={`text-xl mb-12 ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
                       style={{ 
                         color: '#B8A892',
-                        outline: editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                        outline: !isPublicPreview && editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
                         padding: '4px',
                         margin: '-4px',
                         borderRadius: '4px'
                       }}
-                      contentEditable
+                      contentEditable={!isPublicPreview}
                       suppressContentEditableWarning
-                      onFocus={() => setEditingField('statement-subtitle')}
-                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                      onFocus={() => !isPublicPreview && setEditingField('statement-subtitle')}
+                      onBlur={(e) => !isPublicPreview && handleSubtitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.subtitle}
                     </p>
@@ -2006,39 +2008,39 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   )}
 
                   <h2 
-                    className="font-bold mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                    className={`font-bold mb-8 ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
                     style={{ 
                     color: '#F5B800', 
                     fontWeight: 700, 
                     fontSize: viewMode === 'desktop' ? '72px' : '40px',
                     lineHeight: '1.1',
                       letterSpacing: '-0.03em',
-                      outline: editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
+                      outline: !isPublicPreview && editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
                       padding: '4px',
                       margin: '-4px',
                       borderRadius: '4px'
                     }}
-                    contentEditable
+                    contentEditable={!isPublicPreview}
                     suppressContentEditableWarning
-                    onFocus={() => setEditingField('ending-title')}
-                    onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    onFocus={() => !isPublicPreview && setEditingField('ending-title')}
+                    onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
                   >
                     {editingField === 'ending-title' ? question.title : replaceVariables(question.title)}
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity" 
+                      className={`text-xl mb-12 ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
                       style={{ 
                         color: '#C4B5A0',
-                        outline: editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
+                        outline: !isPublicPreview && editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
                         padding: '4px',
                         margin: '-4px',
                         borderRadius: '4px'
                       }}
-                      contentEditable
+                      contentEditable={!isPublicPreview}
                       suppressContentEditableWarning
-                      onFocus={() => setEditingField('ending-subtitle')}
-                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                      onFocus={() => !isPublicPreview && setEditingField('ending-subtitle')}
+                      onBlur={(e) => !isPublicPreview && handleSubtitleBlur(e.currentTarget.textContent || '')}
                     >
                       {editingField === 'ending-subtitle' ? question.subtitle : replaceVariables(question.subtitle)}
                     </p>
