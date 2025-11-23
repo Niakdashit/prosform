@@ -19,65 +19,52 @@ interface SettingsPanelProps {
 // Layout icons represented as SVG-like components
 const LayoutIcon = ({ type }: { type: string }) => {
   const layouts: Record<string, React.ReactElement> = {
-    // Mobile layouts
+    // Mobile layouts - thicker lines like Typeform
     "mobile-vertical": (
-      <div className="w-full h-full border-2 border-foreground rounded flex flex-col gap-0.5 p-1">
-        <div className="h-2 bg-foreground rounded-sm" />
-        <div className="flex-1 bg-foreground rounded-sm" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex flex-col gap-[2px] p-[2px]">
+        <div className="h-[5px] bg-foreground rounded-[1px]" />
+        <div className="flex-1 bg-foreground rounded-[1px]" />
       </div>
     ),
     "mobile-horizontal": (
-      <div className="w-full h-full border-2 border-foreground rounded flex items-center gap-1 p-1">
-        <div className="h-full w-1.5 bg-foreground rounded-sm" />
-        <div className="h-full flex-1 bg-foreground rounded-sm" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex items-center gap-[2px] p-[2px]">
+        <div className="h-full w-[3px] bg-foreground rounded-[1px]" />
+        <div className="h-full flex-1 bg-foreground rounded-[1px]" />
       </div>
     ),
     "mobile-centered": (
-      <div className="w-full h-full border-2 border-foreground rounded flex flex-col items-center justify-center gap-0.5 p-1">
-        <div className="w-3 h-1 bg-foreground rounded-sm" />
-        <div className="w-4 h-2 bg-foreground rounded-sm" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex flex-col items-center justify-center gap-[2px] p-[2px]">
+        <div className="w-[6px] h-[2px] bg-foreground rounded-[1px]" />
+        <div className="w-[9px] h-[4px] bg-foreground rounded-[1px]" />
       </div>
     ),
     "mobile-minimal": (
-      <div className="w-full h-full border-2 border-foreground rounded flex flex-col justify-end p-1">
-        <div className="h-2 bg-foreground rounded-sm" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex flex-col justify-end p-[2px]">
+        <div className="h-[5px] bg-foreground rounded-[1px]" />
       </div>
     ),
-    // Desktop layouts
+    // Desktop layouts - thicker lines like Typeform
     "desktop-left-right": (
-      <div className="w-full h-full border-2 border-foreground rounded flex gap-1 p-0.5">
-        <div className="w-1/2 bg-foreground rounded-sm" />
-        <div className="w-1/2 bg-foreground rounded-sm" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex gap-[2px] p-[2px]">
+        <div className="w-1/2 bg-foreground rounded-[1px]" />
+        <div className="w-1/2 bg-foreground rounded-[1px]" />
       </div>
     ),
     "desktop-right-left": (
-      <div className="w-full h-full border-2 border-foreground rounded flex gap-1 p-0.5">
-        <div className="w-1/2 bg-foreground rounded-sm" />
-        <div className="w-1/2 bg-foreground rounded-sm" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex gap-[2px] p-[2px]">
+        <div className="w-1/2 bg-foreground rounded-[1px]" />
+        <div className="w-1/2 bg-foreground rounded-[1px]" />
       </div>
     ),
     "desktop-centered": (
-      <div className="w-full h-full border-2 border-foreground rounded flex items-center justify-center p-1">
-        <div className="w-3/5 h-3/4 bg-foreground rounded-sm" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex items-center justify-center p-[2px]">
+        <div className="w-3/5 h-3/4 bg-foreground rounded-[1px]" />
       </div>
     ),
     "desktop-split": (
-      <div className="w-full h-full border-2 border-foreground rounded flex gap-1 p-0.5">
-        <div className="w-1/3 bg-foreground rounded-sm" />
-        <div className="w-2/3 bg-foreground rounded-sm" />
-      </div>
-    ),
-    "desktop-top-bottom": (
-      <div className="w-full h-full border-2 border-foreground rounded flex flex-col gap-1 p-0.5">
-        <div className="h-1/2 bg-foreground rounded-sm" />
-        <div className="h-1/2 bg-foreground rounded-sm" />
-      </div>
-    ),
-    "desktop-full": (
-      <div className="w-full h-full border-2 border-foreground rounded p-1">
-        <div className="w-full h-full bg-foreground rounded-sm flex items-center justify-center">
-          <div className="w-1/2 h-1/3 bg-background rounded-sm" />
-        </div>
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex gap-[2px] p-[2px]">
+        <div className="w-1/3 bg-foreground rounded-[1px]" />
+        <div className="w-2/3 bg-foreground rounded-[1px]" />
       </div>
     ),
   };
@@ -110,19 +97,21 @@ const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
         
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
           <div>
-            <Label className="text-xs font-normal mb-1.5 block">Mobile</Label>
+            <Label className="text-xs font-normal text-muted-foreground mb-1.5 block">Mobile</Label>
             <Select 
               value={currentMobileLayout}
               onValueChange={(value) => onUpdateQuestion?.(question.id, { mobileLayout: value })}
             >
               <SelectTrigger className="h-8 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4">
+                <div className="flex items-center gap-1.5 w-full">
+                  <div className="w-4 h-4 flex-shrink-0">
                     <LayoutIcon type={currentMobileLayout} />
                   </div>
-                  <SelectValue />
+                  <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
                 </div>
               </SelectTrigger>
               <SelectContent>
@@ -141,17 +130,19 @@ const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
           </div>
 
           <div>
-            <Label className="text-xs font-normal mb-1.5 block">Desktop</Label>
+            <Label className="text-xs font-normal text-muted-foreground mb-1.5 block">Desktop</Label>
             <Select 
               value={currentDesktopLayout}
               onValueChange={(value) => onUpdateQuestion?.(question.id, { desktopLayout: value })}
             >
               <SelectTrigger className="h-8 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4">
+                <div className="flex items-center gap-1.5 w-full">
+                  <div className="w-4 h-4 flex-shrink-0">
                     <LayoutIcon type={currentDesktopLayout} />
                   </div>
-                  <SelectValue />
+                  <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
                 </div>
               </SelectTrigger>
               <SelectContent>
