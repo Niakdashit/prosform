@@ -173,7 +173,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             className="w-full h-full"
           >
             {question.type === "welcome" ? (
-              <div className="flex w-full h-full" style={{ alignItems: viewMode === 'desktop' ? 'center' : 'flex-start', justifyContent: viewMode === 'desktop' ? 'center' : 'flex-start', padding: viewMode === 'desktop' ? '0 64px' : '24px 20px' }}>
+              <div className="flex w-full h-full" style={{ alignItems: viewMode === 'desktop' ? 'center' : 'flex-start', justifyContent: viewMode === 'desktop' ? 'center' : 'flex-start', padding: viewMode === 'desktop' ? '0 64px' : '24px 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 {(() => {
                   const desktopLayout = question.desktopLayout || 'desktop-left-right';
                   const mobileLayout = question.mobileLayout || 'mobile-vertical';
@@ -794,7 +794,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 })()}
               </div>
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
-              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px]">
                   <div className="mb-10">
                     {question.number && (
@@ -1055,7 +1055,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : question.type === "rating" ? (
-              <div className="w-full h-full flex items-center justify-center px-24">
+              <div className="w-full h-full flex items-center justify-center px-24" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] relative">
                   {editingField === 'rating-title' && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1180,7 +1180,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : question.type === "choice" || question.type === "dropdown" || question.type === "yesno" || question.type === "picture-choice" ? (
-              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] relative">
                   {editingField === 'choice-title' && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1296,7 +1296,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : question.type === "file" ? (
-              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] relative">
                   {editingField === 'file-title' && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1391,7 +1391,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : question.type === "statement" ? (
-              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] text-center relative">
                   {(editingField === 'statement-title' || editingField === 'statement-subtitle') && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1490,7 +1490,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] text-center relative">
                   {(editingField === 'ending-title' || editingField === 'ending-subtitle') && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
