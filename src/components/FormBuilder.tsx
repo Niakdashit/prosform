@@ -187,6 +187,12 @@ export const FormBuilder = () => {
     }
   }, [isMobile]);
 
+  // Sync questions to localStorage for preview synchronization
+  useEffect(() => {
+    localStorage.setItem('preview-questions', JSON.stringify(questions));
+    localStorage.setItem('preview-viewMode', viewMode);
+  }, [questions, viewMode]);
+
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {
