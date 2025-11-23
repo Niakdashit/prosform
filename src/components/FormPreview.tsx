@@ -79,12 +79,13 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                     <span>Takes X minutes</span>
                   </div>
                 </div>
-                <div>
-                  <div className="w-full overflow-hidden" style={{ 
-                    borderRadius: '32px'
-                  }}>
+                <div className="flex justify-end">
+                  <div
+                    className="overflow-hidden w-[520px] h-[520px] max-w-full rounded-[40px]"
+                    style={{ borderRadius: "40px" }}
+                  >
                     <img
-                      src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1200&h=890&fit=crop"
+                      src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
                       alt="Feedback illustration"
                       className="w-full h-full object-cover"
                     />
