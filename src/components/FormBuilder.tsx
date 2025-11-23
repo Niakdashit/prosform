@@ -166,6 +166,7 @@ export const FormBuilder = () => {
   const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
   const [isAddContentModalOpen, setIsAddContentModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
@@ -245,6 +246,8 @@ export const FormBuilder = () => {
         <FormPreview
           question={activeQuestion}
           onUpdateQuestion={updateQuestion}
+          viewMode={viewMode}
+          onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
           onNext={() => {
             const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
             if (currentIndex < questions.length - 1) {
@@ -253,7 +256,11 @@ export const FormBuilder = () => {
           }}
         />
         
-        <SettingsPanel question={activeQuestion} onUpdateQuestion={updateQuestion} />
+        <SettingsPanel 
+          question={activeQuestion} 
+          onUpdateQuestion={updateQuestion}
+          onViewModeChange={setViewMode}
+        />
       </div>
 
       <AddContentModal
