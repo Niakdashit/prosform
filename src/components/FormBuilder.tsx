@@ -79,10 +79,16 @@ const defaultQuestions: Question[] = [
 ];
 
 export const FormBuilder = () => {
-  const [questions] = useState<Question[]>(defaultQuestions);
+  const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
+
+  const updateQuestion = (id: string, updates: Partial<Question>) => {
+    setQuestions(prev => prev.map(q => 
+      q.id === id ? { ...q, ...updates } : q
+    ));
+  };
 
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
@@ -96,6 +102,7 @@ export const FormBuilder = () => {
         
         <FormPreview
           question={activeQuestion}
+          onUpdateQuestion={updateQuestion}
           onNext={() => {
             const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
             if (currentIndex < questions.length - 1) {

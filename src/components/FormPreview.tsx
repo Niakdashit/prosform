@@ -8,16 +8,32 @@ import { useState } from "react";
 interface FormPreviewProps {
   question?: Question;
   onNext: () => void;
+  onUpdateQuestion: (id: string, updates: Partial<Question>) => void;
 }
 
-export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
+export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
+  const [editingField, setEditingField] = useState<string | null>(null);
 
   if (!question) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onNext();
+  };
+
+  const handleTitleBlur = (value: string) => {
+    if (question && value.trim() !== question.title) {
+      onUpdateQuestion(question.id, { title: value.trim() });
+    }
+    setEditingField(null);
+  };
+
+  const handleSubtitleBlur = (value: string) => {
+    if (question && value.trim() !== question.subtitle) {
+      onUpdateQuestion(question.id, { subtitle: value.trim() });
+    }
+    setEditingField(null);
   };
 
   return (
@@ -46,15 +62,39 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
               <div className="flex items-center justify-center w-full h-full px-16">
                 <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
                   <div>
-                    <h1 className="font-bold mb-6 leading-[1.05]" style={{ 
-                      color: '#F5CA3C', 
-                      fontWeight: 700, 
-                      fontSize: '64px',
-                      letterSpacing: '-0.02em' 
-                    }}>
+                    <h1 
+                      className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#F5CA3C', 
+                        fontWeight: 700, 
+                        fontSize: '64px',
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('welcome-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
                       {question.title}
                     </h1>
-                    <p className="text-[16px] mb-8 leading-[1.6]" style={{ color: '#B8A892' }}>
+                    <p 
+                      className="text-[16px] mb-8 leading-[1.6] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#B8A892',
+                        outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('welcome-subtitle')}
+                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                    >
                       {question.subtitle}
                     </p>
                     <button
@@ -103,7 +143,22 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                         {question.number} →
                       </div>
                     )}
-                    <h2 className="text-[56px] font-bold leading-[1.1]" style={{ color: '#FFFFFF', fontWeight: 700, letterSpacing: '-0.02em' }}>
+                    <h2 
+                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'text-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('text-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
                       {question.title}
                     </h2>
                   </div>
@@ -146,7 +201,22 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                         {question.number} →
                       </div>
                     )}
-                    <h2 className="text-[56px] font-bold leading-[1.1]" style={{ color: '#FFFFFF', fontWeight: 700, letterSpacing: '-0.02em' }}>
+                    <h2 
+                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'rating-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('rating-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
                       {question.title}
                     </h2>
                   </div>
@@ -177,7 +247,22 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                         {question.number} →
                       </div>
                     )}
-                    <h2 className="text-[56px] font-bold leading-[1.1]" style={{ color: '#FFFFFF', fontWeight: 700, letterSpacing: '-0.02em' }}>
+                    <h2 
+                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'choice-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('choice-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
                       {question.title}
                     </h2>
                   </div>
@@ -204,7 +289,22 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
             ) : (
               <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px] text-center">
-                  <h2 className="text-[72px] font-bold mb-6 leading-[1.1]" style={{ color: '#F5B800', fontWeight: 700, letterSpacing: '-0.03em' }}>
+                  <h2 
+                    className="text-[72px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                    style={{ 
+                      color: '#F5B800', 
+                      fontWeight: 700, 
+                      letterSpacing: '-0.03em',
+                      outline: editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
+                      padding: '4px',
+                      margin: '-4px',
+                      borderRadius: '4px'
+                    }}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onFocus={() => setEditingField('ending-title')}
+                    onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                  >
                     {question.title}
                   </h2>
                   <p className="text-xl mb-10" style={{ color: '#C4B5A0' }}>
