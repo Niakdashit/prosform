@@ -1587,6 +1587,49 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           border: editingChoiceIndex === index ? '2px solid rgba(245, 184, 0, 0.5)' : '1px solid rgba(255,255,255,0.2)'
                         }}
                       >
+                        {/* Action buttons - on top border, right side */}
+                        <div 
+                          className="absolute -top-3 right-4 flex items-center gap-1.5"
+                          style={{
+                            opacity: hoveredChoiceIndex === index ? 1 : 0,
+                            transition: 'opacity 0.2s ease'
+                          }}
+                        >
+                          <button
+                            onClick={() => handleDeleteChoice(index)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(61, 55, 49, 0.9)',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                            title="Delete choice"
+                          >
+                            <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                          </button>
+                          <button
+                            onClick={() => handleDuplicateChoice(index)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(61, 55, 49, 0.9)',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                            title="Duplicate choice"
+                          >
+                            <Copy className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                          </button>
+                          <button
+                            onClick={() => {/* Custom logic for sparkles */}}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(245, 184, 0, 0.9)',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                            title="Customize choice"
+                          >
+                            <Sparkles className="w-3.5 h-3.5" style={{ color: '#3D3731' }} />
+                          </button>
+                        </div>
+                        
                         <span className="font-semibold text-base" style={{ color: '#A89A8A' }}>
                           {String.fromCharCode(65 + index)}
                         </span>
@@ -1606,49 +1649,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         >
                           {choice}
                         </span>
-                        
-                        {/* Action buttons - visible on hover, aligned to the right */}
-                        <div 
-                          className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5"
-                          style={{
-                            opacity: hoveredChoiceIndex === index ? 1 : 0,
-                            transition: 'opacity 0.2s ease'
-                          }}
-                        >
-                          <button
-                            onClick={() => handleDeleteChoice(index)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                            style={{ 
-                              backgroundColor: 'rgba(61, 55, 49, 0.85)',
-                              border: '1px solid rgba(255,255,255,0.1)'
-                            }}
-                            title="Delete choice"
-                          >
-                            <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
-                          </button>
-                          <button
-                            onClick={() => handleDuplicateChoice(index)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                            style={{ 
-                              backgroundColor: 'rgba(61, 55, 49, 0.85)',
-                              border: '1px solid rgba(255,255,255,0.1)'
-                            }}
-                            title="Duplicate choice"
-                          >
-                            <Copy className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
-                          </button>
-                          <button
-                            onClick={() => {/* Custom logic for sparkles */}}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                            style={{ 
-                              backgroundColor: 'rgba(245, 184, 0, 0.85)',
-                              border: '1px solid rgba(255,255,255,0.1)'
-                            }}
-                            title="Customize choice"
-                          >
-                            <Sparkles className="w-3.5 h-3.5" style={{ color: '#3D3731' }} />
-                          </button>
-                        </div>
                       </div>
                     ))}
                   </div>
