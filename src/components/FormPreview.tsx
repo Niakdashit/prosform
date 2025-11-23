@@ -761,9 +761,19 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     );
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
-                        <ImageBlock />
-                        <TextContent />
+                      <div className="flex flex-col w-full h-full">
+                        <div className="w-full" style={{ height: '40%', minHeight: '250px' }}>
+                          <img
+                            src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=800&h=600&fit=crop"
+                            alt="Banner"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 flex items-center justify-center px-5 py-8">
+                          <div className="w-full max-w-[700px]">
+                            <TextContent />
+                          </div>
+                        </div>
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-minimal') {
