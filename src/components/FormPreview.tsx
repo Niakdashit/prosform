@@ -21,29 +21,30 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: '#3D3731' }}>
-      {/* Logo */}
-      <div className="absolute top-8 left-8">
-        <div className="grid grid-cols-2 gap-1">
-          <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
-          <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
-          <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
-          <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+    <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
+      <div className="relative overflow-hidden" style={{ backgroundColor: '#3D3731', width: '1100px', height: '620px' }}>
+        {/* Logo */}
+        <div className="absolute top-8 left-8">
+          <div className="grid grid-cols-2 gap-1">
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+          </div>
         </div>
-      </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={question.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className="w-full max-w-4xl mx-auto px-8"
-        >
-          {question.type === "welcome" ? (
-            <div className="flex items-center justify-center w-full h-full px-16">
-              <div className="w-[1100px] h-[620px] grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={question.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="w-full h-full"
+          >
+            {question.type === "welcome" ? (
+              <div className="flex items-center justify-center w-full h-full px-16">
+                <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
                 <div>
                   <h1 className="font-bold mb-6 leading-[1.05]" style={{ 
                     color: '#F5CA3C', 
@@ -90,10 +91,10 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                       className="w-full h-full object-cover"
                     />
                   </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : question.type === "text" ? (
+            ) : question.type === "text" ? (
             <div className="w-full max-w-[900px] px-16">
               <div className="mb-10">
                 {question.number && (
@@ -212,10 +213,11 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
               >
                 Start over
               </Button>
-            </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
