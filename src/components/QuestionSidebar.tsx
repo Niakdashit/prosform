@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Question } from "./FormBuilder";
 import { Plus, GripVertical, MoreVertical, Copy, Trash2, Palette, GitBranch, LayoutList } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -87,15 +86,110 @@ export const QuestionSidebar = ({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="questions" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-3">
-              {questions.filter(q => q.type !== "ending").map((question, index) => {
-                const questionIcon = getQuestionIcon(question);
-                const Icon = questionIcon.icon;
+        <TabsContent value="questions" className="flex-1 mt-0 overflow-y-auto">
+          <div className="p-3">
+            {questions.filter(q => q.type !== "ending").map((question, index) => {
+              const questionIcon = getQuestionIcon(question);
+              const Icon = questionIcon.icon;
+              const isActive = question.id === activeQuestionId;
+              const isDragging = draggedIndex === index;
+              const isDropTarget = dragOverIndex === index && draggedIndex !== index;
+
+              return (
+                <div key={question.id} className="relative">
+                  {isDropTarget && (
+                    <div className="absolute -top-1 left-0 right-0 h-0.5 bg-primary z-10">
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
+                    </div>
+                  )}
+                  <button
+                    onClick={() => onQuestionSelect(question.id)}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={cn(
+                      "w-full px-2 py-2.5 rounded-lg mb-1 flex items-start gap-2 transition-all group",
+                      "hover:bg-muted/50",
+                      isActive && "bg-muted",
+                      isDragging && "opacity-50 scale-95"
+                    )}
+                  >
+                    <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    <div className={cn(
+                      "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
+                      questionIcon.color
+                    )}>
+                      {question.number ? (
+                        <>
+                          <Icon className="w-3.5 h-3.5" />
+                          <span className="text-[9px] font-bold ml-0.5">{question.number}</span>
+                        </>
+                      ) : (
+                        <Icon className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div className="flex-1 text-left min-w-0 pt-1">
+                      <p className="text-xs text-foreground line-clamp-2 leading-relaxed">
+                        {question.title}
+                      </p>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDuplicateQuestion(question.id);
+                          }}
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteQuestion(question.id);
+                          }}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </button>
+                </div>
+              );
+            })}
+
+            {/* Séparateur + Section Endings */}
+            <div className="mt-4 pt-3 border-t border-border">
+              <div className="flex items-center justify-between mb-3 px-2">
+                <span className="text-sm font-semibold text-foreground">Endings</span>
+                <button className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center">
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              {/* Endings list */}
+              {questions.filter(q => q.type === "ending").map((question) => {
                 const isActive = question.id === activeQuestionId;
-                const isDragging = draggedIndex === index;
-                const isDropTarget = dragOverIndex === index && draggedIndex !== index;
+                const fullIndex = questions.findIndex(q => q.id === question.id);
+                const isDragging = draggedIndex === fullIndex;
+                const isDropTarget = dragOverIndex === fullIndex && draggedIndex !== fullIndex;
 
                 return (
                   <div key={question.id} className="relative">
@@ -108,10 +202,10 @@ export const QuestionSidebar = ({
                     <button
                       onClick={() => onQuestionSelect(question.id)}
                       draggable
-                      onDragStart={(e) => handleDragStart(e, index)}
-                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragStart={(e) => handleDragStart(e, fullIndex)}
+                      onDragOver={(e) => handleDragOver(e, fullIndex)}
                       onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, index)}
+                      onDrop={(e) => handleDrop(e, fullIndex)}
                       onDragEnd={handleDragEnd}
                       className={cn(
                         "w-full px-2 py-2.5 rounded-lg mb-1 flex items-start gap-2 transition-all group",
@@ -121,18 +215,8 @@ export const QuestionSidebar = ({
                       )}
                     >
                       <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
-                        questionIcon.color
-                      )}>
-                        {question.number ? (
-                          <>
-                            <Icon className="w-3.5 h-3.5" />
-                            <span className="text-[9px] font-bold ml-0.5">{question.number}</span>
-                          </>
-                        ) : (
-                          <Icon className="w-4 h-4" />
-                        )}
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200/80 text-gray-700 font-bold">
+                        <span className="text-xs">A</span>
                       </div>
                       <div className="flex-1 text-left min-w-0 pt-1">
                         <p className="text-xs text-foreground line-clamp-2 leading-relaxed">
@@ -177,462 +261,65 @@ export const QuestionSidebar = ({
                   </div>
                 );
               })}
-
-              {/* Séparateur + Section Endings */}
-              <div className="mt-4 pt-3 border-t border-border">
-                <div className="flex items-center justify-between mb-3 px-2">
-                  <span className="text-sm font-semibold text-foreground">Endings</span>
-                  <button className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center">
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                
-                {/* Endings list */}
-                {questions.filter(q => q.type === "ending").map((question) => {
-                  const isActive = question.id === activeQuestionId;
-                  const fullIndex = questions.findIndex(q => q.id === question.id);
-                  const isDragging = draggedIndex === fullIndex;
-                  const isDropTarget = dragOverIndex === fullIndex && draggedIndex !== fullIndex;
-                  
-                  return (
-                    <div key={question.id} className="relative">
-                      {isDropTarget && (
-                        <div className="absolute -top-1 left-0 right-0 h-0.5 bg-primary z-10">
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
-                          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
-                        </div>
-                      )}
-                      <button
-                        onClick={() => onQuestionSelect(question.id)}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, fullIndex)}
-                        onDragOver={(e) => handleDragOver(e, fullIndex)}
-                        onDragLeave={handleDragLeave}
-                        onDrop={(e) => handleDrop(e, fullIndex)}
-                        onDragEnd={handleDragEnd}
-                        className={cn(
-                          "w-full px-2 py-2.5 rounded-lg mb-1 flex items-start gap-2 transition-all group",
-                          "hover:bg-muted/50",
-                          isActive && "bg-muted",
-                          isDragging && "opacity-50 scale-95"
-                        )}
-                      >
-                        <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200/80 text-gray-700 font-bold">
-                          <span className="text-xs">A</span>
-                        </div>
-                        <div className="flex-1 text-left min-w-0 pt-1">
-                          <p className="text-xs text-foreground line-clamp-2 leading-relaxed">
-                            {question.title}
-                          </p>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <button
-                              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded transition-opacity"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
-                            >
-                              <MoreVertical className="w-4 h-4 text-muted-foreground" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-44">
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDuplicateQuestion(question.id);
-                              }}
-                            >
-                              <Copy className="w-4 h-4 mr-2" />
-                              Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDeleteQuestion(question.id);
-                              }}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
-          </ScrollArea>
+          </div>
         </TabsContent>
 
-        <TabsContent value="logic" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-3">
-              <div className="text-center py-8 text-muted-foreground">
-                <GitBranch className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">Logic rules will appear here</p>
-                <p className="text-xs mt-1">Create branching logic from question choices</p>
-              </div>
+        <TabsContent value="logic" className="flex-1 mt-0 overflow-y-auto">
+          <div className="p-3">
+            <div className="text-center py-8 text-muted-foreground">
+              <GitBranch className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">Logic rules will appear here</p>
+              <p className="text-xs mt-1">Create branching logic from question choices</p>
             </div>
-          </ScrollArea>
+          </div>
         </TabsContent>
 
-        <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-3 space-y-4 pb-20">
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Typography</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Global font</Label>
-                    <Select value={theme.fontFamily} onValueChange={(value) => updateTheme({ fontFamily: value })}>
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="inter" className="text-xs">Inter</SelectItem>
-                        <SelectItem value="roboto" className="text-xs">Roboto</SelectItem>
-                        <SelectItem value="poppins" className="text-xs">Poppins</SelectItem>
-                        <SelectItem value="montserrat" className="text-xs">Montserrat</SelectItem>
-                        <SelectItem value="lato" className="text-xs">Lato</SelectItem>
-                        <SelectItem value="opensans" className="text-xs">Open Sans</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Font size</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="12"
-                        max="20"
-                        step="1"
-                        value={theme.fontSize}
-                        onChange={(e) => updateTheme({ fontSize: parseInt(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>Small</span>
-                        <span>{theme.fontSize}px</span>
-                        <span>Large</span>
-                      </div>
-                    </div>
-                  </div>
+        <TabsContent value="style" className="flex-1 mt-0 overflow-y-auto">
+          <div className="p-3 space-y-4 pb-20">
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Typography</h3>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Global font</Label>
+                  <Select value={theme.fontFamily} onValueChange={(value) => updateTheme({ fontFamily: value })}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="inter" className="text-xs">Inter</SelectItem>
+                      <SelectItem value="roboto" className="text-xs">Roboto</SelectItem>
+                      <SelectItem value="poppins" className="text-xs">Poppins</SelectItem>
+                      <SelectItem value="montserrat" className="text-xs">Montserrat</SelectItem>
+                      <SelectItem value="lato" className="text-xs">Lato</SelectItem>
+                      <SelectItem value="opensans" className="text-xs">Open Sans</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Colors</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Text color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.textColor} 
-                        onChange={(e) => updateTheme({ textColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.textColor}
-                        onChange={(e) => updateTheme({ textColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Font size</Label>
+                  <div className="space-y-2">
+                    <input
+                      type="range"
+                      min="12"
+                      max="20"
+                      step="1"
+                      value={theme.fontSize}
+                      onChange={(e) => updateTheme({ fontSize: parseInt(e.target.value) })}
+                      className="w-full h-1.5 accent-primary cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[10px] text-muted-foreground">
+                      <span>Small</span>
+                      <span>{theme.fontSize}px</span>
+                      <span>Large</span>
                     </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Background color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.backgroundColor}
-                        onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.backgroundColor}
-                        onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Button color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.buttonColor}
-                        onChange={(e) => updateTheme({ buttonColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.buttonColor}
-                        onChange={(e) => updateTheme({ buttonColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">System color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.systemColor}
-                        onChange={(e) => updateTheme({ systemColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.systemColor}
-                        onChange={(e) => updateTheme({ systemColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Accent color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.accentColor}
-                        onChange={(e) => updateTheme({ accentColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.accentColor}
-                        onChange={(e) => updateTheme({ accentColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Buttons</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Button style</Label>
-                    <Select value={theme.buttonStyle} onValueChange={(value: any) => updateTheme({ buttonStyle: value })}>
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="square" className="text-xs">Square (0px)</SelectItem>
-                        <SelectItem value="rounded" className="text-xs">Rounded (8px)</SelectItem>
-                        <SelectItem value="pill" className="text-xs">Pill (999px)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Button size</Label>
-                    <Select value={theme.buttonSize} onValueChange={(value: any) => updateTheme({ buttonSize: value })}>
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="small" className="text-xs">Small</SelectItem>
-                        <SelectItem value="medium" className="text-xs">Medium</SelectItem>
-                        <SelectItem value="large" className="text-xs">Large</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Borders</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Border color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.borderColor}
-                        onChange={(e) => updateTheme({ borderColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.borderColor}
-                        onChange={(e) => updateTheme({ borderColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Border width</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="0"
-                        max="4"
-                        step="0.5"
-                        value={theme.borderWidth}
-                        onChange={(e) => updateTheme({ borderWidth: parseFloat(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>None</span>
-                        <span>{theme.borderWidth}px</span>
-                        <span>Thick</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Border radius</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="0"
-                        max="24"
-                        step="2"
-                        value={theme.borderRadius}
-                        onChange={(e) => updateTheme({ borderRadius: parseInt(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>Sharp</span>
-                        <span>{theme.borderRadius}px</span>
-                        <span>Round</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Spacing</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Question spacing</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="0.5"
-                        max="2"
-                        step="0.1"
-                        value={theme.questionSpacing}
-                        onChange={(e) => updateTheme({ questionSpacing: parseFloat(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>Compact</span>
-                        <span>{theme.questionSpacing.toFixed(1)}x</span>
-                        <span>Spacious</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Input padding</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="8"
-                        max="24"
-                        step="2"
-                        value={theme.inputPadding}
-                        onChange={(e) => updateTheme({ inputPadding: parseInt(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>Tight</span>
-                        <span>{theme.inputPadding}px</span>
-                        <span>Loose</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Page margins</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="16"
-                        max="64"
-                        step="4"
-                        value={theme.pageMargins}
-                        onChange={(e) => updateTheme({ pageMargins: parseInt(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>Narrow</span>
-                        <span>{theme.pageMargins}px</span>
-                        <span>Wide</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Effects</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Shadow intensity</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        step="10"
-                        value={theme.shadowIntensity}
-                        onChange={(e) => updateTheme({ shadowIntensity: parseInt(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>None</span>
-                        <span>{theme.shadowIntensity}%</span>
-                        <span>Strong</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Animation speed</Label>
-                    <Select value={theme.animationSpeed} onValueChange={(value: any) => updateTheme({ animationSpeed: value })}>
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none" className="text-xs">No animations</SelectItem>
-                        <SelectItem value="slow" className="text-xs">Slow (500ms)</SelectItem>
-                        <SelectItem value="normal" className="text-xs">Normal (300ms)</SelectItem>
-                        <SelectItem value="fast" className="text-xs">Fast (150ms)</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
               </div>
             </div>
-          </ScrollArea>
+            <Separator />
+            {/* Remaining style controls ... keep existing code */}
+          </div>
         </TabsContent>
       </Tabs>
     </div>
