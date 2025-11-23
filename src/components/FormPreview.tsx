@@ -41,6 +41,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   const [showVariableMenu, setShowVariableMenu] = useState(false);
   const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
   const [menuView, setMenuView] = useState<'main' | 'variables'>('main');
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   const availableVariables = [
     { key: 'first_name', label: 'First name', description: "User's first name" },
@@ -114,6 +115,47 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
     setEditingChoiceIndex(null);
   };
 
+  // Helper function to get layout class based on type and selected layout
+  const getLayoutClasses = () => {
+    const layout = question?.desktopLayout || 'desktop-centered';
+    
+    // Different layouts for welcome screens
+    if (question?.type === 'welcome') {
+      switch (layout) {
+        case 'desktop-split': return 'grid grid-cols-[1fr_1fr] gap-16 items-center px-12';
+        case 'desktop-fullscreen': return 'flex flex-col items-center justify-center px-24 text-center';
+        case 'desktop-centered': return 'flex flex-col items-center justify-center px-24 text-center max-w-3xl mx-auto';
+        case 'desktop-left-right': return 'grid grid-cols-[1.2fr_0.8fr] gap-16 items-center px-12';
+        default: return 'grid grid-cols-[1fr_1fr] gap-16 items-center px-12';
+      }
+    }
+    
+    // Different layouts for other question types
+    switch (layout) {
+      case 'desktop-centered': return 'flex items-center justify-center px-24';
+      case 'desktop-narrow': return 'flex items-center justify-center px-32';
+      case 'desktop-wide': return 'flex items-center justify-center px-16';
+      case 'desktop-minimal': return 'flex items-center justify-center px-40';
+      case 'desktop-left-right': return 'grid grid-cols-[1fr_1fr] gap-16 items-center px-12';
+      case 'desktop-columns': return 'grid grid-cols-[1fr_1fr] gap-12 items-start px-12';
+      case 'desktop-grid': return 'grid grid-cols-3 gap-8 px-12';
+      case 'desktop-horizontal': return 'flex flex-col items-center justify-center px-24 space-y-4';
+      default: return 'flex items-center justify-center px-24';
+    }
+  };
+
+  const getMaxWidthForLayout = () => {
+    if (!question) return '700px';
+    const layout = question.desktopLayout || 'desktop-centered';
+    
+    switch (layout) {
+      case 'desktop-narrow': return '500px';
+      case 'desktop-wide': return '900px';
+      case 'desktop-minimal': return '450px';
+      default: return '700px';
+    }
+  };
+
   return (
     <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
       <div className="relative overflow-hidden" style={{ backgroundColor: '#3D3731', width: '1100px', height: '620px' }}>
@@ -138,7 +180,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
           >
             {question.type === "welcome" ? (
               <div className="flex items-center justify-center w-full h-full px-16">
-                <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12 relative">
+                <div className={`w-full h-full ${getLayoutClasses()} relative`}>
                   <div>
                     <div className="relative">
                       {editingField === 'welcome-title' && (
@@ -397,8 +439,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                 </div>
               </div>
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
-              <div className="w-full h-full flex items-center justify-center px-24">
-                <div className="w-full max-w-[700px]">
+              <div className={`w-full h-full ${getLayoutClasses()}`}>
+                <div className="w-full" style={{ maxWidth: getMaxWidthForLayout() }}>
                   <div className="mb-10">
                     {question.number && (
                       <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
