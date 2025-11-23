@@ -139,52 +139,49 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                 <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12 relative">
                   <div>
                     <div className="relative">
-                      {editingField === 'welcome-title' && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => setShowVariableMenu((open) => !open)}
-                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
-                            style={{ 
-                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                              color: '#F5B800',
-                              backdropFilter: 'blur(8px)'
-                            }}
-                          >
-                            <Sparkles className="w-3.5 h-3.5" />
-                          </button>
+                      <button
+                        type="button"
+                        onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); }}
+                        className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                        style={{ 
+                          backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                          color: '#F5B800',
+                          backdropFilter: 'blur(8px)'
+                        }}
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                      </button>
 
-                          {showVariableMenu && (
-                            <div
-                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl"
-                              style={{
-                                top: '32px',
-                                right: 0,
-                                backgroundColor: '#4A4138',
-                                border: '1px solid rgba(245, 184, 0, 0.3)',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                              }}
-                            >
-                              <div className="space-y-1">
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      {variable.label}
-                                    </div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      {variable.description} • {`{{${variable.key}}}`}
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </>
+                      {showVariableMenu && variableTarget === 'title' && (
+                        <div
+                          className="absolute z-50 w-72 p-2 rounded-md shadow-xl"
+                          style={{
+                            top: '32px',
+                            right: 0,
+                            backgroundColor: '#4A4138',
+                            border: '1px solid rgba(245, 184, 0, 0.3)',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                          }}
+                        >
+                          <div className="space-y-1">
+                            {availableVariables.map((variable) => (
+                              <button
+                                key={variable.key}
+                                onClick={() => insertVariable(variable.key)}
+                                className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                              >
+                                <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                  {variable.label}
+                                </div>
+                                <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                  {variable.description} • {`{{${variable.key}}}`}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
+
                       <h1 
                         className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
@@ -199,7 +196,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         }}
                         contentEditable
                         suppressContentEditableWarning
-                        onFocus={() => { setEditingField('welcome-title'); setVariableTarget('title'); }}
+                        onFocus={() => setEditingField('welcome-title')}
                         onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                       >
                         {question.title}
@@ -207,52 +204,49 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     </div>
                     
                     <div className="relative">
-                      {editingField === 'welcome-subtitle' && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => setShowVariableMenu((open) => !open)}
-                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
-                            style={{ 
-                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                              color: '#F5B800',
-                              backdropFilter: 'blur(8px)'
-                            }}
-                          >
-                            <Sparkles className="w-3.5 h-3.5" />
-                          </button>
+                      <button
+                        type="button"
+                        onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); }}
+                        className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                        style={{ 
+                          backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                          color: '#F5B800',
+                          backdropFilter: 'blur(8px)'
+                        }}
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                      </button>
 
-                          {showVariableMenu && (
-                            <div
-                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl"
-                              style={{
-                                top: '32px',
-                                right: 0,
-                                backgroundColor: '#4A4138',
-                                border: '1px solid rgba(245, 184, 0, 0.3)',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                              }}
-                            >
-                              <div className="space-y-1">
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      {variable.label}
-                                    </div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      {variable.description} • {`{{${variable.key}}}`}
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </>
+                      {showVariableMenu && variableTarget === 'subtitle' && (
+                        <div
+                          className="absolute z-50 w-72 p-2 rounded-md shadow-xl"
+                          style={{
+                            top: '32px',
+                            right: 0,
+                            backgroundColor: '#4A4138',
+                            border: '1px solid rgba(245, 184, 0, 0.3)',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                          }}
+                        >
+                          <div className="space-y-1">
+                            {availableVariables.map((variable) => (
+                              <button
+                                key={variable.key}
+                                onClick={() => insertVariable(variable.key)}
+                                className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                              >
+                                <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                  {variable.label}
+                                </div>
+                                <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                  {variable.description} • {`{{${variable.key}}}`}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
+
                       <p 
                         className="text-[16px] mb-8 leading-[1.6] cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
@@ -264,7 +258,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         }}
                         contentEditable
                         suppressContentEditableWarning
-                        onFocus={() => { setEditingField('welcome-subtitle'); setVariableTarget('subtitle'); }}
+                        onFocus={() => setEditingField('welcome-subtitle')}
                         onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
                       >
                         {question.subtitle}
@@ -317,52 +311,49 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       </div>
                     )}
                     <div className="relative">
-                      {editingField === 'text-title' && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => setShowVariableMenu((open) => !open)}
-                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
-                            style={{ 
-                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                              color: '#F5B800',
-                              backdropFilter: 'blur(8px)'
-                            }}
-                          >
-                            <Sparkles className="w-3.5 h-3.5" />
-                          </button>
+                      <button
+                        type="button"
+                        onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); }}
+                        className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                        style={{ 
+                          backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                          color: '#F5B800',
+                          backdropFilter: 'blur(8px)'
+                        }}
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                      </button>
 
-                          {showVariableMenu && (
-                            <div
-                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl"
-                              style={{
-                                top: '32px',
-                                right: 0,
-                                backgroundColor: '#4A4138',
-                                border: '1px solid rgba(245, 184, 0, 0.3)',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                              }}
-                            >
-                              <div className="space-y-1">
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      {variable.label}
-                                    </div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      {variable.description} • {`{{${variable.key}}}`}
-                                    </div>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </>
+                      {showVariableMenu && variableTarget === 'title' && (
+                        <div
+                          className="absolute z-50 w-72 p-2 rounded-md shadow-xl"
+                          style={{
+                            top: '32px',
+                            right: 0,
+                            backgroundColor: '#4A4138',
+                            border: '1px solid rgba(245, 184, 0, 0.3)',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                          }}
+                        >
+                          <div className="space-y-1">
+                            {availableVariables.map((variable) => (
+                              <button
+                                key={variable.key}
+                                onClick={() => insertVariable(variable.key)}
+                                className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                              >
+                                <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                  {variable.label}
+                                </div>
+                                <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                  {variable.description} • {`{{${variable.key}}}`}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )}
+
                       <h2 
                         className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
@@ -376,7 +367,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         }}
                         contentEditable
                         suppressContentEditableWarning
-                        onFocus={() => { setEditingField('text-title'); setVariableTarget('title'); }}
+                        onFocus={() => setEditingField('text-title')}
                         onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                       >
                         {question.title}
