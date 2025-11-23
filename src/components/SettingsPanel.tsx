@@ -22,6 +22,7 @@ import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
 interface SettingsPanelProps {
   question?: Question;
   onUpdateQuestion?: (id: string, updates: Partial<Question>) => void;
+  onViewModeChange?: (mode: 'desktop' | 'mobile') => void;
 }
 
 const LayoutIcon = ({ type }: { type: string }) => {
@@ -42,7 +43,7 @@ const LayoutIcon = ({ type }: { type: string }) => {
   return <img src={icon} alt={type} className="w-full h-full" />;
 };
 
-const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
+const LayoutSelector = ({ question, onUpdateQuestion, onViewModeChange }: SettingsPanelProps) => {
   if (!question) return null;
 
   // Only show layout selector for question types with visual content
@@ -75,7 +76,10 @@ const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
           <Label className="text-xs font-normal text-muted-foreground w-16 flex-shrink-0">Mobile</Label>
           <Select 
             value={currentMobileLayout}
-            onValueChange={(value) => onUpdateQuestion?.(question.id, { mobileLayout: value })}
+            onValueChange={(value) => {
+              onUpdateQuestion?.(question.id, { mobileLayout: value });
+              onViewModeChange?.('mobile');
+            }}
           >
             <SelectTrigger className="h-9 text-xs flex-1">
               <div className="flex items-center gap-2 w-full">
@@ -106,7 +110,10 @@ const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
           <Label className="text-xs font-normal text-muted-foreground w-16 flex-shrink-0">Desktop</Label>
           <Select 
             value={currentDesktopLayout}
-            onValueChange={(value) => onUpdateQuestion?.(question.id, { desktopLayout: value })}
+            onValueChange={(value) => {
+              onUpdateQuestion?.(question.id, { desktopLayout: value });
+              onViewModeChange?.('desktop');
+            }}
           >
             <SelectTrigger className="h-9 text-xs flex-1">
               <div className="flex items-center gap-2 w-full">
@@ -139,7 +146,7 @@ const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
   );
 };
 
-export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
+export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: SettingsPanelProps) => {
   if (!question) return null;
 
   const getQuestionTypeLabel = () => {
@@ -164,7 +171,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderWelcomeSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -241,7 +248,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderTextSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -289,7 +296,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderEmailSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -339,7 +346,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderPhoneSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -401,7 +408,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderNumberSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -460,7 +467,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDateSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -523,7 +530,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDropdownSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -579,7 +586,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderYesNoSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -634,7 +641,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderFileUploadSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -695,7 +702,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderStatementSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Description</Label>
@@ -763,7 +770,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderPictureChoiceSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -843,7 +850,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderRatingSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -925,7 +932,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderChoiceSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="space-y-3">
         <div className="flex items-center justify-between">

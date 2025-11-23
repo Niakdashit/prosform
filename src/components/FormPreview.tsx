@@ -7,7 +7,8 @@ import {
   Clock, Star, Smile, Frown, Meh, Heart, ThumbsUp,
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
-  Paperclip, BarChart3, Upload, ChevronDown, Sparkles
+  Paperclip, BarChart3, Upload, ChevronDown, Sparkles,
+  Monitor, Smartphone
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,9 +30,11 @@ interface FormPreviewProps {
   question?: Question;
   onNext: () => void;
   onUpdateQuestion: (id: string, updates: Partial<Question>) => void;
+  viewMode: 'desktop' | 'mobile';
+  onToggleViewMode: () => void;
 }
 
-export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewProps) => {
+export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
@@ -116,7 +119,37 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
 
   return (
     <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
-      <div className="relative overflow-hidden" style={{ backgroundColor: '#3D3731', width: '1100px', height: '620px' }}>
+      {/* Toggle button */}
+      <button
+        onClick={onToggleViewMode}
+        className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
+        style={{
+          backgroundColor: '#4A4138',
+          border: '1px solid rgba(245, 184, 0, 0.3)',
+          color: '#F5CA3C'
+        }}
+      >
+        {viewMode === 'desktop' ? (
+          <>
+            <Monitor className="w-4 h-4" />
+            <span className="text-xs font-medium">Desktop</span>
+          </>
+        ) : (
+          <>
+            <Smartphone className="w-4 h-4" />
+            <span className="text-xs font-medium">Mobile</span>
+          </>
+        )}
+      </button>
+
+      <div 
+        className="relative overflow-hidden transition-all duration-300" 
+        style={{ 
+          backgroundColor: '#3D3731', 
+          width: viewMode === 'desktop' ? '1100px' : '375px', 
+          height: viewMode === 'desktop' ? '620px' : '667px' 
+        }}
+      >
         {/* Logo */}
         <div className="absolute top-8 left-8">
           <div className="grid grid-cols-2 gap-1">
