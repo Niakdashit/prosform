@@ -45,11 +45,11 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
             <div className="flex items-center justify-center w-full h-full px-8">
               <div className="w-full max-w-[1200px] grid grid-cols-[1fr_1fr] gap-16 items-center" style={{ padding: '60px' }}>
                 <div>
-                  <h1 className="font-bold mb-6 leading-[0.9]" style={{ 
+                  <h1 className="font-bold mb-6 leading-[1.05]" style={{ 
                     color: '#F5CA3C', 
                     fontWeight: 700, 
-                    fontSize: '80px',
-                    letterSpacing: '-0.04em' 
+                    fontSize: '72px',
+                    letterSpacing: '-0.03em' 
                   }}>
                     {question.title}
                   </h1>
