@@ -121,7 +121,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         boxShadow: 'none'
                       }}
                     >
-                      <span>Give feedback</span>
+                      <span>{question.buttonText || "Start"}</span>
                       <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
                         press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                       </span>
@@ -189,7 +189,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       <Textarea
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        placeholder="Type your answer here..."
+                        placeholder={question.placeholder || "Type your answer here..."}
                         className="bg-transparent border rounded-lg text-xl px-4 py-4 min-h-[200px] focus:ring-2 focus:ring-[#F5B800] placeholder:text-[#7A6F61] resize-none"
                         style={{ 
                           borderColor: 'rgba(255,255,255,0.25)',
@@ -211,14 +211,16 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                           'text'
                         }
                         placeholder={
-                          question.type === 'email' ? 'name@example.com' :
-                          question.type === 'phone' ? '+1 (555) 000-0000' :
-                          question.type === 'number' ? 'Enter a number...' :
-                          question.type === 'date' ? 'Select a date...' :
-                          question.variant === 'number' ? 'Enter a number...' :
-                          question.variant === 'date' ? 'Select a date...' :
-                          question.variant === 'video' ? 'Upload video/audio or paste link...' :
-                          question.placeholder || 'Type your answer here...'
+                          question.placeholder || (
+                            question.type === 'email' ? 'name@example.com' :
+                            question.type === 'phone' ? '+1 (555) 000-0000' :
+                            question.type === 'number' ? 'Enter a number...' :
+                            question.type === 'date' ? 'Select a date...' :
+                            question.variant === 'number' ? 'Enter a number...' :
+                            question.variant === 'date' ? 'Select a date...' :
+                            question.variant === 'video' ? 'Upload video/audio or paste link...' :
+                            'Type your answer here...'
+                          )
                         }
                         className="bg-transparent border-b rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#7A6F61]"
                         style={{ 
@@ -463,7 +465,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       color: '#3D3731' 
                     }}
                   >
-                    Continue
+                    {question.buttonText || "Continue"}
                   </button>
                 </div>
               </div>
@@ -488,9 +490,24 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   >
                     {question.title}
                   </h2>
-                  <p className="text-xl mb-10" style={{ color: '#C4B5A0' }}>
-                    We appreciate you taking the time to share your thoughts.
-                  </p>
+                  {question.subtitle && (
+                    <p 
+                      className="text-xl mb-10 cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#C4B5A0',
+                        outline: editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('ending-subtitle')}
+                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {question.subtitle}
+                    </p>
+                  )}
                   <Button
                     onClick={() => window.location.reload()}
                     className="font-semibold px-8 py-3 h-[52px] rounded-lg text-base hover:opacity-90 transition-opacity"
@@ -499,7 +516,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       color: '#3D3731' 
                     }}
                   >
-                    Start over
+                    {question.buttonText || "Start over"}
                   </Button>
                 </div>
               </div>

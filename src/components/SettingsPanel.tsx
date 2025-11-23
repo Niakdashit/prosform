@@ -57,11 +57,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
         <Label className="text-xs text-muted-foreground mb-2 block">Button</Label>
         <Input 
           type="text" 
-          value={question.subtitle || "Give feedback"}
-          onChange={(e) => onUpdateQuestion?.(question.id, { subtitle: e.target.value })}
+          value={question.buttonText || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { buttonText: e.target.value })}
+          placeholder="Give feedback"
           className="text-xs h-8"
         />
-        <p className="text-[10px] text-muted-foreground mt-1.5">{(question.subtitle || "Give feedback").length}/24</p>
+        <p className="text-[10px] text-muted-foreground mt-1.5">{(question.buttonText || "").length}/24</p>
       </div>
 
       <Separator className="my-4" />
@@ -530,7 +531,13 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
-        <Input type="text" placeholder="Continue" className="text-xs h-8" />
+        <Input 
+          type="text" 
+          value={question.buttonText || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { buttonText: e.target.value })}
+          placeholder="Continue" 
+          className="text-xs h-8" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -762,7 +769,13 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
-        <Input type="text" placeholder="Create your own form" className="text-xs h-8" />
+        <Input 
+          type="text" 
+          value={question.buttonText || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { buttonText: e.target.value })}
+          placeholder="Create your own form" 
+          className="text-xs h-8" 
+        />
       </div>
 
       <Separator className="my-4" />

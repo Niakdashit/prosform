@@ -26,6 +26,7 @@ export interface Question {
   multipleFiles?: boolean;
   phoneFormat?: string;
   placeholder?: string;
+  buttonText?: string;
 }
 
 const defaultQuestions: Question[] = [
@@ -34,6 +35,7 @@ const defaultQuestions: Question[] = [
     type: "welcome",
     title: "How are we doing?",
     subtitle: "Your feedback helps us build an even better place to work.",
+    buttonText: "Give feedback",
     icon: "greeting"
   },
   {
@@ -41,58 +43,113 @@ const defaultQuestions: Question[] = [
     type: "text",
     title: "First, what's your full name?",
     icon: "user",
-    number: 1
+    number: 1,
+    variant: "short",
+    placeholder: "Type your answer here..."
   },
   {
     id: "q2",
-    type: "choice",
-    title: "Thanks, ___. Which department do you...",
-    icon: "building",
+    type: "email",
+    title: "What's your email address?",
+    icon: "mail",
     number: 2,
-    choices: ["Marketing", "Sales", "Engineering", "Other"]
+    placeholder: "name@example.com"
   },
   {
     id: "q3",
-    type: "rating",
-    title: "How do you rate the company...",
-    icon: "star",
-    number: 3
+    type: "phone",
+    title: "What's your phone number?",
+    icon: "phone",
+    number: 3,
+    placeholder: "+1 (555) 000-0000"
   },
   {
     id: "q4",
-    type: "choice",
-    title: "Do you feel valued?",
-    icon: "check",
+    type: "number",
+    title: "How many years have you been here?",
+    icon: "hash",
     number: 4,
-    choices: ["Yes", "No", "Sometimes"]
+    placeholder: "Enter a number",
+    minValue: 0,
+    maxValue: 50
   },
   {
     id: "q5",
-    type: "choice",
-    title: "Do you feel supported by the...",
-    icon: "chart",
+    type: "date",
+    title: "When did you start?",
+    icon: "calendar",
     number: 5,
-    choices: ["Yes", "No", "Sometimes"]
+    dateFormat: "ddmmyyyy"
   },
   {
     id: "q6",
-    type: "choice",
-    title: "Does leadership clearly...",
-    icon: "target",
+    type: "rating",
+    title: "How do you rate the company culture?",
+    icon: "star",
     number: 6,
-    choices: ["Yes", "No", "Sometimes"]
+    variant: "stars"
   },
   {
     id: "q7",
+    type: "choice",
+    title: "Which department do you work in?",
+    icon: "building",
+    number: 7,
+    choices: ["Marketing", "Sales", "Engineering", "Other"]
+  },
+  {
+    id: "q8",
+    type: "dropdown",
+    title: "Select your location",
+    icon: "map",
+    number: 8,
+    choices: ["New York", "London", "Paris", "Tokyo"]
+  },
+  {
+    id: "q9",
+    type: "yesno",
+    title: "Do you feel valued?",
+    icon: "check",
+    number: 9
+  },
+  {
+    id: "q10",
+    type: "picture-choice",
+    title: "Choose your preferred workspace",
+    icon: "image",
+    number: 10,
+    choices: ["Open space", "Private office", "Hybrid"]
+  },
+  {
+    id: "q11",
+    type: "file",
+    title: "Upload any supporting documents",
+    icon: "upload",
+    number: 11,
+    maxFileSize: 10,
+    fileTypes: ["PDF", "DOC", "JPG"]
+  },
+  {
+    id: "q12",
+    type: "statement",
+    title: "Thank you for your time!",
+    subtitle: "Your responses will help us improve",
+    icon: "info",
+    number: 12
+  },
+  {
+    id: "q13",
     type: "text",
-    title: "Great! Is there anything we coul...",
+    title: "Any additional comments?",
     icon: "message",
-    number: 7
+    number: 13,
+    variant: "long",
+    maxLength: 500
   },
   {
     id: "ending",
     type: "ending",
-    title: "Thanks for your feedback, ___!",
+    title: "Thanks for your feedback!",
     icon: "check"
   }
 ];
