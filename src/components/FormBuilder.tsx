@@ -321,6 +321,8 @@ export const FormBuilder = () => {
             onPreview={() => {
               setIsFullPreview(true);
               setPreviewQuestionIndex(0);
+              // Set viewMode based on device: desktop shows desktop, mobile shows mobile
+              setViewMode(isMobile ? 'mobile' : 'desktop');
             }}
           />
         )}
