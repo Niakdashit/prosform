@@ -8,7 +8,7 @@ import {
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
   Paperclip, BarChart3, Upload, ChevronDown, Sparkles,
-  Monitor, Smartphone
+  Monitor, Smartphone, Copy, Sliders, Trash2
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -244,18 +244,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             alt="Uploaded"
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                            <button
+                              onClick={() => {/* Duplicate logic */}}
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                            >
+                              <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                            </button>
                             <button
                               onClick={() => fileInputRef.current?.click()}
-                              className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                             >
-                              Change
+                              <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                             <button
                               onClick={handleRemoveImage}
-                              className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                             >
-                              Remove
+                              <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                           </div>
                         </>
@@ -796,18 +805,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           )}
                           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
                           {uploadedImage && (
-                            <div className="absolute top-4 right-4 z-20 opacity-0 hover:opacity-100 transition-opacity">
+                            <div className="absolute top-4 right-4 z-20 opacity-0 hover:opacity-100 transition-opacity flex items-center gap-2">
+                              <button
+                                onClick={() => {/* Duplicate logic */}}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              >
+                                <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
                               <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="px-3 py-1.5 bg-white/90 text-black rounded-lg text-xs font-medium hover:bg-white transition-colors mr-2"
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                               >
-                                Change
+                                <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                               </button>
                               <button
                                 onClick={handleRemoveImage}
-                                className="px-3 py-1.5 bg-red-500/90 text-white rounded-lg text-xs font-medium hover:bg-red-500 transition-colors"
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                               >
-                                Remove
+                                <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                               </button>
                             </div>
                           )}
@@ -835,18 +853,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                   alt="Feedback illustration"
                                   className="w-full h-full object-cover"
                                 />
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                                  <button
+                                    onClick={() => {/* Duplicate logic */}}
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  >
+                                    <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                  </button>
                                   <button
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                   >
-                                    Change
+                                    <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                   </button>
                                   <button
                                     onClick={handleRemoveImage}
-                                    className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                   >
-                                    Remove
+                                    <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                   </button>
                                 </div>
                               </>
@@ -879,18 +906,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                   alt="Feedback illustration"
                                   className="w-full h-full object-cover"
                                 />
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                                  <button
+                                    onClick={() => {/* Duplicate logic */}}
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  >
+                                    <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                  </button>
                                   <button
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                   >
-                                    Change
+                                    <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                   </button>
                                   <button
                                     onClick={handleRemoveImage}
-                                    className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                   >
-                                    Remove
+                                    <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                   </button>
                                 </div>
                               </>
@@ -947,18 +983,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                 alt="Banner"
                                 className="w-full h-full object-cover"
                               />
-                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                                <button
+                                  onClick={() => {/* Duplicate logic */}}
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                >
+                                  <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                </button>
                                 <button
                                   onClick={() => fileInputRef.current?.click()}
-                                  className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                 >
-                                  Change
+                                  <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                 </button>
                                 <button
                                   onClick={handleRemoveImage}
-                                  className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                 >
-                                  Remove
+                                  <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                 </button>
                               </div>
                             </>
@@ -1009,18 +1054,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         )}
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
                         {uploadedImage && (
-                          <div className="absolute top-4 right-4 z-20">
+                          <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+                            <button
+                              onClick={() => {/* Duplicate logic */}}
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                            >
+                              <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                            </button>
                             <button
                               onClick={() => fileInputRef.current?.click()}
-                              className="px-3 py-1.5 bg-white/90 text-black rounded-lg text-xs font-medium hover:bg-white transition-colors mr-2"
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                             >
-                              Change
+                              <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                             <button
                               onClick={handleRemoveImage}
-                              className="px-3 py-1.5 bg-red-500/90 text-white rounded-lg text-xs font-medium hover:bg-red-500 transition-colors"
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                             >
-                              Remove
+                              <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                           </div>
                         )}
