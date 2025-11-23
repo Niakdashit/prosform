@@ -414,11 +414,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Desktop layouts
                   if (viewMode === 'desktop') {
                     if (desktopLayout === 'desktop-left-right') {
-                      // Split: Ordre vertical - 1. Image, 2. Titre, 3. Reste
+                      // Split: Ordre vertical - 1. Image, 2. Titre, 3. Reste - Aligné à gauche
                       return (
-                        <div className="w-full h-full flex flex-col items-center justify-center gap-8 px-12">
+                        <div className="w-full h-full flex flex-col items-start justify-center gap-8 px-12">
                           <ImageBlock />
-                          <div className="text-center max-w-[600px]">
+                          <div className="max-w-[600px]">
                             <div className="relative">
                               {editingField === 'welcome-title' && (
                                 <>
@@ -611,7 +611,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             
                             <button 
                               onClick={onNext}
-                              className="group px-8 py-4 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-3 mx-auto"
+                              className="group px-8 py-4 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
                               style={{ 
                                 backgroundColor: '#F5CA3C',
                                 color: '#3D3731'
@@ -622,7 +622,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                 press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                               </span>
                             </button>
-                            <div className="flex items-center justify-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                            <div className="flex items-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
                               <Clock className="w-4 h-4" />
                               <span>Takes X minutes</span>
                             </div>
