@@ -8,10 +8,12 @@ import {
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
   Paperclip, BarChart3, Upload, ChevronDown, Sparkles,
-  Monitor, Smartphone, Copy, Sliders, Trash2
+  Monitor, Smartphone, ImagePlus, Edit3
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ImageUploadModal } from "./ImageUploadModal";
+import { ImageEditorModal } from "./ImageEditorModal";
 
 const PHONE_COUNTRIES = [
   { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
@@ -46,6 +48,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
   const [menuView, setMenuView] = useState<'main' | 'variables'>('main');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [imageRotation, setImageRotation] = useState(0);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showEditorModal, setShowEditorModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,16 +59,19 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
       const reader = new FileReader();
       reader.onloadend = () => {
         setUploadedImage(reader.result as string);
+        setImageRotation(0);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveImage = () => {
-    setUploadedImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+  const handleImageSelect = (imageData: string) => {
+    setUploadedImage(imageData);
+    setImageRotation(0);
+  };
+
+  const handleImageEdit = (rotation: number) => {
+    setImageRotation(rotation);
   };
 
   const availableVariables = [
@@ -243,28 +251,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             src={uploadedImage}
                             alt="Uploaded"
                             className="w-full h-full object-cover"
+                            style={{
+                              transform: `rotate(${imageRotation}deg)`,
+                              transition: 'transform 0.3s ease'
+                            }}
                           />
                           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                             <button
-                              onClick={() => {/* Duplicate logic */}}
+                              onClick={() => setShowUploadModal(true)}
                               className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                               style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Change image"
                             >
-                              <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                             <button
-                              onClick={() => fileInputRef.current?.click()}
+                              onClick={() => setShowEditorModal(true)}
                               className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                               style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Edit image"
                             >
-                              <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                            <button
-                              onClick={handleRemoveImage}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                            >
-                              <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                           </div>
                         </>
@@ -781,6 +788,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               src={uploadedImage}
                               alt="Background"
                               className="absolute inset-0 w-full h-full object-cover"
+                              style={{
+                                transform: `rotate(${imageRotation}deg)`,
+                                transition: 'transform 0.3s ease'
+                              }}
                             />
                           ) : (
                             <div
@@ -800,25 +811,20 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           {uploadedImage && (
                             <div className="absolute top-4 right-4 z-20 opacity-0 hover:opacity-100 transition-opacity flex items-center gap-2">
                               <button
-                                onClick={() => {/* Duplicate logic */}}
+                                onClick={() => setShowUploadModal(true)}
                                 className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                 style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Change image"
                               >
-                                <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                               </button>
                               <button
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={() => setShowEditorModal(true)}
                                 className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                 style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Edit image"
                               >
-                                <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                              <button
-                                onClick={handleRemoveImage}
-                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              >
-                                <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                               </button>
                             </div>
                           )}
@@ -845,28 +851,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                   src={uploadedImage}
                                   alt="Feedback illustration"
                                   className="w-full h-full object-cover"
+                                  style={{
+                                    transform: `rotate(${imageRotation}deg)`,
+                                    transition: 'transform 0.3s ease'
+                                  }}
                                 />
                                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                                   <button
-                                    onClick={() => {/* Duplicate logic */}}
+                                    onClick={() => setShowUploadModal(true)}
                                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                     style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                    title="Change image"
                                   >
-                                    <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                    <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                   </button>
                                   <button
-                                    onClick={() => fileInputRef.current?.click()}
+                                    onClick={() => setShowEditorModal(true)}
                                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                     style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                    title="Edit image"
                                   >
-                                    <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                  </button>
-                                  <button
-                                    onClick={handleRemoveImage}
-                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                  >
-                                    <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                    <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                   </button>
                                 </div>
                               </>
@@ -891,38 +896,37 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       // Panel: Split 50/50 - Image à gauche collée au bord, Texte à droite avec padding
                       return (
                         <div className="relative w-full h-full flex">
-                          <div className="absolute left-0 top-0 w-1/2 h-full group">
-                            {uploadedImage ? (
-                              <>
-                                <img
-                                  src={uploadedImage}
-                                  alt="Feedback illustration"
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                                  <button
-                                    onClick={() => {/* Duplicate logic */}}
-                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                  >
-                                    <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                  </button>
-                                  <button
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                  >
-                                    <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                  </button>
-                                  <button
-                                    onClick={handleRemoveImage}
-                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                  >
-                                    <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                  </button>
-                                </div>
-                              </>
+                            <div className="absolute left-0 top-0 w-1/2 h-full group">
+                              {uploadedImage ? (
+                                <>
+                                  <img
+                                    src={uploadedImage}
+                                    alt="Feedback illustration"
+                                    className="w-full h-full object-cover"
+                                    style={{
+                                      transform: `rotate(${imageRotation}deg)`,
+                                      transition: 'transform 0.3s ease'
+                                    }}
+                                  />
+                                  <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                                    <button
+                                      onClick={() => setShowUploadModal(true)}
+                                      className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                      style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                      title="Change image"
+                                    >
+                                      <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                    </button>
+                                    <button
+                                      onClick={() => setShowEditorModal(true)}
+                                      className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                      style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                      title="Edit image"
+                                    >
+                                      <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                    </button>
+                                  </div>
+                                </>
                             ) : (
                               <div
                                 onClick={() => fileInputRef.current?.click()}
@@ -975,28 +979,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                 src={uploadedImage}
                                 alt="Banner"
                                 className="w-full h-full object-cover"
+                                style={{
+                                  transform: `rotate(${imageRotation}deg)`,
+                                  transition: 'transform 0.3s ease'
+                                }}
                               />
                               <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                                 <button
-                                  onClick={() => {/* Duplicate logic */}}
+                                  onClick={() => setShowUploadModal(true)}
                                   className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                   style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  title="Change image"
                                 >
-                                  <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                  <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                 </button>
                                 <button
-                                  onClick={() => fileInputRef.current?.click()}
+                                  onClick={() => setShowEditorModal(true)}
                                   className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                   style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  title="Edit image"
                                 >
-                                  <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                </button>
-                                <button
-                                  onClick={handleRemoveImage}
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                >
-                                  <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                  <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                 </button>
                               </div>
                             </>
@@ -1030,6 +1033,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             src={uploadedImage}
                             alt="Background"
                             className="absolute inset-0 w-full h-full object-cover"
+                            style={{
+                              transform: `rotate(${imageRotation}deg)`,
+                              transition: 'transform 0.3s ease'
+                            }}
                           />
                         ) : (
                           <div
@@ -1047,27 +1054,22 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         )}
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
                         {uploadedImage && (
-                          <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+                          <div className="absolute top-4 right-4 z-20 opacity-0 hover:opacity-100 transition-opacity flex items-center gap-2">
                             <button
-                              onClick={() => {/* Duplicate logic */}}
+                              onClick={() => setShowUploadModal(true)}
                               className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                               style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Change image"
                             >
-                              <Copy className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                             <button
-                              onClick={() => fileInputRef.current?.click()}
+                              onClick={() => setShowEditorModal(true)}
                               className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                               style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Edit image"
                             >
-                              <Sliders className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                            <button
-                              onClick={handleRemoveImage}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                            >
-                              <Trash2 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                           </div>
                         )}
@@ -1900,6 +1902,19 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
         accept="image/*"
         onChange={handleImageUpload}
         className="hidden"
+      />
+
+      {/* Image modals */}
+      <ImageUploadModal
+        open={showUploadModal}
+        onOpenChange={setShowUploadModal}
+        onImageSelect={handleImageSelect}
+      />
+      <ImageEditorModal
+        open={showEditorModal}
+        onOpenChange={setShowEditorModal}
+        imageUrl={uploadedImage || ''}
+        onSave={handleImageEdit}
       />
     </div>
   );
