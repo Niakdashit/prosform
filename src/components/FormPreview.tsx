@@ -42,39 +42,38 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           className="w-full max-w-4xl mx-auto px-8"
         >
           {question.type === "welcome" ? (
-            <div className="grid grid-cols-2 gap-20 items-center max-w-6xl px-12">
-              <div>
-                <h1 className="text-[4rem] font-bold mb-6 leading-[1.1]" style={{ 
+            <div className="grid grid-cols-[1fr,1.1fr] gap-16 items-center w-full max-w-[1400px] px-16">
+              <div className="pr-8">
+                <h1 className="text-[72px] font-bold mb-4 leading-[0.95]" style={{ 
                   color: '#F5B800', 
                   fontWeight: 700, 
-                  letterSpacing: '-0.02em' 
+                  letterSpacing: '-0.03em' 
                 }}>
                   {question.title}
                 </h1>
-                <p className="text-[15px] mb-10 leading-relaxed" style={{ color: '#A89A8A' }}>
+                <p className="text-base mb-12 leading-[1.6]" style={{ color: '#C4B5A0' }}>
                   {question.subtitle}
                 </p>
                 <Button
                   onClick={onNext}
-                  size="lg"
-                  className="h-auto text-base font-semibold px-7 py-3.5 rounded-lg"
+                  className="h-[52px] text-base font-semibold px-8 rounded-lg hover:opacity-90 transition-opacity"
                   style={{ 
                     backgroundColor: '#F5B800', 
                     color: '#3D3731' 
                   }}
                 >
                   Give feedback
-                  <span className="ml-4 text-sm opacity-80 font-normal">press <strong>Enter ↵</strong></span>
+                  <span className="ml-4 font-normal" style={{ color: '#3D3731' }}>press <strong className="font-semibold">Enter ↵</strong></span>
                 </Button>
-                <div className="flex items-center gap-2 mt-4 text-xs" style={{ color: '#A89A8A' }}>
-                  <Clock className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2 mt-4 text-sm" style={{ color: '#C4B5A0' }}>
+                  <Clock className="w-4 h-4" />
                   <span>Takes X minutes</span>
                 </div>
               </div>
-              <div className="relative">
-                <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-[0_25px_80px_-20px_rgba(0,0,0,0.6)]">
+              <div className="relative pl-8">
+                <div className="aspect-[1.33/1] rounded-[32px] overflow-hidden shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)]">
                   <img
-                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=800&h=600&fit=crop"
+                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=900&h=675&fit=crop"
                     alt="Feedback illustration"
                     className="w-full h-full object-cover"
                   />
@@ -82,14 +81,14 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
               </div>
             </div>
           ) : question.type === "text" ? (
-            <div className="max-w-2xl px-12">
-              <div className="mb-8">
+            <div className="w-full max-w-[900px] px-16">
+              <div className="mb-10">
                 {question.number && (
-                  <div className="mb-4 font-medium text-base" style={{ color: '#F5B800' }}>
+                  <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
                     {question.number} →
                   </div>
                 )}
-                <h2 className="text-5xl font-bold mb-4" style={{ color: '#F5F5F5', fontWeight: 700 }}>
+                <h2 className="text-[56px] font-bold leading-[1.1]" style={{ color: '#FFFFFF', fontWeight: 700, letterSpacing: '-0.02em' }}>
                   {question.title}
                 </h2>
               </div>
@@ -98,17 +97,17 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Type your answer here..."
-                  className="bg-transparent border-b rounded-none text-xl px-0 py-4 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="bg-transparent border-b rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#7A6F61]"
                   style={{ 
-                    borderColor: 'rgba(255,255,255,0.2)',
-                    color: '#F5F5F5'
+                    borderColor: 'rgba(255,255,255,0.25)',
+                    color: '#FFFFFF'
                   }}
                   autoFocus
                 />
-                <div className="mt-6 flex items-center gap-3">
+                <div className="mt-8 flex items-center gap-4">
                   <Button
                     type="submit"
-                    className="font-medium px-5 py-2.5 h-auto rounded-lg"
+                    className="font-semibold px-6 py-3 h-[48px] rounded-lg text-base hover:opacity-90 transition-opacity"
                     style={{ 
                       backgroundColor: '#F5B800', 
                       color: '#3D3731' 
@@ -116,34 +115,34 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                   >
                     OK <span className="ml-1">✓</span>
                   </Button>
-                  <span className="text-xs" style={{ color: '#A89A8A' }}>
-                    press <kbd className="px-2 py-1 rounded text-xs" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>Enter</kbd>
+                  <span className="text-sm" style={{ color: '#A89A8A' }}>
+                    press <kbd className="px-2.5 py-1.5 rounded text-sm font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#C4B5A0' }}>Enter</kbd>
                   </span>
                 </div>
               </form>
             </div>
           ) : question.type === "rating" ? (
-            <div className="max-w-2xl px-12">
-              <div className="mb-8">
+            <div className="w-full max-w-[900px] px-16">
+              <div className="mb-10">
                 {question.number && (
-                  <div className="mb-4 font-medium text-base" style={{ color: '#F5B800' }}>
+                  <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
                     {question.number} →
                   </div>
                 )}
-                <h2 className="text-5xl font-bold mb-4" style={{ color: '#F5F5F5', fontWeight: 700 }}>
+                <h2 className="text-[56px] font-bold leading-[1.1]" style={{ color: '#FFFFFF', fontWeight: 700, letterSpacing: '-0.02em' }}>
                   {question.title}
                 </h2>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <button
                     key={rating}
                     onClick={onNext}
-                    className="w-16 h-16 rounded-lg transition-all flex items-center justify-center text-2xl font-semibold"
+                    className="w-20 h-20 rounded-xl transition-all flex items-center justify-center text-3xl font-semibold hover:opacity-80"
                     style={{
-                      backgroundColor: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      color: '#F5F5F5'
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      color: '#FFFFFF'
                     }}
                   >
                     {rating}
@@ -152,47 +151,47 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
               </div>
             </div>
           ) : question.type === "choice" ? (
-            <div className="max-w-2xl px-12">
-              <div className="mb-8">
+            <div className="w-full max-w-[900px] px-16">
+              <div className="mb-10">
                 {question.number && (
-                  <div className="mb-4 font-medium text-base" style={{ color: '#F5B800' }}>
+                  <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
                     {question.number} →
                   </div>
                 )}
-                <h2 className="text-5xl font-bold mb-4" style={{ color: '#F5F5F5', fontWeight: 700 }}>
+                <h2 className="text-[56px] font-bold leading-[1.1]" style={{ color: '#FFFFFF', fontWeight: 700, letterSpacing: '-0.02em' }}>
                   {question.title}
                 </h2>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {["Yes", "No", "Sometimes"].map((choice, index) => (
                   <button
                     key={choice}
                     onClick={onNext}
-                    className="w-full p-4 rounded-lg transition-all flex items-center gap-4 text-left group"
+                    className="w-full p-5 rounded-xl transition-all flex items-center gap-5 text-left group hover:opacity-80"
                     style={{
-                      backgroundColor: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.15)'
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.2)'
                     }}
                   >
-                    <span className="font-medium" style={{ color: '#A89A8A' }}>
+                    <span className="font-semibold text-base" style={{ color: '#A89A8A' }}>
                       {String.fromCharCode(65 + index)}
                     </span>
-                    <span className="text-lg font-medium" style={{ color: '#F5F5F5' }}>{choice}</span>
+                    <span className="text-xl font-medium" style={{ color: '#FFFFFF' }}>{choice}</span>
                   </button>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="max-w-2xl text-center px-12">
-              <h2 className="text-6xl font-bold mb-5" style={{ color: '#F5B800', fontWeight: 700 }}>
+            <div className="w-full max-w-[900px] text-center px-16">
+              <h2 className="text-[72px] font-bold mb-6 leading-[1.1]" style={{ color: '#F5B800', fontWeight: 700, letterSpacing: '-0.03em' }}>
                 {question.title}
               </h2>
-              <p className="text-lg mb-8" style={{ color: '#A89A8A' }}>
+              <p className="text-xl mb-10" style={{ color: '#C4B5A0' }}>
                 We appreciate you taking the time to share your thoughts.
               </p>
               <Button
                 onClick={() => window.location.reload()}
-                className="font-semibold px-7 py-3.5 h-auto rounded-lg"
+                className="font-semibold px-8 py-3 h-[52px] rounded-lg text-base hover:opacity-90 transition-opacity"
                 style={{ 
                   backgroundColor: '#F5B800', 
                   color: '#3D3731' 
