@@ -367,6 +367,7 @@ export const FormBuilder = () => {
               viewMode="mobile"
               onToggleViewMode={() => {}} // No toggle on mobile
               isMobileResponsive={true}
+              allQuestions={questions}
               onNext={() => {
                 const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
                 if (currentIndex < questions.length - 1) {
@@ -393,6 +394,7 @@ export const FormBuilder = () => {
               viewMode={viewMode}
               onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
               isMobileResponsive={false}
+              allQuestions={questions}
               onNext={() => {
                 const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
                 if (currentIndex < questions.length - 1) {
