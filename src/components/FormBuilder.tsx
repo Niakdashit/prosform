@@ -2,6 +2,7 @@ import { useState } from "react";
 import { QuestionSidebar } from "./QuestionSidebar";
 import { FormPreview } from "./FormPreview";
 import { SettingsPanel } from "./SettingsPanel";
+import { TopToolbar } from "./TopToolbar";
 
 export interface Question {
   id: string;
@@ -84,24 +85,27 @@ export const FormBuilder = () => {
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
   return (
-    <div className="flex h-screen bg-muted overflow-hidden">
-      <QuestionSidebar
-        questions={questions}
-        activeQuestionId={activeQuestionId}
-        onQuestionSelect={setActiveQuestionId}
-      />
-      
-      <FormPreview
-        question={activeQuestion}
-        onNext={() => {
-          const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
-          if (currentIndex < questions.length - 1) {
-            setActiveQuestionId(questions[currentIndex + 1].id);
-          }
-        }}
-      />
-      
-      <SettingsPanel question={activeQuestion} />
+    <div className="flex flex-col h-screen bg-muted overflow-hidden">
+      <TopToolbar />
+      <div className="flex flex-1 overflow-hidden">
+        <QuestionSidebar
+          questions={questions}
+          activeQuestionId={activeQuestionId}
+          onQuestionSelect={setActiveQuestionId}
+        />
+        
+        <FormPreview
+          question={activeQuestion}
+          onNext={() => {
+            const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+            if (currentIndex < questions.length - 1) {
+              setActiveQuestionId(questions[currentIndex + 1].id);
+            }
+          }}
+        />
+        
+        <SettingsPanel question={activeQuestion} />
+      </div>
     </div>
   );
 };
