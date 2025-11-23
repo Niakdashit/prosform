@@ -171,7 +171,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   };
 
   return (
-    <div className={`flex-1 flex items-center justify-center relative overflow-hidden ${isMobileResponsive ? '' : 'bg-gray-100'}`}>
+    <div className={`flex items-center justify-center relative overflow-hidden ${isMobileResponsive ? 'w-screen h-screen fixed inset-0' : 'flex-1 bg-gray-100'}`}>
       {/* Toggle button - hidden on mobile responsive mode */}
       {!isMobileResponsive && (
         <button
