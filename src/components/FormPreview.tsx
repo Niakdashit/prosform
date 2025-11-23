@@ -688,14 +688,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     } else if (desktopLayout === 'desktop-card') {
                       // Card: Texte à gauche, Image remplit tout l'espace droit
                       return (
-                        <div className="w-full h-full flex items-center gap-0 px-12">
+                        <div className="w-full h-full flex items-center gap-0 pl-12">
                           <div className="flex-1 pr-16">
                             <TextContent />
                           </div>
                           <div
                             className="overflow-hidden h-full flex-1"
                             style={{ 
-                              borderRadius: "36px"
+                              borderRadius: "36px 0 0 36px"
                             }}
                           >
                             <img
@@ -709,11 +709,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     } else if (desktopLayout === 'desktop-panel') {
                       // Panel: Image remplit tout l'espace gauche, Texte à droite
                       return (
-                        <div className="w-full h-full flex items-center gap-0 px-12">
+                        <div className="w-full h-full flex items-center gap-0 pr-12">
                           <div
                             className="overflow-hidden h-full flex-1"
                             style={{ 
-                              borderRadius: "36px"
+                              borderRadius: "0 36px 36px 0"
                             }}
                           >
                             <img
