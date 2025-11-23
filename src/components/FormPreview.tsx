@@ -7,7 +7,7 @@ import {
   Clock, Star, Smile, Frown, Meh, Heart, ThumbsUp,
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
-  Paperclip, BarChart3, Upload, ChevronDown, Sparkles, Monitor, Smartphone
+  Paperclip, BarChart3, Upload, ChevronDown, Sparkles
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -115,127 +115,39 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
     setEditingChoiceIndex(null);
   };
 
-  // Fonction pour obtenir les dimensions du conteneur selon le mode
-  const getContainerDimensions = () => {
-    if (viewMode === 'mobile') {
-      return { width: '375px', height: '667px', borderRadius: '36px' }; // iPhone format
-    }
-    return { width: '1100px', height: '620px', borderRadius: '0' }; // Desktop format
-  };
-
-  // Fonction pour obtenir le layout exact comme dans l'icône
+  // Helper function to get layout class based on type and selected layout
   const getLayoutClasses = () => {
-    const layout = viewMode === 'mobile' ? question?.mobileLayout : question?.desktopLayout;
-    const isMobile = viewMode === 'mobile';
+    const layout = question?.desktopLayout || 'desktop-centered';
     
-    if (!layout) {
-      return isMobile ? 'flex flex-col justify-center p-8' : 'flex items-center justify-center px-24';
-    }
-
-    // WELCOME SCREEN LAYOUTS
+    // Different layouts for welcome screens
     if (question?.type === 'welcome') {
-      if (isMobile) {
-        switch (layout) {
-          case 'mobile-vertical': // Stack vertical
-            return 'flex flex-col justify-center p-8';
-          case 'mobile-horizontal': // Split horizontal  
-            return 'grid grid-cols-2 gap-4 items-center p-6';
-          case 'mobile-centered': // Centered
-            return 'flex flex-col justify-center items-center text-center p-8';
-          case 'mobile-minimal': // Minimal
-            return 'flex flex-col justify-center p-12';
-          case 'mobile-hero': // Hero avec grande image en haut
-            return 'flex flex-col p-6';
-          default:
-            return 'flex flex-col justify-center p-8';
-        }
-      } else {
-        switch (layout) {
-          case 'desktop-left-right': // Image gauche, texte droite
-            return 'grid grid-cols-[1fr_1.2fr] gap-16 items-center p-12';
-          case 'desktop-right-left': // Texte gauche, image droite
-            return 'grid grid-cols-[1.2fr_1fr] gap-16 items-center p-12';
-          case 'desktop-centered': // Centré
-            return 'flex flex-col justify-center items-center text-center p-16 max-w-3xl mx-auto';
-          case 'desktop-split': // Wallpaper (50/50)
-            return 'grid grid-cols-[1fr_1fr] gap-16 items-center p-12';
-          case 'desktop-fullscreen': // Fullscreen
-            return 'flex flex-col justify-center items-center text-center';
-          default:
-            return 'grid grid-cols-[1fr_1fr] gap-16 items-center p-12';
-        }
+      switch (layout) {
+        case 'desktop-split': return 'grid grid-cols-[1fr_1fr] gap-16 items-center px-12';
+        case 'desktop-fullscreen': return 'flex flex-col items-center justify-center px-24 text-center';
+        case 'desktop-centered': return 'flex flex-col items-center justify-center px-24 text-center max-w-3xl mx-auto';
+        case 'desktop-left-right': return 'grid grid-cols-[1.2fr_0.8fr] gap-16 items-center px-12';
+        default: return 'grid grid-cols-[1fr_1fr] gap-16 items-center px-12';
       }
     }
-
-    // TEXT/INPUT LAYOUTS
-    if (['text', 'email', 'phone', 'number', 'date'].includes(question?.type || '')) {
-      if (isMobile) {
-        switch (layout) {
-          case 'mobile-vertical':
-            return 'flex flex-col justify-center p-8';
-          case 'mobile-centered':
-            return 'flex flex-col justify-center items-center p-8';
-          case 'mobile-minimal':
-            return 'flex flex-col justify-center p-12';
-          case 'mobile-fullwidth':
-            return 'flex flex-col justify-center p-6';
-          default:
-            return 'flex flex-col justify-center p-8';
-        }
-      } else {
-        switch (layout) {
-          case 'desktop-centered':
-            return 'flex justify-center items-center px-24';
-          case 'desktop-narrow':
-            return 'flex justify-center items-center px-32';
-          case 'desktop-wide':
-            return 'flex justify-center items-center px-16';
-          case 'desktop-minimal':
-            return 'flex justify-center items-center px-40';
-          case 'desktop-left-right':
-            return 'grid grid-cols-2 gap-16 items-center px-12';
-          default:
-            return 'flex justify-center items-center px-24';
-        }
-      }
+    
+    // Different layouts for other question types
+    switch (layout) {
+      case 'desktop-centered': return 'flex items-center justify-center px-24';
+      case 'desktop-narrow': return 'flex items-center justify-center px-32';
+      case 'desktop-wide': return 'flex items-center justify-center px-16';
+      case 'desktop-minimal': return 'flex items-center justify-center px-40';
+      case 'desktop-left-right': return 'grid grid-cols-[1fr_1fr] gap-16 items-center px-12';
+      case 'desktop-columns': return 'grid grid-cols-[1fr_1fr] gap-12 items-start px-12';
+      case 'desktop-grid': return 'grid grid-cols-3 gap-8 px-12';
+      case 'desktop-horizontal': return 'flex flex-col items-center justify-center px-24 space-y-4';
+      default: return 'flex items-center justify-center px-24';
     }
-
-    // CHOICE LAYOUTS
-    if (['choice', 'picture-choice'].includes(question?.type || '')) {
-      if (isMobile) {
-        switch (layout) {
-          case 'mobile-vertical':
-            return 'flex flex-col p-8';
-          case 'mobile-grid':
-            return 'grid grid-cols-2 gap-3 p-8';
-          case 'mobile-cards':
-            return 'flex flex-col gap-3 p-8';
-          default:
-            return 'flex flex-col p-8';
-        }
-      } else {
-        switch (layout) {
-          case 'desktop-left-right':
-            return 'grid grid-cols-2 gap-16 px-12';
-          case 'desktop-columns':
-            return 'grid grid-cols-2 gap-8 px-12';
-          case 'desktop-grid':
-            return 'grid grid-cols-3 gap-6 px-12';
-          case 'desktop-centered':
-            return 'flex justify-center items-center px-24';
-          default:
-            return 'flex justify-center items-center px-24';
-        }
-      }
-    }
-
-    return isMobile ? 'flex flex-col justify-center p-8' : 'flex justify-center items-center px-24';
   };
 
-  const getMaxWidth = () => {
-    if (viewMode === 'mobile') return '100%';
+  const getMaxWidthForLayout = () => {
+    if (!question) return '700px';
+    const layout = question.desktopLayout || 'desktop-centered';
     
-    const layout = question?.desktopLayout;
     switch (layout) {
       case 'desktop-narrow': return '500px';
       case 'desktop-wide': return '900px';
@@ -244,44 +156,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
     }
   };
 
-  const containerDimensions = getContainerDimensions();
-  const layoutClasses = getLayoutClasses();
-
   return (
     <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
-      {/* Boutons de switch Mobile/Desktop */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 bg-white rounded-lg p-1 shadow-lg">
-        <button
-          onClick={() => setViewMode('desktop')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-            viewMode === 'desktop' ? 'bg-primary text-primary-foreground' : 'hover:bg-gray-100'
-          }`}
-        >
-          <Monitor className="w-4 h-4" />
-          Desktop
-        </button>
-        <button
-          onClick={() => setViewMode('mobile')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
-            viewMode === 'mobile' ? 'bg-primary text-primary-foreground' : 'hover:bg-gray-100'
-          }`}
-        >
-          <Smartphone className="w-4 h-4" />
-          Mobile
-        </button>
-      </div>
-
-      <div 
-        className="relative overflow-hidden transition-all duration-300 shadow-2xl" 
-        style={{ 
-          backgroundColor: '#3D3731', 
-          width: containerDimensions.width, 
-          height: containerDimensions.height,
-          borderRadius: containerDimensions.borderRadius
-        }}
-      >
+      <div className="relative overflow-hidden" style={{ backgroundColor: '#3D3731', width: '1100px', height: '620px' }}>
         {/* Logo */}
-        <div className="absolute top-8 left-8 z-10">
+        <div className="absolute top-8 left-8">
           <div className="grid grid-cols-2 gap-1">
             <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
             <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
@@ -300,239 +179,1055 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
             className="w-full h-full"
           >
             {question.type === "welcome" ? (
-              <div className={`w-full h-full ${layoutClasses}`}>
-                <div className="flex flex-col gap-4">
-                  {question.image && (
-                    <img
-                      src={question.image}
-                      alt="Welcome Image"
-                      className="w-full object-cover rounded-md"
-                      style={{ maxHeight: '200px' }}
-                    />
-                  )}
+              <div className="flex items-center justify-center w-full h-full px-16">
+                <div className={`w-full h-full ${getLayoutClasses()} relative`}>
                   <div>
-                    <h2
-                      className="text-3xl font-bold text-white break-words"
-                      onClick={() => {
-                        setEditingField('title');
-                        setVariableTarget('title');
-                      }}
-                    >
-                      {editingField === 'title' ? (
-                        <Input
-                          className="text-3xl font-bold"
-                          defaultValue={question.title}
-                          onBlur={(e) => handleTitleBlur(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.currentTarget.blur();
-                            }
-                          }}
-                        />
-                      ) : (
-                        replaceVariables(question.title || "Welcome")
-                      )}
-                    </h2>
-                    <p
-                      className="text-gray-300 mt-2 break-words"
-                      onClick={() => {
-                        setEditingField('subtitle');
-                        setVariableTarget('subtitle');
-                      }}
-                    >
-                      {editingField === 'subtitle' ? (
-                        <Textarea
-                          className="text-gray-300 mt-2"
-                          defaultValue={question.subtitle}
-                          onBlur={(e) => handleSubtitleBlur(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.currentTarget.blur();
-                            }
-                          }}
-                        />
-                      ) : (
-                        replaceVariables(question.subtitle || "This is a welcome screen. Customize it to your liking.")
-                      )}
-                    </p>
-                  </div>
-                  <Button onClick={onNext}>Get Started</Button>
-                </div>
-              </div>
-            ) : question.type === "text" ? (
-              <div className={`w-full h-full ${layoutClasses}`} style={{ maxWidth: getMaxWidth() }}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-                  <label className="text-white text-sm">{replaceVariables(question.title || "Your question here")}</label>
-                  <Input
-                    type="text"
-                    placeholder="Your answer"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full"
-                  />
-                  <Button type="submit">Next</Button>
-                </form>
-              </div>
-            ) : question.type === "email" ? (
-              <div className={`w-full h-full ${layoutClasses}`} style={{ maxWidth: getMaxWidth() }}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-                  <label className="text-white text-sm">{replaceVariables(question.title || "Your question here")}</label>
-                  <Input
-                    type="email"
-                    placeholder="Your email"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full"
-                  />
-                  <Button type="submit">Next</Button>
-                </form>
-              </div>
-            ) : question.type === "phone" ? (
-              <div className={`w-full h-full ${layoutClasses}`} style={{ maxWidth: getMaxWidth() }}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-                  <label className="text-white text-sm">{replaceVariables(question.title || "Your question here")}</label>
-                  <div className="flex items-center space-x-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={showCountryDropdown}
-                          className="w-[120px] justify-start text-left font-normal"
-                          onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                        >
-                          <img
-                            src={`https://flagcdn.com/w20/${selectedCountry.toLowerCase()}.png`}
-                            alt={selectedCountry}
-                            width={20}
-                            height={20}
-                            className="mr-2 rounded-sm object-cover"
-                          />
-                          <span>{PHONE_COUNTRIES.find(country => country.code === selectedCountry)?.dialCode}</span>
-                          <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
-                        {PHONE_COUNTRIES.map((country) => (
-                          <div
-                            key={country.code}
-                            className="flex items-center space-x-2 p-2 hover:bg-secondary cursor-pointer"
-                            onClick={() => {
-                              setSelectedCountry(country.code);
-                              onUpdateQuestion(question.id, { phoneCountry: country.code });
-                              setShowCountryDropdown(false);
+                    <div className="relative">
+                      {editingField === 'welcome-title' && (
+                        <>
+                          <button
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                            style={{ 
+                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                              color: '#F5B800',
+                              backdropFilter: 'blur(8px)'
                             }}
                           >
-                            <img
-                              src={`https://flagcdn.com/w20/${country.code.toLowerCase()}.png`}
-                              alt={country.code}
-                              width={20}
-                              height={20}
-                              className="rounded-sm object-cover"
-                            />
-                            <span>{country.name} ({country.dialCode})</span>
-                          </div>
-                        ))}
+                            <Sparkles className="w-3.5 h-3.5" />
+                          </button>
+
+                          {showVariableMenu && variableTarget === 'title' && (
+                            <div
+                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                              style={{
+                                top: '32px',
+                                right: 0,
+                                backgroundColor: '#4A4138',
+                                border: '1px solid rgba(245, 184, 0, 0.3)',
+                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                              }}
+                            >
+                              {menuView === 'main' ? (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => {
+                                      // TODO: Implémenter la réécriture AI
+                                      console.log('Réécriture AI');
+                                    }}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Réécriture
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Améliorer le texte avec l'IA
+                                    </div>
+                                  </button>
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('variables')}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Variable
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Insérer une variable dynamique
+                                    </div>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('main')}
+                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                  >
+                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
+                                      ← Retour
+                                    </div>
+                                  </button>
+                                  {availableVariables.map((variable) => (
+                                    <button
+                                      key={variable.key}
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => insertVariable(variable.key)}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                        {variable.label}
+                                      </div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                        {variable.description} • {`{{${variable.key}}}`}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      <h1 
+                        className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
+                        style={{ 
+                          color: '#F5CA3C', 
+                          fontWeight: 700, 
+                          fontSize: '64px',
+                          letterSpacing: '-0.02em',
+                          outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                          padding: '4px',
+                          margin: '-4px',
+                          borderRadius: '4px'
+                        }}
+                        contentEditable
+                        suppressContentEditableWarning
+                        onFocus={() => setEditingField('welcome-title')}
+                        onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                      >
+                        {question.title}
+                      </h1>
+                    </div>
+                    
+                    <div className="relative">
+                      {editingField === 'welcome-subtitle' && (
+                        <>
+                          <button
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                            style={{ 
+                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                              color: '#F5B800',
+                              backdropFilter: 'blur(8px)'
+                            }}
+                          >
+                            <Sparkles className="w-3.5 h-3.5" />
+                          </button>
+
+                          {showVariableMenu && variableTarget === 'subtitle' && (
+                            <div
+                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                              style={{
+                                top: '32px',
+                                right: 0,
+                                backgroundColor: '#4A4138',
+                                border: '1px solid rgba(245, 184, 0, 0.3)',
+                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                              }}
+                            >
+                              {menuView === 'main' ? (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => {
+                                      console.log('Réécriture AI');
+                                    }}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Réécriture
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Améliorer le texte avec l'IA
+                                    </div>
+                                  </button>
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('variables')}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Variable
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Insérer une variable dynamique
+                                    </div>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('main')}
+                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                  >
+                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
+                                      ← Retour
+                                    </div>
+                                  </button>
+                                  {availableVariables.map((variable) => (
+                                    <button
+                                      key={variable.key}
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => insertVariable(variable.key)}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                        {variable.label}
+                                      </div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                        {variable.description} • {`{{${variable.key}}}`}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      <p 
+                        className="text-[16px] mb-8 leading-[1.6] cursor-text hover:opacity-80 transition-opacity" 
+                        style={{ 
+                          color: '#B8A892',
+                          outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                          padding: '4px',
+                          margin: '-4px',
+                          borderRadius: '4px'
+                        }}
+                        contentEditable
+                        suppressContentEditableWarning
+                        onFocus={() => setEditingField('welcome-subtitle')}
+                        onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                      >
+                        {question.subtitle}
+                      </p>
+                    </div>
+                    <button
+                      onClick={onNext}
+                      className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
+                      style={{ 
+                        backgroundColor: '#F5CA3C', 
+                        color: '#3D3731',
+                        height: '56px',
+                        borderRadius: '28px',
+                        fontSize: '17px',
+                        border: 'none',
+                        boxShadow: 'none'
+                      }}
+                    >
+                      <span>{question.buttonText || "Start"}</span>
+                      <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
+                        press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
+                      </span>
+                    </button>
+                    <div className="flex items-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                      <Clock className="w-4 h-4" />
+                      <span>Takes X minutes</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <div
+                      className="overflow-hidden w-[420px] h-[420px] max-w-full"
+                      style={{ borderRadius: "36px" }}
+                    >
+                      <img
+                        src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                        alt="Feedback illustration"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
+              <div className={`w-full h-full ${getLayoutClasses()}`}>
+                <div className="w-full" style={{ maxWidth: getMaxWidthForLayout() }}>
+                  <div className="mb-10">
+                    {question.number && (
+                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                        {question.number} →
+                      </div>
+                    )}
+                    <div className="relative">
+                      {editingField === 'text-title' && (
+                        <>
+                          <button
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                            style={{ 
+                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                              color: '#F5B800',
+                              backdropFilter: 'blur(8px)'
+                            }}
+                          >
+                            <Sparkles className="w-3.5 h-3.5" />
+                          </button>
+
+                          {showVariableMenu && variableTarget === 'title' && (
+                            <div
+                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                              style={{
+                                top: '32px',
+                                right: 0,
+                                backgroundColor: '#4A4138',
+                                border: '1px solid rgba(245, 184, 0, 0.3)',
+                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                              }}
+                            >
+                              {menuView === 'main' ? (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => {
+                                      console.log('Réécriture AI');
+                                    }}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Réécriture
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Améliorer le texte avec l'IA
+                                    </div>
+                                  </button>
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('variables')}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Variable
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Insérer une variable dynamique
+                                    </div>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('main')}
+                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                  >
+                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
+                                      ← Retour
+                                    </div>
+                                  </button>
+                                  {availableVariables.map((variable) => (
+                                    <button
+                                      key={variable.key}
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => insertVariable(variable.key)}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                        {variable.label}
+                                      </div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                        {variable.description} • {`{{${variable.key}}}`}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      <h2 
+                        className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                        style={{ 
+                          color: '#FFFFFF', 
+                          fontWeight: 700, 
+                          letterSpacing: '-0.02em',
+                          outline: editingField === 'text-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                          padding: '4px',
+                          margin: '-4px',
+                          borderRadius: '4px'
+                        }}
+                        contentEditable
+                        suppressContentEditableWarning
+                        onFocus={() => setEditingField('text-title')}
+                        onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                      >
+                        {question.title}
+                      </h2>
+                    </div>
+                    {(question.variant || question.type !== "text") && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        {question.type === 'email' && <><Mail className="w-4 h-4" /><span>Email</span></>}
+                        {question.type === 'phone' && <><Phone className="w-4 h-4" /><span>Phone</span></>}
+                        {question.type === 'number' && <><Hash className="w-4 h-4" /><span>Number</span></>}
+                        {question.type === 'date' && <><Calendar className="w-4 h-4" /><span>Date</span></>}
+                        {question.type === 'text' && question.variant === 'video' && <><Video className="w-4 h-4" /><span>Video/Audio</span></>}
+                        {question.type === 'text' && question.variant === 'long' && <><FileText className="w-4 h-4" /><span>Long Text</span></>}
+                        {question.type === 'text' && question.variant === 'short' && <><Type className="w-4 h-4" /><span>Short Text</span></>}
+                      </div>
+                    )}
+                  </div>
+                  <form onSubmit={handleSubmit}>
+                    {question.variant === 'long' ? (
+                      <>
+                        <Textarea
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          placeholder={question.placeholder || "Type your answer here..."}
+                          className="bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-3 min-h-[200px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] resize-none transition-colors"
+                          style={{ 
+                            borderColor: '#F5B800',
+                            color: '#F5B800'
+                          }}
+                          autoFocus
+                        />
+                        <div className="mt-2 text-sm" style={{ color: '#8B7E6E' }}>
+                          <kbd className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#A89A8A' }}>Shift</kbd>
+                          {' '}+ <kbd className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#A89A8A' }}>Enter</kbd>
+                          {' '}to make a line break
+                        </div>
+                      </>
+                    ) : question.type === 'phone' ? (
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
+                            style={{ 
+                              backgroundColor: 'rgba(255,255,255,0.1)',
+                              color: '#F5B800'
+                            }}
+                          >
+                            <span className="text-2xl">{PHONE_COUNTRIES.find(c => c.code === selectedCountry)?.flag}</span>
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                          
+                          {showCountryDropdown && (
+                            <div 
+                              className="absolute top-full left-0 mt-2 rounded-lg overflow-hidden z-10 max-h-[300px] overflow-y-auto"
+                              style={{ 
+                                backgroundColor: '#4A4138',
+                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+                                minWidth: '250px'
+                              }}
+                            >
+                              {PHONE_COUNTRIES.map((country) => (
+                                <button
+                                  key={country.code}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCountry(country.code);
+                                    setShowCountryDropdown(false);
+                                    if (question) {
+                                      onUpdateQuestion(question.id, { phoneCountry: country.code });
+                                    }
+                                  }}
+                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-opacity-10 hover:bg-white transition-colors text-left"
+                                  style={{ color: '#F5B800' }}
+                                >
+                                  <span className="text-xl">{country.flag}</span>
+                                  <span className="flex-1">{country.name}</span>
+                                  <span className="text-sm opacity-70">{country.dialCode}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <Input
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          type="tel"
+                          placeholder={question.placeholder || PHONE_COUNTRIES.find(c => c.code === selectedCountry)?.dialCode + ' (555) 000-0000'}
+                          className="flex-1 bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] transition-colors"
+                          style={{ 
+                            borderColor: '#F5B800',
+                            color: '#F5B800'
+                          }}
+                          autoFocus
+                        />
+                      </div>
+                    ) : (
+                      <Input
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        type={
+                          question.type === 'email' ? 'email' :
+                          question.type === 'number' ? 'number' :
+                          question.type === 'date' ? 'date' :
+                          question.variant === 'number' ? 'number' : 
+                          question.variant === 'date' ? 'date' : 
+                          'text'
+                        }
+                        placeholder={
+                          question.placeholder || (
+                            question.type === 'email' ? 'name@example.com' :
+                            question.type === 'number' ? 'Enter a number...' :
+                            question.type === 'date' ? 'Select a date...' :
+                            question.variant === 'number' ? 'Enter a number...' :
+                            question.variant === 'date' ? 'Select a date...' :
+                            question.variant === 'video' ? 'Upload video/audio or paste link...' :
+                            'Type your answer here...'
+                          )
+                        }
+                        className="bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] transition-colors"
+                        style={{ 
+                          borderColor: '#F5B800',
+                          color: '#F5B800'
+                        }}
+                        autoFocus
+                      />
+                    )}
+                    <div className="mt-8 flex items-center gap-4">
+                      <Button
+                        type="submit"
+                        className="font-semibold px-6 py-3 h-[48px] rounded-lg text-base hover:opacity-90 transition-opacity"
+                        style={{ 
+                          backgroundColor: '#F5B800', 
+                          color: '#3D3731' 
+                        }}
+                      >
+                        OK <span className="ml-1">✓</span>
+                      </Button>
+                      <span className="text-sm" style={{ color: '#A89A8A' }}>
+                        press <kbd className="px-2.5 py-1.5 rounded text-sm font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#C4B5A0' }}>Enter</kbd>
+                      </span>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            ) : question.type === "rating" ? (
+              <div className="w-full h-full flex items-center justify-center px-24">
+                <div className="w-full max-w-[700px] relative">
+                  {editingField === 'rating-title' && (
+                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-72 p-2" 
+                        align="end"
+                        style={{
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
                       </PopoverContent>
                     </Popover>
-                    <Input
-                      type="tel"
-                      placeholder="Your phone number"
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      className="w-full"
-                    />
+                  )}
+                  <div className="mb-10">
+                    {question.number && (
+                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                        {question.number} →
+                      </div>
+                    )}
+                    <h2 
+                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'rating-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('rating-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {question.title}
+                    </h2>
+                    {question.variant && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        {question.variant === 'stars' && <><Star className="w-4 h-4" /><span>Rating</span></>}
+                        {question.variant === 'scale' && <><BarChart3 className="w-4 h-4" /><span>Opinion Scale</span></>}
+                        {question.variant === 'ranking' && <><Hash className="w-4 h-4" /><span>Ranking</span></>}
+                      </div>
+                    )}
                   </div>
-                  <Button type="submit">Next</Button>
-                </form>
+                  <div className="flex gap-4">
+                    {Array.from({ length: question.ratingCount || 5 }, (_, i) => i + 1).map((rating) => {
+                      const getRatingIcon = () => {
+                        const iconProps = {
+                          size: 32,
+                          fill: '#F5B800',
+                          color: '#F5B800',
+                          strokeWidth: 2
+                        };
+
+                        switch (question.ratingType) {
+                          case 'smileys':
+                            if (rating === 1) return <Frown {...iconProps} />;
+                            if (rating === 2) return <Frown {...iconProps} fill="none" />;
+                            if (rating === 3) return <Meh {...iconProps} />;
+                            if (rating === 4) return <Smile {...iconProps} fill="none" />;
+                            return <Smile {...iconProps} />;
+                          case 'hearts':
+                            return <Heart {...iconProps} />;
+                          case 'thumbs':
+                            return <ThumbsUp {...iconProps} />;
+                          case 'numbers':
+                            return <span className="text-2xl font-bold">{rating}</span>;
+                          case 'stars':
+                          default:
+                            return <Star {...iconProps} />;
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={rating}
+                          className="w-20 h-20 rounded-xl transition-all flex items-center justify-center font-semibold cursor-default"
+                          style={{
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            color: '#FFFFFF'
+                          }}
+                        >
+                          {getRatingIcon()}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            ) : question.type === "number" ? (
-              <div className={`w-full h-full ${layoutClasses}`} style={{ maxWidth: getMaxWidth() }}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-                  <label className="text-white text-sm">{replaceVariables(question.title || "Your question here")}</label>
-                  <Input
-                    type="number"
-                    placeholder="Your answer"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full"
-                  />
-                  <Button type="submit">Next</Button>
-                </form>
-              </div>
-            ) : question.type === "date" ? (
-              <div className={`w-full h-full ${layoutClasses}`} style={{ maxWidth: getMaxWidth() }}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-                  <label className="text-white text-sm">{replaceVariables(question.title || "Your question here")}</label>
-                  <Input
-                    type="date"
-                    placeholder="Your answer"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="w-full"
-                  />
-                  <Button type="submit">Next</Button>
-                </form>
-              </div>
-            ) : question.type === "choice" ? (
-              <div className={`w-full h-full ${layoutClasses}`} style={{ maxWidth: getMaxWidth() }}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-                  <label className="text-white text-sm">{replaceVariables(question.title || "Choose an option")}</label>
-                  <div className="flex flex-col gap-2">
-                    {question.choices?.map((choice, index) => (
-                      <label key={index} className="flex items-center space-x-2 text-white">
-                        <input
-                          type="radio"
-                          name="choice"
-                          value={choice}
-                          onChange={(e) => setInputValue(e.target.value)}
-                        />
-                        {editingChoiceIndex === index ? (
-                          <Input
-                            type="text"
-                            defaultValue={choice}
-                            onBlur={(e) => handleChoiceBlur(index, e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.currentTarget.blur();
-                              }
-                            }}
-                          />
-                        ) : (
-                          <span onClick={() => setEditingChoiceIndex(index)}>{choice}</span>
-                        )}
-                      </label>
+            ) : question.type === "choice" || question.type === "dropdown" || question.type === "yesno" || question.type === "picture-choice" ? (
+              <div className="w-full h-full flex items-center justify-center px-24">
+                <div className="w-full max-w-[700px] relative">
+                  {editingField === 'choice-title' && (
+                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-72 p-2" 
+                        align="end"
+                        style={{
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                  <div className="mb-10">
+                    {question.number && (
+                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                        {question.number} →
+                      </div>
+                    )}
+                    <h2 
+                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'choice-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('choice-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {question.title}
+                    </h2>
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                      {question.type === 'dropdown' && <><List className="w-4 h-4" /><span>Dropdown</span></>}
+                      {question.type === 'yesno' && <><CheckCircle className="w-4 h-4" /><span>Yes/No</span></>}
+                      {question.type === 'picture-choice' && <><ImageIcon className="w-4 h-4" /><span>Picture Choice</span></>}
+                      {question.type === 'choice' && question.variant === 'multiple' && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
+                      {question.type === 'choice' && question.variant === 'checkbox' && <><CheckSquare className="w-4 h-4" /><span>Checkbox</span></>}
+                      {question.type === 'choice' && !question.variant && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {(question.choices || ["Yes", "No", "Sometimes"]).map((choice, index) => (
+                      <div
+                        key={index}
+                        className="w-full p-5 rounded-xl transition-all flex items-center gap-5 text-left"
+                        style={{
+                          backgroundColor: 'rgba(255,255,255,0.1)',
+                          border: editingChoiceIndex === index ? '2px solid rgba(245, 184, 0, 0.5)' : '1px solid rgba(255,255,255,0.2)'
+                        }}
+                      >
+                        <span className="font-semibold text-base" style={{ color: '#A89A8A' }}>
+                          {String.fromCharCode(65 + index)}
+                        </span>
+                        <span 
+                          className="text-xl font-medium cursor-text hover:opacity-80 transition-opacity" 
+                          style={{ 
+                            color: '#FFFFFF',
+                            outline: 'none',
+                            padding: '4px',
+                            margin: '-4px',
+                            borderRadius: '4px'
+                          }}
+                          contentEditable
+                          suppressContentEditableWarning
+                          onFocus={() => setEditingChoiceIndex(index)}
+                          onBlur={(e) => handleChoiceBlur(index, e.currentTarget.textContent || '')}
+                        >
+                          {choice}
+                        </span>
+                      </div>
                     ))}
                   </div>
-                  <Button type="submit">Next</Button>
-                </form>
+                </div>
               </div>
-            ) : question.type === "picture-choice" ? (
-              <div className={`w-full h-full ${layoutClasses}`} style={{ maxWidth: getMaxWidth() }}>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
-                  <label className="text-white text-sm">{replaceVariables(question.title || "Choose a picture")}</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    {question.choices?.map((choice, index) => (
-                      <label key={index} className="flex flex-col items-center space-x-2 text-white">
-                        <input
-                          type="radio"
-                          name="choice"
-                          value={choice}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          className="hidden"
-                        />
-                        <img
-                          src={choice}
-                          alt={`Choice ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-md cursor-pointer"
-                        />
-                      </label>
-                    ))}
+            ) : question.type === "file" ? (
+              <div className="w-full h-full flex items-center justify-center px-24">
+                <div className="w-full max-w-[700px] relative">
+                  {editingField === 'file-title' && (
+                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-72 p-2" 
+                        align="end"
+                        style={{
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                  <div className="mb-10">
+                    {question.number && (
+                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                        {question.number} →
+                      </div>
+                    )}
+                    <h2 
+                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'file-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('file-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {question.title}
+                    </h2>
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                      <Paperclip className="w-4 h-4" />
+                      <span>File Upload</span>
+                    </div>
                   </div>
-                  <Button type="submit">Next</Button>
-                </form>
+                  <div 
+                    className="border-2 border-dashed rounded-xl p-12 text-center transition-all"
+                    style={{
+                      borderColor: 'rgba(255,255,255,0.3)',
+                      backgroundColor: 'rgba(255,255,255,0.05)'
+                    }}
+                  >
+                    <Upload className="w-16 h-16 mx-auto mb-4" style={{ color: '#F5B800' }} />
+                    <p className="text-xl mb-2" style={{ color: '#FFFFFF' }}>
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-sm" style={{ color: '#A89A8A' }}>
+                      {question.fileTypes?.join(', ') || 'Any file type'} • Max {question.maxFileSize || 10}MB
+                    </p>
+                  </div>
+                </div>
               </div>
-            ) : null}
+            ) : question.type === "statement" ? (
+              <div className="w-full h-full flex items-center justify-center px-24">
+                <div className="w-full max-w-[700px] text-center relative">
+                  {(editingField === 'statement-title' || editingField === 'statement-subtitle') && (
+                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-72 p-2 z-50" 
+                        align="end"
+                        side="bottom"
+                        sideOffset={8}
+                        style={{
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                  <h2
+                    className="text-[56px] font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity"
+                    style={{ 
+                      color: '#FFFFFF', 
+                      fontWeight: 700, 
+                      letterSpacing: '-0.02em',
+                      outline: editingField === 'statement-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                      padding: '4px',
+                      margin: '-4px',
+                      borderRadius: '4px'
+                    }}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onFocus={() => setEditingField('statement-title')}
+                    onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                  >
+                    {question.title}
+                  </h2>
+                  {question.subtitle && (
+                    <p 
+                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity"
+                      style={{ 
+                        color: '#B8A892',
+                        outline: editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('statement-subtitle')}
+                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {question.subtitle}
+                    </p>
+                  )}
+                  <button
+                    onClick={onNext}
+                    className="font-semibold px-8 py-4 rounded-lg text-lg hover:opacity-90 transition-opacity"
+                    style={{ 
+                      backgroundColor: '#F5B800', 
+                      color: '#3D3731' 
+                    }}
+                  >
+                    {question.buttonText || "Continue"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center px-24">
+                <div className="w-full max-w-[700px] text-center relative">
+                  {(editingField === 'ending-title' || editingField === 'ending-subtitle') && (
+                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            console.log('Variable button clicked, current state:', showVariableMenu);
+                            setShowVariableMenu(!showVariableMenu);
+                          }}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-72 p-2 z-50" 
+                        align="end"
+                        side="bottom"
+                        sideOffset={8}
+                        style={{
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+
+                  <h2 
+                    className="text-[72px] font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                    style={{ 
+                      color: '#F5B800', 
+                      fontWeight: 700, 
+                      letterSpacing: '-0.03em',
+                      outline: editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
+                      padding: '4px',
+                      margin: '-4px',
+                      borderRadius: '4px'
+                    }}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onFocus={() => setEditingField('ending-title')}
+                    onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                  >
+                    {editingField === 'ending-title' ? question.title : replaceVariables(question.title)}
+                  </h2>
+                  {question.subtitle && (
+                    <p 
+                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#C4B5A0',
+                        outline: editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('ending-subtitle')}
+                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {editingField === 'ending-subtitle' ? question.subtitle : replaceVariables(question.subtitle)}
+                    </p>
+                  )}
+                  <Button
+                    onClick={() => window.location.reload()}
+                    className="font-semibold px-8 py-3 h-[52px] rounded-lg text-base hover:opacity-90 transition-opacity"
+                    style={{ 
+                      backgroundColor: '#F5B800', 
+                      color: '#3D3731' 
+                    }}
+                  >
+                    {question.buttonText || "Start over"}
+                  </Button>
+                </div>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
