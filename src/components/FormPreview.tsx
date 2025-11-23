@@ -284,19 +284,37 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     )}
                   </div>
                   <div className="flex gap-4">
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <div
-                        key={rating}
-                        className="w-20 h-20 rounded-xl transition-all flex items-center justify-center text-3xl font-semibold cursor-default"
-                        style={{
-                          backgroundColor: 'rgba(255,255,255,0.1)',
-                          border: '1px solid rgba(255,255,255,0.2)',
-                          color: '#FFFFFF'
-                        }}
-                      >
-                        {rating}
-                      </div>
-                    ))}
+                    {Array.from({ length: question.ratingCount || 5 }, (_, i) => i + 1).map((rating) => {
+                      const getRatingIcon = () => {
+                        switch (question.ratingType) {
+                          case 'smileys':
+                            return ['😞', '🙁', '😐', '🙂', '😄', '😍', '🤩', '😎', '🥳', '🤯'][rating - 1] || '🙂';
+                          case 'hearts':
+                            return '❤️';
+                          case 'thumbs':
+                            return '👍';
+                          case 'numbers':
+                            return rating;
+                          case 'stars':
+                          default:
+                            return '⭐';
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={rating}
+                          className="w-20 h-20 rounded-xl transition-all flex items-center justify-center text-3xl font-semibold cursor-default"
+                          style={{
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            color: '#FFFFFF'
+                          }}
+                        >
+                          {question.ratingType === 'numbers' ? rating : getRatingIcon()}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

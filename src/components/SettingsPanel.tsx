@@ -117,7 +117,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-          <Switch id="required-toggle" defaultChecked className="scale-90" />
+          <Switch 
+            id="required-toggle" 
+            checked={question.required}
+            onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+            className="scale-90" 
+          />
         </div>
         
         {question.variant === 'long' && (
@@ -157,7 +162,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -200,7 +210,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -255,7 +270,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -307,7 +327,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -363,7 +388,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -412,7 +442,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -460,7 +495,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -581,7 +621,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-          <Switch id="required-toggle" defaultChecked className="scale-90" />
+          <Switch 
+            id="required-toggle" 
+            checked={question.required}
+            onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+            className="scale-90" 
+          />
         </div>
 
         <div className="flex items-center justify-between">
@@ -653,7 +698,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
     <>
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-        <Switch id="required-toggle" defaultChecked className="scale-90" />
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
       </div>
 
       <Separator className="my-4" />
@@ -661,8 +711,18 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Rating type</Label>
         <div className="flex gap-2">
-          <Input type="number" defaultValue="5" className="text-xs h-8 w-16" />
-          <Select defaultValue="stars">
+          <Input 
+            type="number" 
+            value={question.ratingCount || 5}
+            onChange={(e) => onUpdateQuestion?.(question.id, { ratingCount: parseInt(e.target.value) || 5 })}
+            min="2"
+            max="10"
+            className="text-xs h-8 w-16" 
+          />
+          <Select 
+            value={question.ratingType || "stars"}
+            onValueChange={(value) => onUpdateQuestion?.(question.id, { ratingType: value })}
+          >
             <SelectTrigger className="h-8 text-xs flex-1">
               <SelectValue />
             </SelectTrigger>
@@ -694,7 +754,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-          <Switch id="required-toggle" defaultChecked className="scale-90" />
+          <Switch 
+            id="required-toggle" 
+            checked={question.required}
+            onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+            className="scale-90" 
+          />
         </div>
         
         <div className="flex items-center justify-between">
