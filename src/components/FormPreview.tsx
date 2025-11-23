@@ -691,7 +691,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       return (
                         <div className="absolute inset-0">
                           <img
-                            src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1600&h=900&fit=crop"
+                            src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=900&fit=crop"
                             alt="Background"
                             className="absolute inset-0 w-full h-full object-cover"
                           />
@@ -770,7 +770,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     return (
                       <div className="absolute inset-0">
                         <img
-                          src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&h=1200&fit=crop"
+                          src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=800&h=1200&fit=crop"
                           alt="Background"
                           className="absolute inset-0 w-full h-full object-cover"
                         />
