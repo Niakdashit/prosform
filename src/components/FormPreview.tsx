@@ -3,7 +3,12 @@ import { Question } from "./FormBuilder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Clock } from "lucide-react";
+import { 
+  Clock, Star, Smile, Frown, Meh, Heart, ThumbsUp,
+  Mail, Phone, Hash, Calendar, Video, FileText, Type,
+  CheckSquare, List, CheckCircle, Image as ImageIcon,
+  Paperclip, BarChart3, Upload
+} from "lucide-react";
 import { useState } from "react";
 
 interface FormPreviewProps {
@@ -174,13 +179,13 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     </h2>
                     {(question.variant || question.type !== "text") && (
                       <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        {question.type === 'email' && '📧 Email'}
-                        {question.type === 'phone' && '📱 Phone'}
-                        {question.type === 'number' && '🔢 Number'}
-                        {question.type === 'date' && '📅 Date'}
-                        {question.type === 'text' && question.variant === 'video' && '🎥 Video/Audio'}
-                        {question.type === 'text' && question.variant === 'long' && '📝 Long Text'}
-                        {question.type === 'text' && question.variant === 'short' && '✏️ Short Text'}
+                        {question.type === 'email' && <><Mail className="w-4 h-4" /><span>Email</span></>}
+                        {question.type === 'phone' && <><Phone className="w-4 h-4" /><span>Phone</span></>}
+                        {question.type === 'number' && <><Hash className="w-4 h-4" /><span>Number</span></>}
+                        {question.type === 'date' && <><Calendar className="w-4 h-4" /><span>Date</span></>}
+                        {question.type === 'text' && question.variant === 'video' && <><Video className="w-4 h-4" /><span>Video/Audio</span></>}
+                        {question.type === 'text' && question.variant === 'long' && <><FileText className="w-4 h-4" /><span>Long Text</span></>}
+                        {question.type === 'text' && question.variant === 'short' && <><Type className="w-4 h-4" /><span>Short Text</span></>}
                       </div>
                     )}
                   </div>
@@ -277,41 +282,52 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     </h2>
                     {question.variant && (
                       <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        {question.variant === 'stars' && '⭐ Rating'}
-                        {question.variant === 'scale' && '📊 Opinion Scale'}
-                        {question.variant === 'ranking' && '🔢 Ranking'}
+                        {question.variant === 'stars' && <><Star className="w-4 h-4" /><span>Rating</span></>}
+                        {question.variant === 'scale' && <><BarChart3 className="w-4 h-4" /><span>Opinion Scale</span></>}
+                        {question.variant === 'ranking' && <><Hash className="w-4 h-4" /><span>Ranking</span></>}
                       </div>
                     )}
                   </div>
                   <div className="flex gap-4">
                     {Array.from({ length: question.ratingCount || 5 }, (_, i) => i + 1).map((rating) => {
                       const getRatingIcon = () => {
+                        const iconProps = {
+                          size: 32,
+                          fill: '#F5B800',
+                          color: '#F5B800',
+                          strokeWidth: 2
+                        };
+
                         switch (question.ratingType) {
                           case 'smileys':
-                            return ['😞', '🙁', '😐', '🙂', '😄', '😍', '🤩', '😎', '🥳', '🤯'][rating - 1] || '🙂';
+                            if (rating === 1) return <Frown {...iconProps} />;
+                            if (rating === 2) return <Frown {...iconProps} fill="none" />;
+                            if (rating === 3) return <Meh {...iconProps} />;
+                            if (rating === 4) return <Smile {...iconProps} fill="none" />;
+                            return <Smile {...iconProps} />;
                           case 'hearts':
-                            return '❤️';
+                            return <Heart {...iconProps} />;
                           case 'thumbs':
-                            return '👍';
+                            return <ThumbsUp {...iconProps} />;
                           case 'numbers':
-                            return rating;
+                            return <span className="text-2xl font-bold">{rating}</span>;
                           case 'stars':
                           default:
-                            return '⭐';
+                            return <Star {...iconProps} />;
                         }
                       };
 
                       return (
                         <div
                           key={rating}
-                          className="w-20 h-20 rounded-xl transition-all flex items-center justify-center text-3xl font-semibold cursor-default"
+                          className="w-20 h-20 rounded-xl transition-all flex items-center justify-center font-semibold cursor-default"
                           style={{
                             backgroundColor: 'rgba(255,255,255,0.1)',
                             border: '1px solid rgba(255,255,255,0.2)',
                             color: '#FFFFFF'
                           }}
                         >
-                          {question.ratingType === 'numbers' ? rating : getRatingIcon()}
+                          {getRatingIcon()}
                         </div>
                       );
                     })}
@@ -346,12 +362,12 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       {question.title}
                     </h2>
                     <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                      {question.type === 'dropdown' && '📋 Dropdown'}
-                      {question.type === 'yesno' && '✓/✗ Yes/No'}
-                      {question.type === 'picture-choice' && '🖼️ Picture Choice'}
-                      {question.type === 'choice' && question.variant === 'multiple' && '☑️ Multiple Choice'}
-                      {question.type === 'choice' && question.variant === 'checkbox' && '☑️ Checkbox'}
-                      {question.type === 'choice' && !question.variant && '☑️ Multiple Choice'}
+                      {question.type === 'dropdown' && <><List className="w-4 h-4" /><span>Dropdown</span></>}
+                      {question.type === 'yesno' && <><CheckCircle className="w-4 h-4" /><span>Yes/No</span></>}
+                      {question.type === 'picture-choice' && <><ImageIcon className="w-4 h-4" /><span>Picture Choice</span></>}
+                      {question.type === 'choice' && question.variant === 'multiple' && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
+                      {question.type === 'choice' && question.variant === 'checkbox' && <><CheckSquare className="w-4 h-4" /><span>Checkbox</span></>}
+                      {question.type === 'choice' && !question.variant && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
                     </div>
                   </div>
                   <div className="space-y-4">
@@ -416,7 +432,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       {question.title}
                     </h2>
                     <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                      📎 File Upload
+                      <Paperclip className="w-4 h-4" />
+                      <span>File Upload</span>
                     </div>
                   </div>
                   <div 
@@ -426,7 +443,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       backgroundColor: 'rgba(255,255,255,0.05)'
                     }}
                   >
-                    <div className="text-6xl mb-4">📤</div>
+                    <Upload className="w-16 h-16 mx-auto mb-4" style={{ color: '#F5B800' }} />
                     <p className="text-xl mb-2" style={{ color: '#FFFFFF' }}>
                       Click to upload or drag and drop
                     </p>

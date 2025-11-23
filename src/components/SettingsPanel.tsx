@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon } from "lucide-react";
+import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp } from "lucide-react";
 
 interface SettingsPanelProps {
   question?: Question;
@@ -726,13 +726,38 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
             <SelectTrigger className="h-8 text-xs flex-1">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="stars" className="text-xs">⭐ Stars</SelectItem>
-              <SelectItem value="smileys" className="text-xs">😊 Smileys</SelectItem>
-              <SelectItem value="hearts" className="text-xs">❤️ Hearts</SelectItem>
-              <SelectItem value="thumbs" className="text-xs">👍 Thumbs</SelectItem>
-              <SelectItem value="numbers" className="text-xs">🔢 Numbers</SelectItem>
-            </SelectContent>
+              <SelectContent>
+                <SelectItem value="stars" className="text-xs">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-3 h-3" />
+                    <span>Stars</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="smileys" className="text-xs">
+                  <div className="flex items-center gap-2">
+                    <Smile className="w-3 h-3" />
+                    <span>Smileys</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="hearts" className="text-xs">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-3 h-3" />
+                    <span>Hearts</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="thumbs" className="text-xs">
+                  <div className="flex items-center gap-2">
+                    <ThumbsUp className="w-3 h-3" />
+                    <span>Thumbs</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="numbers" className="text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 flex items-center justify-center font-bold">#</span>
+                    <span>Numbers</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
           </Select>
         </div>
       </div>
