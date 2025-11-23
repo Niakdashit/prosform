@@ -8,7 +8,7 @@ import {
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
   Paperclip, BarChart3, Upload, ChevronDown, Sparkles,
-  Monitor, Smartphone, ImagePlus, Edit3
+  Monitor, Smartphone, ImagePlus, Edit3, X, Copy
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -51,6 +51,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   const [imageRotation, setImageRotation] = useState(0);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
+  const [hoveredChoiceIndex, setHoveredChoiceIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +73,21 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
 
   const handleImageEdit = (rotation: number) => {
     setImageRotation(rotation);
+  };
+
+  const handleDeleteChoice = (index: number) => {
+    if (!question || !question.choices) return;
+    const newChoices = question.choices.filter((_, i) => i !== index);
+    if (newChoices.length > 0) {
+      onUpdateQuestion(question.id, { choices: newChoices });
+    }
+  };
+
+  const handleDuplicateChoice = (index: number) => {
+    if (!question || !question.choices) return;
+    const newChoices = [...question.choices];
+    newChoices.splice(index + 1, 0, question.choices[index]);
+    onUpdateQuestion(question.id, { choices: newChoices });
   };
 
   const availableVariables = [
@@ -1563,7 +1579,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     {(question.choices || ["Yes", "No", "Sometimes"]).map((choice, index) => (
                       <div
                         key={index}
-                        className="w-full p-5 rounded-xl transition-all flex items-center gap-5 text-left"
+                        onMouseEnter={() => setHoveredChoiceIndex(index)}
+                        onMouseLeave={() => setHoveredChoiceIndex(null)}
+                        className="relative group w-full p-5 rounded-xl transition-all flex items-center gap-5 text-left"
                         style={{
                           backgroundColor: 'rgba(255,255,255,0.1)',
                           border: editingChoiceIndex === index ? '2px solid rgba(245, 184, 0, 0.5)' : '1px solid rgba(255,255,255,0.2)'
@@ -1573,7 +1591,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           {String.fromCharCode(65 + index)}
                         </span>
                         <span 
-                          className="text-xl font-medium cursor-text hover:opacity-80 transition-opacity" 
+                          className="flex-1 text-xl font-medium cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
                             color: '#FFFFFF',
                             outline: 'none',
@@ -1588,6 +1606,49 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         >
                           {choice}
                         </span>
+                        
+                        {/* Action buttons - visible on hover */}
+                        <div 
+                          className="flex items-center gap-2"
+                          style={{
+                            opacity: hoveredChoiceIndex === index ? 1 : 0,
+                            transition: 'opacity 0.2s ease'
+                          }}
+                        >
+                          <button
+                            onClick={() => handleDeleteChoice(index)}
+                            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(61, 55, 49, 0.85)',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                            title="Delete choice"
+                          >
+                            <X className="w-4 h-4" style={{ color: '#FFFFFF' }} />
+                          </button>
+                          <button
+                            onClick={() => handleDuplicateChoice(index)}
+                            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(61, 55, 49, 0.85)',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                            title="Duplicate choice"
+                          >
+                            <Copy className="w-4 h-4" style={{ color: '#FFFFFF' }} />
+                          </button>
+                          <button
+                            onClick={() => {/* Custom logic for sparkles */}}
+                            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(245, 184, 0, 0.85)',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                            title="Customize choice"
+                          >
+                            <Sparkles className="w-4 h-4" style={{ color: '#3D3731' }} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
