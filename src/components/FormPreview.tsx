@@ -419,7 +419,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       const alignmentClass = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
                       
                       return (
-                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-6 px-12 py-12 overflow-y-auto`}>
+                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 px-12 py-12 overflow-y-auto`}>
                           <div
                             className="overflow-hidden flex-shrink-0"
                             style={{ 
@@ -510,8 +510,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
 
                               <h1 
-                                className="font-bold mb-4 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
-                                style={{ 
+                                className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
+                                style={{
                                   color: '#F5CA3C', 
                                   fontWeight: 700, 
                                   fontSize: '48px',
@@ -606,8 +606,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
                               
                               <p 
-                                className="mb-6 cursor-text hover:opacity-80 transition-opacity" 
-                                style={{ 
+                                className="mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                                style={{
                                   color: '#E3DDD5',
                                   fontWeight: 400,
                                   fontSize: '16px',
@@ -639,7 +639,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                 press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                               </span>
                             </button>
-                            <div className="inline-flex items-center gap-2.5 mt-3" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                            <div className="inline-flex items-center gap-2.5 mt-4" style={{ color: '#A89A8A', fontSize: '14px' }}>
                               <Clock className="w-4 h-4" />
                               <span>Takes X minutes</span>
                             </div>
