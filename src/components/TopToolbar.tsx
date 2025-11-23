@@ -17,7 +17,7 @@ export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
         <Button 
           variant="default" 
           size="sm" 
-          className="gap-1.5 h-8 text-xs px-2.5 bg-secondary hover:bg-secondary/90"
+          className="gap-1.5 h-8 text-xs px-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"
           onClick={onAddContent}
         >
           <Plus className="w-3.5 h-3.5" />
