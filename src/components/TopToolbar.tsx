@@ -5,7 +5,8 @@ import {
   Smartphone, 
   Eye, 
   RotateCcw,
-  Settings
+  Settings,
+  Share2
 } from "lucide-react";
 
 export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
@@ -36,6 +37,9 @@ export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <RotateCcw className="w-3.5 h-3.5" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Share2 className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Settings className="w-3.5 h-3.5" />
