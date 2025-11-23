@@ -230,19 +230,27 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <div>
-        <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-        <Select defaultValue="split">
-          <SelectTrigger className="h-8 text-xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="split" className="text-xs">Split</SelectItem>
-            <SelectItem value="stack" className="text-xs">Stack</SelectItem>
-            <SelectItem value="wallpaper" className="text-xs">Wallpaper</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {question.desktopLayout === 'desktop-left-right' && (
+        <>
+          <div>
+            <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
+            <Select 
+              value={question.splitAlignment || 'left'}
+              onValueChange={(value: 'left' | 'center' | 'right') => onUpdateQuestion?.(question.id, { splitAlignment: value })}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="left" className="text-xs">Left</SelectItem>
+                <SelectItem value="center" className="text-xs">Center</SelectItem>
+                <SelectItem value="right" className="text-xs">Right</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Separator className="my-4" />
+        </>
+      )}
     </>
   );
 

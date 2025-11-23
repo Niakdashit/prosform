@@ -32,6 +32,7 @@ export interface Question {
   ratingType?: string;
   mobileLayout?: string;
   desktopLayout?: string;
+  splitAlignment?: 'left' | 'center' | 'right';
 }
 
 const defaultQuestions: Question[] = [
