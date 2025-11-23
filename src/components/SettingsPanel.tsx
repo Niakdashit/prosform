@@ -56,7 +56,6 @@ const LayoutSelector = ({ question, onUpdateQuestion, onViewModeChange }: Settin
 
   const mobileLayouts = [
     { value: "mobile-vertical", label: "Stack" },
-    { value: "mobile-horizontal", label: "Split" },
     { value: "mobile-centered", label: "Centered" },
     { value: "mobile-minimal", label: "Minimal" },
   ];
