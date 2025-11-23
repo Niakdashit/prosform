@@ -284,7 +284,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             marginBottom: `${(question.blockSpacing || 1) * 24}px`,
                             outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                             padding: '4px',
-                            margin: '-4px',
+                            marginTop: '-4px',
+                            marginLeft: '-4px',
+                            marginRight: '-4px',
                             borderRadius: '4px'
                           }}
                           contentEditable
@@ -379,7 +381,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             marginBottom: `${(question.blockSpacing || 1) * 32}px`,
                             outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
                             padding: '4px',
-                            margin: '-4px',
+                            marginTop: '-4px',
+                            marginLeft: '-4px',
+                            marginRight: '-4px',
                             borderRadius: '4px'
                           }}
                           contentEditable
@@ -525,7 +529,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                   marginBottom: `${(question.blockSpacing || 1) * 24}px`,
                                   outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                                   padding: '4px',
-                                  margin: '-4px',
+                                  marginTop: '-4px',
+                                  marginLeft: '-4px',
+                                  marginRight: '-4px',
                                   borderRadius: '4px'
                                 }}
                                 contentEditable
@@ -621,7 +627,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                   marginBottom: `${(question.blockSpacing || 1) * 32}px`,
                                   outline: editingField === 'welcome-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                                   padding: '4px',
-                                  margin: '-4px',
+                                  marginTop: '-4px',
+                                  marginLeft: '-4px',
+                                  marginRight: '-4px',
                                   borderRadius: '4px'
                                 }}
                                 contentEditable
