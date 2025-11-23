@@ -32,9 +32,10 @@ interface FormPreviewProps {
   onUpdateQuestion: (id: string, updates: Partial<Question>) => void;
   viewMode: 'desktop' | 'mobile';
   onToggleViewMode: () => void;
+  isMobileResponsive?: boolean;
 }
 
-export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode }: FormPreviewProps) => {
+export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
@@ -119,28 +120,30 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
 
   return (
     <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
-      {/* Toggle button */}
-      <button
-        onClick={onToggleViewMode}
-        className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
-        style={{
-          backgroundColor: '#4A4138',
-          border: '1px solid rgba(245, 184, 0, 0.3)',
-          color: '#F5CA3C'
-        }}
-      >
-        {viewMode === 'desktop' ? (
-          <>
-            <Monitor className="w-4 h-4" />
-            <span className="text-xs font-medium">Desktop</span>
-          </>
-        ) : (
-          <>
-            <Smartphone className="w-4 h-4" />
-            <span className="text-xs font-medium">Mobile</span>
-          </>
-        )}
-      </button>
+      {/* Toggle button - hidden on mobile responsive mode */}
+      {!isMobileResponsive && (
+        <button
+          onClick={onToggleViewMode}
+          className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
+          style={{
+            backgroundColor: '#4A4138',
+            border: '1px solid rgba(245, 184, 0, 0.3)',
+            color: '#F5CA3C'
+          }}
+        >
+          {viewMode === 'desktop' ? (
+            <>
+              <Monitor className="w-4 h-4" />
+              <span className="text-xs font-medium">Desktop</span>
+            </>
+          ) : (
+            <>
+              <Smartphone className="w-4 h-4" />
+              <span className="text-xs font-medium">Mobile</span>
+            </>
+          )}
+        </button>
+      )}
 
       <div 
         className="relative overflow-hidden transition-all duration-300" 

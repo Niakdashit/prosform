@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { QuestionSidebar } from "./QuestionSidebar";
 import { FormPreview } from "./FormPreview";
 import { SettingsPanel } from "./SettingsPanel";
 import { TopToolbar } from "./TopToolbar";
 import { AddContentModal } from "./AddContentModal";
+import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
+import { Button } from "./ui/button";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface Question {
   id: string;
@@ -165,10 +169,20 @@ const defaultQuestions: Question[] = [
 ];
 
 export const FormBuilder = () => {
+  const isMobile = useIsMobile();
   const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
   const [isAddContentModalOpen, setIsAddContentModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
+  const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+
+  // Force mobile view mode on mobile devices
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode('mobile');
+    }
+  }, [isMobile]);
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
@@ -237,32 +251,98 @@ export const FormBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <TopToolbar onAddContent={() => setIsAddContentModalOpen(true)} />
-      <div className="flex flex-1 overflow-hidden">
-        <QuestionSidebar
-          questions={questions}
-          activeQuestionId={activeQuestionId}
-          onQuestionSelect={setActiveQuestionId}
-          onReorderQuestions={reorderQuestions}
-        />
-        
-        <FormPreview
-          question={activeQuestion}
-          onUpdateQuestion={updateQuestion}
-          viewMode={viewMode}
-          onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-          onNext={() => {
-            const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
-            if (currentIndex < questions.length - 1) {
-              setActiveQuestionId(questions[currentIndex + 1].id);
-            }
-          }}
-        />
-        
-        <SettingsPanel 
-          question={activeQuestion} 
-          onUpdateQuestion={updateQuestion}
-          onViewModeChange={setViewMode}
-        />
+      <div className="flex flex-1 overflow-hidden relative">
+        {isMobile ? (
+          <>
+            {/* Mobile: Drawers with trigger buttons */}
+            <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
+              <DrawerContent className="h-[85vh]">
+                <QuestionSidebar
+                  questions={questions}
+                  activeQuestionId={activeQuestionId}
+                  onQuestionSelect={(id) => {
+                    setActiveQuestionId(id);
+                    setLeftDrawerOpen(false);
+                  }}
+                  onReorderQuestions={reorderQuestions}
+                />
+              </DrawerContent>
+            </Drawer>
+
+            <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
+              <DrawerContent className="h-[85vh]">
+                <SettingsPanel 
+                  question={activeQuestion} 
+                  onUpdateQuestion={updateQuestion}
+                  onViewModeChange={setViewMode}
+                />
+              </DrawerContent>
+            </Drawer>
+
+            {/* Left drawer trigger button */}
+            <Button
+              onClick={() => setLeftDrawerOpen(true)}
+              className="fixed left-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
+              variant="default"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+
+            {/* Right drawer trigger button */}
+            <Button
+              onClick={() => setRightDrawerOpen(true)}
+              className="fixed right-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
+              variant="default"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+
+            {/* Full screen preview */}
+            <FormPreview
+              question={activeQuestion}
+              onUpdateQuestion={updateQuestion}
+              viewMode="mobile"
+              onToggleViewMode={() => {}} // No toggle on mobile
+              isMobileResponsive={true}
+              onNext={() => {
+                const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+                if (currentIndex < questions.length - 1) {
+                  setActiveQuestionId(questions[currentIndex + 1].id);
+                }
+              }}
+            />
+          </>
+        ) : (
+          <>
+            {/* Desktop: Side panels */}
+            <QuestionSidebar
+              questions={questions}
+              activeQuestionId={activeQuestionId}
+              onQuestionSelect={setActiveQuestionId}
+              onReorderQuestions={reorderQuestions}
+            />
+            
+            <FormPreview
+              question={activeQuestion}
+              onUpdateQuestion={updateQuestion}
+              viewMode={viewMode}
+              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+              isMobileResponsive={false}
+              onNext={() => {
+                const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+                if (currentIndex < questions.length - 1) {
+                  setActiveQuestionId(questions[currentIndex + 1].id);
+                }
+              }}
+            />
+            
+            <SettingsPanel 
+              question={activeQuestion} 
+              onUpdateQuestion={updateQuestion}
+              onViewModeChange={setViewMode}
+            />
+          </>
+        )}
       </div>
 
       <AddContentModal
