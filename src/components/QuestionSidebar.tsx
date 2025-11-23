@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Question } from "./FormBuilder";
-import { User, Building2, Star, List, BarChart3, Ban, AlignLeft, CheckCircle, Smile, Plus, GripVertical, MoreVertical, Copy, Trash2 } from "lucide-react";
+import { Plus, GripVertical, MoreVertical, Copy, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getQuestionIcon } from "@/lib/questionIcons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,17 +20,6 @@ interface QuestionSidebarProps {
   onDeleteQuestion: (id: string) => void;
 }
 
-const iconMap: Record<string, any> = {
-  user: User,
-  building: Building2,
-  star: Star,
-  list: List,
-  chart: BarChart3,
-  ban: Ban,
-  alignLeft: AlignLeft,
-  check: CheckCircle,
-  greeting: Smile,
-};
 
 export const QuestionSidebar = ({
   questions,
@@ -78,21 +68,11 @@ export const QuestionSidebar = ({
         <div className="p-3">
           {/* Questions (sauf endings) */}
           {questions.filter(q => q.type !== "ending").map((question, index) => {
-            const Icon = iconMap[question.icon || "alignLeft"];
+            const questionIcon = getQuestionIcon(question);
+            const Icon = questionIcon.icon;
             const isActive = question.id === activeQuestionId;
             const isDragging = draggedIndex === index;
             const isDropTarget = dragOverIndex === index && draggedIndex !== index;
-            
-            // Déterminer la couleur de fond selon le type et l'index
-            let bgColor = "bg-gray-200 text-gray-700";
-            if (question.type === "welcome") bgColor = "bg-gray-200/80 text-gray-700";
-            else if (question.type === "text" && question.number === 1) bgColor = "bg-pink-200/70 text-pink-800";
-            else if (question.type === "choice" && question.number === 2) bgColor = "bg-purple-200/70 text-purple-800";
-            else if (question.type === "rating" && question.number === 3) bgColor = "bg-green-200/70 text-green-800";
-            else if (question.type === "choice" && question.number === 4) bgColor = "bg-green-200/70 text-green-800";
-            else if (question.type === "choice" && question.number === 5) bgColor = "bg-green-200/70 text-green-800";
-            else if (question.type === "choice" && question.number === 6) bgColor = "bg-purple-200/70 text-purple-800";
-            else if (question.type === "text" && question.number === 7) bgColor = "bg-blue-200/70 text-blue-800";
 
             return (
               <div key={question.id} className="relative">
@@ -119,13 +99,16 @@ export const QuestionSidebar = ({
                 >
                   <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                   <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 font-semibold",
-                    bgColor
+                    "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                    questionIcon.color
                   )}>
                     {question.number ? (
-                      <span className="text-sm">{question.number}</span>
+                      <>
+                        <Icon className="w-4 h-4" />
+                        <span className="text-[10px] font-semibold ml-0.5">{question.number}</span>
+                      </>
                     ) : (
-                      Icon && <Icon className="w-4 h-4" />
+                      <Icon className="w-5 h-5" />
                     )}
                   </div>
                   <div className="flex-1 text-left min-w-0 pt-1">
