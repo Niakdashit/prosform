@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface ThemeSettings {
   // Typography
@@ -59,28 +59,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState<ThemeSettings>(() => {
-    if (typeof window === 'undefined') return defaultTheme;
-    try {
-      const stored = window.localStorage.getItem('form-theme-settings');
-      return stored ? { ...defaultTheme, ...JSON.parse(stored) } : defaultTheme;
-    } catch {
-      return defaultTheme;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('form-theme-settings', JSON.stringify(theme));
-      
-      // Broadcast theme changes for real-time sync
-      const channel = new BroadcastChannel('form-theme-sync');
-      channel.postMessage(theme);
-      channel.close();
-    } catch {
-      // ignore
-    }
-  }, [theme]);
+  const [theme, setTheme] = useState<ThemeSettings>(defaultTheme);
 
   const updateTheme = (updates: Partial<ThemeSettings>) => {
     setTheme(prev => ({ ...prev, ...updates }));

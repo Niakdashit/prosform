@@ -38,10 +38,9 @@ interface FormPreviewProps {
   onToggleViewMode: () => void;
   isMobileResponsive?: boolean;
   allQuestions?: Question[];
-  isPublicPreview?: boolean;
 }
 
-export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [], isPublicPreview = false }: FormPreviewProps) => {
+export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [] }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
@@ -315,42 +314,38 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               transition: 'transform 0.3s ease'
                             }}
                           />
-                          {!isPublicPreview && (
-                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                              <button
-                                onClick={() => setShowUploadModal(true)}
-                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                title="Change image"
-                              >
-                                <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                              <button
-                                onClick={() => setShowEditorModal(true)}
-                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                title="Edit image"
-                              >
-                                <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                            </div>
-                          )}
+                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                            <button
+                              onClick={() => setShowUploadModal(true)}
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Change image"
+                            >
+                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                            </button>
+                            <button
+                              onClick={() => setShowEditorModal(true)}
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Edit image"
+                            >
+                              <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                            </button>
+                          </div>
                         </>
                       ) : (
-                        !isPublicPreview && (
-                          <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
-                          >
-                            <Upload className="w-12 h-12 mb-3" style={{ color: theme.buttonColor }} />
-                            <p className="text-sm font-medium" style={{ color: theme.buttonColor }}>
-                              Upload Image
-                            </p>
-                            <p className="text-xs mt-1" style={{ color: theme.systemColor }}>
-                              Click to browse
-                            </p>
-                          </div>
-                        )
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <Upload className="w-12 h-12 mb-3" style={{ color: theme.buttonColor }} />
+                          <p className="text-sm font-medium" style={{ color: theme.buttonColor }}>
+                            Upload Image
+                          </p>
+                          <p className="text-xs mt-1" style={{ color: theme.systemColor }}>
+                            Click to browse
+                          </p>
+                        </div>
                       )}
                     </div>
                   );
@@ -359,7 +354,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   const TextContent = ({ centered = false }: { centered?: boolean }) => (
                     <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
                       <div className="relative">
-                        {!isPublicPreview && editingField === 'welcome-title' && (
+                        {editingField === 'welcome-title' && (
                           <>
                             <button
                               type="button"
@@ -433,7 +428,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         )}
 
                         <h1 
-                          className={`font-bold ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                          className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
                             color: theme.accentColor, 
                             fontWeight: 700, 
@@ -441,24 +436,24 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             lineHeight: '1.05',
                             letterSpacing: '-0.02em',
                             marginBottom: `${(question.blockSpacing || 1) * 24}px`,
-                            outline: !isPublicPreview && editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                            outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                             padding: '4px',
                             marginTop: '-4px',
                             marginLeft: '-4px',
                             marginRight: '-4px',
                             borderRadius: '4px'
                           }}
-                          contentEditable={!isPublicPreview}
+                          contentEditable
                           suppressContentEditableWarning
-                          onFocus={() => !isPublicPreview && setEditingField('welcome-title')}
-                          onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
+                          onFocus={() => setEditingField('welcome-title')}
+                          onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                         >
                           {question.title}
                         </h1>
                       </div>
                       
                       <div className="relative">
-                        {!isPublicPreview && editingField === 'welcome-subtitle' && (
+                        {editingField === 'welcome-subtitle' && (
                           <>
                             <button
                               type="button"
@@ -532,23 +527,23 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         )}
 
                         <p 
-                          className={`text-[16px] ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                          className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
                             color: '#B8A892',
                             fontSize: viewMode === 'desktop' ? '16px' : '14px',
                             lineHeight: '1.6',
                             marginBottom: `${(question.blockSpacing || 1) * 32}px`,
-                            outline: !isPublicPreview && editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                            outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
                             padding: '4px',
                             marginTop: '-4px',
                             marginLeft: '-4px',
                             marginRight: '-4px',
                             borderRadius: '4px'
                           }}
-                          contentEditable={!isPublicPreview}
+                          contentEditable
                           suppressContentEditableWarning
-                          onFocus={() => !isPublicPreview && setEditingField('welcome-subtitle')}
-                          onBlur={(e) => !isPublicPreview && handleSubtitleBlur(e.currentTarget.textContent || '')}
+                          onFocus={() => setEditingField('welcome-subtitle')}
+                          onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
                         >
                           {question.subtitle}
                         </p>
@@ -1164,7 +1159,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       </div>
                     )}
                     <div className="relative">
-                      {!isPublicPreview && editingField === 'text-title' && (
+                      {editingField === 'text-title' && (
                         <>
                           <button
                             type="button"
@@ -1254,27 +1249,27 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       )}
 
                       <h2 
-                        className={`font-bold ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                        className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                           color: '#FFFFFF', 
                           fontWeight: 700, 
                           fontSize: viewMode === 'desktop' ? '56px' : '32px',
                           lineHeight: '1.1',
                           letterSpacing: '-0.02em',
-                          outline: !isPublicPreview && editingField === 'text-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                          outline: editingField === 'text-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                           padding: '4px',
                           margin: '-4px',
                           borderRadius: '4px'
                         }}
-                        contentEditable={!isPublicPreview}
+                        contentEditable
                         suppressContentEditableWarning
-                        onFocus={() => !isPublicPreview && setEditingField('text-title')}
-                        onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
+                        onFocus={() => setEditingField('text-title')}
+                        onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                       >
                         {question.title}
                       </h2>
                     </div>
-                    {!isPublicPreview && (question.variant || question.type !== "text") && (
+                    {(question.variant || question.type !== "text") && (
                       <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
                         {question.type === 'email' && <><Mail className="w-4 h-4" /><span>Email</span></>}
                         {question.type === 'phone' && <><Phone className="w-4 h-4" /><span>Phone</span></>}
@@ -1469,24 +1464,24 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       </div>
                     )}
                     <h2 
-                      className={`text-4xl font-bold leading-[1.1] ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                      className="text-4xl font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#FFFFFF', 
                         fontWeight: 700, 
                         letterSpacing: '-0.02em',
-                        outline: !isPublicPreview && editingField === 'rating-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        outline: editingField === 'rating-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                         padding: '4px',
                         margin: '-4px',
                         borderRadius: '4px'
                       }}
-                      contentEditable={!isPublicPreview}
+                      contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => !isPublicPreview && setEditingField('rating-title')}
-                      onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
+                      onFocus={() => setEditingField('rating-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.title}
                     </h2>
-                    {!isPublicPreview && question.variant && (
+                    {question.variant && (
                       <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
                         {question.variant === 'stars' && <><Star className="w-4 h-4" /><span>Rating</span></>}
                         {question.variant === 'scale' && <><BarChart3 className="w-4 h-4" /><span>Opinion Scale</span></>}
@@ -1536,52 +1531,50 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           }}
                         >
                           {/* Action buttons - on top border */}
-                          {!isPublicPreview && (
-                            <div 
-                              className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5"
-                              style={{
-                                opacity: hoveredRatingIndex === rating ? 1 : 0,
-                                transition: 'opacity 0.2s ease'
+                          <div 
+                            className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5"
+                            style={{
+                              opacity: hoveredRatingIndex === rating ? 1 : 0,
+                              transition: 'opacity 0.2s ease'
+                            }}
+                          >
+                            <button
+                              onClick={() => handleDeleteRating(rating)}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                              style={{ 
+                                backgroundColor: 'rgba(61, 55, 49, 0.9)',
+                                border: '1px solid rgba(255,255,255,0.1)'
                               }}
+                              title="Delete rating"
                             >
-                              <button
-                                onClick={() => handleDeleteRating(rating)}
-                                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                                style={{ 
-                                  backgroundColor: 'rgba(61, 55, 49, 0.9)',
-                                  border: '1px solid rgba(255,255,255,0.1)'
-                                }}
-                                title="Delete rating"
-                              >
-                                <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setBranchingChoiceIndex(rating);
-                                  setShowBranchingModal(true);
-                                }}
-                                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                                style={{ 
-                                  backgroundColor: 'rgba(61, 55, 49, 0.9)',
-                                  border: '1px solid rgba(255,255,255,0.1)'
-                                }}
-                                title="Branching logic"
-                              >
-                                <GitBranch className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                              <button
-                                onClick={() => {/* Custom logic for sparkles */}}
-                                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                                style={{ 
-                                  backgroundColor: 'rgba(245, 184, 0, 0.9)',
-                                  border: '1px solid rgba(255,255,255,0.1)'
-                                }}
-                                title="Customize rating"
-                              >
-                                <Sparkles className="w-3.5 h-3.5" style={{ color: '#3D3731' }} />
-                              </button>
-                            </div>
-                          )}
+                              <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setBranchingChoiceIndex(rating);
+                                setShowBranchingModal(true);
+                              }}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                              style={{ 
+                                backgroundColor: 'rgba(61, 55, 49, 0.9)',
+                                border: '1px solid rgba(255,255,255,0.1)'
+                              }}
+                              title="Branching logic"
+                            >
+                              <GitBranch className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                            </button>
+                            <button
+                              onClick={() => {/* Custom logic for sparkles */}}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                              style={{ 
+                                backgroundColor: 'rgba(245, 184, 0, 0.9)',
+                                border: '1px solid rgba(255,255,255,0.1)'
+                              }}
+                              title="Customize rating"
+                            >
+                              <Sparkles className="w-3.5 h-3.5" style={{ color: '#3D3731' }} />
+                            </button>
+                          </div>
                           
                           {getRatingIcon()}
                         </div>
@@ -1593,7 +1586,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             ) : question.type === "choice" || question.type === "dropdown" || question.type === "yesno" || question.type === "picture-choice" ? (
               <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] relative">
-                  {!isPublicPreview && editingField === 'choice-title' && (
+                  {editingField === 'choice-title' && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
@@ -1644,35 +1637,33 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       </div>
                     )}
                       <h2 
-                        className={`font-bold ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                        className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                         color: '#FFFFFF', 
                         fontWeight: 700, 
                         fontSize: viewMode === 'desktop' ? '56px' : '32px',
                         lineHeight: '1.1',
                           letterSpacing: '-0.02em',
-                          outline: !isPublicPreview && editingField === 'choice-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                          outline: editingField === 'choice-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                         padding: '4px',
                         margin: '-4px',
                         borderRadius: '4px'
                       }}
-                      contentEditable={!isPublicPreview}
+                      contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => !isPublicPreview && setEditingField('choice-title')}
-                      onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
+                      onFocus={() => setEditingField('choice-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.title}
                     </h2>
-                    {!isPublicPreview && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        {question.type === 'dropdown' && <><List className="w-4 h-4" /><span>Dropdown</span></>}
-                        {question.type === 'yesno' && <><CheckCircle className="w-4 h-4" /><span>Yes/No</span></>}
-                        {question.type === 'picture-choice' && <><ImageIcon className="w-4 h-4" /><span>Picture Choice</span></>}
-                        {question.type === 'choice' && question.variant === 'multiple' && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
-                        {question.type === 'choice' && question.variant === 'checkbox' && <><CheckSquare className="w-4 h-4" /><span>Checkbox</span></>}
-                        {question.type === 'choice' && !question.variant && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
-                      </div>
-                    )}
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                      {question.type === 'dropdown' && <><List className="w-4 h-4" /><span>Dropdown</span></>}
+                      {question.type === 'yesno' && <><CheckCircle className="w-4 h-4" /><span>Yes/No</span></>}
+                      {question.type === 'picture-choice' && <><ImageIcon className="w-4 h-4" /><span>Picture Choice</span></>}
+                      {question.type === 'choice' && question.variant === 'multiple' && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
+                      {question.type === 'choice' && question.variant === 'checkbox' && <><CheckSquare className="w-4 h-4" /><span>Checkbox</span></>}
+                      {question.type === 'choice' && !question.variant && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
+                    </div>
                   </div>
                   <div className="space-y-4">
                     {(question.choices || ["Yes", "No", "Sometimes"]).map((choice, index) => (
@@ -1687,58 +1678,56 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         }}
                       >
                         {/* Action buttons - on top border, right side */}
-                        {!isPublicPreview && (
-                          <div 
-                            className="absolute -top-3 right-4 flex items-center gap-1.5"
-                            style={{
-                              opacity: hoveredChoiceIndex === index ? 1 : 0,
-                              transition: 'opacity 0.2s ease'
+                        <div 
+                          className="absolute -top-3 right-4 flex items-center gap-1.5"
+                          style={{
+                            opacity: hoveredChoiceIndex === index ? 1 : 0,
+                            transition: 'opacity 0.2s ease'
+                          }}
+                        >
+                          <button
+                            onClick={() => handleDeleteChoice(index)}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(61, 55, 49, 0.9)',
+                              border: '1px solid rgba(255,255,255,0.1)'
                             }}
+                            title="Delete choice"
                           >
+                            <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                          </button>
                             <button
-                              onClick={() => handleDeleteChoice(index)}
+                              onClick={() => {
+                                setBranchingChoiceIndex(index);
+                                setShowBranchingModal(true);
+                              }}
                               className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
                               style={{ 
                                 backgroundColor: 'rgba(61, 55, 49, 0.9)',
                                 border: '1px solid rgba(255,255,255,0.1)'
                               }}
-                              title="Delete choice"
+                              title="Branching logic"
                             >
-                              <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                              <GitBranch className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
                             </button>
-                              <button
-                                onClick={() => {
-                                  setBranchingChoiceIndex(index);
-                                  setShowBranchingModal(true);
-                                }}
-                                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                                style={{ 
-                                  backgroundColor: 'rgba(61, 55, 49, 0.9)',
-                                  border: '1px solid rgba(255,255,255,0.1)'
-                                }}
-                                title="Branching logic"
-                              >
-                                <GitBranch className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                            <button
-                              onClick={() => {/* Custom logic for sparkles */}}
-                              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                              style={{ 
-                                backgroundColor: 'rgba(245, 184, 0, 0.9)',
-                                border: '1px solid rgba(255,255,255,0.1)'
-                              }}
-                              title="Customize choice"
-                            >
-                              <Sparkles className="w-3.5 h-3.5" style={{ color: '#3D3731' }} />
-                            </button>
-                          </div>
-                        )}
+                          <button
+                            onClick={() => {/* Custom logic for sparkles */}}
+                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ 
+                              backgroundColor: 'rgba(245, 184, 0, 0.9)',
+                              border: '1px solid rgba(255,255,255,0.1)'
+                            }}
+                            title="Customize choice"
+                          >
+                            <Sparkles className="w-3.5 h-3.5" style={{ color: '#3D3731' }} />
+                          </button>
+                        </div>
                         
                         <span className="font-semibold text-base" style={{ color: '#A89A8A' }}>
                           {String.fromCharCode(65 + index)}
                         </span>
                         <span 
-                          className={`flex-1 text-xl font-medium ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                          className="flex-1 text-xl font-medium cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
                             color: '#FFFFFF',
                             outline: 'none',
@@ -1746,10 +1735,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             margin: '-4px',
                             borderRadius: '4px'
                           }}
-                          contentEditable={!isPublicPreview}
+                          contentEditable
                           suppressContentEditableWarning
-                          onFocus={() => !isPublicPreview && setEditingChoiceIndex(index)}
-                          onBlur={(e) => !isPublicPreview && handleChoiceBlur(index, e.currentTarget.textContent || '')}
+                          onFocus={() => setEditingChoiceIndex(index)}
+                          onBlur={(e) => handleChoiceBlur(index, e.currentTarget.textContent || '')}
                         >
                           {choice}
                         </span>
@@ -1761,7 +1750,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             ) : question.type === "file" ? (
               <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] relative">
-                  {!isPublicPreview && editingField === 'file-title' && (
+                  {editingField === 'file-title' && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
@@ -1812,31 +1801,29 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       </div>
                     )}
                     <h2 
-                      className={`font-bold ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                      className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                       color: '#FFFFFF', 
                       fontWeight: 700, 
                       fontSize: viewMode === 'desktop' ? '56px' : '32px',
                       lineHeight: '1.1',
                         letterSpacing: '-0.02em',
-                        outline: !isPublicPreview && editingField === 'file-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        outline: editingField === 'file-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                         padding: '4px',
                         margin: '-4px',
                         borderRadius: '4px'
                       }}
-                      contentEditable={!isPublicPreview}
+                      contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => !isPublicPreview && setEditingField('file-title')}
-                      onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
+                      onFocus={() => setEditingField('file-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.title}
                     </h2>
-                    {!isPublicPreview && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        <Paperclip className="w-4 h-4" />
-                        <span>File Upload</span>
-                      </div>
-                    )}
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                      <Paperclip className="w-4 h-4" />
+                      <span>File Upload</span>
+                    </div>
                   </div>
                   <div 
                     className="border-2 border-dashed rounded-xl p-12 text-center transition-all"
@@ -1905,39 +1892,39 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     </Popover>
                   )}
                   <h2
-                    className={`font-bold mb-8 ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                    className="font-bold mb-8 cursor-text hover:opacity-80 transition-opacity"
                     style={{ 
                     color: '#FFFFFF', 
                     fontWeight: 700, 
                     fontSize: viewMode === 'desktop' ? '56px' : '32px',
                     lineHeight: '1.1',
                       letterSpacing: '-0.02em',
-                      outline: !isPublicPreview && editingField === 'statement-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                      outline: editingField === 'statement-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                       padding: '4px',
                       margin: '-4px',
                       borderRadius: '4px'
                     }}
-                    contentEditable={!isPublicPreview}
+                    contentEditable
                     suppressContentEditableWarning
-                    onFocus={() => !isPublicPreview && setEditingField('statement-title')}
-                    onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
+                    onFocus={() => setEditingField('statement-title')}
+                    onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                   >
                     {question.title}
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className={`text-xl mb-12 ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity"
                       style={{ 
                         color: '#B8A892',
-                        outline: !isPublicPreview && editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                        outline: editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
                         padding: '4px',
                         margin: '-4px',
                         borderRadius: '4px'
                       }}
-                      contentEditable={!isPublicPreview}
+                      contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => !isPublicPreview && setEditingField('statement-subtitle')}
-                      onBlur={(e) => !isPublicPreview && handleSubtitleBlur(e.currentTarget.textContent || '')}
+                      onFocus={() => setEditingField('statement-subtitle')}
+                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.subtitle}
                     </p>
@@ -1957,7 +1944,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             ) : (
               <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px] text-center relative">
-                  {!isPublicPreview && (editingField === 'ending-title' || editingField === 'ending-subtitle') && (
+                  {(editingField === 'ending-title' || editingField === 'ending-subtitle') && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
@@ -2008,39 +1995,39 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   )}
 
                   <h2 
-                    className={`font-bold mb-8 ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                    className="font-bold mb-8 cursor-text hover:opacity-80 transition-opacity" 
                     style={{ 
                     color: '#F5B800', 
                     fontWeight: 700, 
                     fontSize: viewMode === 'desktop' ? '72px' : '40px',
                     lineHeight: '1.1',
                       letterSpacing: '-0.03em',
-                      outline: !isPublicPreview && editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
+                      outline: editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
                       padding: '4px',
                       margin: '-4px',
                       borderRadius: '4px'
                     }}
-                    contentEditable={!isPublicPreview}
+                    contentEditable
                     suppressContentEditableWarning
-                    onFocus={() => !isPublicPreview && setEditingField('ending-title')}
-                    onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
+                    onFocus={() => setEditingField('ending-title')}
+                    onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                   >
                     {editingField === 'ending-title' ? question.title : replaceVariables(question.title)}
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className={`text-xl mb-12 ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
+                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#C4B5A0',
-                        outline: !isPublicPreview && editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
+                        outline: editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
                         padding: '4px',
                         margin: '-4px',
                         borderRadius: '4px'
                       }}
-                      contentEditable={!isPublicPreview}
+                      contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => !isPublicPreview && setEditingField('ending-subtitle')}
-                      onBlur={(e) => !isPublicPreview && handleSubtitleBlur(e.currentTarget.textContent || '')}
+                      onFocus={() => setEditingField('ending-subtitle')}
+                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
                     >
                       {editingField === 'ending-subtitle' ? question.subtitle : replaceVariables(question.subtitle)}
                     </p>
