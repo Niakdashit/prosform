@@ -10,80 +10,36 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag, Monitor } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import mobileVerticalIcon from "@/assets/layout-mobile-vertical.svg";
+import mobileHorizontalIcon from "@/assets/layout-mobile-horizontal.svg";
+import mobileCenteredIcon from "@/assets/layout-mobile-centered.svg";
+import mobileMinimalIcon from "@/assets/layout-mobile-minimal.svg";
+import desktopLeftRightIcon from "@/assets/layout-desktop-left-right.svg";
+import desktopRightLeftIcon from "@/assets/layout-desktop-right-left.svg";
+import desktopCenteredIcon from "@/assets/layout-desktop-centered.svg";
+import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
 
 interface SettingsPanelProps {
   question?: Question;
   onUpdateQuestion?: (id: string, updates: Partial<Question>) => void;
 }
 
-// Layout icons exactly matching Typeform style - simple and minimal
 const LayoutIcon = ({ type }: { type: string }) => {
-  const layouts: Record<string, React.ReactElement> = {
-    // Mobile icon - simple vertical phone
-    "mobile-vertical": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="7" y="3" width="10" height="18" rx="2" />
-        <line x1="9" y1="7" x2="15" y2="7" />
-        <line x1="9" y1="11" x2="15" y2="11" />
-        <line x1="9" y1="15" x2="15" y2="15" />
-      </svg>
-    ),
-    "mobile-horizontal": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="7" y="3" width="10" height="18" rx="2" />
-        <line x1="9" y1="7" x2="15" y2="7" />
-        <line x1="9" y1="11" x2="15" y2="11" />
-        <line x1="9" y1="15" x2="15" y2="15" />
-      </svg>
-    ),
-    "mobile-centered": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="7" y="3" width="10" height="18" rx="2" />
-        <line x1="9" y1="7" x2="15" y2="7" />
-        <line x1="9" y1="11" x2="15" y2="11" />
-        <line x1="9" y1="15" x2="15" y2="15" />
-      </svg>
-    ),
-    "mobile-minimal": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="7" y="3" width="10" height="18" rx="2" />
-        <line x1="9" y1="7" x2="15" y2="7" />
-        <line x1="9" y1="11" x2="15" y2="11" />
-        <line x1="9" y1="15" x2="15" y2="15" />
-      </svg>
-    ),
-    // Desktop icon - simple horizontal screen with split
-    "desktop-left-right": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="2" y="5" width="20" height="13" rx="2" />
-        <line x1="12" y1="5" x2="12" y2="18" />
-        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
-      </svg>
-    ),
-    "desktop-right-left": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="2" y="5" width="20" height="13" rx="2" />
-        <line x1="12" y1="5" x2="12" y2="18" />
-        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
-      </svg>
-    ),
-    "desktop-centered": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="2" y="5" width="20" height="13" rx="2" />
-        <line x1="12" y1="5" x2="12" y2="18" />
-        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
-      </svg>
-    ),
-    "desktop-split": (
-      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-        <rect x="2" y="5" width="20" height="13" rx="2" />
-        <line x1="12" y1="5" x2="12" y2="18" />
-        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
-      </svg>
-    ),
+  const iconMap: Record<string, string> = {
+    "mobile-vertical": mobileVerticalIcon,
+    "mobile-horizontal": mobileHorizontalIcon,
+    "mobile-centered": mobileCenteredIcon,
+    "mobile-minimal": mobileMinimalIcon,
+    "desktop-left-right": desktopLeftRightIcon,
+    "desktop-right-left": desktopRightLeftIcon,
+    "desktop-centered": desktopCenteredIcon,
+    "desktop-split": desktopSplitIcon,
   };
   
-  return layouts[type] || null;
+  const icon = iconMap[type];
+  if (!icon) return null;
+  
+  return <img src={icon} alt={type} className="w-full h-full" />;
 };
 
 const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
