@@ -8,12 +8,13 @@ import {
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
   Paperclip, BarChart3, Upload, ChevronDown, Sparkles,
-  Monitor, Smartphone, ImagePlus, Edit3, X, Copy
+  Monitor, Smartphone, ImagePlus, Edit3, X, GitBranch
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ImageUploadModal } from "./ImageUploadModal";
 import { ImageEditorModal } from "./ImageEditorModal";
+import { BranchingModal } from "./BranchingModal";
 
 const PHONE_COUNTRIES = [
   { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
@@ -53,6 +54,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [hoveredChoiceIndex, setHoveredChoiceIndex] = useState<number | null>(null);
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number | null>(null);
+  const [showBranchingModal, setShowBranchingModal] = useState(false);
+  const [branchingChoiceIndex, setBranchingChoiceIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,26 +87,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
     }
   };
 
-  const handleDuplicateChoice = (index: number) => {
-    if (!question || !question.choices) return;
-    const newChoices = [...question.choices];
-    newChoices.splice(index + 1, 0, question.choices[index]);
-    onUpdateQuestion(question.id, { choices: newChoices });
-  };
-
   const handleDeleteRating = (ratingValue: number) => {
     if (!question) return;
     const currentCount = question.ratingCount || 5;
     if (currentCount > 1) {
       onUpdateQuestion(question.id, { ratingCount: currentCount - 1 });
-    }
-  };
-
-  const handleDuplicateRating = (ratingValue: number) => {
-    if (!question) return;
-    const currentCount = question.ratingCount || 5;
-    if (currentCount < 10) {
-      onUpdateQuestion(question.id, { ratingCount: currentCount + 1 });
     }
   };
 
@@ -1525,15 +1513,18 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
                             </button>
                             <button
-                              onClick={() => handleDuplicateRating(rating)}
+                              onClick={() => {
+                                setBranchingChoiceIndex(rating);
+                                setShowBranchingModal(true);
+                              }}
                               className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
                               style={{ 
                                 backgroundColor: 'rgba(61, 55, 49, 0.9)',
                                 border: '1px solid rgba(255,255,255,0.1)'
                               }}
-                              title="Duplicate rating"
+                              title="Branching logic"
                             >
-                              <Copy className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                              <GitBranch className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
                             </button>
                             <button
                               onClick={() => {/* Custom logic for sparkles */}}
@@ -1668,17 +1659,20 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           >
                             <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
                           </button>
-                          <button
-                            onClick={() => handleDuplicateChoice(index)}
-                            className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                            style={{ 
-                              backgroundColor: 'rgba(61, 55, 49, 0.9)',
-                              border: '1px solid rgba(255,255,255,0.1)'
-                            }}
-                            title="Duplicate choice"
-                          >
-                            <Copy className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
-                          </button>
+                            <button
+                              onClick={() => {
+                                setBranchingChoiceIndex(index);
+                                setShowBranchingModal(true);
+                              }}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                              style={{ 
+                                backgroundColor: 'rgba(61, 55, 49, 0.9)',
+                                border: '1px solid rgba(255,255,255,0.1)'
+                              }}
+                              title="Branching logic"
+                            >
+                              <GitBranch className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
+                            </button>
                           <button
                             onClick={() => {/* Custom logic for sparkles */}}
                             className="w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
@@ -2038,6 +2032,20 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
         onOpenChange={setShowEditorModal}
         imageUrl={uploadedImage || ''}
         onSave={handleImageEdit}
+      />
+      
+      {/* Branching modal */}
+      <BranchingModal
+        open={showBranchingModal}
+        onOpenChange={setShowBranchingModal}
+        questionTitle={question?.title || ''}
+        questionId={question?.id || ''}
+        choices={question?.choices || []}
+        availableQuestions={[
+          { id: '1', title: 'First, what\'s your full name?', number: '1' },
+          { id: '2', title: 'Thanks, ___. Which department do you work in?', number: '2' },
+          { id: '3', title: 'How do you rate the company culture?', number: '3' }
+        ]}
       />
     </div>
   );
