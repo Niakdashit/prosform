@@ -180,6 +180,23 @@ export const FormBuilder = () => {
   const [isFullPreview, setIsFullPreview] = useState(false);
   const [previewQuestionIndex, setPreviewQuestionIndex] = useState(0);
 
+  // Initial load from localStorage to keep editor & preview in sync
+  useEffect(() => {
+    try {
+      const savedQuestions = window.localStorage.getItem('preview-questions');
+      const savedViewMode = window.localStorage.getItem('preview-viewMode');
+
+      if (savedQuestions) {
+        setQuestions(JSON.parse(savedQuestions));
+      }
+      if (savedViewMode === 'desktop' || savedViewMode === 'mobile') {
+        setViewMode(savedViewMode);
+      }
+    } catch (e) {
+      console.error('Error loading saved form builder state:', e);
+    }
+  }, []);
+
   // Force mobile view mode on mobile devices
   useEffect(() => {
     if (isMobile) {
