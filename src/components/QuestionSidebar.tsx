@@ -437,33 +437,64 @@ export const QuestionSidebar = ({
 
               <div>
                 <h3 className="text-sm font-semibold mb-3">Buttons</h3>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Button style</Label>
-                    <Select value={theme.buttonStyle} onValueChange={(value: any) => updateTheme({ buttonStyle: value })}>
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="square" className="text-xs">Square (0px)</SelectItem>
-                        <SelectItem value="rounded" className="text-xs">Rounded (8px)</SelectItem>
-                        <SelectItem value="pill" className="text-xs">Pill (999px)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-xs text-muted-foreground mb-3 block">Button style</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "square", label: "Square", radius: "0px" },
+                        { value: "rounded", label: "Rounded", radius: "8px" },
+                        { value: "pill", label: "Pill", radius: "999px" },
+                      ].map((style) => (
+                        <button
+                          key={style.value}
+                          onClick={() => updateTheme({ buttonStyle: style.value as any })}
+                          className={cn(
+                            "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:border-primary/50",
+                            theme.buttonStyle === style.value ? "border-primary bg-primary/5" : "border-border"
+                          )}
+                        >
+                          <div 
+                            className="w-full h-7 bg-foreground flex items-center justify-center text-background text-[10px] font-medium transition-all"
+                            style={{ borderRadius: style.radius }}
+                          >
+                            OK
+                          </div>
+                          <span className="text-[10px] font-medium">{style.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Button size</Label>
-                    <Select value={theme.buttonSize} onValueChange={(value: any) => updateTheme({ buttonSize: value })}>
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="small" className="text-xs">Small</SelectItem>
-                        <SelectItem value="medium" className="text-xs">Medium</SelectItem>
-                        <SelectItem value="large" className="text-xs">Large</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-xs text-muted-foreground mb-3 block">Button size</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: "small", label: "Small", height: "h-7", text: "text-xs" },
+                        { value: "medium", label: "Medium", height: "h-9", text: "text-sm" },
+                        { value: "large", label: "Large", height: "h-11", text: "text-base" },
+                      ].map((size) => (
+                        <button
+                          key={size.value}
+                          onClick={() => updateTheme({ buttonSize: size.value as any })}
+                          className={cn(
+                            "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:border-primary/50",
+                            theme.buttonSize === size.value ? "border-primary bg-primary/5" : "border-border"
+                          )}
+                        >
+                          <div 
+                            className={cn(
+                              "w-full bg-foreground flex items-center justify-center text-background font-medium transition-all rounded-lg",
+                              size.height,
+                              size.text
+                            )}
+                          >
+                            OK
+                          </div>
+                          <span className="text-[10px] font-medium">{size.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
