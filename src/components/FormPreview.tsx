@@ -173,11 +173,31 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             className="w-full h-full"
           >
             {question.type === "welcome" ? (
-              <div className="flex w-full h-full" style={{ alignItems: viewMode === 'desktop' ? 'center' : 'flex-start', justifyContent: viewMode === 'desktop' ? 'center' : 'flex-start', padding: viewMode === 'desktop' ? '0 64px' : '24px 20px', paddingLeft: '7%', paddingRight: '7%' }}>
+              <div
+                className="flex w-full h-full"
+                style={{
+                  alignItems: viewMode === "desktop" ? "center" : "flex-start",
+                  justifyContent: viewMode === "desktop" ? "center" : "flex-start",
+                  padding:
+                    viewMode === "desktop"
+                      ? "0 64px"
+                      : question.mobileLayout === "mobile-centered"
+                      ? "0"
+                      : "24px 20px",
+                  paddingLeft:
+                    viewMode === "mobile" && question.mobileLayout === "mobile-centered"
+                      ? 0
+                      : "7%",
+                  paddingRight:
+                    viewMode === "mobile" && question.mobileLayout === "mobile-centered"
+                      ? 0
+                      : "7%",
+                }}
+              >
                 {(() => {
-                  const desktopLayout = question.desktopLayout || 'desktop-left-right';
-                  const mobileLayout = question.mobileLayout || 'mobile-vertical';
-                  const currentLayout = viewMode === 'desktop' ? desktopLayout : mobileLayout;
+                  const desktopLayout = question.desktopLayout || "desktop-left-right";
+                  const mobileLayout = question.mobileLayout || "mobile-vertical";
+                  const currentLayout = viewMode === "desktop" ? desktopLayout : mobileLayout;
 
                   // Image component
                   const ImageBlock = () => (
