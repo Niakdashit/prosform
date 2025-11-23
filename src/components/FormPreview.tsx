@@ -170,394 +170,342 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             className="w-full h-full"
           >
             {question.type === "welcome" ? (
-              (() => {
-                const currentLayout = viewMode === 'desktop' 
-                  ? (question.desktopLayout || 'desktop-left-right')
-                  : (question.mobileLayout || 'mobile-vertical');
+              <div className="flex items-center justify-center w-full h-full px-16">
+                {(() => {
+                  const desktopLayout = question.desktopLayout || 'desktop-left-right';
+                  const mobileLayout = question.mobileLayout || 'mobile-vertical';
+                  const currentLayout = viewMode === 'desktop' ? desktopLayout : mobileLayout;
 
-                // Render content blocks
-                const renderTextContent = () => (
-                  <div>
-                    <div className="relative">
-                      {editingField === 'welcome-title' && (
-                        <>
-                          <button
-                            type="button"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                            style={{ 
-                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                              color: '#F5B800',
-                              backdropFilter: 'blur(8px)'
-                            }}
-                          >
-                            <Sparkles className="w-3.5 h-3.5" />
-                          </button>
-
-                          {showVariableMenu && variableTarget === 'title' && (
-                            <div
-                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                              style={{
-                                top: '32px',
-                                right: 0,
-                                backgroundColor: '#4A4138',
-                                border: '1px solid rgba(245, 184, 0, 0.3)',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                              }}
-                            >
-                              {menuView === 'main' ? (
-                                <div className="space-y-1">
-                                  <button
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => {
-                                      // TODO: Implémenter la réécriture AI
-                                      console.log('Réécriture AI');
-                                    }}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      Réécriture
-                                    </div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      Améliorer le texte avec l'IA
-                                    </div>
-                                  </button>
-                                  <button
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => setMenuView('variables')}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      Variable
-                                    </div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      Insérer une variable dynamique
-                                    </div>
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="space-y-1">
-                                  <button
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => setMenuView('main')}
-                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                  >
-                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
-                                      ← Retour
-                                    </div>
-                                  </button>
-                                  {availableVariables.map((variable) => (
-                                    <button
-                                      key={variable.key}
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => insertVariable(variable.key)}
-                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                    >
-                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                        {variable.label}
-                                      </div>
-                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                        {variable.description} • {`{{${variable.key}}}`}
-                                      </div>
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </>
-                      )}
-
-                      <h1 
-                        className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
-                        style={{ 
-                          color: '#F5CA3C', 
-                          fontWeight: 700, 
-                          fontSize: '64px',
-                          letterSpacing: '-0.02em',
-                          outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                          padding: '4px',
-                          margin: '-4px',
-                          borderRadius: '4px'
-                        }}
-                        contentEditable
-                        suppressContentEditableWarning
-                        onFocus={() => setEditingField('welcome-title')}
-                        onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
-                      >
-                        {question.title}
-                      </h1>
-                    </div>
-                    
-                    <div className="relative">
-                      {editingField === 'welcome-subtitle' && (
-                        <>
-                          <button
-                            type="button"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                            className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                            style={{ 
-                              backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                              color: '#F5B800',
-                              backdropFilter: 'blur(8px)'
-                            }}
-                          >
-                            <Sparkles className="w-3.5 h-3.5" />
-                          </button>
-
-                          {showVariableMenu && variableTarget === 'subtitle' && (
-                            <div
-                              className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                              style={{
-                                top: '32px',
-                                right: 0,
-                                backgroundColor: '#4A4138',
-                                border: '1px solid rgba(245, 184, 0, 0.3)',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                              }}
-                            >
-                              {menuView === 'main' ? (
-                                <div className="space-y-1">
-                                  <button
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => {
-                                      console.log('Réécriture AI');
-                                    }}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      Réécriture
-                                    </div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      Améliorer le texte avec l'IA
-                                    </div>
-                                  </button>
-                                  <button
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => setMenuView('variables')}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      Variable
-                                    </div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      Insérer une variable dynamique
-                                    </div>
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="space-y-1">
-                                  <button
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => setMenuView('main')}
-                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                  >
-                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
-                                      ← Retour
-                                    </div>
-                                  </button>
-                                  {availableVariables.map((variable) => (
-                                    <button
-                                      key={variable.key}
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => insertVariable(variable.key)}
-                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                    >
-                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                        {variable.label}
-                                      </div>
-                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                        {variable.description} • {`{{${variable.key}}}`}
-                                      </div>
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </>
-                      )}
-
-                      <p 
-                        className="text-[16px] mb-8 leading-[1.6] cursor-text hover:opacity-80 transition-opacity" 
-                        style={{ 
-                          color: '#B8A892',
-                          outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
-                          padding: '4px',
-                          margin: '-4px',
-                          borderRadius: '4px'
-                        }}
-                        contentEditable
-                        suppressContentEditableWarning
-                        onFocus={() => setEditingField('welcome-subtitle')}
-                        onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
-                      >
-                        {question.subtitle}
-                      </p>
-                    </div>
-                    <button
-                      onClick={onNext}
-                      className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
+                  // Image component
+                  const ImageBlock = () => (
+                    <div
+                      className="overflow-hidden"
                       style={{ 
-                        backgroundColor: '#F5CA3C', 
-                        color: '#3D3731',
-                        height: '56px',
-                        borderRadius: '28px',
-                        fontSize: '17px',
-                        border: 'none',
-                        boxShadow: 'none'
+                        borderRadius: "36px",
+                        width: viewMode === 'desktop' ? '420px' : currentLayout === 'mobile-horizontal' ? '140px' : '100%',
+                        height: viewMode === 'desktop' ? '420px' : currentLayout === 'mobile-horizontal' ? '140px' : '280px',
+                        maxWidth: '100%',
+                        flexShrink: 0
                       }}
                     >
-                      <span>{question.buttonText || "Start"}</span>
-                      <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
-                        press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
-                      </span>
-                    </button>
-                    <div className="flex items-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
-                      <Clock className="w-4 h-4" />
-                      <span>Takes X minutes</span>
+                      <img
+                        src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                        alt="Feedback illustration"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  </div>
-                );
+                  );
 
-                const renderImage = () => (
-                  <div
-                    className="overflow-hidden"
-                    style={{ 
-                      borderRadius: "36px",
-                      width: viewMode === 'desktop' ? '420px' : '100%',
-                      height: viewMode === 'desktop' ? '420px' : '280px',
-                      maxWidth: '100%'
-                    }}
-                  >
-                    <img
-                      src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
-                      alt="Feedback illustration"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                );
+                  // Text content component  
+                  const TextContent = ({ centered = false }: { centered?: boolean }) => (
+                    <div className={centered ? 'text-center' : ''}>
+                      <div className="relative">
+                        {editingField === 'welcome-title' && (
+                          <>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                              style={{ 
+                                backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                                color: '#F5B800',
+                                backdropFilter: 'blur(8px)'
+                              }}
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
+                            </button>
 
-                // Desktop layouts
-                if (viewMode === 'desktop') {
-                  if (currentLayout === 'desktop-left-right') {
-                    // Split: Text left, Image right
-                    return (
-                      <div className="flex items-center justify-center w-full h-full px-16">
-                        <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
-                          {renderTextContent()}
-                          <div className="flex justify-end">
-                            {renderImage()}
+                            {showVariableMenu && variableTarget === 'title' && (
+                              <div
+                                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                                style={{
+                                  top: '32px',
+                                  right: 0,
+                                  backgroundColor: '#4A4138',
+                                  border: '1px solid rgba(245, 184, 0, 0.3)',
+                                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                                }}
+                              >
+                                {menuView === 'main' ? (
+                                  <div className="space-y-1">
+                                    <button
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => console.log('Réécriture AI')}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                    </button>
+                                    <button
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => setMenuView('variables')}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-1">
+                                    <button
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => setMenuView('main')}
+                                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                    >
+                                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                    </button>
+                                    {availableVariables.map((variable) => (
+                                      <button
+                                        key={variable.key}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => insertVariable(variable.key)}
+                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                      >
+                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        <h1 
+                          className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
+                          style={{ 
+                            color: '#F5CA3C', 
+                            fontWeight: 700, 
+                            fontSize: viewMode === 'desktop' ? '64px' : '48px',
+                            letterSpacing: '-0.02em',
+                            outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                            padding: '4px',
+                            margin: '-4px',
+                            borderRadius: '4px'
+                          }}
+                          contentEditable
+                          suppressContentEditableWarning
+                          onFocus={() => setEditingField('welcome-title')}
+                          onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                        >
+                          {question.title}
+                        </h1>
+                      </div>
+                      
+                      <div className="relative">
+                        {editingField === 'welcome-subtitle' && (
+                          <>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                              style={{ 
+                                backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                                color: '#F5B800',
+                                backdropFilter: 'blur(8px)'
+                              }}
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
+                            </button>
+
+                            {showVariableMenu && variableTarget === 'subtitle' && (
+                              <div
+                                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                                style={{
+                                  top: '32px',
+                                  right: 0,
+                                  backgroundColor: '#4A4138',
+                                  border: '1px solid rgba(245, 184, 0, 0.3)',
+                                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                                }}
+                              >
+                                {menuView === 'main' ? (
+                                  <div className="space-y-1">
+                                    <button
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => console.log('Réécriture AI')}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                    </button>
+                                    <button
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => setMenuView('variables')}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-1">
+                                    <button
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => setMenuView('main')}
+                                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                    >
+                                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                    </button>
+                                    {availableVariables.map((variable) => (
+                                      <button
+                                        key={variable.key}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => insertVariable(variable.key)}
+                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                      >
+                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        <p 
+                          className="text-[16px] mb-8 leading-[1.6] cursor-text hover:opacity-80 transition-opacity" 
+                          style={{ 
+                            color: '#B8A892',
+                            outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                            padding: '4px',
+                            margin: '-4px',
+                            borderRadius: '4px'
+                          }}
+                          contentEditable
+                          suppressContentEditableWarning
+                          onFocus={() => setEditingField('welcome-subtitle')}
+                          onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                        >
+                          {question.subtitle}
+                        </p>
+                      </div>
+                      
+                      <button
+                        onClick={onNext}
+                        className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
+                        style={{ 
+                          backgroundColor: '#F5CA3C', 
+                          color: '#3D3731',
+                          height: '56px',
+                          borderRadius: '28px',
+                          fontSize: '17px',
+                          border: 'none',
+                          boxShadow: 'none'
+                        }}
+                      >
+                        <span>{question.buttonText || "Start"}</span>
+                        <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
+                          press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
+                        </span>
+                      </button>
+                      <div className="flex items-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                        <Clock className="w-4 h-4" />
+                        <span>Takes X minutes</span>
+                      </div>
+                    </div>
+                  );
+
+                  // Desktop layouts
+                  if (viewMode === 'desktop') {
+                    if (desktopLayout === 'desktop-left-right') {
+                      // Split: Image gauche (petite), Texte droite
+                      return (
+                        <div className="w-full h-full grid grid-cols-[auto_1fr] gap-16 items-center px-12">
+                          <ImageBlock />
+                          <TextContent />
+                        </div>
+                      );
+                    } else if (desktopLayout === 'desktop-right-left') {
+                      // Stack: Texte gauche, Image droite (petite)
+                      return (
+                        <div className="w-full h-full grid grid-cols-[1fr_auto] gap-16 items-center px-12">
+                          <TextContent />
+                          <ImageBlock />
+                        </div>
+                      );
+                    } else if (desktopLayout === 'desktop-centered') {
+                      // Centered: Image gauche, Texte droite (comme split)
+                      return (
+                        <div className="w-full h-full grid grid-cols-[auto_1fr] gap-16 items-center px-12">
+                          <ImageBlock />
+                          <TextContent />
+                        </div>
+                      );
+                    } else if (desktopLayout === 'desktop-split') {
+                      // Wallpaper: Image en fond, texte en overlay
+                      return (
+                        <div className="absolute inset-0">
+                          <img
+                            src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1600&h=900&fit=crop"
+                            alt="Background"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                          <div className="relative z-10 flex items-center justify-center h-full px-16">
+                            <div className="max-w-[700px] text-center">
+                              <TextContent centered />
+                            </div>
                           </div>
                         </div>
+                      );
+                    }
+                  }
+
+                  // Mobile layouts
+                  if (mobileLayout === 'mobile-vertical') {
+                    return (
+                      <div className="flex flex-col gap-8 items-center py-8 px-6 w-full">
+                        <ImageBlock />
+                        <TextContent />
                       </div>
                     );
-                  } else if (currentLayout === 'desktop-right-left') {
-                    // Stack: Image left, Text right
+                  } else if (mobileLayout === 'mobile-horizontal') {
                     return (
-                      <div className="flex items-center justify-center w-full h-full px-16">
-                        <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
-                          <div className="flex justify-start">
-                            {renderImage()}
-                          </div>
-                          {renderTextContent()}
+                      <div className="flex items-center gap-6 py-8 px-6 w-full">
+                        <div className="flex-1">
+                          <TextContent />
                         </div>
+                        <ImageBlock />
                       </div>
                     );
-                  } else if (currentLayout === 'desktop-centered') {
-                    // Centered: Image top, Text bottom
+                  } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex items-center justify-center w-full h-full px-16">
-                        <div className="flex flex-col items-center justify-center gap-10 px-12">
-                          {renderImage()}
-                          <div className="text-center max-w-[600px]">
-                            {renderTextContent()}
-                          </div>
-                        </div>
+                      <div className="flex flex-col gap-8 items-center justify-center py-8 px-6 w-full text-center">
+                        <ImageBlock />
+                        <TextContent centered />
                       </div>
                     );
-                  } else if (currentLayout === 'desktop-split') {
-                    // Wallpaper: Full background image with text overlay
+                  } else if (mobileLayout === 'mobile-minimal') {
                     return (
-                      <div className="relative w-full h-full">
+                      <div className="absolute inset-0">
                         <img
-                          src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                          src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&h=1200&fit=crop"
                           alt="Background"
                           className="absolute inset-0 w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/30" />
-                        <div className="relative z-10 flex items-center justify-center w-full h-full px-16">
-                          <div className="text-center max-w-[700px]">
-                            {renderTextContent()}
-                          </div>
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                        <div className="relative z-10 flex items-center justify-center h-full px-6">
+                          <TextContent centered />
                         </div>
                       </div>
                     );
                   }
-                }
 
-                // Mobile layouts
-                if (currentLayout === 'mobile-vertical') {
-                  // Stack: Image top, Text bottom
+                  // Fallback
                   return (
-                    <div className="flex flex-col items-center justify-center h-full px-6 py-8 gap-6">
-                      {renderImage()}
-                      {renderTextContent()}
+                    <div className="w-full h-full grid grid-cols-[auto_1fr] gap-16 items-center px-12">
+                      <ImageBlock />
+                      <TextContent />
                     </div>
                   );
-                } else if (currentLayout === 'mobile-horizontal') {
-                  // Split: Side by side (compact)
-                  return (
-                    <div className="flex items-center h-full px-4 py-8 gap-4">
-                      <div className="flex-1">
-                        {renderTextContent()}
-                      </div>
-                      <div className="flex-shrink-0 w-32">
-                        {renderImage()}
-                      </div>
-                    </div>
-                  );
-                } else if (currentLayout === 'mobile-centered') {
-                  // Centered: Image and text centered
-                  return (
-                    <div className="flex flex-col items-center justify-center h-full px-6 py-8 gap-6 text-center">
-                      <div className="w-48 h-48">
-                        {renderImage()}
-                      </div>
-                      {renderTextContent()}
-                    </div>
-                  );
-                } else if (currentLayout === 'mobile-minimal') {
-                  // Minimal/Wallpaper: Background with overlay
-                  return (
-                    <div className="relative w-full h-full">
-                      <img
-                        src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
-                        alt="Background"
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/40" />
-                      <div className="relative z-10 flex items-center justify-center h-full px-6 py-8">
-                        {renderTextContent()}
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Default fallback
-                return (
-                  <div className="flex items-center justify-center w-full h-full px-16">
-                    <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
-                      {renderTextContent()}
-                      <div className="flex justify-end">
-                        {renderImage()}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()
+                })()}
+              </div>
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
               <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px]">
