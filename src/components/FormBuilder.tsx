@@ -177,6 +177,8 @@ export const FormBuilder = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  const [isFullPreview, setIsFullPreview] = useState(false);
+  const [previewQuestionIndex, setPreviewQuestionIndex] = useState(0);
 
   // Force mobile view mode on mobile devices
   useEffect(() => {
@@ -313,8 +315,47 @@ export const FormBuilder = () => {
   return (
     <ThemeProvider>
       <div className="flex flex-col h-screen bg-muted overflow-hidden">
-        <TopToolbar onAddContent={() => setIsAddContentModalOpen(true)} />
-      <div className="flex flex-1 overflow-hidden relative">
+        {!isFullPreview && (
+          <TopToolbar 
+            onAddContent={() => setIsAddContentModalOpen(true)}
+            onPreview={() => {
+              setIsFullPreview(true);
+              setPreviewQuestionIndex(0);
+            }}
+          />
+        )}
+        
+        {isFullPreview ? (
+          <div className="flex-1 flex items-center justify-center relative bg-gray-100">
+            <button
+              onClick={() => setIsFullPreview(false)}
+              className="absolute top-4 left-4 z-50 px-4 py-2 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
+              style={{
+                backgroundColor: '#4A4138',
+                border: '1px solid rgba(245, 184, 0, 0.3)',
+                color: '#F5CA3C'
+              }}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-xs font-medium">Exit Preview</span>
+            </button>
+            
+            <FormPreview
+              question={questions[previewQuestionIndex]}
+              onUpdateQuestion={updateQuestion}
+              viewMode={viewMode}
+              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+              isMobileResponsive={false}
+              allQuestions={questions}
+              onNext={() => {
+                if (previewQuestionIndex < questions.length - 1) {
+                  setPreviewQuestionIndex(prev => prev + 1);
+                }
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
             {/* Mobile: Drawers with trigger buttons */}
@@ -412,9 +453,10 @@ export const FormBuilder = () => {
             />
           </>
         )}
-      </div>
+          </div>
+        )}
 
-      <AddContentModal
+        <AddContentModal
         isOpen={isAddContentModalOpen}
         onClose={() => setIsAddContentModalOpen(false)}
         onSelectElement={handleAddElement}
