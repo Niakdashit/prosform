@@ -88,23 +88,18 @@ const LayoutIcon = ({ type }: { type: string }) => {
 const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
   if (!question) return null;
 
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [desktopOpen, setDesktopOpen] = React.useState(false);
-
   const mobileLayouts = [
-    { value: "mobile-vertical", label: "Vertical" },
-    { value: "mobile-horizontal", label: "Horizontal" },
+    { value: "mobile-vertical", label: "Stack" },
+    { value: "mobile-horizontal", label: "Split" },
     { value: "mobile-centered", label: "Centered" },
     { value: "mobile-minimal", label: "Minimal" },
   ];
 
   const desktopLayouts = [
-    { value: "desktop-left-right", label: "Left-Right" },
-    { value: "desktop-right-left", label: "Right-Left" },
+    { value: "desktop-left-right", label: "Split" },
+    { value: "desktop-right-left", label: "Stack" },
     { value: "desktop-centered", label: "Centered" },
-    { value: "desktop-split", label: "Split" },
-    { value: "desktop-top-bottom", label: "Top-Bottom" },
-    { value: "desktop-full", label: "Full Width" },
+    { value: "desktop-split", label: "Wallpaper" },
   ];
 
   const currentMobileLayout = question.mobileLayout || "mobile-vertical";
@@ -113,93 +108,65 @@ const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
   return (
     <>
       <div>
-        <Label className="text-sm font-medium mb-3 block">Layout</Label>
+        <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
         
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Smartphone className="w-3.5 h-3.5 text-muted-foreground" />
-              <Label className="text-xs text-muted-foreground">Mobile</Label>
-            </div>
-            <Popover open={mobileOpen} onOpenChange={setMobileOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="w-full h-10 justify-start gap-2 text-xs"
-                >
-                  <div className="w-5 h-5">
+            <Label className="text-xs font-normal mb-1.5 block">Mobile</Label>
+            <Select 
+              value={currentMobileLayout}
+              onValueChange={(value) => onUpdateQuestion?.(question.id, { mobileLayout: value })}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4">
                     <LayoutIcon type={currentMobileLayout} />
                   </div>
-                  <span>{mobileLayouts.find(l => l.value === currentMobileLayout)?.label}</span>
-                  <svg className="ml-auto w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="m6 9 6 6 6-6"/>
-                  </svg>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-56 p-2" align="start">
-                <div className="grid grid-cols-4 gap-2">
-                  {mobileLayouts.map((layout) => (
-                    <button
-                      key={layout.value}
-                      onClick={() => {
-                        onUpdateQuestion?.(question.id, { mobileLayout: layout.value });
-                        setMobileOpen(false);
-                      }}
-                      className={`w-full h-12 p-1.5 border-2 rounded transition-colors ${
-                        currentMobileLayout === layout.value 
-                          ? 'border-primary bg-primary/10' 
-                          : 'border-border hover:border-primary'
-                      }`}
-                    >
-                      <LayoutIcon type={layout.value} />
-                    </button>
-                  ))}
+                  <SelectValue />
                 </div>
-              </PopoverContent>
-            </Popover>
+              </SelectTrigger>
+              <SelectContent>
+                {mobileLayouts.map((layout) => (
+                  <SelectItem key={layout.value} value={layout.value} className="text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4">
+                        <LayoutIcon type={layout.value} />
+                      </div>
+                      <span>{layout.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Monitor className="w-3.5 h-3.5 text-muted-foreground" />
-              <Label className="text-xs text-muted-foreground">Desktop</Label>
-            </div>
-            <Popover open={desktopOpen} onOpenChange={setDesktopOpen}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="w-full h-10 justify-start gap-2 text-xs"
-                >
-                  <div className="w-5 h-5">
+            <Label className="text-xs font-normal mb-1.5 block">Desktop</Label>
+            <Select 
+              value={currentDesktopLayout}
+              onValueChange={(value) => onUpdateQuestion?.(question.id, { desktopLayout: value })}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4">
                     <LayoutIcon type={currentDesktopLayout} />
                   </div>
-                  <span>{desktopLayouts.find(l => l.value === currentDesktopLayout)?.label}</span>
-                  <svg className="ml-auto w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="m6 9 6 6 6-6"/>
-                  </svg>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-2" align="start">
-                <div className="grid grid-cols-3 gap-2">
-                  {desktopLayouts.map((layout) => (
-                    <button
-                      key={layout.value}
-                      onClick={() => {
-                        onUpdateQuestion?.(question.id, { desktopLayout: layout.value });
-                        setDesktopOpen(false);
-                      }}
-                      className={`w-full h-14 p-1.5 border-2 rounded transition-colors ${
-                        currentDesktopLayout === layout.value 
-                          ? 'border-primary bg-primary/10' 
-                          : 'border-border hover:border-primary'
-                      }`}
-                    >
-                      <LayoutIcon type={layout.value} />
-                    </button>
-                  ))}
+                  <SelectValue />
                 </div>
-              </PopoverContent>
-            </Popover>
+              </SelectTrigger>
+              <SelectContent>
+                {desktopLayouts.map((layout) => (
+                  <SelectItem key={layout.value} value={layout.value} className="text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4">
+                        <LayoutIcon type={layout.value} />
+                      </div>
+                      <span>{layout.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
