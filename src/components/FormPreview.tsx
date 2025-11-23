@@ -170,8 +170,13 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             className="w-full h-full"
           >
             {question.type === "welcome" ? (
-              <div className="flex items-center justify-center w-full h-full px-16">
-                <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12 relative">
+              (() => {
+                const currentLayout = viewMode === 'desktop' 
+                  ? (question.desktopLayout || 'desktop-left-right')
+                  : (question.mobileLayout || 'mobile-vertical');
+
+                // Render content blocks
+                const renderTextContent = () => (
                   <div>
                     <div className="relative">
                       {editingField === 'welcome-title' && (
@@ -415,20 +420,144 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       <span>Takes X minutes</span>
                     </div>
                   </div>
-                  <div className="flex justify-end">
-                    <div
-                      className="overflow-hidden w-[420px] h-[420px] max-w-full"
-                      style={{ borderRadius: "36px" }}
-                    >
+                );
+
+                const renderImage = () => (
+                  <div
+                    className="overflow-hidden"
+                    style={{ 
+                      borderRadius: "36px",
+                      width: viewMode === 'desktop' ? '420px' : '100%',
+                      height: viewMode === 'desktop' ? '420px' : '280px',
+                      maxWidth: '100%'
+                    }}
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                      alt="Feedback illustration"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                );
+
+                // Desktop layouts
+                if (viewMode === 'desktop') {
+                  if (currentLayout === 'desktop-left-right') {
+                    // Split: Text left, Image right
+                    return (
+                      <div className="flex items-center justify-center w-full h-full px-16">
+                        <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
+                          {renderTextContent()}
+                          <div className="flex justify-end">
+                            {renderImage()}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  } else if (currentLayout === 'desktop-right-left') {
+                    // Stack: Image left, Text right
+                    return (
+                      <div className="flex items-center justify-center w-full h-full px-16">
+                        <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
+                          <div className="flex justify-start">
+                            {renderImage()}
+                          </div>
+                          {renderTextContent()}
+                        </div>
+                      </div>
+                    );
+                  } else if (currentLayout === 'desktop-centered') {
+                    // Centered: Image top, Text bottom
+                    return (
+                      <div className="flex items-center justify-center w-full h-full px-16">
+                        <div className="flex flex-col items-center justify-center gap-10 px-12">
+                          {renderImage()}
+                          <div className="text-center max-w-[600px]">
+                            {renderTextContent()}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  } else if (currentLayout === 'desktop-split') {
+                    // Wallpaper: Full background image with text overlay
+                    return (
+                      <div className="relative w-full h-full">
+                        <img
+                          src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                          alt="Background"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/30" />
+                        <div className="relative z-10 flex items-center justify-center w-full h-full px-16">
+                          <div className="text-center max-w-[700px]">
+                            {renderTextContent()}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                }
+
+                // Mobile layouts
+                if (currentLayout === 'mobile-vertical') {
+                  // Stack: Image top, Text bottom
+                  return (
+                    <div className="flex flex-col items-center justify-center h-full px-6 py-8 gap-6">
+                      {renderImage()}
+                      {renderTextContent()}
+                    </div>
+                  );
+                } else if (currentLayout === 'mobile-horizontal') {
+                  // Split: Side by side (compact)
+                  return (
+                    <div className="flex items-center h-full px-4 py-8 gap-4">
+                      <div className="flex-1">
+                        {renderTextContent()}
+                      </div>
+                      <div className="flex-shrink-0 w-32">
+                        {renderImage()}
+                      </div>
+                    </div>
+                  );
+                } else if (currentLayout === 'mobile-centered') {
+                  // Centered: Image and text centered
+                  return (
+                    <div className="flex flex-col items-center justify-center h-full px-6 py-8 gap-6 text-center">
+                      <div className="w-48 h-48">
+                        {renderImage()}
+                      </div>
+                      {renderTextContent()}
+                    </div>
+                  );
+                } else if (currentLayout === 'mobile-minimal') {
+                  // Minimal/Wallpaper: Background with overlay
+                  return (
+                    <div className="relative w-full h-full">
                       <img
                         src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
-                        alt="Feedback illustration"
-                        className="w-full h-full object-cover"
+                        alt="Background"
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
+                      <div className="absolute inset-0 bg-black/40" />
+                      <div className="relative z-10 flex items-center justify-center h-full px-6 py-8">
+                        {renderTextContent()}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // Default fallback
+                return (
+                  <div className="flex items-center justify-center w-full h-full px-16">
+                    <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12">
+                      {renderTextContent()}
+                      <div className="flex justify-end">
+                        {renderImage()}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
               <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px]">
