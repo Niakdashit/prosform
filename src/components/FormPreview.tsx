@@ -38,9 +38,10 @@ interface FormPreviewProps {
   onToggleViewMode: () => void;
   isMobileResponsive?: boolean;
   allQuestions?: Question[];
+  isPublicPreview?: boolean;
 }
 
-export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [] }: FormPreviewProps) => {
+export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [], isPublicPreview = false }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
@@ -314,38 +315,42 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               transition: 'transform 0.3s ease'
                             }}
                           />
-                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                            <button
-                              onClick={() => setShowUploadModal(true)}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              title="Change image"
-                            >
-                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                            <button
-                              onClick={() => setShowEditorModal(true)}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              title="Edit image"
-                            >
-                              <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                          </div>
+                          {!isPublicPreview && (
+                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                              <button
+                                onClick={() => setShowUploadModal(true)}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Change image"
+                              >
+                                <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
+                              <button
+                                onClick={() => setShowEditorModal(true)}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Edit image"
+                              >
+                                <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
+                            </div>
+                          )}
                         </>
                       ) : (
-                        <div
-                          onClick={() => fileInputRef.current?.click()}
-                          className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
-                        >
-                          <Upload className="w-12 h-12 mb-3" style={{ color: theme.buttonColor }} />
-                          <p className="text-sm font-medium" style={{ color: theme.buttonColor }}>
-                            Upload Image
-                          </p>
-                          <p className="text-xs mt-1" style={{ color: theme.systemColor }}>
-                            Click to browse
-                          </p>
-                        </div>
+                        !isPublicPreview && (
+                          <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                          >
+                            <Upload className="w-12 h-12 mb-3" style={{ color: theme.buttonColor }} />
+                            <p className="text-sm font-medium" style={{ color: theme.buttonColor }}>
+                              Upload Image
+                            </p>
+                            <p className="text-xs mt-1" style={{ color: theme.systemColor }}>
+                              Click to browse
+                            </p>
+                          </div>
+                        )
                       )}
                     </div>
                   );
@@ -354,7 +359,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   const TextContent = ({ centered = false }: { centered?: boolean }) => (
                     <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
                       <div className="relative">
-                        {editingField === 'welcome-title' && (
+                        {!isPublicPreview && editingField === 'welcome-title' && (
                           <>
                             <button
                               type="button"
@@ -428,7 +433,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         )}
 
                         <h1 
-                          className="font-bold cursor-text hover:opacity-80 transition-opacity" 
+                          className={`font-bold ${!isPublicPreview ? 'cursor-text hover:opacity-80' : ''} transition-opacity`}
                           style={{ 
                             color: theme.accentColor, 
                             fontWeight: 700, 
@@ -436,24 +441,24 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             lineHeight: '1.05',
                             letterSpacing: '-0.02em',
                             marginBottom: `${(question.blockSpacing || 1) * 24}px`,
-                            outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                            outline: !isPublicPreview && editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                             padding: '4px',
                             marginTop: '-4px',
                             marginLeft: '-4px',
                             marginRight: '-4px',
                             borderRadius: '4px'
                           }}
-                          contentEditable
+                          contentEditable={!isPublicPreview}
                           suppressContentEditableWarning
-                          onFocus={() => setEditingField('welcome-title')}
-                          onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                          onFocus={() => !isPublicPreview && setEditingField('welcome-title')}
+                          onBlur={(e) => !isPublicPreview && handleTitleBlur(e.currentTarget.textContent || '')}
                         >
                           {question.title}
                         </h1>
                       </div>
                       
                       <div className="relative">
-                        {editingField === 'welcome-subtitle' && (
+                        {!isPublicPreview && editingField === 'welcome-subtitle' && (
                           <>
                             <button
                               type="button"
@@ -1269,7 +1274,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         {question.title}
                       </h2>
                     </div>
-                    {(question.variant || question.type !== "text") && (
+                    {!isPublicPreview && (question.variant || question.type !== "text") && (
                       <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
                         {question.type === 'email' && <><Mail className="w-4 h-4" /><span>Email</span></>}
                         {question.type === 'phone' && <><Phone className="w-4 h-4" /><span>Phone</span></>}

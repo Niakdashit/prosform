@@ -39,6 +39,7 @@ const Preview = () => {
         onToggleViewMode={() => {}} // No toggle in public preview
         isMobileResponsive={true}
         allQuestions={questions}
+        isPublicPreview={true}
         onNext={() => {
           if (currentIndex < questions.length - 1) {
             setCurrentIndex(prev => prev + 1);
