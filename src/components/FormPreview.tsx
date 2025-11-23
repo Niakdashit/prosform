@@ -40,6 +40,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   const [formResponses, setFormResponses] = useState<Record<string, string>>({});
   const [showVariableMenu, setShowVariableMenu] = useState(false);
   const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
+  const [menuView, setMenuView] = useState<'main' | 'variables'>('main');
 
   const availableVariables = [
     { key: 'first_name', label: 'First name', description: "User's first name" },
@@ -59,6 +60,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
     }
 
     setShowVariableMenu(false);
+    setMenuView('main');
   };
 
   const replaceVariables = (text: string): string => {
@@ -144,7 +146,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                           <button
                             type="button"
                             onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); }}
+                            onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
                             className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
                             style={{ 
                               backgroundColor: 'rgba(245, 184, 0, 0.15)',
@@ -166,23 +168,64 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                                 boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
                               }}
                             >
-                              <div className="space-y-1">
-                                {availableVariables.map((variable) => (
+                              {menuView === 'main' ? (
+                                <div className="space-y-1">
                                   <button
-                                    key={variable.key}
                                     onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
+                                    onClick={() => {
+                                      // TODO: Implémenter la réécriture AI
+                                      console.log('Réécriture AI');
+                                    }}
                                     className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
                                   >
                                     <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      {variable.label}
+                                      Réécriture
                                     </div>
                                     <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      {variable.description} • {`{{${variable.key}}}`}
+                                      Améliorer le texte avec l'IA
                                     </div>
                                   </button>
-                                ))}
-                              </div>
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('variables')}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Variable
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Insérer une variable dynamique
+                                    </div>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('main')}
+                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                  >
+                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
+                                      ← Retour
+                                    </div>
+                                  </button>
+                                  {availableVariables.map((variable) => (
+                                    <button
+                                      key={variable.key}
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => insertVariable(variable.key)}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                        {variable.label}
+                                      </div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                        {variable.description} • {`{{${variable.key}}}`}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                         </>
@@ -215,7 +258,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                           <button
                             type="button"
                             onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); }}
+                            onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
                             className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
                             style={{ 
                               backgroundColor: 'rgba(245, 184, 0, 0.15)',
@@ -237,23 +280,63 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                                 boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
                               }}
                             >
-                              <div className="space-y-1">
-                                {availableVariables.map((variable) => (
+                              {menuView === 'main' ? (
+                                <div className="space-y-1">
                                   <button
-                                    key={variable.key}
                                     onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
+                                    onClick={() => {
+                                      console.log('Réécriture AI');
+                                    }}
                                     className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
                                   >
                                     <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      {variable.label}
+                                      Réécriture
                                     </div>
                                     <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      {variable.description} • {`{{${variable.key}}}`}
+                                      Améliorer le texte avec l'IA
                                     </div>
                                   </button>
-                                ))}
-                              </div>
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('variables')}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Variable
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Insérer une variable dynamique
+                                    </div>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('main')}
+                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                  >
+                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
+                                      ← Retour
+                                    </div>
+                                  </button>
+                                  {availableVariables.map((variable) => (
+                                    <button
+                                      key={variable.key}
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => insertVariable(variable.key)}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                        {variable.label}
+                                      </div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                        {variable.description} • {`{{${variable.key}}}`}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                         </>
@@ -328,7 +411,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                           <button
                             type="button"
                             onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); }}
+                            onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
                             className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
                             style={{ 
                               backgroundColor: 'rgba(245, 184, 0, 0.15)',
@@ -350,23 +433,63 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                                 boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
                               }}
                             >
-                              <div className="space-y-1">
-                                {availableVariables.map((variable) => (
+                              {menuView === 'main' ? (
+                                <div className="space-y-1">
                                   <button
-                                    key={variable.key}
                                     onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
+                                    onClick={() => {
+                                      console.log('Réécriture AI');
+                                    }}
                                     className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
                                   >
                                     <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                      {variable.label}
+                                      Réécriture
                                     </div>
                                     <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                      {variable.description} • {`{{${variable.key}}}`}
+                                      Améliorer le texte avec l'IA
                                     </div>
                                   </button>
-                                ))}
-                              </div>
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('variables')}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                      Variable
+                                    </div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                      Insérer une variable dynamique
+                                    </div>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => setMenuView('main')}
+                                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                  >
+                                    <div className="text-xs" style={{ color: '#A89A8A' }}>
+                                      ← Retour
+                                    </div>
+                                  </button>
+                                  {availableVariables.map((variable) => (
+                                    <button
+                                      key={variable.key}
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => insertVariable(variable.key)}
+                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                    >
+                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                        {variable.label}
+                                      </div>
+                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                        {variable.description} • {`{{${variable.key}}}`}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
                         </>
