@@ -42,53 +42,55 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           className="w-full max-w-4xl mx-auto px-8"
         >
           {question.type === "welcome" ? (
-            <div className="flex items-center justify-between w-full max-w-[1500px] px-24 gap-24">
-              <div className="flex-1 max-w-[560px]">
-                <h1 className="font-bold mb-6 leading-[0.9]" style={{ 
-                  color: '#F5CA3C', 
-                  fontWeight: 700, 
-                  fontSize: '80px',
-                  letterSpacing: '-0.04em' 
-                }}>
-                  {question.title}
-                </h1>
-                <p className="text-[17px] mb-14 leading-[1.65]" style={{ color: '#B8A892' }}>
-                  {question.subtitle}
-                </p>
-                <button
-                  onClick={onNext}
-                  className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
-                  style={{ 
-                    backgroundColor: '#F5CA3C', 
-                    color: '#3D3731',
-                    height: '60px',
-                    borderRadius: '30px',
-                    fontSize: '18px',
-                    border: 'none',
-                    boxShadow: 'none'
-                  }}
-                >
-                  <span>Give feedback</span>
-                  <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.6)', fontSize: '15px' }}>
-                    press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
-                  </span>
-                </button>
-                <div className="flex items-center gap-2.5 mt-5" style={{ color: '#B8A892', fontSize: '14px' }}>
-                  <Clock className="w-4 h-4" />
-                  <span>Takes X minutes</span>
+            <div className="flex items-center justify-center w-full h-full px-20">
+              <div className="flex items-center gap-16 max-w-[1400px] w-full">
+                <div className="flex-1 max-w-[520px]">
+                  <h1 className="font-bold mb-6 leading-[0.9]" style={{ 
+                    color: '#F5CA3C', 
+                    fontWeight: 700, 
+                    fontSize: '80px',
+                    letterSpacing: '-0.04em' 
+                  }}>
+                    {question.title}
+                  </h1>
+                  <p className="text-[17px] mb-14 leading-[1.65]" style={{ color: '#B8A892' }}>
+                    {question.subtitle}
+                  </p>
+                  <button
+                    onClick={onNext}
+                    className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
+                    style={{ 
+                      backgroundColor: '#F5CA3C', 
+                      color: '#3D3731',
+                      height: '60px',
+                      borderRadius: '30px',
+                      fontSize: '18px',
+                      border: 'none',
+                      boxShadow: 'none'
+                    }}
+                  >
+                    <span>Give feedback</span>
+                    <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.6)', fontSize: '15px' }}>
+                      press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
+                    </span>
+                  </button>
+                  <div className="flex items-center gap-2.5 mt-5" style={{ color: '#B8A892', fontSize: '14px' }}>
+                    <Clock className="w-4 h-4" />
+                    <span>Takes X minutes</span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1 max-w-[640px] flex justify-end">
-                <div className="w-[560px] overflow-hidden" style={{ 
-                  borderRadius: '44px',
-                  aspectRatio: '1.35/1',
-                  boxShadow: '0 40px 110px -35px rgba(0,0,0,0.75)'
-                }}>
-                  <img
-                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1200&h=890&fit=crop"
-                    alt="Feedback illustration"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="flex-1 max-w-[560px]">
+                  <div className="w-full overflow-hidden" style={{ 
+                    borderRadius: '44px',
+                    aspectRatio: '1.35/1',
+                    boxShadow: '0 40px 110px -35px rgba(0,0,0,0.75)'
+                  }}>
+                    <img
+                      src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1200&h=890&fit=crop"
+                      alt="Feedback illustration"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
