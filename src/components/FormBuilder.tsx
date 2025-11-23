@@ -347,7 +347,7 @@ export const FormBuilder = () => {
               onUpdateQuestion={updateQuestion}
               viewMode={viewMode}
               onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              isMobileResponsive={false}
+              isMobileResponsive={true}
               allQuestions={questions}
               onNext={() => {
                 if (previewQuestionIndex < questions.length - 1) {
