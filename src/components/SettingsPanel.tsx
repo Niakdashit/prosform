@@ -372,8 +372,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderTextSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -420,8 +418,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderEmailSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -470,8 +466,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderPhoneSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -532,8 +526,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderNumberSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -591,8 +583,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDateSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -654,8 +644,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDropdownSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -710,8 +698,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderYesNoSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -974,8 +960,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderRatingSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -1056,8 +1040,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderChoiceSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
-      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
