@@ -14,22 +14,10 @@ import mobileVerticalIcon from "@/assets/layout-mobile-vertical.svg";
 import mobileHorizontalIcon from "@/assets/layout-mobile-horizontal.svg";
 import mobileCenteredIcon from "@/assets/layout-mobile-centered.svg";
 import mobileMinimalIcon from "@/assets/layout-mobile-minimal.svg";
-import mobileHeroIcon from "@/assets/layout-mobile-hero.svg";
-import mobileGridIcon from "@/assets/layout-mobile-grid.svg";
-import mobileCardsIcon from "@/assets/layout-mobile-cards.svg";
-import mobileFullwidthIcon from "@/assets/layout-mobile-fullwidth.svg";
-import mobileCompactIcon from "@/assets/layout-mobile-compact.svg";
 import desktopLeftRightIcon from "@/assets/layout-desktop-left-right.svg";
 import desktopRightLeftIcon from "@/assets/layout-desktop-right-left.svg";
 import desktopCenteredIcon from "@/assets/layout-desktop-centered.svg";
 import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
-import desktopFullscreenIcon from "@/assets/layout-desktop-fullscreen.svg";
-import desktopColumnsIcon from "@/assets/layout-desktop-columns.svg";
-import desktopGridIcon from "@/assets/layout-desktop-grid.svg";
-import desktopWideIcon from "@/assets/layout-desktop-wide.svg";
-import desktopHorizontalIcon from "@/assets/layout-desktop-horizontal.svg";
-import desktopMinimalIcon from "@/assets/layout-desktop-minimal.svg";
-import desktopNarrowIcon from "@/assets/layout-desktop-narrow.svg";
 
 interface SettingsPanelProps {
   question?: Question;
@@ -42,22 +30,10 @@ const LayoutIcon = ({ type }: { type: string }) => {
     "mobile-horizontal": mobileHorizontalIcon,
     "mobile-centered": mobileCenteredIcon,
     "mobile-minimal": mobileMinimalIcon,
-    "mobile-hero": mobileHeroIcon,
-    "mobile-grid": mobileGridIcon,
-    "mobile-cards": mobileCardsIcon,
-    "mobile-fullwidth": mobileFullwidthIcon,
-    "mobile-compact": mobileCompactIcon,
     "desktop-left-right": desktopLeftRightIcon,
     "desktop-right-left": desktopRightLeftIcon,
     "desktop-centered": desktopCenteredIcon,
     "desktop-split": desktopSplitIcon,
-    "desktop-fullscreen": desktopFullscreenIcon,
-    "desktop-columns": desktopColumnsIcon,
-    "desktop-grid": desktopGridIcon,
-    "desktop-wide": desktopWideIcon,
-    "desktop-horizontal": desktopHorizontalIcon,
-    "desktop-minimal": desktopMinimalIcon,
-    "desktop-narrow": desktopNarrowIcon,
   };
   
   const icon = iconMap[type];
@@ -69,133 +45,22 @@ const LayoutIcon = ({ type }: { type: string }) => {
 const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
   if (!question) return null;
 
-  // Layouts spécifiques par type de question
-  const getLayoutsByType = () => {
-    const questionType = question.type;
-    
-    // Welcome & Ending screens - layouts visuels
-    if (questionType === 'welcome' || questionType === 'ending') {
-      return {
-        mobile: [
-          { value: "mobile-vertical", label: "Stack" },
-          { value: "mobile-centered", label: "Centered" },
-          { value: "mobile-minimal", label: "Minimal" },
-          { value: "mobile-hero", label: "Hero" },
-        ],
-        desktop: [
-          { value: "desktop-split", label: "Wallpaper" },
-          { value: "desktop-centered", label: "Centered" },
-          { value: "desktop-left-right", label: "Split" },
-          { value: "desktop-fullscreen", label: "Fullscreen" },
-        ]
-      };
-    }
-    
-    // Multiple Choice & Picture Choice - layouts avec colonnes
-    if (questionType === 'choice' || questionType === 'picture-choice') {
-      return {
-        mobile: [
-          { value: "mobile-vertical", label: "Stack" },
-          { value: "mobile-grid", label: "Grid" },
-          { value: "mobile-cards", label: "Cards" },
-        ],
-        desktop: [
-          { value: "desktop-left-right", label: "Split" },
-          { value: "desktop-columns", label: "2 Columns" },
-          { value: "desktop-grid", label: "Grid" },
-          { value: "desktop-centered", label: "Centered" },
-        ]
-      };
-    }
-    
-    // File Upload - layouts avec zone de drop
-    if (questionType === 'file') {
-      return {
-        mobile: [
-          { value: "mobile-centered", label: "Centered" },
-          { value: "mobile-vertical", label: "Stack" },
-          { value: "mobile-fullwidth", label: "Full Width" },
-        ],
-        desktop: [
-          { value: "desktop-centered", label: "Centered" },
-          { value: "desktop-left-right", label: "Split" },
-          { value: "desktop-wide", label: "Wide" },
-        ]
-      };
-    }
-    
-    // Rating & Opinion Scale - layouts horizontaux
-    if (questionType === 'rating') {
-      return {
-        mobile: [
-          { value: "mobile-vertical", label: "Stack" },
-          { value: "mobile-centered", label: "Centered" },
-          { value: "mobile-compact", label: "Compact" },
-        ],
-        desktop: [
-          { value: "desktop-centered", label: "Centered" },
-          { value: "desktop-horizontal", label: "Horizontal" },
-          { value: "desktop-left-right", label: "Split" },
-        ]
-      };
-    }
-    
-    // Text inputs, Email, Phone, Number, Date - layouts minimalistes
-    if (['text', 'email', 'phone', 'number', 'date', 'dropdown', 'yesno'].includes(questionType)) {
-      return {
-        mobile: [
-          { value: "mobile-centered", label: "Centered" },
-          { value: "mobile-vertical", label: "Stack" },
-          { value: "mobile-minimal", label: "Minimal" },
-        ],
-        desktop: [
-          { value: "desktop-centered", label: "Centered" },
-          { value: "desktop-left-right", label: "Split" },
-          { value: "desktop-minimal", label: "Minimal" },
-          { value: "desktop-narrow", label: "Narrow" },
-        ]
-      };
-    }
-    
-    // Statement - layouts pour contenu textuel
-    if (questionType === 'statement') {
-      return {
-        mobile: [
-          { value: "mobile-centered", label: "Centered" },
-          { value: "mobile-minimal", label: "Minimal" },
-          { value: "mobile-vertical", label: "Stack" },
-        ],
-        desktop: [
-          { value: "desktop-centered", label: "Centered" },
-          { value: "desktop-wide", label: "Wide" },
-          { value: "desktop-left-right", label: "Split" },
-        ]
-      };
-    }
-    
-    // Default layouts
-    return {
-      mobile: [
-        { value: "mobile-vertical", label: "Stack" },
-        { value: "mobile-horizontal", label: "Split" },
-        { value: "mobile-centered", label: "Centered" },
-        { value: "mobile-minimal", label: "Minimal" },
-      ],
-      desktop: [
-        { value: "desktop-left-right", label: "Split" },
-        { value: "desktop-right-left", label: "Stack" },
-        { value: "desktop-centered", label: "Centered" },
-        { value: "desktop-split", label: "Wallpaper" },
-      ]
-    };
-  };
+  const mobileLayouts = [
+    { value: "mobile-vertical", label: "Stack" },
+    { value: "mobile-horizontal", label: "Split" },
+    { value: "mobile-centered", label: "Centered" },
+    { value: "mobile-minimal", label: "Minimal" },
+  ];
 
-  const layouts = getLayoutsByType();
-  const mobileLayouts = layouts.mobile;
-  const desktopLayouts = layouts.desktop;
+  const desktopLayouts = [
+    { value: "desktop-left-right", label: "Split" },
+    { value: "desktop-right-left", label: "Stack" },
+    { value: "desktop-centered", label: "Centered" },
+    { value: "desktop-split", label: "Wallpaper" },
+  ];
 
-  const currentMobileLayout = question.mobileLayout || mobileLayouts[0].value;
-  const currentDesktopLayout = question.desktopLayout || desktopLayouts[0].value;
+  const currentMobileLayout = question.mobileLayout || "mobile-vertical";
+  const currentDesktopLayout = question.desktopLayout || "desktop-left-right";
 
   return (
     <>
@@ -372,6 +237,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderTextSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -418,6 +285,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderEmailSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -466,6 +335,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderPhoneSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -526,6 +397,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderNumberSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -583,6 +456,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDateSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -644,6 +519,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDropdownSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -698,6 +575,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderYesNoSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -960,6 +839,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderRatingSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -1040,6 +921,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderChoiceSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
