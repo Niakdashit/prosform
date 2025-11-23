@@ -191,17 +191,24 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </div>
                   <form onSubmit={handleSubmit}>
                     {question.variant === 'long' ? (
-                      <Textarea
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        placeholder={question.placeholder || "Type your answer here..."}
-                        className="bg-transparent border rounded-lg text-xl px-4 py-4 min-h-[200px] focus:ring-2 focus:ring-[#F5B800] placeholder:text-[#7A6F61] resize-none"
-                        style={{ 
-                          borderColor: 'rgba(255,255,255,0.25)',
-                          color: '#FFFFFF'
-                        }}
-                        autoFocus
-                      />
+                      <>
+                        <Textarea
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          placeholder={question.placeholder || "Type your answer here..."}
+                          className="bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-5 min-h-[200px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] resize-none transition-colors"
+                          style={{ 
+                            borderColor: '#F5B800',
+                            color: '#F5B800'
+                          }}
+                          autoFocus
+                        />
+                        <div className="mt-2 text-sm" style={{ color: '#8B7E6E' }}>
+                          <kbd className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#A89A8A' }}>Shift</kbd>
+                          {' '}+ <kbd className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#A89A8A' }}>Enter</kbd>
+                          {' '}to make a line break
+                        </div>
+                      </>
                     ) : (
                       <Input
                         value={inputValue}
@@ -227,10 +234,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                             'Type your answer here...'
                           )
                         }
-                        className="bg-transparent border-b rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#7A6F61]"
+                        className="bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] transition-colors"
                         style={{ 
-                          borderColor: 'rgba(255,255,255,0.25)',
-                          color: '#FFFFFF'
+                          borderColor: '#F5B800',
+                          color: '#F5B800'
                         }}
                         autoFocus
                       />
