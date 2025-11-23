@@ -41,7 +41,7 @@ export interface Question {
   blockSpacing?: number;
 }
 
-const defaultQuestions: Question[] = [
+export const defaultQuestions: Question[] = [
   {
     id: "welcome",
     type: "welcome",
