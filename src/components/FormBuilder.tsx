@@ -33,7 +33,7 @@ export interface Question {
   mobileLayout?: string;
   desktopLayout?: string;
   splitAlignment?: 'left' | 'center' | 'right';
-  lineHeight?: number;
+  blockSpacing?: number;
 }
 
 const defaultQuestions: Question[] = [
