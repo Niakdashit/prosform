@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Question } from "./FormBuilder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Clock } from "lucide-react";
 import { useState } from "react";
 
@@ -161,19 +162,50 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     >
                       {question.title}
                     </h2>
+                    {question.variant && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        <span className="font-medium">
+                          {question.variant === 'video' && '🎥 Video/Audio'}
+                          {question.variant === 'long' && '📝 Long Text'}
+                          {question.variant === 'short' && '✏️ Short Text'}
+                          {question.variant === 'number' && '🔢 Number'}
+                          {question.variant === 'date' && '📅 Date'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <form onSubmit={handleSubmit}>
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder="Type your answer here..."
-                      className="bg-transparent border-b rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#7A6F61]"
-                      style={{ 
-                        borderColor: 'rgba(255,255,255,0.25)',
-                        color: '#FFFFFF'
-                      }}
-                      autoFocus
-                    />
+                    {question.variant === 'long' ? (
+                      <Textarea
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        placeholder="Type your answer here..."
+                        className="bg-transparent border rounded-lg text-xl px-4 py-4 min-h-[200px] focus:ring-2 focus:ring-[#F5B800] placeholder:text-[#7A6F61] resize-none"
+                        style={{ 
+                          borderColor: 'rgba(255,255,255,0.25)',
+                          color: '#FFFFFF'
+                        }}
+                        autoFocus
+                      />
+                    ) : (
+                      <Input
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        type={question.variant === 'number' ? 'number' : question.variant === 'date' ? 'date' : 'text'}
+                        placeholder={
+                          question.variant === 'number' ? 'Enter a number...' :
+                          question.variant === 'date' ? 'Select a date...' :
+                          question.variant === 'video' ? 'Upload video/audio or paste link...' :
+                          'Type your answer here...'
+                        }
+                        className="bg-transparent border-b rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#7A6F61]"
+                        style={{ 
+                          borderColor: 'rgba(255,255,255,0.25)',
+                          color: '#FFFFFF'
+                        }}
+                        autoFocus
+                      />
+                    )}
                     <div className="mt-8 flex items-center gap-4">
                       <Button
                         type="submit"
@@ -219,6 +251,15 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     >
                       {question.title}
                     </h2>
+                    {question.variant && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        <span className="font-medium">
+                          {question.variant === 'stars' && '⭐ Rating'}
+                          {question.variant === 'scale' && '📊 Opinion Scale'}
+                          {question.variant === 'ranking' && '🔢 Ranking'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-4">
                     {[1, 2, 3, 4, 5].map((rating) => (
@@ -265,6 +306,16 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     >
                       {question.title}
                     </h2>
+                    {question.variant && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        <span className="font-medium">
+                          {question.variant === 'multiple' && '☑️ Multiple Choice'}
+                          {question.variant === 'dropdown' && '📋 Dropdown'}
+                          {question.variant === 'yesno' && '✓/✗ Yes/No'}
+                          {question.variant === 'checkbox' && '☑️ Checkbox'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-4">
                     {["Yes", "No", "Sometimes"].map((choice, index) => (
