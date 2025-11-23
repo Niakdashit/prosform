@@ -12,16 +12,9 @@ import {
 interface TopToolbarProps {
   onAddContent: () => void;
   onPreview: () => void;
-  questions: any[];
 }
 
-export const TopToolbar = ({ onAddContent, onPreview, questions }: TopToolbarProps) => {
-  const handlePublicPreview = () => {
-    // Store questions in localStorage
-    localStorage.setItem('preview-questions', JSON.stringify(questions));
-    // Open in new tab
-    window.open('/preview', '_blank');
-  };
+export const TopToolbar = ({ onAddContent, onPreview }: TopToolbarProps) => {
   return (
     <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
       <div className="flex items-center gap-1.5">
@@ -44,7 +37,7 @@ export const TopToolbar = ({ onAddContent, onPreview, questions }: TopToolbarPro
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Smartphone className="w-3.5 h-3.5" />
         </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={handlePublicPreview} title="Public preview (new tab)">
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onPreview}>
           <Eye className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
