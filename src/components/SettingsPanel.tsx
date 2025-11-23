@@ -18,6 +18,8 @@ import desktopLeftRightIcon from "@/assets/layout-desktop-left-right.svg";
 import desktopRightLeftIcon from "@/assets/layout-desktop-right-left.svg";
 import desktopCenteredIcon from "@/assets/layout-desktop-centered.svg";
 import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
+import desktopCardIcon from "@/assets/layout-desktop-card.svg";
+import desktopPanelIcon from "@/assets/layout-desktop-panel.svg";
 
 interface SettingsPanelProps {
   question?: Question;
@@ -35,6 +37,8 @@ const LayoutIcon = ({ type }: { type: string }) => {
     "desktop-right-left": desktopRightLeftIcon,
     "desktop-centered": desktopCenteredIcon,
     "desktop-split": desktopSplitIcon,
+    "desktop-card": desktopCardIcon,
+    "desktop-panel": desktopPanelIcon,
   };
   
   const icon = iconMap[type];
@@ -62,6 +66,8 @@ const LayoutSelector = ({ question, onUpdateQuestion, onViewModeChange }: Settin
     { value: "desktop-right-left", label: "Stack" },
     { value: "desktop-centered", label: "Centered" },
     { value: "desktop-split", label: "Wallpaper" },
+    { value: "desktop-card", label: "Card" },
+    { value: "desktop-panel", label: "Panel" },
   ];
 
   const currentMobileLayout = question.mobileLayout || "mobile-vertical";
