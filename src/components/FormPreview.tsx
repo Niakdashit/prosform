@@ -414,27 +414,33 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Desktop layouts
                   if (viewMode === 'desktop') {
                     if (desktopLayout === 'desktop-left-right') {
-                      // Split: Image gauche (petite), Texte droite
+                      // Split: Image petite à gauche, Texte à droite (sur la même ligne)
                       return (
-                        <div className="w-full h-full grid grid-cols-[auto_1fr] gap-16 items-center px-12">
+                        <div className="w-full h-full flex items-center gap-16 px-12">
                           <ImageBlock />
-                          <TextContent />
+                          <div className="flex-1">
+                            <TextContent />
+                          </div>
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-right-left') {
-                      // Stack: Texte gauche, Image droite (petite)
+                      // Stack: Texte à gauche, Image petite à droite (sur la même ligne)
                       return (
-                        <div className="w-full h-full grid grid-cols-[1fr_auto] gap-16 items-center px-12">
-                          <TextContent />
+                        <div className="w-full h-full flex items-center gap-16 px-12">
+                          <div className="flex-1">
+                            <TextContent />
+                          </div>
                           <ImageBlock />
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-centered') {
-                      // Centered: Image gauche, Texte droite (comme split)
+                      // Centered: Image à gauche, Texte à droite (comme split)
                       return (
-                        <div className="w-full h-full grid grid-cols-[auto_1fr] gap-16 items-center px-12">
+                        <div className="w-full h-full flex items-center gap-16 px-12">
                           <ImageBlock />
-                          <TextContent />
+                          <div className="flex-1">
+                            <TextContent />
+                          </div>
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-split') {
