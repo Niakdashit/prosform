@@ -89,7 +89,7 @@ export const QuestionSidebar = ({
 
         <TabsContent value="questions" className="flex-1 mt-0 overflow-hidden">
           <ScrollArea className="h-[calc(100vh-180px)]">
-            <div className="p-3">
+            <div className="p-3 pb-3">
               {questions.filter(q => q.type !== "ending").map((question, index) => {
                 const questionIcon = getQuestionIcon(question);
                 const Icon = questionIcon.icon;
