@@ -416,7 +416,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     if (desktopLayout === 'desktop-left-right') {
                       // Split: Image petite à gauche, Texte à droite (sur la même ligne)
                       return (
-                        <div className="w-full h-full flex items-center gap-16 px-12">
+                        <div className="w-full h-full flex items-start gap-16 px-12 mt-16">
                           <ImageBlock />
                           <div className="flex-1">
                             <TextContent />
@@ -426,7 +426,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     } else if (desktopLayout === 'desktop-right-left') {
                       // Stack: Texte à gauche, Image petite à droite (sur la même ligne)
                       return (
-                        <div className="w-full h-full flex items-center gap-16 px-12">
+                        <div className="w-full h-full flex items-start gap-16 px-12 mt-16">
                           <div className="flex-1">
                             <TextContent />
                           </div>
@@ -436,7 +436,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     } else if (desktopLayout === 'desktop-centered') {
                       // Centered: Image à gauche, Texte à droite (comme split)
                       return (
-                        <div className="w-full h-full flex items-center gap-16 px-12">
+                        <div className="w-full h-full flex items-start gap-16 px-12 mt-16">
                           <ImageBlock />
                           <div className="flex-1">
                             <TextContent />
