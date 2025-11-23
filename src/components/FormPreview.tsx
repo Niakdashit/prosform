@@ -274,13 +274,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         )}
 
                         <h1 
-                          className="font-bold mb-6 cursor-text hover:opacity-80 transition-opacity" 
+                          className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
                             color: '#F5CA3C', 
                             fontWeight: 700, 
                             fontSize: viewMode === 'desktop' ? '64px' : '32px',
                             lineHeight: '1.05',
                             letterSpacing: '-0.02em',
+                            marginBottom: `${(question.blockSpacing || 1) * 24}px`,
                             outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                             padding: '4px',
                             margin: '-4px',
@@ -514,13 +515,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
 
                               <h1 
-                                className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
+                                className="font-bold leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
                                 style={{
                                   color: '#F5CA3C', 
                                   fontWeight: 700, 
                                   fontSize: '48px',
                                   letterSpacing: '-0.02em',
                                   lineHeight: '1.05',
+                                  marginBottom: `${(question.blockSpacing || 1) * 24}px`,
                                   outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                                   padding: '4px',
                                   margin: '-4px',
@@ -610,12 +612,13 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
                               
                               <p 
-                                className="mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                                className="cursor-text hover:opacity-80 transition-opacity" 
                                 style={{
                                   color: '#E3DDD5',
                                   fontWeight: 400,
                                   fontSize: '16px',
                                   lineHeight: '1.6',
+                                  marginBottom: `${(question.blockSpacing || 1) * 32}px`,
                                   outline: editingField === 'welcome-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                                   padding: '4px',
                                   margin: '-4px',
@@ -630,7 +633,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               </p>
                             </div>
                             
-                            <div className="mt-10">
+                            <div className="mt-10" style={{ marginTop: `${(question.blockSpacing || 1) * 32}px` }}>
                               <button 
                                 onClick={onNext}
                                 className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3"
