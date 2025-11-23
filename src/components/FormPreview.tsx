@@ -39,8 +39,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [formResponses, setFormResponses] = useState<Record<string, string>>({});
   const [showVariableMenu, setShowVariableMenu] = useState(false);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
 
   const availableVariables = [
     { key: 'first_name', label: 'First name', description: 'User\'s first name' },
@@ -49,18 +48,16 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   ];
 
   const insertVariable = (variableKey: string) => {
-    const activeElement = document.activeElement as HTMLElement;
-    const isTitle = activeElement === titleRef.current;
-    const isSubtitle = activeElement === subtitleRef.current;
-    
-    if (isTitle && question) {
+    if (!question) return;
+
+    if (variableTarget === 'title') {
       const newTitle = (question.title || '') + `{{${variableKey}}}`;
       onUpdateQuestion(question.id, { title: newTitle });
-    } else if (isSubtitle && question) {
+    } else if (variableTarget === 'subtitle') {
       const newSubtitle = (question.subtitle || '') + `{{${variableKey}}}`;
       onUpdateQuestion(question.id, { subtitle: newSubtitle });
     }
-    
+
     setShowVariableMenu(false);
   };
 
@@ -140,52 +137,50 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
             {question.type === "welcome" ? (
               <div className="flex items-center justify-center w-full h-full px-16">
                 <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12 relative">
-                  {(editingField === 'welcome-title' || editingField === 'welcome-subtitle') && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setShowVariableMenu((open) => !open)}
-                        className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
-                        style={{ 
-                          backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                          color: '#F5B800',
-                          backdropFilter: 'blur(8px)'
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowVariableMenu((open) => !open)}
+                      className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                      style={{ 
+                        backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                        color: '#F5B800',
+                        backdropFilter: 'blur(8px)'
+                      }}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </button>
+
+                    {showVariableMenu && (
+                      <div
+                        className="absolute z-50 mt-2 w-72 p-2 rounded-md shadow-xl"
+                        style={{
+                          top: '32px',
+                          right: 0,
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
                         }}
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
-                      </button>
-
-                      {showVariableMenu && (
-                        <div
-                          className="absolute z-50 mt-2 w-72 p-2 rounded-md shadow-xl"
-                          style={{
-                            top: '32px',
-                            right: 0,
-                            backgroundColor: '#4A4138',
-                            border: '1px solid rgba(245, 184, 0, 0.3)',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                          }}
-                        >
-                          <div className="space-y-1">
-                            {availableVariables.map((variable) => (
-                              <button
-                                key={variable.key}
-                                onClick={() => insertVariable(variable.key)}
-                                className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                              >
-                                <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                  {variable.label}
-                                </div>
-                                <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                  {variable.description} • {`{{${variable.key}}}`}
-                                </div>
-                              </button>
-                            ))}
-                          </div>
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
                         </div>
-                      )}
-                    </>
-                  )}
+                      </div>
+                    )}
+                  </>
 
                   <div>
                     <h1 
@@ -202,7 +197,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       }}
                       contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => setEditingField('welcome-title')}
+                      onFocus={() => { setEditingField('welcome-title'); setVariableTarget('title'); }}
                       onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.title}
@@ -218,7 +213,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       }}
                       contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => setEditingField('welcome-subtitle')}
+                      onFocus={() => { setEditingField('welcome-subtitle'); setVariableTarget('subtitle'); }}
                       onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.subtitle}
@@ -263,52 +258,50 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
               <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px] relative">
-                  {editingField === 'text-title' && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setShowVariableMenu((open) => !open)}
-                        className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
-                        style={{ 
-                          backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                          color: '#F5B800',
-                          backdropFilter: 'blur(8px)'
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowVariableMenu((open) => !open)}
+                      className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                      style={{ 
+                        backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                        color: '#F5B800',
+                        backdropFilter: 'blur(8px)'
+                      }}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </button>
+
+                    {showVariableMenu && (
+                      <div
+                        className="absolute z-50 mt-2 w-72 p-2 rounded-md shadow-xl"
+                        style={{
+                          top: '32px',
+                          right: 0,
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
                         }}
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
-                      </button>
-
-                      {showVariableMenu && (
-                        <div
-                          className="absolute z-50 mt-2 w-72 p-2 rounded-md shadow-xl"
-                          style={{
-                            top: '32px',
-                            right: 0,
-                            backgroundColor: '#4A4138',
-                            border: '1px solid rgba(245, 184, 0, 0.3)',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                          }}
-                        >
-                          <div className="space-y-1">
-                            {availableVariables.map((variable) => (
-                              <button
-                                key={variable.key}
-                                onClick={() => insertVariable(variable.key)}
-                                className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                              >
-                                <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                  {variable.label}
-                                </div>
-                                <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                  {variable.description} • {`{{${variable.key}}}`}
-                                </div>
-                              </button>
-                            ))}
-                          </div>
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
                         </div>
-                      )}
-                    </>
-                  )}
+                      </div>
+                    )}
+                  </>
 
                   <div className="mb-10">
                     {question.number && (
@@ -329,7 +322,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       }}
                       contentEditable
                       suppressContentEditableWarning
-                      onFocus={() => setEditingField('text-title')}
+                      onFocus={() => { setEditingField('text-title'); setVariableTarget('title'); }}
                       onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                     >
                       {question.title}
@@ -857,7 +850,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     </Popover>
                   )}
                   <h2
-                    ref={titleRef}
                     className="text-[56px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity"
                     style={{ 
                       color: '#FFFFFF', 
@@ -877,7 +869,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </h2>
                   {question.subtitle && (
                     <p 
-                      ref={subtitleRef}
                       className="text-xl mb-8 cursor-text hover:opacity-80 transition-opacity"
                       style={{ 
                         color: '#B8A892',
@@ -960,7 +951,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   )}
 
                   <h2 
-                    ref={titleRef}
                     className="text-[72px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                     style={{ 
                       color: '#F5B800', 
@@ -980,7 +970,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </h2>
                   {question.subtitle && (
                     <p 
-                      ref={subtitleRef}
                       className="text-xl mb-10 cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#C4B5A0',
