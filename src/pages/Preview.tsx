@@ -8,9 +8,17 @@ const PreviewContent = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const { updateTheme } = useTheme();
-
-
   useEffect(() => {
+    // Load theme from localStorage on mount to match editor styling
+    try {
+      const storedTheme = window.localStorage.getItem('form-theme-settings');
+      if (storedTheme) {
+        updateTheme(JSON.parse(storedTheme));
+      }
+    } catch (e) {
+      console.error('Error loading theme for public preview:', e);
+    }
+
     // Load initial questions from localStorage
     const loadData = () => {
       const savedQuestions = localStorage.getItem('preview-questions');
