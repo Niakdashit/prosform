@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Question } from "./FormBuilder";
-import { User, Building2, Star, List, BarChart3, Ban, AlignLeft, CheckCircle, Smile, Plus, GripVertical } from "lucide-react";
+import { User, Building2, Star, List, BarChart3, Ban, AlignLeft, CheckCircle, Smile, Plus, GripVertical, MoreVertical, Copy, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface QuestionSidebarProps {
   questions: Question[];
   activeQuestionId: string;
   onQuestionSelect: (id: string) => void;
   onReorderQuestions: (startIndex: number, endIndex: number) => void;
+  onDuplicateQuestion: (id: string) => void;
+  onDeleteQuestion: (id: string) => void;
 }
 
 const iconMap: Record<string, any> = {
@@ -28,6 +36,8 @@ export const QuestionSidebar = ({
   activeQuestionId,
   onQuestionSelect,
   onReorderQuestions,
+  onDuplicateQuestion,
+  onDeleteQuestion,
 }: QuestionSidebarProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -123,6 +133,40 @@ export const QuestionSidebar = ({
                       {question.title}
                     </p>
                   </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <button
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded transition-opacity"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-44">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDuplicateQuestion(question.id);
+                        }}
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Duplicate
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteQuestion(question.id);
+                        }}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </button>
               </div>
             );
@@ -176,6 +220,40 @@ export const QuestionSidebar = ({
                         {question.title}
                       </p>
                     </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted rounded transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-44">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDuplicateQuestion(question.id);
+                          }}
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteQuestion(question.id);
+                          }}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </button>
                 </div>
               );
