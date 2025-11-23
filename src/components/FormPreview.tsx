@@ -36,9 +36,10 @@ interface FormPreviewProps {
   viewMode: 'desktop' | 'mobile';
   onToggleViewMode: () => void;
   isMobileResponsive?: boolean;
+  allQuestions?: Question[];
 }
 
-export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false }: FormPreviewProps) => {
+export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [] }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
@@ -2041,11 +2042,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
         questionTitle={question?.title || ''}
         questionId={question?.id || ''}
         choices={question?.choices || []}
-        availableQuestions={[
-          { id: '1', title: 'First, what\'s your full name?', number: '1' },
-          { id: '2', title: 'Thanks, ___. Which department do you work in?', number: '2' },
-          { id: '3', title: 'How do you rate the company culture?', number: '3' }
-        ]}
+        availableQuestions={allQuestions
+          .filter(q => q.type !== 'welcome' && q.type !== 'ending')
+          .map(q => ({
+            id: q.id,
+            title: q.title,
+            number: q.number?.toString() || ''
+          }))
+        }
       />
     </div>
   );
