@@ -170,8 +170,28 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
     setEditingChoiceIndex(null);
   };
 
+  // Calculate scale for full-screen responsive mode
+  const getScale = () => {
+    if (!isMobileResponsive) return 1;
+    
+    const baseWidth = viewMode === 'desktop' ? 1100 : 375;
+    const baseHeight = viewMode === 'desktop' ? 620 : 667;
+    
+    const scaleX = window.innerWidth / baseWidth;
+    const scaleY = window.innerHeight / baseHeight;
+    
+    return Math.min(scaleX, scaleY);
+  };
+
+  const scale = getScale();
+
   return (
-    <div className={`flex items-center justify-center relative overflow-hidden ${isMobileResponsive ? 'w-screen h-screen fixed inset-0' : 'flex-1 bg-gray-100'}`}>
+    <div
+      className={`flex items-center justify-center relative overflow-hidden ${
+        isMobileResponsive ? 'w-screen h-screen fixed inset-0' : 'flex-1 bg-gray-100'
+      }`}
+      style={isMobileResponsive ? { backgroundColor: theme.backgroundColor } : undefined}
+    >
       {/* Toggle button - hidden on mobile responsive mode */}
       {!isMobileResponsive && (
         <button
@@ -180,7 +200,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
           style={{
             backgroundColor: '#4A4138',
             border: '1px solid rgba(245, 184, 0, 0.3)',
-            color: '#F5CA3C'
+            color: '#F5CA3C',
           }}
         >
           {viewMode === 'desktop' ? (
@@ -197,12 +217,26 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
         </button>
       )}
 
-      <div 
-        className="relative overflow-hidden transition-all duration-300" 
-        style={{ 
-          backgroundColor: theme.backgroundColor, 
-          width: isMobileResponsive ? '100vw' : (viewMode === 'desktop' ? '1100px' : '375px'),
-          height: isMobileResponsive ? '100vh' : (viewMode === 'desktop' ? '620px' : '667px')
+      <div
+        className="relative overflow-hidden transition-all duration-300"
+        style={{
+          backgroundColor: theme.backgroundColor,
+          width: isMobileResponsive
+            ? viewMode === 'desktop'
+              ? '1100px'
+              : '375px'
+            : viewMode === 'desktop'
+            ? '1100px'
+            : '375px',
+          height: isMobileResponsive
+            ? viewMode === 'desktop'
+              ? '620px'
+              : '667px'
+            : viewMode === 'desktop'
+            ? '620px'
+            : '667px',
+          transform: isMobileResponsive ? `scale(${scale})` : 'none',
+          transformOrigin: 'center center',
         }}
       >
         {/* Logo */}
