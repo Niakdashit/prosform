@@ -28,60 +28,91 @@ export const QuestionSidebar = ({
 }: QuestionSidebarProps) => {
   return (
     <div className="w-[200px] bg-background border-r border-border flex flex-col">
-      <div className="p-2.5 border-b border-border flex items-center gap-2">
-        <div className="w-7 h-7 bg-muted rounded flex items-center justify-center flex-shrink-0">
-          <div className="w-3.5 h-3.5 bg-foreground/20 rounded-sm" />
+      {/* Header avec breadcrumb */}
+      <div className="px-3 py-2.5 border-b border-border">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+          <span className="flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2"/>
+            </svg>
+            Forms
+          </span>
+          <span>›</span>
+          <span className="truncate">Employer Feedback Form (co...</span>
         </div>
-        <h2 className="text-xs font-medium text-foreground truncate">How are we doing?</h2>
+      </div>
+      
+      {/* Universal mode + titre */}
+      <div className="p-2.5 border-b border-border">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-6 h-6 bg-muted rounded flex items-center justify-center flex-shrink-0">
+            <div className="w-3 h-3 bg-foreground/20 rounded-sm" />
+          </div>
+          <h2 className="text-xs font-medium text-foreground truncate">How are we doing?</h2>
+        </div>
       </div>
 
       <ScrollArea className="flex-1">
         <div className="p-1.5">
-          {questions.map((question) => {
+          {questions.map((question, index) => {
             const Icon = iconMap[question.icon || "message"];
             const isActive = question.id === activeQuestionId;
             
+            // Skip le premier welcome pour éviter le doublon
+            if (question.type === "welcome") return null;
+            
+            // Afficher "Endings" avant le dernier item
+            const isLastItem = index === questions.length - 1;
+            
             return (
-              <button
-                key={question.id}
-                onClick={() => onQuestionSelect(question.id)}
-                className={cn(
-                  "w-full p-2 rounded mb-0.5 flex items-start gap-2 transition-colors",
-                  "hover:bg-muted/50",
-                  isActive && "bg-muted"
+              <div key={question.id}>
+                {isLastItem && (
+                  <div className="px-2 py-3 mt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-foreground">Endings</span>
+                      <button className="w-5 h-5 rounded hover:bg-muted flex items-center justify-center">
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
                 )}
-              >
-                <div className={cn(
-                  "w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-[10px] font-semibold",
-                  question.type === "welcome" && "bg-pink-100 text-pink-600",
-                  question.type === "text" && "bg-blue-100 text-blue-600",
-                  question.type === "rating" && "bg-green-100 text-green-600",
-                  question.type === "choice" && "bg-purple-100 text-purple-600",
-                  question.type === "ending" && "bg-cyan-100 text-cyan-600"
-                )}>
-                  {question.number ? (
-                    <span>{question.number}</span>
-                  ) : (
-                    Icon && <Icon className="w-3 h-3" />
+                <button
+                  onClick={() => onQuestionSelect(question.id)}
+                  className={cn(
+                    "w-full p-2 rounded mb-1 flex items-start gap-2.5 transition-colors",
+                    "hover:bg-muted/50",
+                    isActive && "bg-muted"
                   )}
-                </div>
-                <div className="flex-1 text-left min-w-0">
-                  <p className="text-[11px] text-foreground line-clamp-2 leading-[1.4]">
-                    {question.title}
-                  </p>
-                </div>
-              </button>
+                >
+                  <div className={cn(
+                    "w-7 h-7 rounded flex items-center justify-center flex-shrink-0 text-[11px] font-semibold",
+                    question.type === "text" && "bg-pink-200/60 text-pink-700",
+                    question.type === "rating" && "bg-green-200/60 text-green-700",
+                    question.type === "choice" && index % 3 === 0 && "bg-purple-200/60 text-purple-700",
+                    question.type === "choice" && index % 3 === 1 && "bg-green-200/60 text-green-700",
+                    question.type === "choice" && index % 3 === 2 && "bg-purple-200/60 text-purple-700",
+                    question.type === "ending" && "bg-gray-200 text-gray-700"
+                  )}>
+                    {question.type === "ending" ? (
+                      <span>A</span>
+                    ) : question.number ? (
+                      <span>{question.number}</span>
+                    ) : (
+                      Icon && <Icon className="w-3.5 h-3.5" />
+                    )}
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <p className="text-[11px] text-foreground line-clamp-2 leading-[1.5]">
+                      {question.title}
+                    </p>
+                  </div>
+                </button>
+              </div>
             );
           })}
         </div>
       </ScrollArea>
 
-      <div className="p-1.5 border-t border-border">
-        <Button variant="ghost" size="sm" className="w-full justify-start text-[11px] h-7 px-2">
-          <Plus className="w-3 h-3 mr-1.5" />
-          Endings
-        </Button>
-      </div>
     </div>
   );
 };
