@@ -38,9 +38,10 @@ interface FormPreviewProps {
   onToggleViewMode: () => void;
   isMobileResponsive?: boolean;
   allQuestions?: Question[];
+  isPreviewOnly?: boolean;
 }
 
-export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [] }: FormPreviewProps) => {
+export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [], isPreviewOnly = false }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
@@ -172,8 +173,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
 
   return (
     <div className={`flex items-center justify-center relative overflow-hidden ${isMobileResponsive ? 'w-screen h-screen fixed inset-0' : 'flex-1 bg-gray-100'}`}>
-      {/* Toggle button - hidden on mobile responsive mode */}
-      {!isMobileResponsive && (
+      {/* Toggle button - hidden on mobile responsive mode and preview only */}
+      {!isMobileResponsive && !isPreviewOnly && (
         <button
           onClick={onToggleViewMode}
           className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
@@ -270,46 +271,20 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       }}
                     >
                       {uploadedImage ? (
-                        <>
-                          <img
-                            src={uploadedImage}
-                            alt="Uploaded"
-                            className="w-full h-full object-cover"
-                            style={{
-                              transform: `rotate(${imageRotation}deg)`,
-                              transition: 'transform 0.3s ease'
-                            }}
-                          />
-                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                            <button
-                              onClick={() => setShowUploadModal(true)}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              title="Change image"
-                            >
-                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                            <button
-                              onClick={() => setShowEditorModal(true)}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              title="Edit image"
-                            >
-                              <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                          </div>
-                        </>
+                        <img
+                          src={uploadedImage}
+                          alt="Uploaded"
+                          className="w-full h-full object-cover"
+                          style={{
+                            transform: `rotate(${imageRotation}deg)`,
+                            transition: 'transform 0.3s ease'
+                          }}
+                        />
                       ) : (
-                        <div
-                          onClick={() => fileInputRef.current?.click()}
-                          className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
-                        >
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-muted/50">
                           <Upload className="w-12 h-12 mb-3" style={{ color: theme.buttonColor }} />
                           <p className="text-sm font-medium" style={{ color: theme.buttonColor }}>
                             Upload Image
-                          </p>
-                          <p className="text-xs mt-1" style={{ color: theme.systemColor }}>
-                            Click to browse
                           </p>
                         </div>
                       )}
@@ -320,177 +295,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   const TextContent = ({ centered = false }: { centered?: boolean }) => (
                     <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
                       <div className="relative">
-                        {editingField === 'welcome-title' && (
-                          <>
-                            <button
-                              type="button"
-                              onMouseDown={(e) => e.preventDefault()}
-                              onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                              style={{ 
-                                backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                                color: '#F5B800',
-                                backdropFilter: 'blur(8px)'
-                              }}
-                            >
-                              <Sparkles className="w-3.5 h-3.5" />
-                            </button>
-
-                            {showVariableMenu && variableTarget === 'title' && (
-                              <div
-                                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                                style={{
-                                  top: '32px',
-                                  right: 0,
-                                  backgroundColor: '#4A4138',
-                                  border: '1px solid rgba(245, 184, 0, 0.3)',
-                                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                                }}
-                              >
-                                {menuView === 'main' ? (
-                                  <div className="space-y-1">
-                                    <button
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => console.log('Réécriture AI')}
-                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                    >
-                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                    </button>
-                                    <button
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => setMenuView('variables')}
-                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                    >
-                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <div className="space-y-1">
-                                    <button
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => setMenuView('main')}
-                                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                    >
-                                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                    </button>
-                                    {availableVariables.map((variable) => (
-                                      <button
-                                        key={variable.key}
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => insertVariable(variable.key)}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                      >
-                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        )}
-
-                        <h1 
-                          className="font-bold cursor-text hover:opacity-80 transition-opacity" 
-                          style={{ 
-                            color: theme.accentColor, 
-                            fontWeight: 700, 
-                            fontSize: viewMode === 'desktop' ? '64px' : '32px',
-                            lineHeight: '1.05',
-                            letterSpacing: '-0.02em',
-                            marginBottom: `${(question.blockSpacing || 1) * 24}px`,
-                            outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                            padding: '4px',
-                            marginTop: '-4px',
-                            marginLeft: '-4px',
-                            marginRight: '-4px',
-                            borderRadius: '4px'
-                          }}
-                          contentEditable
-                          suppressContentEditableWarning
-                          onFocus={() => setEditingField('welcome-title')}
-                          onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
-                        >
-                          {question.title}
-                        </h1>
-                      </div>
-                      
-                      <div className="relative">
-                        {editingField === 'welcome-subtitle' && (
-                          <>
-                            <button
-                              type="button"
-                              onMouseDown={(e) => e.preventDefault()}
-                              onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                              style={{ 
-                                backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                                color: '#F5B800',
-                                backdropFilter: 'blur(8px)'
-                              }}
-                            >
-                              <Sparkles className="w-3.5 h-3.5" />
-                            </button>
-
-                            {showVariableMenu && variableTarget === 'subtitle' && (
-                              <div
-                                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                                style={{
-                                  top: '32px',
-                                  right: 0,
-                                  backgroundColor: '#4A4138',
-                                  border: '1px solid rgba(245, 184, 0, 0.3)',
-                                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                                }}
-                              >
-                                {menuView === 'main' ? (
-                                  <div className="space-y-1">
-                                    <button
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => console.log('Réécriture AI')}
-                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                    >
-                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                    </button>
-                                    <button
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => setMenuView('variables')}
-                                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                    >
-                                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <div className="space-y-1">
-                                    <button
-                                      onMouseDown={(e) => e.preventDefault()}
-                                      onClick={() => setMenuView('main')}
-                                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                    >
-                                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                    </button>
-                                    {availableVariables.map((variable) => (
-                                      <button
-                                        key={variable.key}
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => insertVariable(variable.key)}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                      >
-                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        )}
 
                         <p 
                           className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
@@ -607,11 +411,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                             onClick={() => setMenuView('variables')}
                                             className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
                                           >
-                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                          </button>
-                                        </div>
-                                      ) : (
+                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                          </button>
+                        </div>
+                      ) : (
                                         <div className="space-y-1">
                                           <button
                                             onMouseDown={(e) => e.preventDefault()}
@@ -880,7 +684,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                     transition: 'transform 0.3s ease'
                                   }}
                                 />
-                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                          {!isPreviewOnly && (
+                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                                   <button
                                     onClick={() => setShowUploadModal(true)}
                                     className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
@@ -898,6 +703,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                     <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                   </button>
                                 </div>
+                          )}
                               </>
                             ) : (
                               <div
