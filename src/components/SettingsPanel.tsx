@@ -16,56 +16,70 @@ interface SettingsPanelProps {
   onUpdateQuestion?: (id: string, updates: Partial<Question>) => void;
 }
 
-// Layout icons represented as SVG-like components matching Typeform style
+// Layout icons exactly matching Typeform style - simple and minimal
 const LayoutIcon = ({ type }: { type: string }) => {
   const layouts: Record<string, React.ReactElement> = {
-    // Mobile layouts - authentic Typeform style
+    // Mobile icon - simple vertical phone
     "mobile-vertical": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex flex-col gap-[3px] p-[3px]">
-        <div className="h-[6px] bg-foreground rounded-sm" />
-        <div className="flex-1 bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="7" y="3" width="10" height="18" rx="2" />
+        <line x1="9" y1="7" x2="15" y2="7" />
+        <line x1="9" y1="11" x2="15" y2="11" />
+        <line x1="9" y1="15" x2="15" y2="15" />
+      </svg>
     ),
     "mobile-horizontal": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex items-center gap-[3px] p-[3px]">
-        <div className="h-full w-[4px] bg-foreground rounded-sm" />
-        <div className="h-full flex-1 bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="7" y="3" width="10" height="18" rx="2" />
+        <line x1="9" y1="7" x2="15" y2="7" />
+        <line x1="9" y1="11" x2="15" y2="11" />
+        <line x1="9" y1="15" x2="15" y2="15" />
+      </svg>
     ),
     "mobile-centered": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex flex-col items-center justify-center gap-[2px] p-[3px]">
-        <div className="w-[7px] h-[3px] bg-foreground rounded-sm" />
-        <div className="w-[10px] h-[5px] bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="7" y="3" width="10" height="18" rx="2" />
+        <line x1="9" y1="7" x2="15" y2="7" />
+        <line x1="9" y1="11" x2="15" y2="11" />
+        <line x1="9" y1="15" x2="15" y2="15" />
+      </svg>
     ),
     "mobile-minimal": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex flex-col justify-end p-[3px]">
-        <div className="h-[6px] bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="7" y="3" width="10" height="18" rx="2" />
+        <line x1="9" y1="7" x2="15" y2="7" />
+        <line x1="9" y1="11" x2="15" y2="11" />
+        <line x1="9" y1="15" x2="15" y2="15" />
+      </svg>
     ),
-    // Desktop layouts - authentic Typeform style
+    // Desktop icon - simple horizontal screen with split
     "desktop-left-right": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex gap-[3px] p-[3px]">
-        <div className="w-1/2 bg-foreground rounded-sm" />
-        <div className="w-1/2 bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="2" y="5" width="20" height="13" rx="2" />
+        <line x1="12" y1="5" x2="12" y2="18" />
+        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
+      </svg>
     ),
     "desktop-right-left": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex gap-[3px] p-[3px]">
-        <div className="w-1/2 bg-foreground rounded-sm" />
-        <div className="w-1/2 bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="2" y="5" width="20" height="13" rx="2" />
+        <line x1="12" y1="5" x2="12" y2="18" />
+        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
+      </svg>
     ),
     "desktop-centered": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex items-center justify-center p-[3px]">
-        <div className="w-3/5 h-3/4 bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="2" y="5" width="20" height="13" rx="2" />
+        <line x1="12" y1="5" x2="12" y2="18" />
+        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
+      </svg>
     ),
     "desktop-split": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex gap-[3px] p-[3px]">
-        <div className="w-1/3 bg-foreground rounded-sm" />
-        <div className="w-2/3 bg-foreground rounded-sm" />
-      </div>
+      <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <rect x="2" y="5" width="20" height="13" rx="2" />
+        <line x1="12" y1="5" x2="12" y2="18" />
+        <rect x="9" y="18" width="6" height="2" rx="1" fill="currentColor" />
+      </svg>
     ),
   };
   
