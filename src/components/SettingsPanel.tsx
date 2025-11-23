@@ -16,55 +16,55 @@ interface SettingsPanelProps {
   onUpdateQuestion?: (id: string, updates: Partial<Question>) => void;
 }
 
-// Layout icons represented as SVG-like components
+// Layout icons represented as SVG-like components matching Typeform style
 const LayoutIcon = ({ type }: { type: string }) => {
   const layouts: Record<string, React.ReactElement> = {
-    // Mobile layouts - thicker lines like Typeform
+    // Mobile layouts - authentic Typeform style
     "mobile-vertical": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex flex-col gap-[2px] p-[2px]">
-        <div className="h-[5px] bg-foreground rounded-[1px]" />
-        <div className="flex-1 bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex flex-col gap-[3px] p-[3px]">
+        <div className="h-[6px] bg-foreground rounded-sm" />
+        <div className="flex-1 bg-foreground rounded-sm" />
       </div>
     ),
     "mobile-horizontal": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex items-center gap-[2px] p-[2px]">
-        <div className="h-full w-[3px] bg-foreground rounded-[1px]" />
-        <div className="h-full flex-1 bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex items-center gap-[3px] p-[3px]">
+        <div className="h-full w-[4px] bg-foreground rounded-sm" />
+        <div className="h-full flex-1 bg-foreground rounded-sm" />
       </div>
     ),
     "mobile-centered": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex flex-col items-center justify-center gap-[2px] p-[2px]">
-        <div className="w-[6px] h-[2px] bg-foreground rounded-[1px]" />
-        <div className="w-[9px] h-[4px] bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex flex-col items-center justify-center gap-[2px] p-[3px]">
+        <div className="w-[7px] h-[3px] bg-foreground rounded-sm" />
+        <div className="w-[10px] h-[5px] bg-foreground rounded-sm" />
       </div>
     ),
     "mobile-minimal": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex flex-col justify-end p-[2px]">
-        <div className="h-[5px] bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex flex-col justify-end p-[3px]">
+        <div className="h-[6px] bg-foreground rounded-sm" />
       </div>
     ),
-    // Desktop layouts - thicker lines like Typeform
+    // Desktop layouts - authentic Typeform style
     "desktop-left-right": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex gap-[2px] p-[2px]">
-        <div className="w-1/2 bg-foreground rounded-[1px]" />
-        <div className="w-1/2 bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex gap-[3px] p-[3px]">
+        <div className="w-1/2 bg-foreground rounded-sm" />
+        <div className="w-1/2 bg-foreground rounded-sm" />
       </div>
     ),
     "desktop-right-left": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex gap-[2px] p-[2px]">
-        <div className="w-1/2 bg-foreground rounded-[1px]" />
-        <div className="w-1/2 bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex gap-[3px] p-[3px]">
+        <div className="w-1/2 bg-foreground rounded-sm" />
+        <div className="w-1/2 bg-foreground rounded-sm" />
       </div>
     ),
     "desktop-centered": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex items-center justify-center p-[2px]">
-        <div className="w-3/5 h-3/4 bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex items-center justify-center p-[3px]">
+        <div className="w-3/5 h-3/4 bg-foreground rounded-sm" />
       </div>
     ),
     "desktop-split": (
-      <div className="w-full h-full border-[2.5px] border-foreground rounded-sm flex gap-[2px] p-[2px]">
-        <div className="w-1/3 bg-foreground rounded-[1px]" />
-        <div className="w-2/3 bg-foreground rounded-[1px]" />
+      <div className="w-full h-full border-[2.5px] border-foreground rounded-md flex gap-[3px] p-[3px]">
+        <div className="w-1/3 bg-foreground rounded-sm" />
+        <div className="w-2/3 bg-foreground rounded-sm" />
       </div>
     ),
   };
