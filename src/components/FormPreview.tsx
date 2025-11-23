@@ -745,14 +745,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Mobile layouts
                   if (mobileLayout === 'mobile-vertical') {
                     return (
-                      <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
+                      <div className="flex flex-col items-center justify-center gap-6 py-6 w-full max-w-[700px]" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
                         <ImageBlock />
                         <TextContent />
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-horizontal') {
                     return (
-                      <div className="flex gap-4 py-6 px-5 w-full max-w-[700px]">
+                      <div className="flex items-center justify-center gap-4 py-6 w-full max-w-[700px]" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
                         <div className="flex-1">
                           <TextContent />
                         </div>
@@ -761,7 +761,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     );
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
+                      <div className="flex flex-col items-center justify-center gap-6 py-6 w-full max-w-[700px]" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
                         <ImageBlock />
                         <TextContent />
                       </div>
