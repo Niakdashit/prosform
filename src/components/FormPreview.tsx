@@ -414,9 +414,12 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Desktop layouts
                   if (viewMode === 'desktop') {
                     if (desktopLayout === 'desktop-left-right') {
-                      // Split: Ordre vertical - 1. Image, 2. Titre, 3. Reste - Aligné à gauche
+                      // Split: Ordre vertical - 1. Image, 2. Titre, 3. Reste
+                      const alignment = question.splitAlignment || 'left';
+                      const alignmentClass = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
+                      
                       return (
-                        <div className="w-full h-full flex flex-col items-start justify-start gap-6 px-12 py-12 overflow-y-auto">
+                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-6 px-12 py-12 overflow-y-auto`}>
                           <div
                             className="overflow-hidden flex-shrink-0"
                             style={{ 
@@ -431,7 +434,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div className="max-w-[600px]">
+                          <div className="max-w-[600px]" style={{ textAlign: alignment }}>
                             <div className="relative">
                               {editingField === 'welcome-title' && (
                                 <>
@@ -624,7 +627,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             
                             <button 
                               onClick={onNext}
-                              className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
+                              className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3"
                               style={{ 
                                 backgroundColor: '#F5CA3C',
                                 color: '#3D3731'
@@ -635,7 +638,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                 press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                               </span>
                             </button>
-                            <div className="flex items-center gap-2.5 mt-3" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                            <div className="inline-flex items-center gap-2.5 mt-3" style={{ color: '#A89A8A', fontSize: '14px' }}>
                               <Clock className="w-4 h-4" />
                               <span>Takes X minutes</span>
                             </div>
