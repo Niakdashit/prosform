@@ -1607,9 +1607,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           {choice}
                         </span>
                         
-                        {/* Action buttons - visible on hover */}
+                        {/* Action buttons - visible on hover, aligned to the right */}
                         <div 
-                          className="flex items-center gap-2"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5"
                           style={{
                             opacity: hoveredChoiceIndex === index ? 1 : 0,
                             transition: 'opacity 0.2s ease'
@@ -1617,36 +1617,36 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         >
                           <button
                             onClick={() => handleDeleteChoice(index)}
-                            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
                             style={{ 
                               backgroundColor: 'rgba(61, 55, 49, 0.85)',
                               border: '1px solid rgba(255,255,255,0.1)'
                             }}
                             title="Delete choice"
                           >
-                            <X className="w-4 h-4" style={{ color: '#FFFFFF' }} />
+                            <X className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
                           </button>
                           <button
                             onClick={() => handleDuplicateChoice(index)}
-                            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
                             style={{ 
                               backgroundColor: 'rgba(61, 55, 49, 0.85)',
                               border: '1px solid rgba(255,255,255,0.1)'
                             }}
                             title="Duplicate choice"
                           >
-                            <Copy className="w-4 h-4" style={{ color: '#FFFFFF' }} />
+                            <Copy className="w-3.5 h-3.5" style={{ color: '#FFFFFF' }} />
                           </button>
                           <button
                             onClick={() => {/* Custom logic for sparkles */}}
-                            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
                             style={{ 
                               backgroundColor: 'rgba(245, 184, 0, 0.85)',
                               border: '1px solid rgba(255,255,255,0.1)'
                             }}
                             title="Customize choice"
                           >
-                            <Sparkles className="w-4 h-4" style={{ color: '#3D3731' }} />
+                            <Sparkles className="w-3.5 h-3.5" style={{ color: '#3D3731' }} />
                           </button>
                         </div>
                       </div>
