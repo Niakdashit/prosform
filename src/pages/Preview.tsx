@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { FormPreview } from "@/components/FormPreview";
 import { Question } from "@/components/FormBuilder";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 
-const Preview = () => {
+const PreviewContent = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const { updateTheme } = useTheme();
+
 
   useEffect(() => {
     // Load initial questions from localStorage
@@ -25,7 +27,24 @@ const Preview = () => {
 
     loadData();
 
-    // Listen for changes from the editor (in another tab/window)
+    // Use BroadcastChannel for real-time sync (works in same tab AND other tabs)
+    const previewChannel = new BroadcastChannel('form-preview-sync');
+    const themeChannel = new BroadcastChannel('form-theme-sync');
+    
+    previewChannel.onmessage = (event) => {
+      if (event.data.questions) {
+        setQuestions(event.data.questions);
+      }
+      if (event.data.viewMode) {
+        setViewMode(event.data.viewMode);
+      }
+    };
+
+    themeChannel.onmessage = (event) => {
+      updateTheme(event.data);
+    };
+
+    // Also listen for storage changes (for other tabs/windows)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'preview-questions' && e.newValue) {
         setQuestions(JSON.parse(e.newValue));
@@ -38,9 +57,11 @@ const Preview = () => {
     window.addEventListener('storage', handleStorageChange);
 
     return () => {
+      previewChannel.close();
+      themeChannel.close();
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, []);
+  }, [updateTheme]);
 
   if (questions.length === 0) {
     return (
@@ -51,8 +72,7 @@ const Preview = () => {
   }
 
   return (
-    <ThemeProvider>
-      <FormPreview
+    <FormPreview
         question={questions[currentIndex]}
         onUpdateQuestion={() => {}} // No editing in public preview
         viewMode={viewMode}
@@ -66,6 +86,13 @@ const Preview = () => {
           }
         }}
       />
+  );
+};
+
+const Preview = () => {
+  return (
+    <ThemeProvider>
+      <PreviewContent />
     </ThemeProvider>
   );
 };
