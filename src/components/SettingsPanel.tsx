@@ -1208,20 +1208,212 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     <div className="w-[280px] bg-background border-l border-border flex flex-col">
       <div className="p-3 border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
-            {(() => {
-              const Icon = getQuestionIcon(question).icon;
-              const color = getQuestionIcon(question).color;
-              return (
-                <>
-                  <div className={`w-6 h-6 rounded flex items-center justify-center ${color}`}>
-                    <Icon className="w-3.5 h-3.5" />
+          <Select 
+            value={question.type}
+            onValueChange={(value) => {
+              // Update question type and reset variant if needed
+              const updates: Partial<Question> = { type: value as any };
+              
+              // Reset variant for text types
+              if (value === 'text') {
+                updates.variant = 'short';
+              }
+              
+              // Reset variant for rating types
+              if (value === 'rating') {
+                updates.variant = undefined;
+                updates.ratingCount = 5;
+              }
+              
+              onUpdateQuestion?.(question.id, updates);
+            }}
+          >
+            <SelectTrigger className="flex-1 h-9 text-xs">
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const Icon = getQuestionIcon(question).icon;
+                  const color = getQuestionIcon(question).color;
+                  return (
+                    <>
+                      <div className={`w-6 h-6 rounded flex items-center justify-center ${color}`}>
+                        <Icon className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="font-medium">{getQuestionTypeLabel()}</span>
+                    </>
+                  );
+                })()}
+              </div>
+            </SelectTrigger>
+            <SelectContent className="max-h-[400px]">
+              <SelectItem value="welcome" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["welcome"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["welcome"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
                   </div>
-                  <span className="text-xs font-medium text-foreground">{getQuestionTypeLabel()}</span>
-                </>
-              );
-            })()}
-          </div>
+                  <span>Welcome Screen</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="text" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["short-text"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["short-text"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Short Text</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="email" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["email"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["email"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Email</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="phone" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["phone"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["phone"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Phone Number</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="number" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["number"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["number"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Number</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="date" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["date"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["date"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Date</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="choice" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["multiple-choice"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["multiple-choice"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Multiple Choice</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="yesno" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["yes-no"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["yes-no"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Yes/No</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="dropdown" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["dropdown"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["dropdown"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Dropdown</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="rating" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["rating"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["rating"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Rating</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="picture-choice" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["picture-choice"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["picture-choice"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Picture Choice</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="file" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["file-upload"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["file-upload"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>File Upload</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="statement" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["statement"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["statement"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>Statement</span>
+                </div>
+              </SelectItem>
+              
+              <SelectItem value="ending" className="text-xs">
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded flex items-center justify-center ${questionIconMap["ending"].color}`}>
+                    {(() => {
+                      const Icon = questionIconMap["ending"].icon;
+                      return <Icon className="w-3.5 h-3.5" />;
+                    })()}
+                  </div>
+                  <span>End Screen</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
             <Info className="w-4 h-4" />
           </Button>
