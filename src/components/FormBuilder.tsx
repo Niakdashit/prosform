@@ -9,6 +9,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export interface Question {
   id: string;
@@ -310,8 +311,9 @@ export const FormBuilder = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-muted overflow-hidden">
-      <TopToolbar onAddContent={() => setIsAddContentModalOpen(true)} />
+    <ThemeProvider>
+      <div className="flex flex-col h-screen bg-muted overflow-hidden">
+        <TopToolbar onAddContent={() => setIsAddContentModalOpen(true)} />
       <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
@@ -418,5 +420,6 @@ export const FormBuilder = () => {
         onSelectElement={handleAddElement}
       />
     </div>
+    </ThemeProvider>
   );
 };
