@@ -64,71 +64,69 @@ const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
 
   return (
     <>
-      <div>
+      <div className="space-y-3">
         <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
         
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <Label className="text-xs font-normal text-muted-foreground mb-1.5 block">Mobile</Label>
-            <Select 
-              value={currentMobileLayout}
-              onValueChange={(value) => onUpdateQuestion?.(question.id, { mobileLayout: value })}
-            >
-              <SelectTrigger className="h-8 text-xs">
-                <div className="flex items-center gap-1.5 w-full">
-                  <div className="w-4 h-4 flex-shrink-0">
-                    <LayoutIcon type={currentMobileLayout} />
-                  </div>
-                  <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="m6 9 6 6 6-6"/>
-                  </svg>
+        <div className="flex items-center gap-3">
+          <Label className="text-xs font-normal text-muted-foreground w-16 flex-shrink-0">Mobile</Label>
+          <Select 
+            value={currentMobileLayout}
+            onValueChange={(value) => onUpdateQuestion?.(question.id, { mobileLayout: value })}
+          >
+            <SelectTrigger className="h-9 text-xs flex-1">
+              <div className="flex items-center gap-2 w-full">
+                <div className="w-6 h-6 flex-shrink-0">
+                  <LayoutIcon type={currentMobileLayout} />
                 </div>
-              </SelectTrigger>
-              <SelectContent>
-                {mobileLayouts.map((layout) => (
-                  <SelectItem key={layout.value} value={layout.value} className="text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4">
-                        <LayoutIcon type={layout.value} />
-                      </div>
-                      <span>{layout.label}</span>
+                <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {mobileLayouts.map((layout) => (
+                <SelectItem key={layout.value} value={layout.value} className="text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6">
+                      <LayoutIcon type={layout.value} />
                     </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                    <span>{layout.label}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div>
-            <Label className="text-xs font-normal text-muted-foreground mb-1.5 block">Desktop</Label>
-            <Select 
-              value={currentDesktopLayout}
-              onValueChange={(value) => onUpdateQuestion?.(question.id, { desktopLayout: value })}
-            >
-              <SelectTrigger className="h-8 text-xs">
-                <div className="flex items-center gap-1.5 w-full">
-                  <div className="w-4 h-4 flex-shrink-0">
-                    <LayoutIcon type={currentDesktopLayout} />
-                  </div>
-                  <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="m6 9 6 6 6-6"/>
-                  </svg>
+        <div className="flex items-center gap-3">
+          <Label className="text-xs font-normal text-muted-foreground w-16 flex-shrink-0">Desktop</Label>
+          <Select 
+            value={currentDesktopLayout}
+            onValueChange={(value) => onUpdateQuestion?.(question.id, { desktopLayout: value })}
+          >
+            <SelectTrigger className="h-9 text-xs flex-1">
+              <div className="flex items-center gap-2 w-full">
+                <div className="w-6 h-6 flex-shrink-0">
+                  <LayoutIcon type={currentDesktopLayout} />
                 </div>
-              </SelectTrigger>
-              <SelectContent>
-                {desktopLayouts.map((layout) => (
-                  <SelectItem key={layout.value} value={layout.value} className="text-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4">
-                        <LayoutIcon type={layout.value} />
-                      </div>
-                      <span>{layout.label}</span>
+                <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              {desktopLayouts.map((layout) => (
+                <SelectItem key={layout.value} value={layout.value} className="text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6">
+                      <LayoutIcon type={layout.value} />
                     </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                    <span>{layout.label}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
