@@ -178,8 +178,6 @@ export const FormBuilder = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
-  const [isCapturingPreview, setIsCapturingPreview] = useState(false);
-  const [previewQuestionIndex, setPreviewQuestionIndex] = useState(0);
 
   // Force mobile view mode on mobile devices
   useEffect(() => {
@@ -313,180 +311,20 @@ export const FormBuilder = () => {
     }
   };
 
-  const handlePreview = () => {
-    const targetViewMode = isMobile ? 'mobile' : 'desktop';
-    
-    // Créer une page HTML complète avec le formulaire
-    const previewHTML = `
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prévisualisation du formulaire</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: ${theme.fontFamily === 'inter' ? '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' : theme.fontFamily};
-      background: #f3f4f6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      position: relative;
-    }
-    
-    .close-button {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      z-index: 1000;
-      padding: 12px 16px;
-      border-radius: 8px;
-      background-color: #4A4138;
-      border: 1px solid rgba(245, 184, 0, 0.3);
-      color: #F5CA3C;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      transition: transform 0.2s;
-    }
-    
-    .close-button:hover {
-      transform: scale(1.05);
-    }
-    
-    .form-container {
-      background: ${theme.backgroundColor};
-      width: ${targetViewMode === 'desktop' ? '1100px' : '375px'};
-      height: ${targetViewMode === 'desktop' ? '620px' : '667px'};
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .logo {
-      position: absolute;
-      top: 32px;
-      left: 32px;
-      display: grid;
-      grid-template-columns: repeat(2, 14px);
-      gap: 4px;
-    }
-    
-    .logo-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #F5CA3C;
-    }
-    
-    .content {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: ${targetViewMode === 'desktop' ? '0 64px' : '24px 20px'};
-    }
-    
-    .text-content {
-      text-align: center;
-      max-width: 600px;
-    }
-    
-    h1 {
-      font-size: ${targetViewMode === 'desktop' ? '48px' : '32px'};
-      color: ${theme.textColor};
-      margin-bottom: 16px;
-      font-weight: 700;
-    }
-    
-    p {
-      font-size: ${targetViewMode === 'desktop' ? '18px' : '16px'};
-      color: ${theme.textColor};
-      opacity: 0.9;
-      margin-bottom: 32px;
-    }
-    
-    button {
-      background: ${theme.systemColor};
-      color: ${theme.backgroundColor};
-      padding: 16px 32px;
-      border-radius: ${theme.buttonStyle === 'pill' ? '999px' : theme.buttonStyle === 'rounded' ? '12px' : '4px'};
-      border: none;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    
-    button:hover {
-      transform: scale(1.05);
-    }
-    
-    .image-container {
-      width: ${targetViewMode === 'desktop' ? '420px' : '280px'};
-      height: ${targetViewMode === 'desktop' ? '420px' : '280px'};
-      border-radius: 36px;
-      overflow: hidden;
-      margin: 0 auto ${targetViewMode === 'desktop' ? '48px' : '32px'};
-    }
-    
-    .image-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  </style>
-</head>
-<body>
-  <button class="close-button" onclick="window.close()">
-    ← Fermer
-  </button>
-  
-  <div class="form-container">
-    <div class="logo">
-      <div class="logo-dot"></div>
-      <div class="logo-dot"></div>
-      <div class="logo-dot"></div>
-      <div class="logo-dot"></div>
-    </div>
-    
-    <div class="content">
-      <div class="text-content">
-        ${questions[0].icon ? `<div class="image-container"><img src="https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=500" alt="Welcome" /></div>` : ''}
-        <h1>${questions[0].title || 'Welcome'}</h1>
-        <p>${questions[0].subtitle || ''}</p>
-        <button>${questions[0].buttonText || 'Start'}</button>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
-    `;
-    
-    // Ouvrir dans un nouvel onglet avec le HTML
-    const blob = new Blob([previewHTML], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    
-    // Nettoyer l'URL après un court délai
-    setTimeout(() => URL.revokeObjectURL(url), 100);
-  };
-
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <TopToolbar 
         onAddContent={() => setIsAddContentModalOpen(true)}
-        onPreview={handlePreview}
+        onPreview={() => {
+          // Stocker les questions, le viewMode et le thème dans localStorage
+          const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          localStorage.setItem('preview-questions', JSON.stringify(questions));
+          localStorage.setItem('preview-viewMode', targetViewMode);
+          localStorage.setItem('preview-theme', JSON.stringify(theme));
+          
+          // Ouvrir dans un nouvel onglet
+          window.open('/preview', '_blank');
+        }}
       />
         
         <div className="flex flex-1 overflow-hidden relative">
