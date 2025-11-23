@@ -1,29 +1,35 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { defaultTheme } from '@/contexts/ThemeContext';
+import { defaultQuestions } from '@/components/FormBuilder';
 
 const Preview = () => {
-  const [formData, setFormData] = useState<any>(null);
-
-  useEffect(() => {
-    // Load initial form data
-    const loadFormData = () => {
+  const [formData, setFormData] = useState<any>(() => {
+    try {
       const stored = localStorage.getItem('formPreviewData');
-      if (stored) {
-        setFormData(JSON.parse(stored));
-      }
+      if (stored) return JSON.parse(stored);
+    } catch (e) {
+      // ignore parse errors and fall back to defaults
+    }
+
+    return {
+      theme: defaultTheme,
+      questions: defaultQuestions,
+      currentQuestionIndex: 0,
+      layout: 'desktop',
+      isMobileResponsive: true,
     };
-
-    loadFormData();
-
-    // Listen for changes
+  });
+  useEffect(() => {
+    // Listen for changes triggered from other tabs of the same origin
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'formPreviewData' && e.newValue) {
         setFormData(JSON.parse(e.newValue));
       }
     };
 
-    // Listen for same-tab updates
-    const handleCustomEvent = (e: CustomEvent) => {
+    // Listen for same-tab updates from the builder
+    const handleCustomEvent = (e: any) => {
       setFormData(e.detail);
     };
 
@@ -35,14 +41,6 @@ const Preview = () => {
       window.removeEventListener('formPreviewUpdate' as any, handleCustomEvent);
     };
   }, []);
-
-  if (!formData) {
-    return (
-      <div className="w-screen h-screen flex items-center justify-center bg-background">
-        <div className="text-muted-foreground">Chargement de la prévisualisation...</div>
-      </div>
-    );
-  }
 
   const { theme, questions, currentQuestionIndex, layout, isMobileResponsive } = formData;
 
@@ -120,7 +118,7 @@ const Preview = () => {
                 className="text-3xl font-bold mb-6 text-center"
                 style={{
                   color: theme.textColor,
-                  fontSize: `${theme.titleSize}px`,
+                  fontSize: `${(theme as any).titleSize ?? 32}px`,
                 }}
               >
                 {currentQuestion.title}
@@ -132,7 +130,7 @@ const Preview = () => {
                   style={{
                     color: theme.textColor,
                     opacity: 0.8,
-                    fontSize: `${theme.descriptionSize}px`,
+                    fontSize: `${(theme as any).descriptionSize ?? 16}px`,
                   }}
                 >
                   {currentQuestion.description}

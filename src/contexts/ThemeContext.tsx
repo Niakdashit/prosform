@@ -31,7 +31,7 @@ export interface ThemeSettings {
   animationSpeed: 'none' | 'slow' | 'normal' | 'fast';
 }
 
-const defaultTheme: ThemeSettings = {
+export const defaultTheme: ThemeSettings = {
   fontFamily: 'inter',
   fontSize: 16,
   textColor: '#ffffff',
