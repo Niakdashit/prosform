@@ -175,23 +175,23 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     return labels[question.type] || "Question";
   };
 
-  const LineHeightControl = () => (
+  const BlockSpacingControl = () => (
     <>
       <div>
-        <Label className="text-xs text-muted-foreground mb-2 block">Line spacing</Label>
+        <Label className="text-xs text-muted-foreground mb-2 block">Block spacing</Label>
         <div className="space-y-2">
           <input
             type="range"
-            min="1"
-            max="2.5"
+            min="0.5"
+            max="2"
             step="0.1"
-            value={question?.lineHeight || 1.6}
-            onChange={(e) => onUpdateQuestion?.(question!.id, { lineHeight: parseFloat(e.target.value) })}
+            value={question?.blockSpacing || 1}
+            onChange={(e) => onUpdateQuestion?.(question!.id, { blockSpacing: parseFloat(e.target.value) })}
             className="w-full h-1.5 accent-primary cursor-pointer"
           />
           <div className="flex justify-between text-[10px] text-muted-foreground">
             <span>Tight</span>
-            <span>{(question?.lineHeight || 1.6).toFixed(1)}</span>
+            <span>{(question?.blockSpacing || 1).toFixed(1)}</span>
             <span>Loose</span>
           </div>
         </div>
@@ -283,7 +283,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
         </>
       )}
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -335,7 +335,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -389,7 +389,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -455,7 +455,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -518,7 +518,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -585,7 +585,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -700,7 +700,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -765,7 +765,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -837,7 +837,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -1003,7 +1003,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
@@ -1076,7 +1076,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <LineHeightControl />
+      <BlockSpacingControl />
     </>
   );
 
