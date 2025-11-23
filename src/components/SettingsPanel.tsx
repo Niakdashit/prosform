@@ -14,10 +14,22 @@ import mobileVerticalIcon from "@/assets/layout-mobile-vertical.svg";
 import mobileHorizontalIcon from "@/assets/layout-mobile-horizontal.svg";
 import mobileCenteredIcon from "@/assets/layout-mobile-centered.svg";
 import mobileMinimalIcon from "@/assets/layout-mobile-minimal.svg";
+import mobileHeroIcon from "@/assets/layout-mobile-hero.svg";
+import mobileGridIcon from "@/assets/layout-mobile-grid.svg";
+import mobileCardsIcon from "@/assets/layout-mobile-cards.svg";
+import mobileFullwidthIcon from "@/assets/layout-mobile-fullwidth.svg";
+import mobileCompactIcon from "@/assets/layout-mobile-compact.svg";
 import desktopLeftRightIcon from "@/assets/layout-desktop-left-right.svg";
 import desktopRightLeftIcon from "@/assets/layout-desktop-right-left.svg";
 import desktopCenteredIcon from "@/assets/layout-desktop-centered.svg";
 import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
+import desktopFullscreenIcon from "@/assets/layout-desktop-fullscreen.svg";
+import desktopColumnsIcon from "@/assets/layout-desktop-columns.svg";
+import desktopGridIcon from "@/assets/layout-desktop-grid.svg";
+import desktopWideIcon from "@/assets/layout-desktop-wide.svg";
+import desktopHorizontalIcon from "@/assets/layout-desktop-horizontal.svg";
+import desktopMinimalIcon from "@/assets/layout-desktop-minimal.svg";
+import desktopNarrowIcon from "@/assets/layout-desktop-narrow.svg";
 
 interface SettingsPanelProps {
   question?: Question;
@@ -30,10 +42,22 @@ const LayoutIcon = ({ type }: { type: string }) => {
     "mobile-horizontal": mobileHorizontalIcon,
     "mobile-centered": mobileCenteredIcon,
     "mobile-minimal": mobileMinimalIcon,
+    "mobile-hero": mobileHeroIcon,
+    "mobile-grid": mobileGridIcon,
+    "mobile-cards": mobileCardsIcon,
+    "mobile-fullwidth": mobileFullwidthIcon,
+    "mobile-compact": mobileCompactIcon,
     "desktop-left-right": desktopLeftRightIcon,
     "desktop-right-left": desktopRightLeftIcon,
     "desktop-centered": desktopCenteredIcon,
     "desktop-split": desktopSplitIcon,
+    "desktop-fullscreen": desktopFullscreenIcon,
+    "desktop-columns": desktopColumnsIcon,
+    "desktop-grid": desktopGridIcon,
+    "desktop-wide": desktopWideIcon,
+    "desktop-horizontal": desktopHorizontalIcon,
+    "desktop-minimal": desktopMinimalIcon,
+    "desktop-narrow": desktopNarrowIcon,
   };
   
   const icon = iconMap[type];
