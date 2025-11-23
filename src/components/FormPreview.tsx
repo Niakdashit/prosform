@@ -666,7 +666,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     } else if (desktopLayout === 'desktop-right-left') {
                       // Stack: Texte à gauche, Image petite à droite (sur la même ligne)
                       return (
-                        <div className="w-full h-full flex items-center gap-16 px-12">
+                        <div className="w-full h-full flex items-center gap-16 px-24">
                           <div className="flex-1">
                             <TextContent />
                           </div>
@@ -676,7 +676,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     } else if (desktopLayout === 'desktop-centered') {
                       // Centered: Image à gauche, Texte à droite (comme split)
                       return (
-                        <div className="w-full h-full flex items-center gap-16 px-12">
+                        <div className="w-full h-full flex items-center gap-16 px-24">
                           <ImageBlock />
                           <div className="flex-1">
                             <TextContent />
@@ -704,7 +704,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       // Card: Split 50/50 - Texte à gauche avec padding, Image à droite collée au bord
                       return (
                         <div className="relative w-full h-full flex">
-                          <div className="w-1/2 flex items-center justify-center px-12 z-10">
+                          <div className="w-1/2 flex items-center justify-center px-24 z-10">
                             <div className="max-w-[500px]">
                               <TextContent />
                             </div>
@@ -729,7 +729,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div className="w-1/2 ml-auto flex items-center justify-center px-12 z-10">
+                          <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
                             <div className="max-w-[500px]">
                               <TextContent />
                             </div>
@@ -742,14 +742,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Mobile layouts
                   if (mobileLayout === 'mobile-vertical') {
                     return (
-                      <div className="flex flex-col gap-6 items-center py-6 px-4 w-full">
+                      <div className="flex flex-col gap-6 items-center py-6 px-5 w-full">
                         <ImageBlock />
                         <TextContent />
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-horizontal') {
                     return (
-                      <div className="flex items-center gap-4 py-6 px-4 w-full">
+                      <div className="flex items-center gap-4 py-6 px-5 w-full">
                         <div className="flex-1">
                           <TextContent />
                         </div>
@@ -758,7 +758,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     );
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex flex-col gap-6 items-center justify-center py-6 px-4 w-full text-center">
+                      <div className="flex flex-col gap-6 items-center justify-center py-6 px-5 w-full text-center">
                         <ImageBlock />
                         <TextContent centered />
                       </div>
@@ -772,7 +772,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           className="absolute inset-0 w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
-                        <div className="relative z-10 flex items-center justify-center h-full px-4">
+                        <div className="relative z-10 flex items-center justify-center h-full px-5">
                           <TextContent centered />
                         </div>
                       </div>
