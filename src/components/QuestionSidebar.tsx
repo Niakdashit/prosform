@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
+import { EndingTypeModal } from "./EndingTypeModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +37,13 @@ export const QuestionSidebar = ({
 }: QuestionSidebarProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [endingModalOpen, setEndingModalOpen] = useState(false);
   const { theme, updateTheme } = useTheme();
+
+  const handleSelectEndingType = (type: string) => {
+    console.log("Selected ending type:", type);
+    // TODO: Handle ending type selection
+  };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     e.dataTransfer.effectAllowed = 'move';
@@ -182,7 +189,10 @@ export const QuestionSidebar = ({
               <div className="mt-4 pt-3 border-t border-border">
                 <div className="flex items-center justify-between mb-3 px-2">
                   <span className="text-sm font-semibold text-foreground">Endings</span>
-                  <button className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center">
+                  <button 
+                    onClick={() => setEndingModalOpen(true)}
+                    className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
+                  >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
@@ -635,6 +645,12 @@ export const QuestionSidebar = ({
           </ScrollArea>
         </TabsContent>
       </Tabs>
+
+      <EndingTypeModal 
+        open={endingModalOpen}
+        onOpenChange={setEndingModalOpen}
+        onSelectType={handleSelectEndingType}
+      />
     </div>
   );
 };
