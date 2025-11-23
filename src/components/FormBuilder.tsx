@@ -324,6 +324,7 @@ export const FormBuilder = () => {
               // Set viewMode based on device: desktop shows desktop, mobile shows mobile
               setViewMode(isMobile ? 'mobile' : 'desktop');
             }}
+            questions={questions}
           />
         )}
         
