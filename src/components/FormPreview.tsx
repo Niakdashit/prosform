@@ -639,15 +639,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-12 right-0 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
+                          className="absolute -top-12 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.2)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-4 h-4" />
-                          <span className="text-sm font-medium">Insert variable</span>
+                          <Sparkles className="w-5 h-5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
