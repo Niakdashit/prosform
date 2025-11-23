@@ -88,7 +88,7 @@ export const QuestionSidebar = ({
         </TabsList>
 
         <TabsContent value="questions" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-[calc(100vh-180px)]">
             <div className="p-3">
               {questions.filter(q => q.type !== "ending").map((question, index) => {
                 const questionIcon = getQuestionIcon(question);
@@ -270,7 +270,7 @@ export const QuestionSidebar = ({
         </TabsContent>
 
         <TabsContent value="logic" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-[calc(100vh-180px)]">
             <div className="p-3">
               <div className="text-center py-8 text-muted-foreground">
                 <GitBranch className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -282,7 +282,7 @@ export const QuestionSidebar = ({
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-full">
+          <ScrollArea className="h-[calc(100vh-180px)]">
             <div className="p-3 space-y-4 pb-20">
               <div>
                 <h3 className="text-sm font-semibold mb-3">Typography</h3>
