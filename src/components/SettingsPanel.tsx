@@ -169,6 +169,31 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     return labels[question.type] || "Question";
   };
 
+  const LineHeightControl = () => (
+    <>
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Line spacing</Label>
+        <div className="space-y-2">
+          <input
+            type="range"
+            min="1"
+            max="2.5"
+            step="0.1"
+            value={question?.lineHeight || 1.6}
+            onChange={(e) => onUpdateQuestion?.(question!.id, { lineHeight: parseFloat(e.target.value) })}
+            className="w-full h-1.5 accent-primary cursor-pointer"
+          />
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>Tight</span>
+            <span>{(question?.lineHeight || 1.6).toFixed(1)}</span>
+            <span>Loose</span>
+          </div>
+        </div>
+      </div>
+      <Separator className="my-4" />
+    </>
+  );
+
   const renderWelcomeSettings = () => (
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
@@ -251,6 +276,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           <Separator className="my-4" />
         </>
       )}
+
+      <LineHeightControl />
     </>
   );
 
@@ -299,6 +326,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           Add media
         </Button>
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -349,6 +380,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           Add media
         </Button>
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -411,6 +446,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           className="text-xs h-8"
         />
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -470,6 +509,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           className="text-xs h-8" 
         />
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -533,6 +576,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           </SelectContent>
         </Select>
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -644,6 +691,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           Add media
         </Button>
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -705,6 +756,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
         <Label className="text-xs text-muted-foreground mb-2 block">Max number of files</Label>
         <Input type="number" placeholder="5" className="text-xs h-8" />
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -773,6 +828,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           Add media
         </Button>
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -935,6 +994,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           Add media
         </Button>
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
@@ -1004,6 +1067,10 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
           Add media
         </Button>
       </div>
+
+      <Separator className="my-4" />
+
+      <LineHeightControl />
     </>
   );
 
