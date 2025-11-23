@@ -144,14 +144,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute top-0 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center z-20"
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
                           style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-3.5 h-3.5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
@@ -262,14 +262,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-16 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center z-20"
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
                           style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-3.5 h-3.5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
@@ -472,14 +472,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-16 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center z-20"
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
                           style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-3.5 h-3.5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
@@ -595,14 +595,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-16 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center z-20"
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
                           style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-3.5 h-3.5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
@@ -707,14 +707,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-16 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center z-20"
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
                           style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-3.5 h-3.5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
@@ -798,14 +798,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-12 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center z-20"
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
                           style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-3.5 h-3.5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
@@ -891,14 +891,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-12 right-0 w-10 h-10 rounded-lg transition-all hover:scale-110 flex items-center justify-center"
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
                           style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-3.5 h-3.5" />
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
