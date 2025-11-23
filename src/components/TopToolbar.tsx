@@ -12,9 +12,20 @@ import {
 interface TopToolbarProps {
   onAddContent: () => void;
   onPreview: () => void;
+  questions?: any[];
+  viewMode?: 'desktop' | 'mobile';
 }
 
-export const TopToolbar = ({ onAddContent, onPreview }: TopToolbarProps) => {
+export const TopToolbar = ({ onAddContent, onPreview, questions = [], viewMode = 'desktop' }: TopToolbarProps) => {
+  const handlePreviewClick = () => {
+    // Save questions and viewMode to localStorage
+    localStorage.setItem('preview-questions', JSON.stringify(questions));
+    localStorage.setItem('preview-viewMode', viewMode);
+    
+    // Open preview in new tab
+    window.open('/preview', '_blank');
+  };
+
   return (
     <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
       <div className="flex items-center gap-1.5">
@@ -37,7 +48,7 @@ export const TopToolbar = ({ onAddContent, onPreview }: TopToolbarProps) => {
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Smartphone className="w-3.5 h-3.5" />
         </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onPreview}>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={handlePreviewClick}>
           <Eye className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
