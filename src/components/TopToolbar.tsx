@@ -3,10 +3,8 @@ import {
   Plus, 
   Palette, 
   Smartphone, 
-  Play, 
-  Clock, 
-  RotateCcw, 
-  Languages,
+  Eye, 
+  RotateCcw,
   Settings
 } from "lucide-react";
 
@@ -34,16 +32,10 @@ export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
           <Smartphone className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Play className="w-3.5 h-3.5" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Clock className="w-3.5 h-3.5" />
+          <Eye className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <RotateCcw className="w-3.5 h-3.5" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Languages className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Settings className="w-3.5 h-3.5" />
