@@ -45,6 +45,26 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   const [showVariableMenu, setShowVariableMenu] = useState(false);
   const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
   const [menuView, setMenuView] = useState<'main' | 'variables'>('main');
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setUploadedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const availableVariables = [
     { key: 'first_name', label: 'First name', description: "User's first name" },
@@ -205,10 +225,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   const mobileLayout = question.mobileLayout || "mobile-vertical";
                   const currentLayout = viewMode === "desktop" ? desktopLayout : mobileLayout;
 
-                  // Image component
+                  // Image component with upload functionality
                   const ImageBlock = () => (
                     <div
-                      className="overflow-hidden"
+                      className="overflow-hidden relative group"
                       style={{ 
                         borderRadius: "36px",
                         width: viewMode === 'desktop' ? '420px' : currentLayout === 'mobile-horizontal' ? '140px' : '280px',
@@ -217,10 +237,48 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         flexShrink: 0
                       }}
                     >
-                      <img
-                        src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
-                        alt="Feedback illustration"
-                        className="w-full h-full object-cover"
+                      {uploadedImage ? (
+                        <>
+                          <img
+                            src={uploadedImage}
+                            alt="Uploaded"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => fileInputRef.current?.click()}
+                              className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                            >
+                              Change
+                            </button>
+                            <button
+                              onClick={handleRemoveImage}
+                              className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
+                          <p className="text-sm font-medium" style={{ color: '#F5B800' }}>
+                            Upload Image
+                          </p>
+                          <p className="text-xs mt-1" style={{ color: '#A89A8A' }}>
+                            Click to browse
+                          </p>
+                        </div>
+                      )}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
                       />
                     </div>
                   );
@@ -716,12 +774,43 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       // Wallpaper: Image en fond, texte en overlay
                       return (
                         <div className="absolute inset-0">
-                          <img
-                            src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=900&fit=crop"
-                            alt="Background"
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
+                          {uploadedImage ? (
+                            <img
+                              src={uploadedImage}
+                              alt="Background"
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div
+                              onClick={() => fileInputRef.current?.click()}
+                              className="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                            >
+                              <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                              <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                                Upload Background Image
+                              </p>
+                              <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                                Click to browse
+                              </p>
+                            </div>
+                          )}
                           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                          {uploadedImage && (
+                            <div className="absolute top-4 right-4 z-20 opacity-0 hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="px-3 py-1.5 bg-white/90 text-black rounded-lg text-xs font-medium hover:bg-white transition-colors mr-2"
+                              >
+                                Change
+                              </button>
+                              <button
+                                onClick={handleRemoveImage}
+                                className="px-3 py-1.5 bg-red-500/90 text-white rounded-lg text-xs font-medium hover:bg-red-500 transition-colors"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          )}
                           <div className="relative z-10 flex items-center justify-center h-full px-16">
                             <div className="max-w-[700px] text-center">
                               <TextContent centered />
@@ -738,12 +827,43 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               <TextContent />
                             </div>
                           </div>
-                          <div className="absolute right-0 top-0 w-1/2 h-full">
-                            <img
-                              src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
-                              alt="Feedback illustration"
-                              className="w-full h-full object-cover"
-                            />
+                          <div className="absolute right-0 top-0 w-1/2 h-full group">
+                            {uploadedImage ? (
+                              <>
+                                <img
+                                  src={uploadedImage}
+                                  alt="Feedback illustration"
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                  <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                                  >
+                                    Change
+                                  </button>
+                                  <button
+                                    onClick={handleRemoveImage}
+                                    className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                              >
+                                <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                                <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                                  Upload Image
+                                </p>
+                                <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                                  Click to browse
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -751,12 +871,43 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       // Panel: Split 50/50 - Image à gauche collée au bord, Texte à droite avec padding
                       return (
                         <div className="relative w-full h-full flex">
-                          <div className="absolute left-0 top-0 w-1/2 h-full">
-                            <img
-                              src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
-                              alt="Feedback illustration"
-                              className="w-full h-full object-cover"
-                            />
+                          <div className="absolute left-0 top-0 w-1/2 h-full group">
+                            {uploadedImage ? (
+                              <>
+                                <img
+                                  src={uploadedImage}
+                                  alt="Feedback illustration"
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                  <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                                  >
+                                    Change
+                                  </button>
+                                  <button
+                                    onClick={handleRemoveImage}
+                                    className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                              >
+                                <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                                <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                                  Upload Image
+                                </p>
+                                <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                                  Click to browse
+                                </p>
+                              </div>
+                            )}
                           </div>
                           <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
                             <div className="max-w-[500px]">
@@ -788,12 +939,43 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
                       <div className="flex flex-col w-full h-full">
-                        <div className="w-full" style={{ height: '40%', minHeight: '250px' }}>
-                          <img
-                            src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=800&h=600&fit=crop"
-                            alt="Banner"
-                            className="w-full h-full object-cover"
-                          />
+                        <div className="w-full relative group" style={{ height: '40%', minHeight: '250px' }}>
+                          {uploadedImage ? (
+                            <>
+                              <img
+                                src={uploadedImage}
+                                alt="Banner"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => fileInputRef.current?.click()}
+                                  className="px-4 py-2 bg-white/90 text-black rounded-lg text-sm font-medium hover:bg-white transition-colors"
+                                >
+                                  Change
+                                </button>
+                                <button
+                                  onClick={handleRemoveImage}
+                                  className="px-4 py-2 bg-red-500/90 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <div
+                              onClick={() => fileInputRef.current?.click()}
+                              className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                            >
+                              <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
+                              <p className="text-sm font-medium" style={{ color: '#F5B800' }}>
+                                Upload Banner
+                              </p>
+                              <p className="text-xs mt-1" style={{ color: '#A89A8A' }}>
+                                Click to browse
+                              </p>
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                           <div className="w-full max-w-[700px]">
@@ -805,12 +987,43 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   } else if (mobileLayout === 'mobile-minimal') {
                     return (
                       <div className="absolute inset-0">
-                        <img
-                          src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=800&h=1200&fit=crop"
-                          alt="Background"
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
+                        {uploadedImage ? (
+                          <img
+                            src={uploadedImage}
+                            alt="Background"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                          >
+                            <Upload className="w-14 h-14 mb-3" style={{ color: '#F5B800' }} />
+                            <p className="text-base font-medium" style={{ color: '#F5B800' }}>
+                              Upload Background
+                            </p>
+                            <p className="text-sm mt-1" style={{ color: '#A89A8A' }}>
+                              Click to browse
+                            </p>
+                          </div>
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                        {uploadedImage && (
+                          <div className="absolute top-4 right-4 z-20">
+                            <button
+                              onClick={() => fileInputRef.current?.click()}
+                              className="px-3 py-1.5 bg-white/90 text-black rounded-lg text-xs font-medium hover:bg-white transition-colors mr-2"
+                            >
+                              Change
+                            </button>
+                            <button
+                              onClick={handleRemoveImage}
+                              className="px-3 py-1.5 bg-red-500/90 text-white rounded-lg text-xs font-medium hover:bg-red-500 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        )}
                         <div className="relative z-10 flex items-center justify-center h-full px-5 py-6">
                           <div className="max-w-[700px]">
                             <TextContent />
