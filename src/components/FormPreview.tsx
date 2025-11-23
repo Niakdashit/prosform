@@ -416,8 +416,21 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     if (desktopLayout === 'desktop-left-right') {
                       // Split: Ordre vertical - 1. Image, 2. Titre, 3. Reste - Aligné à gauche
                       return (
-                        <div className="w-full h-full flex flex-col items-start justify-center gap-8 px-12">
-                          <ImageBlock />
+                        <div className="w-full h-full flex flex-col items-start justify-start gap-6 px-12 py-12 overflow-y-auto">
+                          <div
+                            className="overflow-hidden flex-shrink-0"
+                            style={{ 
+                              borderRadius: "36px",
+                              width: '320px',
+                              height: '320px',
+                            }}
+                          >
+                            <img
+                              src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                              alt="Feedback illustration"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                           <div className="max-w-[600px]">
                             <div className="relative">
                               {editingField === 'welcome-title' && (
@@ -494,11 +507,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
 
                               <h1 
-                                className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
+                                className="font-bold mb-4 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
                                 style={{ 
                                   color: '#F5CA3C', 
                                   fontWeight: 700, 
-                                  fontSize: '64px',
+                                  fontSize: '48px',
                                   letterSpacing: '-0.02em',
                                   outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                                   padding: '4px',
@@ -589,11 +602,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
                               
                               <p 
-                                className="mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                                className="mb-6 cursor-text hover:opacity-80 transition-opacity" 
                                 style={{ 
                                   color: '#E3DDD5',
                                   fontWeight: 400,
-                                  fontSize: '18px',
+                                  fontSize: '16px',
                                   lineHeight: '1.6',
                                   outline: editingField === 'welcome-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                                   padding: '4px',
@@ -611,7 +624,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             
                             <button 
                               onClick={onNext}
-                              className="group px-8 py-4 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
+                              className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
                               style={{ 
                                 backgroundColor: '#F5CA3C',
                                 color: '#3D3731'
@@ -622,7 +635,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                                 press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                               </span>
                             </button>
-                            <div className="flex items-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                            <div className="flex items-center gap-2.5 mt-3" style={{ color: '#A89A8A', fontSize: '14px' }}>
                               <Clock className="w-4 h-4" />
                               <span>Takes X minutes</span>
                             </div>
