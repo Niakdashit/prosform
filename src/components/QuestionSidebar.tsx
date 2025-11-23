@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +36,7 @@ export const QuestionSidebar = ({
 }: QuestionSidebarProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const { theme, updateTheme } = useTheme();
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     e.dataTransfer.effectAllowed = 'move';
@@ -88,7 +90,6 @@ export const QuestionSidebar = ({
         <TabsContent value="questions" className="flex-1 mt-0 overflow-hidden">
           <ScrollArea className="h-full">
             <div className="p-3">
-              {/* Questions (sauf endings) */}
               {questions.filter(q => q.type !== "ending").map((question, index) => {
                 const questionIcon = getQuestionIcon(question);
                 const Icon = questionIcon.icon;
@@ -282,13 +283,13 @@ export const QuestionSidebar = ({
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
           <ScrollArea className="h-full">
-            <div className="p-3 space-y-4">
+            <div className="p-3 space-y-4 pb-20">
               <div>
                 <h3 className="text-sm font-semibold mb-3">Typography</h3>
                 <div className="space-y-3">
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Global font</Label>
-                    <Select defaultValue="inter">
+                    <Select value={theme.fontFamily} onValueChange={(value) => updateTheme({ fontFamily: value })}>
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
@@ -311,12 +312,13 @@ export const QuestionSidebar = ({
                         min="12"
                         max="20"
                         step="1"
-                        defaultValue="16"
+                        value={theme.fontSize}
+                        onChange={(e) => updateTheme({ fontSize: parseInt(e.target.value) })}
                         className="w-full h-1.5 accent-primary cursor-pointer"
                       />
                       <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span>Small</span>
-                        <span>16px</span>
+                        <span>{theme.fontSize}px</span>
                         <span>Large</span>
                       </div>
                     </div>
@@ -332,40 +334,90 @@ export const QuestionSidebar = ({
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Text color</Label>
                     <div className="flex gap-2">
-                      <Input type="color" defaultValue="#000000" className="h-8 w-16" />
-                      <Input type="text" defaultValue="#000000" className="h-8 text-xs flex-1" />
+                      <Input 
+                        type="color" 
+                        value={theme.textColor} 
+                        onChange={(e) => updateTheme({ textColor: e.target.value })}
+                        className="h-8 w-16" 
+                      />
+                      <Input 
+                        type="text" 
+                        value={theme.textColor}
+                        onChange={(e) => updateTheme({ textColor: e.target.value })}
+                        className="h-8 text-xs flex-1" 
+                      />
                     </div>
                   </div>
                   
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Background color</Label>
                     <div className="flex gap-2">
-                      <Input type="color" defaultValue="#ffffff" className="h-8 w-16" />
-                      <Input type="text" defaultValue="#ffffff" className="h-8 text-xs flex-1" />
+                      <Input 
+                        type="color" 
+                        value={theme.backgroundColor}
+                        onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
+                        className="h-8 w-16" 
+                      />
+                      <Input 
+                        type="text" 
+                        value={theme.backgroundColor}
+                        onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
+                        className="h-8 text-xs flex-1" 
+                      />
                     </div>
                   </div>
                   
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Button color</Label>
                     <div className="flex gap-2">
-                      <Input type="color" defaultValue="#3b82f6" className="h-8 w-16" />
-                      <Input type="text" defaultValue="#3b82f6" className="h-8 text-xs flex-1" />
+                      <Input 
+                        type="color" 
+                        value={theme.buttonColor}
+                        onChange={(e) => updateTheme({ buttonColor: e.target.value })}
+                        className="h-8 w-16" 
+                      />
+                      <Input 
+                        type="text" 
+                        value={theme.buttonColor}
+                        onChange={(e) => updateTheme({ buttonColor: e.target.value })}
+                        className="h-8 text-xs flex-1" 
+                      />
                     </div>
                   </div>
 
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">System color (lines, progress)</Label>
+                    <Label className="text-xs text-muted-foreground mb-2 block">System color</Label>
                     <div className="flex gap-2">
-                      <Input type="color" defaultValue="#6b7280" className="h-8 w-16" />
-                      <Input type="text" defaultValue="#6b7280" className="h-8 text-xs flex-1" />
+                      <Input 
+                        type="color" 
+                        value={theme.systemColor}
+                        onChange={(e) => updateTheme({ systemColor: e.target.value })}
+                        className="h-8 w-16" 
+                      />
+                      <Input 
+                        type="text" 
+                        value={theme.systemColor}
+                        onChange={(e) => updateTheme({ systemColor: e.target.value })}
+                        className="h-8 text-xs flex-1" 
+                      />
                     </div>
                   </div>
                   
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Accent color</Label>
                     <div className="flex gap-2">
-                      <Input type="color" defaultValue="#8b5cf6" className="h-8 w-16" />
-                      <Input type="text" defaultValue="#8b5cf6" className="h-8 text-xs flex-1" />
+                      <Input 
+                        type="color" 
+                        value={theme.accentColor}
+                        onChange={(e) => updateTheme({ accentColor: e.target.value })}
+                        className="h-8 w-16" 
+                      />
+                      <Input 
+                        type="text" 
+                        value={theme.accentColor}
+                        onChange={(e) => updateTheme({ accentColor: e.target.value })}
+                        className="h-8 text-xs flex-1" 
+                      />
                     </div>
                   </div>
                 </div>
@@ -378,7 +430,7 @@ export const QuestionSidebar = ({
                 <div className="space-y-3">
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Button style</Label>
-                    <Select defaultValue="rounded">
+                    <Select value={theme.buttonStyle} onValueChange={(value: any) => updateTheme({ buttonStyle: value })}>
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
@@ -392,7 +444,7 @@ export const QuestionSidebar = ({
                   
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Button size</Label>
-                    <Select defaultValue="medium">
+                    <Select value={theme.buttonSize} onValueChange={(value: any) => updateTheme({ buttonSize: value })}>
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
@@ -414,8 +466,18 @@ export const QuestionSidebar = ({
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Border color</Label>
                     <div className="flex gap-2">
-                      <Input type="color" defaultValue="#e5e7eb" className="h-8 w-16" />
-                      <Input type="text" defaultValue="#e5e7eb" className="h-8 text-xs flex-1" />
+                      <Input 
+                        type="color" 
+                        value={theme.borderColor}
+                        onChange={(e) => updateTheme({ borderColor: e.target.value })}
+                        className="h-8 w-16" 
+                      />
+                      <Input 
+                        type="text" 
+                        value={theme.borderColor}
+                        onChange={(e) => updateTheme({ borderColor: e.target.value })}
+                        className="h-8 text-xs flex-1" 
+                      />
                     </div>
                   </div>
                   
@@ -427,12 +489,13 @@ export const QuestionSidebar = ({
                         min="0"
                         max="4"
                         step="0.5"
-                        defaultValue="1"
+                        value={theme.borderWidth}
+                        onChange={(e) => updateTheme({ borderWidth: parseFloat(e.target.value) })}
                         className="w-full h-1.5 accent-primary cursor-pointer"
                       />
                       <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span>None</span>
-                        <span>1px</span>
+                        <span>{theme.borderWidth}px</span>
                         <span>Thick</span>
                       </div>
                     </div>
@@ -446,12 +509,13 @@ export const QuestionSidebar = ({
                         min="0"
                         max="24"
                         step="2"
-                        defaultValue="8"
+                        value={theme.borderRadius}
+                        onChange={(e) => updateTheme({ borderRadius: parseInt(e.target.value) })}
                         className="w-full h-1.5 accent-primary cursor-pointer"
                       />
                       <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span>Sharp</span>
-                        <span>8px</span>
+                        <span>{theme.borderRadius}px</span>
                         <span>Round</span>
                       </div>
                     </div>
@@ -472,12 +536,13 @@ export const QuestionSidebar = ({
                         min="0.5"
                         max="2"
                         step="0.1"
-                        defaultValue="1"
+                        value={theme.questionSpacing}
+                        onChange={(e) => updateTheme({ questionSpacing: parseFloat(e.target.value) })}
                         className="w-full h-1.5 accent-primary cursor-pointer"
                       />
                       <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span>Compact</span>
-                        <span>1x</span>
+                        <span>{theme.questionSpacing.toFixed(1)}x</span>
                         <span>Spacious</span>
                       </div>
                     </div>
@@ -491,12 +556,13 @@ export const QuestionSidebar = ({
                         min="8"
                         max="24"
                         step="2"
-                        defaultValue="12"
+                        value={theme.inputPadding}
+                        onChange={(e) => updateTheme({ inputPadding: parseInt(e.target.value) })}
                         className="w-full h-1.5 accent-primary cursor-pointer"
                       />
                       <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span>Tight</span>
-                        <span>12px</span>
+                        <span>{theme.inputPadding}px</span>
                         <span>Loose</span>
                       </div>
                     </div>
@@ -510,12 +576,13 @@ export const QuestionSidebar = ({
                         min="16"
                         max="64"
                         step="4"
-                        defaultValue="32"
+                        value={theme.pageMargins}
+                        onChange={(e) => updateTheme({ pageMargins: parseInt(e.target.value) })}
                         className="w-full h-1.5 accent-primary cursor-pointer"
                       />
                       <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span>Narrow</span>
-                        <span>32px</span>
+                        <span>{theme.pageMargins}px</span>
                         <span>Wide</span>
                       </div>
                     </div>
@@ -536,12 +603,13 @@ export const QuestionSidebar = ({
                         min="0"
                         max="100"
                         step="10"
-                        defaultValue="20"
+                        value={theme.shadowIntensity}
+                        onChange={(e) => updateTheme({ shadowIntensity: parseInt(e.target.value) })}
                         className="w-full h-1.5 accent-primary cursor-pointer"
                       />
                       <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span>None</span>
-                        <span>20%</span>
+                        <span>{theme.shadowIntensity}%</span>
                         <span>Strong</span>
                       </div>
                     </div>
@@ -549,7 +617,7 @@ export const QuestionSidebar = ({
                   
                   <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Animation speed</Label>
-                    <Select defaultValue="normal">
+                    <Select value={theme.animationSpeed} onValueChange={(value: any) => updateTheme({ animationSpeed: value })}>
                       <SelectTrigger className="h-8 text-xs">
                         <SelectValue />
                       </SelectTrigger>
