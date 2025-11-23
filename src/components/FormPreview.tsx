@@ -15,6 +15,7 @@ interface FormPreviewProps {
 export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewProps) => {
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
+  const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
 
   if (!question) return null;
 
@@ -35,6 +36,15 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
       onUpdateQuestion(question.id, { subtitle: value.trim() });
     }
     setEditingField(null);
+  };
+
+  const handleChoiceBlur = (index: number, value: string) => {
+    if (question && question.choices) {
+      const newChoices = [...question.choices];
+      newChoices[index] = value.trim() || question.choices[index];
+      onUpdateQuestion(question.id, { choices: newChoices });
+    }
+    setEditingChoiceIndex(null);
   };
 
   return (
@@ -312,20 +322,44 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     )}
                   </div>
                   <div className="space-y-4">
-                    {["Yes", "No", "Sometimes"].map((choice, index) => (
+                    {(question.choices || ["Yes", "No", "Sometimes"]).map((choice, index) => (
                       <button
-                        key={choice}
-                        onClick={onNext}
+                        key={index}
+                        onClick={editingChoiceIndex !== index ? onNext : undefined}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
+                          setEditingChoiceIndex(index);
+                        }}
                         className="w-full p-5 rounded-xl transition-all flex items-center gap-5 text-left group hover:opacity-80"
                         style={{
                           backgroundColor: 'rgba(255,255,255,0.1)',
-                          border: '1px solid rgba(255,255,255,0.2)'
+                          border: editingChoiceIndex === index ? '2px solid rgba(245, 184, 0, 0.5)' : '1px solid rgba(255,255,255,0.2)'
                         }}
                       >
                         <span className="font-semibold text-base" style={{ color: '#A89A8A' }}>
                           {String.fromCharCode(65 + index)}
                         </span>
-                        <span className="text-xl font-medium" style={{ color: '#FFFFFF' }}>{choice}</span>
+                        <span 
+                          className="text-xl font-medium cursor-text" 
+                          style={{ 
+                            color: '#FFFFFF',
+                            outline: 'none',
+                            padding: '2px',
+                            margin: '-2px',
+                            borderRadius: '4px'
+                          }}
+                          contentEditable={editingChoiceIndex === index}
+                          suppressContentEditableWarning
+                          onFocus={() => setEditingChoiceIndex(index)}
+                          onBlur={(e) => handleChoiceBlur(index, e.currentTarget.textContent || '')}
+                          onClick={(e) => {
+                            if (editingChoiceIndex === index) {
+                              e.stopPropagation();
+                            }
+                          }}
+                        >
+                          {choice}
+                        </span>
                       </button>
                     ))}
                   </div>
