@@ -1037,7 +1037,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     </Popover>
                   )}
                   <h2
-                    className="text-[56px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity"
+                    className="text-[56px] font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity"
                     style={{ 
                       color: '#FFFFFF', 
                       fontWeight: 700, 
@@ -1056,7 +1056,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className="text-xl mb-8 cursor-text hover:opacity-80 transition-opacity"
+                      className="text-xl mb-10 cursor-text hover:opacity-80 transition-opacity"
                       style={{ 
                         color: '#B8A892',
                         outline: editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
@@ -1138,7 +1138,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   )}
 
                   <h2 
-                    className="text-[72px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                    className="text-[72px] font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                     style={{ 
                       color: '#F5B800', 
                       fontWeight: 700, 
@@ -1157,7 +1157,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className="text-xl mb-10 cursor-text hover:opacity-80 transition-opacity" 
+                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#C4B5A0',
                         outline: editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
