@@ -414,12 +414,218 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Desktop layouts
                   if (viewMode === 'desktop') {
                     if (desktopLayout === 'desktop-left-right') {
-                      // Split: Image petite à gauche, Texte à droite (sur la même ligne)
+                      // Split: Ordre vertical - 1. Image, 2. Titre, 3. Reste
                       return (
-                        <div className="w-full h-full flex items-center gap-16 px-12">
+                        <div className="w-full h-full flex flex-col items-center justify-center gap-8 px-12">
                           <ImageBlock />
-                          <div className="flex-1">
-                            <TextContent />
+                          <div className="text-center max-w-[600px]">
+                            <div className="relative">
+                              {editingField === 'welcome-title' && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                                    className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                                    style={{ 
+                                      backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                                      color: '#F5B800',
+                                      backdropFilter: 'blur(8px)'
+                                    }}
+                                  >
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                  </button>
+
+                                  {showVariableMenu && variableTarget === 'title' && (
+                                    <div
+                                      className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                                      style={{
+                                        top: '32px',
+                                        right: 0,
+                                        backgroundColor: '#4A4138',
+                                        border: '1px solid rgba(245, 184, 0, 0.3)',
+                                        boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                                      }}
+                                    >
+                                      {menuView === 'main' ? (
+                                        <div className="space-y-1">
+                                          <button
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => console.log('Réécriture AI')}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                          >
+                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                          </button>
+                                          <button
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => setMenuView('variables')}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                          >
+                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <div className="space-y-1">
+                                          <button
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => setMenuView('main')}
+                                            className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                          >
+                                            <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                          </button>
+                                          {availableVariables.map((variable) => (
+                                            <button
+                                              key={variable.key}
+                                              onMouseDown={(e) => e.preventDefault()}
+                                              onClick={() => insertVariable(variable.key)}
+                                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                            >
+                                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+
+                              <h1 
+                                className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
+                                style={{ 
+                                  color: '#F5CA3C', 
+                                  fontWeight: 700, 
+                                  fontSize: '64px',
+                                  letterSpacing: '-0.02em',
+                                  outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                                  padding: '4px',
+                                  margin: '-4px',
+                                  borderRadius: '4px'
+                                }}
+                                contentEditable
+                                suppressContentEditableWarning
+                                onFocus={() => setEditingField('welcome-title')}
+                                onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                              >
+                                {question.title}
+                              </h1>
+                            </div>
+                            
+                            <div className="relative">
+                              {editingField === 'welcome-subtitle' && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                                    className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                                    style={{ 
+                                      backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                                      color: '#F5B800',
+                                      backdropFilter: 'blur(8px)'
+                                    }}
+                                  >
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                  </button>
+
+                                  {showVariableMenu && variableTarget === 'subtitle' && (
+                                    <div
+                                      className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                                      style={{
+                                        top: '32px',
+                                        right: 0,
+                                        backgroundColor: '#4A4138',
+                                        border: '1px solid rgba(245, 184, 0, 0.3)',
+                                        boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                                      }}
+                                    >
+                                      {menuView === 'main' ? (
+                                        <div className="space-y-1">
+                                          <button
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => console.log('Réécriture AI')}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                          >
+                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                          </button>
+                                          <button
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => setMenuView('variables')}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                          >
+                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <div className="space-y-1">
+                                          <button
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => setMenuView('main')}
+                                            className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                          >
+                                            <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                          </button>
+                                          {availableVariables.map((variable) => (
+                                            <button
+                                              key={variable.key}
+                                              onMouseDown={(e) => e.preventDefault()}
+                                              onClick={() => insertVariable(variable.key)}
+                                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                            >
+                                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              
+                              <p 
+                                className="mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                                style={{ 
+                                  color: '#E3DDD5',
+                                  fontWeight: 400,
+                                  fontSize: '18px',
+                                  lineHeight: '1.6',
+                                  outline: editingField === 'welcome-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                                  padding: '4px',
+                                  margin: '-4px',
+                                  borderRadius: '4px'
+                                }}
+                                contentEditable
+                                suppressContentEditableWarning
+                                onFocus={() => setEditingField('welcome-subtitle')}
+                                onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                              >
+                                {replaceVariables(question.subtitle || '')}
+                              </p>
+                            </div>
+                            
+                            <button 
+                              onClick={onNext}
+                              className="group px-8 py-4 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-3 mx-auto"
+                              style={{ 
+                                backgroundColor: '#F5CA3C',
+                                color: '#3D3731'
+                              }}
+                            >
+                              <span>{question.buttonText || "Start"}</span>
+                              <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
+                                press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
+                              </span>
+                            </button>
+                            <div className="flex items-center justify-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                              <Clock className="w-4 h-4" />
+                              <span>Takes X minutes</span>
+                            </div>
                           </div>
                         </div>
                       );
