@@ -45,22 +45,133 @@ const LayoutIcon = ({ type }: { type: string }) => {
 const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
   if (!question) return null;
 
-  const mobileLayouts = [
-    { value: "mobile-vertical", label: "Stack" },
-    { value: "mobile-horizontal", label: "Split" },
-    { value: "mobile-centered", label: "Centered" },
-    { value: "mobile-minimal", label: "Minimal" },
-  ];
+  // Layouts spécifiques par type de question
+  const getLayoutsByType = () => {
+    const questionType = question.type;
+    
+    // Welcome & Ending screens - layouts visuels
+    if (questionType === 'welcome' || questionType === 'ending') {
+      return {
+        mobile: [
+          { value: "mobile-vertical", label: "Stack" },
+          { value: "mobile-centered", label: "Centered" },
+          { value: "mobile-minimal", label: "Minimal" },
+          { value: "mobile-hero", label: "Hero" },
+        ],
+        desktop: [
+          { value: "desktop-split", label: "Wallpaper" },
+          { value: "desktop-centered", label: "Centered" },
+          { value: "desktop-left-right", label: "Split" },
+          { value: "desktop-fullscreen", label: "Fullscreen" },
+        ]
+      };
+    }
+    
+    // Multiple Choice & Picture Choice - layouts avec colonnes
+    if (questionType === 'choice' || questionType === 'picture-choice') {
+      return {
+        mobile: [
+          { value: "mobile-vertical", label: "Stack" },
+          { value: "mobile-grid", label: "Grid" },
+          { value: "mobile-cards", label: "Cards" },
+        ],
+        desktop: [
+          { value: "desktop-left-right", label: "Split" },
+          { value: "desktop-columns", label: "2 Columns" },
+          { value: "desktop-grid", label: "Grid" },
+          { value: "desktop-centered", label: "Centered" },
+        ]
+      };
+    }
+    
+    // File Upload - layouts avec zone de drop
+    if (questionType === 'file') {
+      return {
+        mobile: [
+          { value: "mobile-centered", label: "Centered" },
+          { value: "mobile-vertical", label: "Stack" },
+          { value: "mobile-fullwidth", label: "Full Width" },
+        ],
+        desktop: [
+          { value: "desktop-centered", label: "Centered" },
+          { value: "desktop-left-right", label: "Split" },
+          { value: "desktop-wide", label: "Wide" },
+        ]
+      };
+    }
+    
+    // Rating & Opinion Scale - layouts horizontaux
+    if (questionType === 'rating') {
+      return {
+        mobile: [
+          { value: "mobile-vertical", label: "Stack" },
+          { value: "mobile-centered", label: "Centered" },
+          { value: "mobile-compact", label: "Compact" },
+        ],
+        desktop: [
+          { value: "desktop-centered", label: "Centered" },
+          { value: "desktop-horizontal", label: "Horizontal" },
+          { value: "desktop-left-right", label: "Split" },
+        ]
+      };
+    }
+    
+    // Text inputs, Email, Phone, Number, Date - layouts minimalistes
+    if (['text', 'email', 'phone', 'number', 'date', 'dropdown', 'yesno'].includes(questionType)) {
+      return {
+        mobile: [
+          { value: "mobile-centered", label: "Centered" },
+          { value: "mobile-vertical", label: "Stack" },
+          { value: "mobile-minimal", label: "Minimal" },
+        ],
+        desktop: [
+          { value: "desktop-centered", label: "Centered" },
+          { value: "desktop-left-right", label: "Split" },
+          { value: "desktop-minimal", label: "Minimal" },
+          { value: "desktop-narrow", label: "Narrow" },
+        ]
+      };
+    }
+    
+    // Statement - layouts pour contenu textuel
+    if (questionType === 'statement') {
+      return {
+        mobile: [
+          { value: "mobile-centered", label: "Centered" },
+          { value: "mobile-minimal", label: "Minimal" },
+          { value: "mobile-vertical", label: "Stack" },
+        ],
+        desktop: [
+          { value: "desktop-centered", label: "Centered" },
+          { value: "desktop-wide", label: "Wide" },
+          { value: "desktop-left-right", label: "Split" },
+        ]
+      };
+    }
+    
+    // Default layouts
+    return {
+      mobile: [
+        { value: "mobile-vertical", label: "Stack" },
+        { value: "mobile-horizontal", label: "Split" },
+        { value: "mobile-centered", label: "Centered" },
+        { value: "mobile-minimal", label: "Minimal" },
+      ],
+      desktop: [
+        { value: "desktop-left-right", label: "Split" },
+        { value: "desktop-right-left", label: "Stack" },
+        { value: "desktop-centered", label: "Centered" },
+        { value: "desktop-split", label: "Wallpaper" },
+      ]
+    };
+  };
 
-  const desktopLayouts = [
-    { value: "desktop-left-right", label: "Split" },
-    { value: "desktop-right-left", label: "Stack" },
-    { value: "desktop-centered", label: "Centered" },
-    { value: "desktop-split", label: "Wallpaper" },
-  ];
+  const layouts = getLayoutsByType();
+  const mobileLayouts = layouts.mobile;
+  const desktopLayouts = layouts.desktop;
 
-  const currentMobileLayout = question.mobileLayout || "mobile-vertical";
-  const currentDesktopLayout = question.desktopLayout || "desktop-left-right";
+  const currentMobileLayout = question.mobileLayout || mobileLayouts[0].value;
+  const currentDesktopLayout = question.desktopLayout || desktopLayouts[0].value;
 
   return (
     <>
