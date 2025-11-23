@@ -141,49 +141,52 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
               <div className="flex items-center justify-center w-full h-full px-16">
                 <div className="w-full h-full grid grid-cols-[1fr_1fr] gap-16 items-center px-12 relative">
                   {(editingField === 'welcome-title' || editingField === 'welcome-subtitle') && (
-                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
-                      <PopoverTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => setShowVariableMenu(!showVariableMenu)}
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent 
-                        className="w-72 p-2" 
-                        align="end"
-                        style={{
-                          backgroundColor: '#4A4138',
-                          border: '1px solid rgba(245, 184, 0, 0.3)',
-                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setShowVariableMenu((open) => !open)}
+                        className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                        style={{ 
+                          backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                          color: '#F5B800',
+                          backdropFilter: 'blur(8px)'
                         }}
                       >
-                        <div className="space-y-1">
-                          {availableVariables.map((variable) => (
-                            <button
-                              key={variable.key}
-                              onClick={() => insertVariable(variable.key)}
-                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                            >
-                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                {variable.label}
-                              </div>
-                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                {variable.description} • {`{{${variable.key}}}`}
-                              </div>
-                            </button>
-                          ))}
+                        <Sparkles className="w-3.5 h-3.5" />
+                      </button>
+
+                      {showVariableMenu && (
+                        <div
+                          className="absolute z-50 mt-2 w-72 p-2 rounded-md shadow-xl"
+                          style={{
+                            top: '32px',
+                            right: 0,
+                            backgroundColor: '#4A4138',
+                            border: '1px solid rgba(245, 184, 0, 0.3)',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                          }}
+                        >
+                          <div className="space-y-1">
+                            {availableVariables.map((variable) => (
+                              <button
+                                key={variable.key}
+                                onClick={() => insertVariable(variable.key)}
+                                className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                              >
+                                <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                  {variable.label}
+                                </div>
+                                <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                  {variable.description} • {`{{${variable.key}}}`}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </PopoverContent>
-                    </Popover>
+                      )}
+                    </>
                   )}
+
                   <div>
                     <h1 
                       className="font-bold mb-6 leading-[1.05] cursor-text hover:opacity-80 transition-opacity" 
@@ -261,49 +264,52 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
               <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px] relative">
                   {editingField === 'text-title' && (
-                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
-                      <PopoverTrigger asChild>
-                        <button
-                          type="button"
-                          onClick={() => setShowVariableMenu(!showVariableMenu)}
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent 
-                        className="w-72 p-2" 
-                        align="end"
-                        style={{
-                          backgroundColor: '#4A4138',
-                          border: '1px solid rgba(245, 184, 0, 0.3)',
-                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setShowVariableMenu((open) => !open)}
+                        className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
+                        style={{ 
+                          backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                          color: '#F5B800',
+                          backdropFilter: 'blur(8px)'
                         }}
                       >
-                        <div className="space-y-1">
-                          {availableVariables.map((variable) => (
-                            <button
-                              key={variable.key}
-                              onClick={() => insertVariable(variable.key)}
-                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                            >
-                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
-                                {variable.label}
-                              </div>
-                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
-                                {variable.description} • {`{{${variable.key}}}`}
-                              </div>
-                            </button>
-                          ))}
+                        <Sparkles className="w-3.5 h-3.5" />
+                      </button>
+
+                      {showVariableMenu && (
+                        <div
+                          className="absolute z-50 mt-2 w-72 p-2 rounded-md shadow-xl"
+                          style={{
+                            top: '32px',
+                            right: 0,
+                            backgroundColor: '#4A4138',
+                            border: '1px solid rgba(245, 184, 0, 0.3)',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                          }}
+                        >
+                          <div className="space-y-1">
+                            {availableVariables.map((variable) => (
+                              <button
+                                key={variable.key}
+                                onClick={() => insertVariable(variable.key)}
+                                className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                              >
+                                <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                  {variable.label}
+                                </div>
+                                <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                  {variable.description} • {`{{${variable.key}}}`}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </PopoverContent>
-                    </Popover>
+                      )}
+                    </>
                   )}
+
                   <div className="mb-10">
                     {question.number && (
                       <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
