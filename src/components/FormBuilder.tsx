@@ -187,10 +187,15 @@ export const FormBuilder = () => {
     }
   }, [isMobile]);
 
-  // Sync questions to localStorage for preview synchronization
+  // Sync questions to localStorage and broadcast for preview synchronization
   useEffect(() => {
     localStorage.setItem('preview-questions', JSON.stringify(questions));
     localStorage.setItem('preview-viewMode', viewMode);
+    
+    // Broadcast changes to other tabs/windows AND same page
+    const channel = new BroadcastChannel('form-preview-sync');
+    channel.postMessage({ questions, viewMode });
+    channel.close();
   }, [questions, viewMode]);
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);

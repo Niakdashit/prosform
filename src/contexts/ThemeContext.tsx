@@ -72,6 +72,11 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     try {
       window.localStorage.setItem('form-theme-settings', JSON.stringify(theme));
+      
+      // Broadcast theme changes for real-time sync
+      const channel = new BroadcastChannel('form-theme-sync');
+      channel.postMessage(theme);
+      channel.close();
     } catch {
       // ignore
     }
