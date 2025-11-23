@@ -145,7 +145,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </div>
                 </div>
               </div>
-            ) : question.type === "text" ? (
+            ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
               <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px]">
                   <div className="mb-10">
@@ -172,13 +172,15 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     >
                       {question.title}
                     </h2>
-                    {question.variant && (
+                    {(question.variant || question.type !== "text") && (
                       <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        {question.variant === 'video' && '🎥 Video/Audio'}
-                        {question.variant === 'long' && '📝 Long Text'}
-                        {question.variant === 'short' && '✏️ Short Text'}
-                        {question.variant === 'number' && '🔢 Number'}
-                        {question.variant === 'date' && '📅 Date'}
+                        {question.type === 'email' && '📧 Email'}
+                        {question.type === 'phone' && '📱 Phone'}
+                        {question.type === 'number' && '🔢 Number'}
+                        {question.type === 'date' && '📅 Date'}
+                        {question.type === 'text' && question.variant === 'video' && '🎥 Video/Audio'}
+                        {question.type === 'text' && question.variant === 'long' && '📝 Long Text'}
+                        {question.type === 'text' && question.variant === 'short' && '✏️ Short Text'}
                       </div>
                     )}
                   </div>
@@ -199,12 +201,24 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       <Input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        type={question.variant === 'number' ? 'number' : question.variant === 'date' ? 'date' : 'text'}
+                        type={
+                          question.type === 'email' ? 'email' :
+                          question.type === 'phone' ? 'tel' :
+                          question.type === 'number' ? 'number' :
+                          question.type === 'date' ? 'date' :
+                          question.variant === 'number' ? 'number' : 
+                          question.variant === 'date' ? 'date' : 
+                          'text'
+                        }
                         placeholder={
+                          question.type === 'email' ? 'name@example.com' :
+                          question.type === 'phone' ? '+1 (555) 000-0000' :
+                          question.type === 'number' ? 'Enter a number...' :
+                          question.type === 'date' ? 'Select a date...' :
                           question.variant === 'number' ? 'Enter a number...' :
                           question.variant === 'date' ? 'Select a date...' :
                           question.variant === 'video' ? 'Upload video/audio or paste link...' :
-                          'Type your answer here...'
+                          question.placeholder || 'Type your answer here...'
                         }
                         className="bg-transparent border-b rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-[#7A6F61]"
                         style={{ 
@@ -284,7 +298,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </div>
                 </div>
               </div>
-            ) : question.type === "choice" ? (
+            ) : question.type === "choice" || question.type === "dropdown" || question.type === "yesno" || question.type === "picture-choice" ? (
               <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px]">
                   <div className="mb-10">
@@ -311,14 +325,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     >
                       {question.title}
                     </h2>
-                    {question.variant && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        {question.variant === 'multiple' && '☑️ Multiple Choice'}
-                        {question.variant === 'dropdown' && '📋 Dropdown'}
-                        {question.variant === 'yesno' && '✓/✗ Yes/No'}
-                        {question.variant === 'checkbox' && '☑️ Checkbox'}
-                      </div>
-                    )}
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                      {question.type === 'dropdown' && '📋 Dropdown'}
+                      {question.type === 'yesno' && '✓/✗ Yes/No'}
+                      {question.type === 'picture-choice' && '🖼️ Picture Choice'}
+                      {question.type === 'choice' && question.variant === 'multiple' && '☑️ Multiple Choice'}
+                      {question.type === 'choice' && question.variant === 'checkbox' && '☑️ Checkbox'}
+                      {question.type === 'choice' && !question.variant && '☑️ Multiple Choice'}
+                    </div>
                   </div>
                   <div className="space-y-4">
                     {(question.choices || ["Yes", "No", "Sometimes"]).map((choice, index) => (
@@ -352,6 +366,105 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            ) : question.type === "file" ? (
+              <div className="w-full h-full flex items-center justify-center px-24">
+                <div className="w-full max-w-[700px]">
+                  <div className="mb-10">
+                    {question.number && (
+                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                        {question.number} →
+                      </div>
+                    )}
+                    <h2 
+                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        letterSpacing: '-0.02em',
+                        outline: editingField === 'file-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('file-title')}
+                      onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {question.title}
+                    </h2>
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                      📎 File Upload
+                    </div>
+                  </div>
+                  <div 
+                    className="border-2 border-dashed rounded-xl p-12 text-center transition-all"
+                    style={{
+                      borderColor: 'rgba(255,255,255,0.3)',
+                      backgroundColor: 'rgba(255,255,255,0.05)'
+                    }}
+                  >
+                    <div className="text-6xl mb-4">📤</div>
+                    <p className="text-xl mb-2" style={{ color: '#FFFFFF' }}>
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-sm" style={{ color: '#A89A8A' }}>
+                      {question.fileTypes?.join(', ') || 'Any file type'} • Max {question.maxFileSize || 10}MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : question.type === "statement" ? (
+              <div className="w-full h-full flex items-center justify-center px-24">
+                <div className="w-full max-w-[700px] text-center">
+                  <h2 
+                    className="text-[56px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                    style={{ 
+                      color: '#FFFFFF', 
+                      fontWeight: 700, 
+                      letterSpacing: '-0.02em',
+                      outline: editingField === 'statement-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
+                      padding: '4px',
+                      margin: '-4px',
+                      borderRadius: '4px'
+                    }}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onFocus={() => setEditingField('statement-title')}
+                    onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
+                  >
+                    {question.title}
+                  </h2>
+                  {question.subtitle && (
+                    <p 
+                      className="text-xl mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#B8A892',
+                        outline: editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
+                        padding: '4px',
+                        margin: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('statement-subtitle')}
+                      onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
+                    >
+                      {question.subtitle}
+                    </p>
+                  )}
+                  <button
+                    onClick={onNext}
+                    className="font-semibold px-8 py-4 rounded-lg text-lg hover:opacity-90 transition-opacity"
+                    style={{ 
+                      backgroundColor: '#F5B800', 
+                      color: '#3D3731' 
+                    }}
+                  >
+                    Continue
+                  </button>
                 </div>
               </div>
             ) : (
