@@ -15,7 +15,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ImageUploadModal } from "./ImageUploadModal";
 import { ImageEditorModal } from "./ImageEditorModal";
 import { BranchingModal } from "./BranchingModal";
-import { useTheme } from "@/contexts/ThemeContext";
 
 const PHONE_COUNTRIES = [
   { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
@@ -41,7 +40,6 @@ interface FormPreviewProps {
 }
 
 export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onToggleViewMode, isMobileResponsive = false, allQuestions = [] }: FormPreviewProps) => {
-  const { theme } = useTheme();
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
@@ -178,9 +176,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
           onClick={onToggleViewMode}
           className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
           style={{
-            backgroundColor: theme.buttonColor,
-            border: `${theme.borderWidth}px solid ${theme.borderColor}`,
-            color: theme.textColor,
+            backgroundColor: '#4A4138',
+            border: '1px solid rgba(245, 184, 0, 0.3)',
+            color: '#F5CA3C'
           }}
         >
           {viewMode === 'desktop' ? (
@@ -200,7 +198,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
       <div 
         className="relative overflow-hidden transition-all duration-300" 
         style={{ 
-          backgroundColor: theme.backgroundColor, 
+          backgroundColor: '#3D3731', 
           width: viewMode === 'desktop' ? '1100px' : '375px', 
           height: viewMode === 'desktop' ? '620px' : '667px' 
         }}
