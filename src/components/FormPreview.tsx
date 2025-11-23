@@ -419,7 +419,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       const alignmentClass = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
                       
                       return (
-                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 px-16 py-12 overflow-y-auto scrollbar-hide`}>
+                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide`}>
                           <div
                             className="overflow-hidden flex-shrink-0"
                             style={{ 
@@ -738,7 +738,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 })()}
               </div>
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
-              <div className="w-full h-full flex items-center justify-center px-16">
+              <div className="w-full h-full flex items-center justify-center px-24">
                 <div className="w-full max-w-[700px]">
                   <div className="mb-10">
                     {question.number && (
