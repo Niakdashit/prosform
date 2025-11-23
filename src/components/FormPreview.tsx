@@ -686,7 +686,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-card') {
-                      // Card: Split 50/50 - Texte à gauche avec padding, Image à droite sans padding
+                      // Card: Split 50/50 - Texte à gauche avec padding, Image à droite sans marge
                       return (
                         <div className="w-full h-full flex">
                           <div className="w-1/2 flex items-center justify-center px-12">
@@ -694,7 +694,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               <TextContent />
                             </div>
                           </div>
-                          <div className="w-1/2 h-full">
+                          <div className="w-1/2 h-full -mr-16">
                             <img
                               src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
                               alt="Feedback illustration"
@@ -704,10 +704,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-panel') {
-                      // Panel: Split 50/50 - Image à gauche sans padding, Texte à droite avec padding
+                      // Panel: Split 50/50 - Image à gauche sans marge, Texte à droite avec padding
                       return (
                         <div className="w-full h-full flex">
-                          <div className="w-1/2 h-full">
+                          <div className="w-1/2 h-full -ml-16">
                             <img
                               src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
                               alt="Feedback illustration"
