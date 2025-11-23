@@ -4,6 +4,7 @@ import { FormPreview } from "./FormPreview";
 import { SettingsPanel } from "./SettingsPanel";
 import { TopToolbar } from "./TopToolbar";
 import { AddContentModal } from "./AddContentModal";
+import { toast } from "sonner";
 
 export interface Question {
   id: string;
@@ -103,13 +104,22 @@ export const FormBuilder = () => {
       "rating": "rating",
       "opinion-scale": "rating",
       "ranking": "rating",
+      "number": "text",
+      "date": "text",
+      "checkbox": "choice",
+      "video": "text",
     };
 
     const questionType = typeMap[elementType] || "text";
     
     // Update the active question's type
     if (activeQuestion) {
+      if (activeQuestion.type === "welcome" || activeQuestion.type === "ending") {
+        toast.error("Cannot change Welcome or Ending screen type");
+        return;
+      }
       updateQuestion(activeQuestion.id, { type: questionType });
+      toast.success(`Element changed to ${elementType.replace('-', ' ')}`);
     }
   };
 
