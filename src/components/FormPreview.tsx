@@ -269,10 +269,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </div>
                   <div className="flex gap-4">
                     {[1, 2, 3, 4, 5].map((rating) => (
-                      <button
+                      <div
                         key={rating}
-                        onClick={onNext}
-                        className="w-20 h-20 rounded-xl transition-all flex items-center justify-center text-3xl font-semibold hover:opacity-80"
+                        className="w-20 h-20 rounded-xl transition-all flex items-center justify-center text-3xl font-semibold cursor-default"
                         style={{
                           backgroundColor: 'rgba(255,255,255,0.1)',
                           border: '1px solid rgba(255,255,255,0.2)',
@@ -280,7 +279,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         }}
                       >
                         {rating}
-                      </button>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -323,14 +322,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </div>
                   <div className="space-y-4">
                     {(question.choices || ["Yes", "No", "Sometimes"]).map((choice, index) => (
-                      <button
+                      <div
                         key={index}
-                        onClick={editingChoiceIndex !== index ? onNext : undefined}
-                        onDoubleClick={(e) => {
-                          e.stopPropagation();
-                          setEditingChoiceIndex(index);
-                        }}
-                        className="w-full p-5 rounded-xl transition-all flex items-center gap-5 text-left group hover:opacity-80"
+                        className="w-full p-5 rounded-xl transition-all flex items-center gap-5 text-left"
                         style={{
                           backgroundColor: 'rgba(255,255,255,0.1)',
                           border: editingChoiceIndex === index ? '2px solid rgba(245, 184, 0, 0.5)' : '1px solid rgba(255,255,255,0.2)'
@@ -340,27 +334,22 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                           {String.fromCharCode(65 + index)}
                         </span>
                         <span 
-                          className="text-xl font-medium cursor-text" 
+                          className="text-xl font-medium cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
                             color: '#FFFFFF',
                             outline: 'none',
-                            padding: '2px',
-                            margin: '-2px',
+                            padding: '4px',
+                            margin: '-4px',
                             borderRadius: '4px'
                           }}
-                          contentEditable={editingChoiceIndex === index}
+                          contentEditable
                           suppressContentEditableWarning
                           onFocus={() => setEditingChoiceIndex(index)}
                           onBlur={(e) => handleChoiceBlur(index, e.currentTarget.textContent || '')}
-                          onClick={(e) => {
-                            if (editingChoiceIndex === index) {
-                              e.stopPropagation();
-                            }
-                          }}
                         >
                           {choice}
                         </span>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 </div>
