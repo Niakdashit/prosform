@@ -27,6 +27,8 @@ export interface Question {
   phoneFormat?: string;
   placeholder?: string;
   buttonText?: string;
+  ratingCount?: number;
+  ratingType?: string;
 }
 
 const defaultQuestions: Question[] = [
@@ -87,7 +89,9 @@ const defaultQuestions: Question[] = [
     title: "How do you rate the company culture?",
     icon: "star",
     number: 6,
-    variant: "stars"
+    variant: "stars",
+    ratingCount: 5,
+    ratingType: "stars"
   },
   {
     id: "q7",
