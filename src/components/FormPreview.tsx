@@ -685,6 +685,52 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           </div>
                         </div>
                       );
+                    } else if (desktopLayout === 'desktop-card') {
+                      // Card: Texte à gauche, Image remplit tout l'espace droit
+                      return (
+                        <div className="w-full h-full flex items-center gap-16 px-12">
+                          <div className="flex-1">
+                            <TextContent />
+                          </div>
+                          <div
+                            className="overflow-hidden h-full"
+                            style={{ 
+                              borderRadius: "36px",
+                              width: '420px',
+                              flexShrink: 0
+                            }}
+                          >
+                            <img
+                              src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                              alt="Feedback illustration"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      );
+                    } else if (desktopLayout === 'desktop-panel') {
+                      // Panel: Image remplit tout l'espace gauche, Texte à droite
+                      return (
+                        <div className="w-full h-full flex items-center gap-16 px-12">
+                          <div
+                            className="overflow-hidden h-full"
+                            style={{ 
+                              borderRadius: "36px",
+                              width: '420px',
+                              flexShrink: 0
+                            }}
+                          >
+                            <img
+                              src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                              alt="Feedback illustration"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <TextContent />
+                          </div>
+                        </div>
+                      );
                     }
                   }
 
