@@ -282,13 +282,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           </p>
                         </div>
                       )}
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
                     </div>
                   );
 
@@ -1899,6 +1892,15 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
           </motion.div>
         </AnimatePresence>
       </div>
+      
+      {/* Hidden file input - always rendered so it's accessible from all layouts */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
     </div>
   );
 };
