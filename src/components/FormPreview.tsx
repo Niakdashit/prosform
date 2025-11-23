@@ -44,7 +44,7 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           {question.type === "welcome" ? (
             <div className="flex items-center justify-center w-full h-full px-8">
               <div className="w-full max-w-[1200px] grid grid-cols-[1fr_1fr] gap-12 items-start" style={{ padding: '60px 80px' }}>
-                <div className="text-left">
+                <div>
                   <h1 className="font-bold mb-6 leading-[1.05]" style={{ 
                     color: '#F5CA3C', 
                     fontWeight: 700, 
