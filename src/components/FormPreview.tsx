@@ -891,7 +891,12 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
+                          type="button"
+                          onClick={() => {
+                            console.log('Variable button clicked, current state:', showVariableMenu);
+                            setShowVariableMenu(!showVariableMenu);
+                          }}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
@@ -902,8 +907,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
-                        className="w-72 p-2" 
+                        className="w-72 p-2 z-50" 
                         align="end"
+                        side="bottom"
+                        sideOffset={8}
                         style={{
                           backgroundColor: '#4A4138',
                           border: '1px solid rgba(245, 184, 0, 0.3)',
