@@ -20,7 +20,7 @@ export const TopToolbar = ({ onAddContent, onPreview, questions }: TopToolbarPro
     // Store questions in localStorage
     localStorage.setItem('preview-questions', JSON.stringify(questions));
     // Open in new tab
-    window.open('/#/preview', '_blank');
+    window.open('/preview', '_blank');
   };
   return (
     <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
