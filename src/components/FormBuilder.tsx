@@ -153,7 +153,7 @@ export const FormBuilder = () => {
           }}
         />
         
-        <SettingsPanel question={activeQuestion} />
+        <SettingsPanel question={activeQuestion} onUpdateQuestion={updateQuestion} />
       </div>
 
       <AddContentModal
