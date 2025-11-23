@@ -686,15 +686,15 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-card') {
-                      // Card: Split 50/50 - Texte à gauche avec padding, Image à droite sans marge
+                      // Card: Split 50/50 - Texte à gauche avec padding, Image à droite collée au bord
                       return (
-                        <div className="w-full h-full flex">
-                          <div className="w-1/2 flex items-center justify-center px-12">
+                        <div className="relative w-full h-full flex">
+                          <div className="w-1/2 flex items-center justify-center px-12 z-10">
                             <div className="max-w-[500px]">
                               <TextContent />
                             </div>
                           </div>
-                          <div className="w-1/2 h-full -mr-16">
+                          <div className="absolute right-0 top-0 w-1/2 h-full">
                             <img
                               src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
                               alt="Feedback illustration"
@@ -704,17 +704,17 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-panel') {
-                      // Panel: Split 50/50 - Image à gauche sans marge, Texte à droite avec padding
+                      // Panel: Split 50/50 - Image à gauche collée au bord, Texte à droite avec padding
                       return (
-                        <div className="w-full h-full flex">
-                          <div className="w-1/2 h-full -ml-16">
+                        <div className="relative w-full h-full flex">
+                          <div className="absolute left-0 top-0 w-1/2 h-full">
                             <img
                               src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
                               alt="Feedback illustration"
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div className="w-1/2 flex items-center justify-center px-12">
+                          <div className="w-1/2 ml-auto flex items-center justify-center px-12 z-10">
                             <div className="max-w-[500px]">
                               <TextContent />
                             </div>
