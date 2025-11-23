@@ -745,14 +745,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Mobile layouts
                   if (mobileLayout === 'mobile-vertical') {
                     return (
-                      <div className="flex flex-col items-center justify-center gap-6 py-6 w-full max-w-[700px]" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
+                      <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
                         <ImageBlock />
                         <TextContent />
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-horizontal') {
                     return (
-                      <div className="flex items-center justify-center gap-4 py-6 w-full max-w-[700px]" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
+                      <div className="flex gap-4 py-6 px-5 w-full max-w-[700px]">
                         <div className="flex-1">
                           <TextContent />
                         </div>
@@ -761,7 +761,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     );
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex flex-col items-center justify-center gap-6 py-6 w-full max-w-[700px]" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
+                      <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
                         <ImageBlock />
                         <TextContent />
                       </div>
@@ -775,7 +775,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           className="absolute inset-0 w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
-                        <div className="relative z-10 flex items-center justify-center h-full py-6" style={{ paddingLeft: '5%', paddingRight: '5%' }}>
+                        <div className="relative z-10 flex items-center justify-center h-full px-5 py-6">
                           <div className="max-w-[700px]">
                             <TextContent />
                           </div>
