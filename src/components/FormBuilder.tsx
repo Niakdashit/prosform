@@ -25,6 +25,7 @@ export interface Question {
   maxFileSize?: number;
   multipleFiles?: boolean;
   phoneFormat?: string;
+  phoneCountry?: string;
   placeholder?: string;
   buttonText?: string;
   ratingCount?: number;
@@ -63,7 +64,8 @@ const defaultQuestions: Question[] = [
     title: "What's your phone number?",
     icon: "phone",
     number: 3,
-    placeholder: "+1 (555) 000-0000"
+    placeholder: "+1 (555) 000-0000",
+    phoneCountry: "US"
   },
   {
     id: "q4",

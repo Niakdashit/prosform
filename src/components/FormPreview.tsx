@@ -7,9 +7,22 @@ import {
   Clock, Star, Smile, Frown, Meh, Heart, ThumbsUp,
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
-  Paperclip, BarChart3, Upload
+  Paperclip, BarChart3, Upload, ChevronDown
 } from "lucide-react";
 import { useState } from "react";
+
+const PHONE_COUNTRIES = [
+  { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', dialCode: '+44' },
+  { code: 'FR', name: 'France', flag: '🇫🇷', dialCode: '+33' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪', dialCode: '+49' },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸', dialCode: '+34' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹', dialCode: '+39' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦', dialCode: '+1' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺', dialCode: '+61' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵', dialCode: '+81' },
+  { code: 'CN', name: 'China', flag: '🇨🇳', dialCode: '+86' },
+];
 
 interface FormPreviewProps {
   question?: Question;
@@ -21,6 +34,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   const [inputValue, setInputValue] = useState("");
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState(question?.phoneCountry || 'US');
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
   if (!question) return null;
 
@@ -209,13 +224,72 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                           {' '}to make a line break
                         </div>
                       </>
+                    ) : question.type === 'phone' ? (
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
+                            style={{ 
+                              backgroundColor: 'rgba(255,255,255,0.1)',
+                              color: '#F5B800'
+                            }}
+                          >
+                            <span className="text-2xl">{PHONE_COUNTRIES.find(c => c.code === selectedCountry)?.flag}</span>
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
+                          
+                          {showCountryDropdown && (
+                            <div 
+                              className="absolute top-full left-0 mt-2 rounded-lg overflow-hidden z-10 max-h-[300px] overflow-y-auto"
+                              style={{ 
+                                backgroundColor: '#4A4138',
+                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+                                minWidth: '250px'
+                              }}
+                            >
+                              {PHONE_COUNTRIES.map((country) => (
+                                <button
+                                  key={country.code}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCountry(country.code);
+                                    setShowCountryDropdown(false);
+                                    if (question) {
+                                      onUpdateQuestion(question.id, { phoneCountry: country.code });
+                                    }
+                                  }}
+                                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-opacity-10 hover:bg-white transition-colors text-left"
+                                  style={{ color: '#F5B800' }}
+                                >
+                                  <span className="text-xl">{country.flag}</span>
+                                  <span className="flex-1">{country.name}</span>
+                                  <span className="text-sm opacity-70">{country.dialCode}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <Input
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          type="tel"
+                          placeholder={question.placeholder || PHONE_COUNTRIES.find(c => c.code === selectedCountry)?.dialCode + ' (555) 000-0000'}
+                          className="flex-1 bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-5 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] transition-colors"
+                          style={{ 
+                            borderColor: '#F5B800',
+                            color: '#F5B800'
+                          }}
+                          autoFocus
+                        />
+                      </div>
                     ) : (
                       <Input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         type={
                           question.type === 'email' ? 'email' :
-                          question.type === 'phone' ? 'tel' :
                           question.type === 'number' ? 'number' :
                           question.type === 'date' ? 'date' :
                           question.variant === 'number' ? 'number' : 
@@ -225,7 +299,6 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         placeholder={
                           question.placeholder || (
                             question.type === 'email' ? 'name@example.com' :
-                            question.type === 'phone' ? '+1 (555) 000-0000' :
                             question.type === 'number' ? 'Enter a number...' :
                             question.type === 'date' ? 'Select a date...' :
                             question.variant === 'number' ? 'Enter a number...' :
