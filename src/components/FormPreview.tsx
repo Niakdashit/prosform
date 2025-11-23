@@ -606,7 +606,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
                               
                               <p 
-                                className="mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                                className="mb-12 cursor-text hover:opacity-80 transition-opacity" 
                                 style={{
                                   color: '#E3DDD5',
                                   fontWeight: 400,
