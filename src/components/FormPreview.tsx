@@ -279,7 +279,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             color: '#F5CA3C', 
                             fontWeight: 700, 
                             fontSize: viewMode === 'desktop' ? '64px' : '32px',
-                            lineHeight: viewMode === 'desktop' ? '1.05' : '1.2',
+                            lineHeight: question.lineHeight || 1.6,
                             letterSpacing: '-0.02em',
                             outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                             padding: '4px',
@@ -880,7 +880,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           color: '#FFFFFF', 
                           fontWeight: 700, 
                           fontSize: viewMode === 'desktop' ? '56px' : '32px',
-                          lineHeight: viewMode === 'desktop' ? '1.1' : '1.2',
+                          lineHeight: question.lineHeight || 1.6,
                           letterSpacing: '-0.02em',
                           outline: editingField === 'text-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                           padding: '4px',
@@ -1217,10 +1217,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       <h2 
                         className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
-                          color: '#FFFFFF', 
-                          fontWeight: 700, 
-                          fontSize: viewMode === 'desktop' ? '56px' : '32px',
-                          lineHeight: viewMode === 'desktop' ? '1.1' : '1.2',
+                        color: '#FFFFFF', 
+                        fontWeight: 700, 
+                        fontSize: viewMode === 'desktop' ? '56px' : '32px',
+                        lineHeight: question.lineHeight || 1.6,
                           letterSpacing: '-0.02em',
                           outline: editingField === 'choice-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                         padding: '4px',
@@ -1333,10 +1333,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     <h2 
                       className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
-                        color: '#FFFFFF', 
-                        fontWeight: 700, 
-                        fontSize: viewMode === 'desktop' ? '56px' : '32px',
-                        lineHeight: viewMode === 'desktop' ? '1.1' : '1.2',
+                      color: '#FFFFFF', 
+                      fontWeight: 700, 
+                      fontSize: viewMode === 'desktop' ? '56px' : '32px',
+                      lineHeight: question.lineHeight || 1.6,
                         letterSpacing: '-0.02em',
                         outline: editingField === 'file-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                         padding: '4px',
@@ -1424,10 +1424,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   <h2
                     className="font-bold mb-8 cursor-text hover:opacity-80 transition-opacity"
                     style={{ 
-                      color: '#FFFFFF', 
-                      fontWeight: 700, 
-                      fontSize: viewMode === 'desktop' ? '56px' : '32px',
-                      lineHeight: viewMode === 'desktop' ? '1.1' : '1.2',
+                    color: '#FFFFFF', 
+                    fontWeight: 700, 
+                    fontSize: viewMode === 'desktop' ? '56px' : '32px',
+                    lineHeight: question.lineHeight || 1.6,
                       letterSpacing: '-0.02em',
                       outline: editingField === 'statement-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                       padding: '4px',
@@ -1527,10 +1527,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   <h2 
                     className="font-bold mb-8 cursor-text hover:opacity-80 transition-opacity" 
                     style={{ 
-                      color: '#F5B800', 
-                      fontWeight: 700, 
-                      fontSize: viewMode === 'desktop' ? '72px' : '40px',
-                      lineHeight: viewMode === 'desktop' ? '1.1' : '1.2',
+                    color: '#F5B800', 
+                    fontWeight: 700, 
+                    fontSize: viewMode === 'desktop' ? '72px' : '40px',
+                    lineHeight: question.lineHeight || 1.6,
                       letterSpacing: '-0.03em',
                       outline: editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
                       padding: '4px',
