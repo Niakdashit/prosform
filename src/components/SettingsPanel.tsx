@@ -45,6 +45,10 @@ const LayoutIcon = ({ type }: { type: string }) => {
 const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
   if (!question) return null;
 
+  // Only show layout selector for question types with visual content
+  const shouldShowLayout = ['welcome', 'statement', 'picture-choice', 'file'].includes(question.type);
+  if (!shouldShowLayout) return null;
+
   const mobileLayouts = [
     { value: "mobile-vertical", label: "Stack" },
     { value: "mobile-horizontal", label: "Split" },
