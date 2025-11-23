@@ -30,6 +30,8 @@ export interface Question {
   buttonText?: string;
   ratingCount?: number;
   ratingType?: string;
+  mobileLayout?: string;
+  desktopLayout?: string;
 }
 
 const defaultQuestions: Question[] = [

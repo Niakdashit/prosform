@@ -1,3 +1,4 @@
+import React from "react";
 import { Question } from "./FormBuilder";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -7,13 +8,206 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag } from "lucide-react";
+import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag, Monitor } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface SettingsPanelProps {
   question?: Question;
   onUpdateQuestion?: (id: string, updates: Partial<Question>) => void;
 }
+
+// Layout icons represented as SVG-like components
+const LayoutIcon = ({ type }: { type: string }) => {
+  const layouts: Record<string, React.ReactElement> = {
+    // Mobile layouts
+    "mobile-vertical": (
+      <div className="w-full h-full border-2 border-foreground rounded flex flex-col gap-0.5 p-1">
+        <div className="h-2 bg-foreground rounded-sm" />
+        <div className="flex-1 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "mobile-horizontal": (
+      <div className="w-full h-full border-2 border-foreground rounded flex items-center gap-1 p-1">
+        <div className="h-full w-1.5 bg-foreground rounded-sm" />
+        <div className="h-full flex-1 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "mobile-centered": (
+      <div className="w-full h-full border-2 border-foreground rounded flex flex-col items-center justify-center gap-0.5 p-1">
+        <div className="w-3 h-1 bg-foreground rounded-sm" />
+        <div className="w-4 h-2 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "mobile-minimal": (
+      <div className="w-full h-full border-2 border-foreground rounded flex flex-col justify-end p-1">
+        <div className="h-2 bg-foreground rounded-sm" />
+      </div>
+    ),
+    // Desktop layouts
+    "desktop-left-right": (
+      <div className="w-full h-full border-2 border-foreground rounded flex gap-1 p-0.5">
+        <div className="w-1/2 bg-foreground rounded-sm" />
+        <div className="w-1/2 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "desktop-right-left": (
+      <div className="w-full h-full border-2 border-foreground rounded flex gap-1 p-0.5">
+        <div className="w-1/2 bg-foreground rounded-sm" />
+        <div className="w-1/2 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "desktop-centered": (
+      <div className="w-full h-full border-2 border-foreground rounded flex items-center justify-center p-1">
+        <div className="w-3/5 h-3/4 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "desktop-split": (
+      <div className="w-full h-full border-2 border-foreground rounded flex gap-1 p-0.5">
+        <div className="w-1/3 bg-foreground rounded-sm" />
+        <div className="w-2/3 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "desktop-top-bottom": (
+      <div className="w-full h-full border-2 border-foreground rounded flex flex-col gap-1 p-0.5">
+        <div className="h-1/2 bg-foreground rounded-sm" />
+        <div className="h-1/2 bg-foreground rounded-sm" />
+      </div>
+    ),
+    "desktop-full": (
+      <div className="w-full h-full border-2 border-foreground rounded p-1">
+        <div className="w-full h-full bg-foreground rounded-sm flex items-center justify-center">
+          <div className="w-1/2 h-1/3 bg-background rounded-sm" />
+        </div>
+      </div>
+    ),
+  };
+  
+  return layouts[type] || null;
+};
+
+const LayoutSelector = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
+  if (!question) return null;
+
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [desktopOpen, setDesktopOpen] = React.useState(false);
+
+  const mobileLayouts = [
+    { value: "mobile-vertical", label: "Vertical" },
+    { value: "mobile-horizontal", label: "Horizontal" },
+    { value: "mobile-centered", label: "Centered" },
+    { value: "mobile-minimal", label: "Minimal" },
+  ];
+
+  const desktopLayouts = [
+    { value: "desktop-left-right", label: "Left-Right" },
+    { value: "desktop-right-left", label: "Right-Left" },
+    { value: "desktop-centered", label: "Centered" },
+    { value: "desktop-split", label: "Split" },
+    { value: "desktop-top-bottom", label: "Top-Bottom" },
+    { value: "desktop-full", label: "Full Width" },
+  ];
+
+  const currentMobileLayout = question.mobileLayout || "mobile-vertical";
+  const currentDesktopLayout = question.desktopLayout || "desktop-left-right";
+
+  return (
+    <>
+      <div>
+        <Label className="text-sm font-medium mb-3 block">Layout</Label>
+        
+        <div className="space-y-3">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Smartphone className="w-3.5 h-3.5 text-muted-foreground" />
+              <Label className="text-xs text-muted-foreground">Mobile</Label>
+            </div>
+            <Popover open={mobileOpen} onOpenChange={setMobileOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="w-full h-10 justify-start gap-2 text-xs"
+                >
+                  <div className="w-5 h-5">
+                    <LayoutIcon type={currentMobileLayout} />
+                  </div>
+                  <span>{mobileLayouts.find(l => l.value === currentMobileLayout)?.label}</span>
+                  <svg className="ml-auto w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-2" align="start">
+                <div className="grid grid-cols-4 gap-2">
+                  {mobileLayouts.map((layout) => (
+                    <button
+                      key={layout.value}
+                      onClick={() => {
+                        onUpdateQuestion?.(question.id, { mobileLayout: layout.value });
+                        setMobileOpen(false);
+                      }}
+                      className={`w-full h-12 p-1.5 border-2 rounded transition-colors ${
+                        currentMobileLayout === layout.value 
+                          ? 'border-primary bg-primary/10' 
+                          : 'border-border hover:border-primary'
+                      }`}
+                    >
+                      <LayoutIcon type={layout.value} />
+                    </button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Monitor className="w-3.5 h-3.5 text-muted-foreground" />
+              <Label className="text-xs text-muted-foreground">Desktop</Label>
+            </div>
+            <Popover open={desktopOpen} onOpenChange={setDesktopOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="w-full h-10 justify-start gap-2 text-xs"
+                >
+                  <div className="w-5 h-5">
+                    <LayoutIcon type={currentDesktopLayout} />
+                  </div>
+                  <span>{desktopLayouts.find(l => l.value === currentDesktopLayout)?.label}</span>
+                  <svg className="ml-auto w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2" align="start">
+                <div className="grid grid-cols-3 gap-2">
+                  {desktopLayouts.map((layout) => (
+                    <button
+                      key={layout.value}
+                      onClick={() => {
+                        onUpdateQuestion?.(question.id, { desktopLayout: layout.value });
+                        setDesktopOpen(false);
+                      }}
+                      className={`w-full h-14 p-1.5 border-2 rounded transition-colors ${
+                        currentDesktopLayout === layout.value 
+                          ? 'border-primary bg-primary/10' 
+                          : 'border-border hover:border-primary'
+                      }`}
+                    >
+                      <LayoutIcon type={layout.value} />
+                    </button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+      </div>
+
+      <Separator className="my-4" />
+    </>
+  );
+};
 
 export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps) => {
   if (!question) return null;
@@ -40,6 +234,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderWelcomeSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="time-toggle" className="text-xs font-normal">Time to complete</Label>
@@ -115,6 +311,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderTextSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -161,6 +359,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderEmailSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -209,6 +409,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderPhoneSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -269,6 +471,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderNumberSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -326,6 +530,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDateSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -387,6 +593,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderDropdownSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -441,6 +649,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderYesNoSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -494,6 +704,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderFileUploadSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -553,6 +765,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderStatementSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Description</Label>
         <Textarea 
@@ -619,6 +833,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderPictureChoiceSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -697,6 +913,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderRatingSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -777,6 +995,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderChoiceSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -844,6 +1064,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderEndingSettings = () => (
     <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Insert variable</Label>
         <Popover>
