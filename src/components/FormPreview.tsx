@@ -606,7 +606,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               )}
                               
                               <p 
-                                className="mb-12 cursor-text hover:opacity-80 transition-opacity" 
+                                className="mb-8 cursor-text hover:opacity-80 transition-opacity" 
                                 style={{
                                   color: '#E3DDD5',
                                   fontWeight: 400,
@@ -626,22 +626,24 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               </p>
                             </div>
                             
-                            <button 
-                              onClick={onNext}
-                              className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3"
-                              style={{ 
-                                backgroundColor: '#F5CA3C',
-                                color: '#3D3731'
-                              }}
-                            >
-                              <span>{question.buttonText || "Start"}</span>
-                              <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
-                                press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
-                              </span>
-                            </button>
-                            <div className="inline-flex items-center gap-2.5 mt-4" style={{ color: '#A89A8A', fontSize: '14px' }}>
-                              <Clock className="w-4 h-4" />
-                              <span>Takes X minutes</span>
+                            <div className="mt-10">
+                              <button 
+                                onClick={onNext}
+                                className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3"
+                                style={{ 
+                                  backgroundColor: '#F5CA3C',
+                                  color: '#3D3731'
+                                }}
+                              >
+                                <span>{question.buttonText || "Start"}</span>
+                                <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
+                                  press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
+                                </span>
+                              </button>
+                              <div className="inline-flex items-center gap-2.5 mt-4" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                                <Clock className="w-4 h-4" />
+                                <span>Takes X minutes</span>
+                              </div>
                             </div>
                           </div>
                         </div>
