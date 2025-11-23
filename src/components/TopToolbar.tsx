@@ -9,7 +9,12 @@ import {
   Share2
 } from "lucide-react";
 
-export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
+interface TopToolbarProps {
+  onAddContent: () => void;
+  onPreview: () => void;
+}
+
+export const TopToolbar = ({ onAddContent, onPreview }: TopToolbarProps) => {
   return (
     <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
       <div className="flex items-center gap-1.5">
@@ -32,7 +37,7 @@ export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Smartphone className="w-3.5 h-3.5" />
         </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onPreview}>
           <Eye className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
