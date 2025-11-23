@@ -9,17 +9,37 @@ const Preview = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   useEffect(() => {
-    // Load questions from localStorage
-    const savedQuestions = localStorage.getItem('preview-questions');
-    const savedViewMode = localStorage.getItem('preview-viewMode');
-    
-    if (savedQuestions) {
-      setQuestions(JSON.parse(savedQuestions));
-    }
-    
-    if (savedViewMode) {
-      setViewMode(savedViewMode as 'desktop' | 'mobile');
-    }
+    // Load initial questions from localStorage
+    const loadData = () => {
+      const savedQuestions = localStorage.getItem('preview-questions');
+      const savedViewMode = localStorage.getItem('preview-viewMode');
+      
+      if (savedQuestions) {
+        setQuestions(JSON.parse(savedQuestions));
+      }
+      
+      if (savedViewMode) {
+        setViewMode(savedViewMode as 'desktop' | 'mobile');
+      }
+    };
+
+    loadData();
+
+    // Listen for changes from the editor (in another tab/window)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'preview-questions' && e.newValue) {
+        setQuestions(JSON.parse(e.newValue));
+      }
+      if (e.key === 'preview-viewMode' && e.newValue) {
+        setViewMode(e.newValue as 'desktop' | 'mobile');
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   if (questions.length === 0) {
