@@ -163,14 +163,12 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       {question.title}
                     </h2>
                     {question.variant && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        <span className="font-medium">
-                          {question.variant === 'video' && '🎥 Video/Audio'}
-                          {question.variant === 'long' && '📝 Long Text'}
-                          {question.variant === 'short' && '✏️ Short Text'}
-                          {question.variant === 'number' && '🔢 Number'}
-                          {question.variant === 'date' && '📅 Date'}
-                        </span>
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        {question.variant === 'video' && '🎥 Video/Audio'}
+                        {question.variant === 'long' && '📝 Long Text'}
+                        {question.variant === 'short' && '✏️ Short Text'}
+                        {question.variant === 'number' && '🔢 Number'}
+                        {question.variant === 'date' && '📅 Date'}
                       </div>
                     )}
                   </div>
@@ -252,12 +250,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       {question.title}
                     </h2>
                     {question.variant && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        <span className="font-medium">
-                          {question.variant === 'stars' && '⭐ Rating'}
-                          {question.variant === 'scale' && '📊 Opinion Scale'}
-                          {question.variant === 'ranking' && '🔢 Ranking'}
-                        </span>
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        {question.variant === 'stars' && '⭐ Rating'}
+                        {question.variant === 'scale' && '📊 Opinion Scale'}
+                        {question.variant === 'ranking' && '🔢 Ranking'}
                       </div>
                     )}
                   </div>
@@ -307,13 +303,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       {question.title}
                     </h2>
                     {question.variant && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        <span className="font-medium">
-                          {question.variant === 'multiple' && '☑️ Multiple Choice'}
-                          {question.variant === 'dropdown' && '📋 Dropdown'}
-                          {question.variant === 'yesno' && '✓/✗ Yes/No'}
-                          {question.variant === 'checkbox' && '☑️ Checkbox'}
-                        </span>
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
+                        {question.variant === 'multiple' && '☑️ Multiple Choice'}
+                        {question.variant === 'dropdown' && '📋 Dropdown'}
+                        {question.variant === 'yesno' && '✓/✗ Yes/No'}
+                        {question.variant === 'checkbox' && '☑️ Checkbox'}
                       </div>
                     )}
                   </div>
