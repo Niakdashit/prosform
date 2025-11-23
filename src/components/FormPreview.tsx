@@ -7,9 +7,10 @@ import {
   Clock, Star, Smile, Frown, Meh, Heart, ThumbsUp,
   Mail, Phone, Hash, Calendar, Video, FileText, Type,
   CheckSquare, List, CheckCircle, Image as ImageIcon,
-  Paperclip, BarChart3, Upload, ChevronDown
+  Paperclip, BarChart3, Upload, ChevronDown, Sparkles
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const PHONE_COUNTRIES = [
   { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
@@ -37,6 +38,31 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   const [selectedCountry, setSelectedCountry] = useState(question?.phoneCountry || 'US');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [formResponses, setFormResponses] = useState<Record<string, string>>({});
+  const [showVariableMenu, setShowVariableMenu] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+
+  const availableVariables = [
+    { key: 'first_name', label: 'First name', description: 'User\'s first name' },
+    { key: 'email', label: 'Email', description: 'User\'s email address' },
+    { key: 'phone', label: 'Phone', description: 'User\'s phone number' },
+  ];
+
+  const insertVariable = (variableKey: string) => {
+    const activeElement = document.activeElement as HTMLElement;
+    const isTitle = activeElement === titleRef.current;
+    const isSubtitle = activeElement === subtitleRef.current;
+    
+    if (isTitle && question) {
+      const newTitle = (question.title || '') + `{{${variableKey}}}`;
+      onUpdateQuestion(question.id, { title: newTitle });
+    } else if (isSubtitle && question) {
+      const newSubtitle = (question.subtitle || '') + `{{${variableKey}}}`;
+      onUpdateQuestion(question.id, { subtitle: newSubtitle });
+    }
+    
+    setShowVariableMenu(false);
+  };
 
   const replaceVariables = (text: string): string => {
     if (!text) return text;
@@ -608,8 +634,53 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
               </div>
             ) : (
               <div className="w-full h-full flex items-center justify-center px-24">
-                <div className="w-full max-w-[700px] text-center">
+                <div className="w-full max-w-[700px] text-center relative">
+                  {(editingField === 'ending-title' || editingField === 'ending-subtitle') && (
+                    <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
+                      <PopoverTrigger asChild>
+                        <button
+                          className="absolute -top-12 right-0 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.2)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          <span className="text-sm font-medium">Insert variable</span>
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent 
+                        className="w-72 p-2" 
+                        align="end"
+                        style={{
+                          backgroundColor: '#4A4138',
+                          border: '1px solid rgba(245, 184, 0, 0.3)',
+                          boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div className="space-y-1">
+                          {availableVariables.map((variable) => (
+                            <button
+                              key={variable.key}
+                              onClick={() => insertVariable(variable.key)}
+                              className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                            >
+                              <div className="font-medium text-sm" style={{ color: '#F5B800' }}>
+                                {variable.label}
+                              </div>
+                              <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>
+                                {variable.description} • {`{{${variable.key}}}`}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+
                   <h2 
+                    ref={titleRef}
                     className="text-[72px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                     style={{ 
                       color: '#F5B800', 
@@ -629,6 +700,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </h2>
                   {question.subtitle && (
                     <p 
+                      ref={subtitleRef}
                       className="text-xl mb-10 cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#C4B5A0',
