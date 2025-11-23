@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ImageUploadModal } from "./ImageUploadModal";
 import { ImageEditorModal } from "./ImageEditorModal";
 import { BranchingModal } from "./BranchingModal";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const PHONE_COUNTRIES = [
   { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1' },
@@ -58,6 +59,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   const [showBranchingModal, setShowBranchingModal] = useState(false);
   const [branchingChoiceIndex, setBranchingChoiceIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { theme } = useTheme();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -198,7 +200,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
       <div 
         className="relative overflow-hidden transition-all duration-300" 
         style={{ 
-          backgroundColor: '#3D3731', 
+          backgroundColor: theme.backgroundColor, 
           width: viewMode === 'desktop' ? '1100px' : '375px', 
           height: viewMode === 'desktop' ? '620px' : '667px' 
         }}
@@ -302,11 +304,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           onClick={() => fileInputRef.current?.click()}
                           className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                         >
-                          <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
-                          <p className="text-sm font-medium" style={{ color: '#F5B800' }}>
+                          <Upload className="w-12 h-12 mb-3" style={{ color: theme.buttonColor }} />
+                          <p className="text-sm font-medium" style={{ color: theme.buttonColor }}>
                             Upload Image
                           </p>
-                          <p className="text-xs mt-1" style={{ color: '#A89A8A' }}>
+                          <p className="text-xs mt-1" style={{ color: theme.systemColor }}>
                             Click to browse
                           </p>
                         </div>
@@ -394,7 +396,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         <h1 
                           className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
-                            color: '#F5CA3C', 
+                            color: theme.accentColor, 
                             fontWeight: 700, 
                             fontSize: viewMode === 'desktop' ? '64px' : '32px',
                             lineHeight: '1.05',
