@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { 
-  ChevronDown, 
   Plus, 
   Palette, 
   Smartphone, 
@@ -13,12 +12,8 @@ import {
 
 export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
   return (
-    <div className="h-12 bg-card border-b border-border flex items-center justify-between px-3">
+    <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
       <div className="flex items-center gap-1.5">
-        <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs px-2.5">
-          <span>Universal mode</span>
-          <ChevronDown className="w-3.5 h-3.5" />
-        </Button>
         <Button 
           variant="default" 
           size="sm" 
@@ -34,7 +29,7 @@ export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
         </Button>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 absolute right-3">
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Smartphone className="w-3.5 h-3.5" />
         </Button>

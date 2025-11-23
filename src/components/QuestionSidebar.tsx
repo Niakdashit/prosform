@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Question } from "./FormBuilder";
-import { User, Building2, Star, List, BarChart3, Ban, AlignLeft, CheckCircle, Smile, Plus, ChevronDown, Layers, GripVertical } from "lucide-react";
+import { User, Building2, Star, List, BarChart3, Ban, AlignLeft, CheckCircle, Smile, Plus, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface QuestionSidebarProps {
@@ -21,7 +21,6 @@ const iconMap: Record<string, any> = {
   alignLeft: AlignLeft,
   check: CheckCircle,
   greeting: Smile,
-  layers: Layers,
 };
 
 export const QuestionSidebar = ({
@@ -65,29 +64,6 @@ export const QuestionSidebar = ({
   };
   return (
     <div className="w-[280px] bg-background border-r border-border flex flex-col">
-      {/* Header avec breadcrumb */}
-      <div className="px-4 py-3 border-b border-border">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2"/>
-          </svg>
-          <span>Forms</span>
-          <span>›</span>
-          <span className="truncate">Employer Feedback Form (co...</span>
-        </div>
-      </div>
-
-      {/* Universal mode dropdown */}
-      <div className="px-4 py-3.5 bg-muted/30">
-        <button className="w-full flex items-center justify-between text-sm hover:bg-muted/50 px-3 py-2 rounded">
-          <div className="flex items-center gap-2.5">
-            <Layers className="w-4 h-4" />
-            <span>Universal mode</span>
-          </div>
-          <ChevronDown className="w-4 h-4" />
-        </button>
-      </div>
-
       <ScrollArea className="flex-1">
         <div className="p-3">
           {/* Questions (sauf endings) */}
