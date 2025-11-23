@@ -42,8 +42,8 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           className="w-full max-w-4xl mx-auto px-8"
         >
           {question.type === "welcome" ? (
-            <div className="grid grid-cols-[1fr,1.1fr] gap-16 items-center w-full max-w-[1400px] px-16">
-              <div className="pr-8">
+            <div className="grid grid-cols-[0.9fr,1.2fr] gap-20 items-center w-full max-w-[1500px] px-20">
+              <div className="pr-4">
                 <h1 className="text-[72px] font-bold mb-4 leading-[0.95]" style={{ 
                   color: '#F5B800', 
                   fontWeight: 700, 
@@ -56,24 +56,27 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                 </p>
                 <Button
                   onClick={onNext}
-                  className="h-[52px] text-base font-semibold px-8 rounded-lg hover:opacity-90 transition-opacity"
+                  className="h-[56px] text-base font-semibold px-8 rounded-xl hover:opacity-90 transition-opacity border-0"
                   style={{ 
-                    backgroundColor: '#F5B800', 
-                    color: '#3D3731' 
+                    backgroundColor: '#F5CA3C', 
+                    color: '#3D3731',
+                    boxShadow: 'none'
                   }}
                 >
                   Give feedback
-                  <span className="ml-4 font-normal" style={{ color: '#3D3731' }}>press <strong className="font-semibold">Enter ↵</strong></span>
+                  <span className="ml-4 font-normal opacity-90" style={{ color: '#6B5D45' }}>
+                    press <strong className="font-semibold">Enter</strong> <span className="text-lg">↵</span>
+                  </span>
                 </Button>
                 <div className="flex items-center gap-2 mt-4 text-sm" style={{ color: '#C4B5A0' }}>
                   <Clock className="w-4 h-4" />
                   <span>Takes X minutes</span>
                 </div>
               </div>
-              <div className="relative pl-8">
-                <div className="aspect-[1.33/1] rounded-[32px] overflow-hidden shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)]">
+              <div className="relative">
+                <div className="w-full rounded-[40px] overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]" style={{ aspectRatio: '1.4/1' }}>
                   <img
-                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=900&h=675&fit=crop"
+                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1000&h=715&fit=crop"
                     alt="Feedback illustration"
                     className="w-full h-full object-cover"
                   />
