@@ -42,9 +42,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
 
   const availableVariables = [
-    { key: 'first_name', label: 'First name', description: 'User\'s first name' },
-    { key: 'email', label: 'Email', description: 'User\'s email address' },
-    { key: 'phone', label: 'Phone', description: 'User\'s phone number' },
+    { key: 'first_name', label: 'First name', description: "User's first name" },
+    { key: 'email', label: 'Email', description: "User's email address" },
+    { key: 'ville', label: 'Ville', description: "Ville de l'utilisateur" },
   ];
 
   const insertVariable = (variableKey: string) => {
