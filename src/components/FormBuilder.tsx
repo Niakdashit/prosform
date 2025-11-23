@@ -328,7 +328,7 @@ export const FormBuilder = () => {
         )}
         
         {isFullPreview ? (
-          <div className="fixed inset-0 flex items-center justify-center bg-transparent z-40">
+          <div className="flex-1 flex items-center justify-center relative bg-gray-100">
             <button
               onClick={() => setIsFullPreview(false)}
               className="absolute top-4 left-4 z-50 px-4 py-2 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
@@ -347,7 +347,7 @@ export const FormBuilder = () => {
               onUpdateQuestion={updateQuestion}
               viewMode={viewMode}
               onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              isMobileResponsive={true}
+              isMobileResponsive={false}
               allQuestions={questions}
               onNext={() => {
                 if (previewQuestionIndex < questions.length - 1) {
