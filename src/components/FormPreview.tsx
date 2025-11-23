@@ -42,41 +42,50 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           className="w-full max-w-4xl mx-auto px-8"
         >
           {question.type === "welcome" ? (
-            <div className="grid grid-cols-[0.9fr,1.2fr] gap-20 items-center w-full max-w-[1500px] px-20">
-              <div className="pr-4">
-                <h1 className="text-[72px] font-bold mb-4 leading-[0.95]" style={{ 
-                  color: '#F5B800', 
+            <div className="flex items-center justify-between w-full max-w-[1600px] px-24 gap-12">
+              <div className="flex-1 max-w-[580px]">
+                <h1 className="font-bold mb-6 leading-[0.9]" style={{ 
+                  color: '#F5CA3C', 
                   fontWeight: 700, 
-                  letterSpacing: '-0.03em' 
+                  fontSize: '80px',
+                  letterSpacing: '-0.04em' 
                 }}>
                   {question.title}
                 </h1>
-                <p className="text-base mb-12 leading-[1.6]" style={{ color: '#C4B5A0' }}>
+                <p className="text-[17px] mb-14 leading-[1.65]" style={{ color: '#B8A892' }}>
                   {question.subtitle}
                 </p>
-                <Button
+                <button
                   onClick={onNext}
-                  className="h-[56px] text-base font-semibold px-8 rounded-xl hover:opacity-90 transition-opacity border-0"
+                  className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
                   style={{ 
                     backgroundColor: '#F5CA3C', 
                     color: '#3D3731',
+                    height: '60px',
+                    borderRadius: '30px',
+                    fontSize: '18px',
+                    border: 'none',
                     boxShadow: 'none'
                   }}
                 >
-                  Give feedback
-                  <span className="ml-4 font-normal opacity-90" style={{ color: '#6B5D45' }}>
-                    press <strong className="font-semibold">Enter</strong> <span className="text-lg">↵</span>
+                  <span>Give feedback</span>
+                  <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.6)', fontSize: '15px' }}>
+                    press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                   </span>
-                </Button>
-                <div className="flex items-center gap-2 mt-4 text-sm" style={{ color: '#C4B5A0' }}>
+                </button>
+                <div className="flex items-center gap-2.5 mt-5" style={{ color: '#B8A892', fontSize: '14px' }}>
                   <Clock className="w-4 h-4" />
                   <span>Takes X minutes</span>
                 </div>
               </div>
-              <div className="relative">
-                <div className="w-full rounded-[40px] overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]" style={{ aspectRatio: '1.4/1' }}>
+              <div className="flex-1 max-w-[720px]">
+                <div className="w-full overflow-hidden" style={{ 
+                  borderRadius: '48px',
+                  aspectRatio: '1.35/1',
+                  boxShadow: '0 40px 100px -30px rgba(0,0,0,0.7)'
+                }}>
                   <img
-                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1000&h=715&fit=crop"
+                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1200&h=890&fit=crop"
                     alt="Feedback illustration"
                     className="w-full h-full object-cover"
                   />
