@@ -170,7 +170,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
             className="w-full h-full"
           >
             {question.type === "welcome" ? (
-              <div className="flex items-center justify-center w-full h-full px-16">
+              <div className="flex w-full h-full" style={{ alignItems: viewMode === 'desktop' ? 'center' : 'flex-start', justifyContent: viewMode === 'desktop' ? 'center' : 'flex-start', padding: viewMode === 'desktop' ? '0 64px' : '24px 20px' }}>
                 {(() => {
                   const desktopLayout = question.desktopLayout || 'desktop-left-right';
                   const mobileLayout = question.mobileLayout || 'mobile-vertical';
@@ -182,7 +182,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       className="overflow-hidden"
                       style={{ 
                         borderRadius: "36px",
-                        width: viewMode === 'desktop' ? '420px' : currentLayout === 'mobile-horizontal' ? '140px' : '100%',
+                        width: viewMode === 'desktop' ? '420px' : currentLayout === 'mobile-horizontal' ? '140px' : '280px',
                         height: viewMode === 'desktop' ? '420px' : currentLayout === 'mobile-horizontal' ? '140px' : '280px',
                         maxWidth: '100%',
                         flexShrink: 0
@@ -198,7 +198,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
 
                   // Text content component  
                   const TextContent = ({ centered = false }: { centered?: boolean }) => (
-                    <div className={centered ? 'text-center' : ''}>
+                    <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
                       <div className="relative">
                         {editingField === 'welcome-title' && (
                           <>
@@ -742,14 +742,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Mobile layouts
                   if (mobileLayout === 'mobile-vertical') {
                     return (
-                      <div className="flex flex-col gap-6 py-6 px-5 w-full">
+                      <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
                         <ImageBlock />
                         <TextContent />
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-horizontal') {
                     return (
-                      <div className="flex items-center gap-4 py-6 px-5 w-full">
+                      <div className="flex gap-4 py-6 px-5 w-full max-w-[700px]">
                         <div className="flex-1">
                           <TextContent />
                         </div>
@@ -758,9 +758,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     );
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex flex-col gap-6 justify-center py-6 px-5 w-full">
+                      <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
                         <ImageBlock />
-                        <TextContent centered />
+                        <TextContent />
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-minimal') {
@@ -772,8 +772,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           className="absolute inset-0 w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
-                        <div className="relative z-10 flex items-center justify-center h-full px-5">
-                          <TextContent centered />
+                        <div className="relative z-10 flex items-start justify-start h-full px-5 py-6">
+                          <div className="max-w-[700px]">
+                            <TextContent />
+                          </div>
                         </div>
                       </div>
                     );
