@@ -57,10 +57,11 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
         <Label className="text-xs text-muted-foreground mb-2 block">Button</Label>
         <Input 
           type="text" 
-          defaultValue="Give feedback"
+          value={question.subtitle || "Give feedback"}
+          onChange={(e) => onUpdateQuestion?.(question.id, { subtitle: e.target.value })}
           className="text-xs h-8"
         />
-        <p className="text-[10px] text-muted-foreground mt-1.5">13/24</p>
+        <p className="text-[10px] text-muted-foreground mt-1.5">{(question.subtitle || "Give feedback").length}/24</p>
       </div>
 
       <Separator className="my-4" />
@@ -132,6 +133,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
         <Label className="text-xs text-muted-foreground mb-2 block">Placeholder</Label>
         <Input 
           type="text" 
+          value={question.placeholder || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { placeholder: e.target.value })}
           placeholder="Type your answer here..."
           className="text-xs h-8"
         />
@@ -162,6 +165,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
         <Label className="text-xs text-muted-foreground mb-2 block">Placeholder</Label>
         <Input 
           type="text" 
+          value={question.placeholder || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { placeholder: e.target.value })}
           placeholder="name@example.com"
           className="text-xs h-8"
         />
@@ -236,6 +241,8 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
         <Label className="text-xs text-muted-foreground mb-2 block">Placeholder</Label>
         <Input 
           type="text" 
+          value={question.placeholder || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { placeholder: e.target.value })}
           placeholder="+1 (555) 000-0000"
           className="text-xs h-8"
         />
@@ -284,7 +291,13 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Placeholder</Label>
-        <Input type="text" placeholder="Enter a number" className="text-xs h-8" />
+        <Input 
+          type="text" 
+          value={question.placeholder || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { placeholder: e.target.value })}
+          placeholder="Enter a number" 
+          className="text-xs h-8" 
+        />
       </div>
     </>
   );
