@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag, Monitor } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getQuestionIcon, questionIconMap } from "@/lib/questionIcons";
 import mobileVerticalIcon from "@/assets/layout-mobile-vertical.svg";
 import mobileHorizontalIcon from "@/assets/layout-mobile-horizontal.svg";
 import mobileCenteredIcon from "@/assets/layout-mobile-centered.svg";
@@ -1207,9 +1208,24 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     <div className="w-[280px] bg-background border-l border-border flex flex-col">
       <div className="p-3 border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="flex-1 px-3 py-2 text-xs bg-muted rounded-md font-medium text-foreground">
-            {getQuestionTypeLabel()}
-          </div>
+          <Select value={question.type} disabled>
+            <SelectTrigger className="flex-1 h-9 text-xs">
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const Icon = getQuestionIcon(question).icon;
+                  const color = getQuestionIcon(question).color;
+                  return (
+                    <>
+                      <div className={`w-6 h-6 rounded flex items-center justify-center ${color}`}>
+                        <Icon className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="font-medium">{getQuestionTypeLabel()}</span>
+                    </>
+                  );
+                })()}
+              </div>
+            </SelectTrigger>
+          </Select>
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
             <Info className="w-4 h-4" />
           </Button>
