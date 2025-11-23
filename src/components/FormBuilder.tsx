@@ -3,6 +3,7 @@ import { QuestionSidebar } from "./QuestionSidebar";
 import { FormPreview } from "./FormPreview";
 import { SettingsPanel } from "./SettingsPanel";
 import { TopToolbar } from "./TopToolbar";
+import { AddContentModal } from "./AddContentModal";
 
 export interface Question {
   id: string;
@@ -81,6 +82,7 @@ const defaultQuestions: Question[] = [
 export const FormBuilder = () => {
   const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
+  const [isAddContentModalOpen, setIsAddContentModalOpen] = useState(false);
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
@@ -90,9 +92,30 @@ export const FormBuilder = () => {
     ));
   };
 
+  const handleAddElement = (elementType: string) => {
+    // Map element types to question types
+    const typeMap: { [key: string]: Question["type"] } = {
+      "short-text": "text",
+      "long-text": "text",
+      "multiple-choice": "choice",
+      "dropdown": "choice",
+      "yes-no": "choice",
+      "rating": "rating",
+      "opinion-scale": "rating",
+      "ranking": "rating",
+    };
+
+    const questionType = typeMap[elementType] || "text";
+    
+    // Update the active question's type
+    if (activeQuestion) {
+      updateQuestion(activeQuestion.id, { type: questionType });
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
-      <TopToolbar />
+      <TopToolbar onAddContent={() => setIsAddContentModalOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         <QuestionSidebar
           questions={questions}
@@ -113,6 +136,12 @@ export const FormBuilder = () => {
         
         <SettingsPanel question={activeQuestion} />
       </div>
+
+      <AddContentModal
+        isOpen={isAddContentModalOpen}
+        onClose={() => setIsAddContentModalOpen(false)}
+        onSelectElement={handleAddElement}
+      />
     </div>
   );
 };

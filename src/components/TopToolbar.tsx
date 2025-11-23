@@ -11,7 +11,7 @@ import {
   Settings
 } from "lucide-react";
 
-export const TopToolbar = () => {
+export const TopToolbar = ({ onAddContent }: { onAddContent: () => void }) => {
   return (
     <div className="h-12 bg-card border-b border-border flex items-center justify-between px-3">
       <div className="flex items-center gap-1.5">
@@ -19,7 +19,12 @@ export const TopToolbar = () => {
           <span>Universal mode</span>
           <ChevronDown className="w-3.5 h-3.5" />
         </Button>
-        <Button variant="default" size="sm" className="gap-1.5 h-8 text-xs px-2.5 bg-secondary hover:bg-secondary/90">
+        <Button 
+          variant="default" 
+          size="sm" 
+          className="gap-1.5 h-8 text-xs px-2.5 bg-secondary hover:bg-secondary/90"
+          onClick={onAddContent}
+        >
           <Plus className="w-3.5 h-3.5" />
           Add content
         </Button>
