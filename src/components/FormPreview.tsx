@@ -180,16 +180,22 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   justifyContent: viewMode === "desktop" ? "center" : "flex-start",
                   padding:
                     viewMode === "desktop"
-                      ? "0 64px"
+                      ? question.desktopLayout === "desktop-card" || question.desktopLayout === "desktop-panel"
+                        ? "0"
+                        : "0 64px"
                       : question.mobileLayout === "mobile-centered"
                       ? "0"
                       : "24px 20px",
                   paddingLeft:
                     viewMode === "mobile" && question.mobileLayout === "mobile-centered"
                       ? 0
+                      : viewMode === "desktop" && (question.desktopLayout === "desktop-card" || question.desktopLayout === "desktop-panel")
+                      ? 0
                       : "7%",
                   paddingRight:
                     viewMode === "mobile" && question.mobileLayout === "mobile-centered"
+                      ? 0
+                      : viewMode === "desktop" && (question.desktopLayout === "desktop-card" || question.desktopLayout === "desktop-panel")
                       ? 0
                       : "7%",
                 }}
