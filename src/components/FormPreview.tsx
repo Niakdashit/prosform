@@ -46,23 +46,23 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           {question.type === "welcome" ? (
             <div className="grid grid-cols-2 gap-12 items-center">
               <div>
-                <h1 className="text-6xl font-bold text-primary mb-6 leading-tight">
+                <h1 className="text-5xl font-bold text-primary mb-4 leading-tight" style={{ fontWeight: 700 }}>
                   {question.title}
                 </h1>
-                <p className="text-xl text-cream/80 mb-8">
+                <p className="text-lg text-cream/70 mb-8">
                   {question.subtitle}
                 </p>
                 <Button
                   onClick={onNext}
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-brown-dark font-semibold text-lg px-8 py-6 rounded-full"
+                  className="bg-primary hover:bg-primary/90 text-brown-dark font-semibold px-6 py-5 rounded-md h-auto"
                 >
                   Give feedback
-                  <span className="ml-2">↵</span>
+                  <span className="ml-2 text-sm">press Enter ↵</span>
                 </Button>
                 <div className="flex items-center gap-2 mt-4 text-cream/60 text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>Takes 5 minutes</span>
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Takes X minutes</span>
                 </div>
               </div>
               <div className="relative">
@@ -77,13 +77,13 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
             </div>
           ) : question.type === "text" ? (
             <div className="max-w-2xl">
-              <div className="mb-8">
+              <div className="mb-6">
                 {question.number && (
-                  <div className="text-primary/60 mb-4 font-medium">
+                  <div className="text-primary/60 mb-3 font-medium text-sm">
                     {question.number} →
                   </div>
                 )}
-                <h2 className="text-5xl font-bold text-cream mb-4">
+                <h2 className="text-4xl font-bold text-cream mb-4" style={{ fontWeight: 700 }}>
                   {question.title}
                 </h2>
               </div>
@@ -92,40 +92,40 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Type your answer here..."
-                  className="bg-transparent border-b-2 border-cream/30 rounded-none text-2xl text-cream placeholder:text-cream/40 focus:border-primary px-0 py-4"
+                  className="bg-transparent border-b border-cream/30 rounded-none text-xl text-cream placeholder:text-cream/40 focus:border-primary px-0 py-3 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
                   autoFocus
                 />
-                <div className="mt-6 flex items-center gap-4">
+                <div className="mt-4 flex items-center gap-3">
                   <Button
                     type="submit"
-                    className="bg-primary hover:bg-primary/90 text-brown-dark font-medium"
+                    className="bg-primary hover:bg-primary/90 text-brown-dark font-medium px-4 py-2 h-auto"
                   >
-                    OK <span className="ml-2">✓</span>
+                    OK <span className="ml-1">✓</span>
                   </Button>
-                  <span className="text-cream/40 text-sm">
-                    press <kbd className="px-2 py-1 bg-cream/10 rounded">Enter</kbd>
+                  <span className="text-cream/50 text-xs">
+                    press <kbd className="px-1.5 py-0.5 bg-cream/10 rounded text-xs">Enter</kbd>
                   </span>
                 </div>
               </form>
             </div>
           ) : question.type === "rating" ? (
             <div className="max-w-2xl">
-              <div className="mb-8">
+              <div className="mb-6">
                 {question.number && (
-                  <div className="text-primary/60 mb-4 font-medium">
+                  <div className="text-primary/60 mb-3 font-medium text-sm">
                     {question.number} →
                   </div>
                 )}
-                <h2 className="text-5xl font-bold text-cream mb-4">
+                <h2 className="text-4xl font-bold text-cream mb-4" style={{ fontWeight: 700 }}>
                   {question.title}
                 </h2>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <button
                     key={rating}
                     onClick={onNext}
-                    className="w-16 h-16 rounded-xl bg-cream/10 hover:bg-primary/20 border-2 border-cream/20 hover:border-primary transition-all flex items-center justify-center text-2xl text-cream font-semibold"
+                    className="w-14 h-14 rounded-lg bg-cream/10 hover:bg-primary/20 border border-cream/20 hover:border-primary transition-all flex items-center justify-center text-xl text-cream font-semibold"
                   >
                     {rating}
                   </button>
@@ -134,42 +134,42 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
             </div>
           ) : question.type === "choice" ? (
             <div className="max-w-2xl">
-              <div className="mb-8">
+              <div className="mb-6">
                 {question.number && (
-                  <div className="text-primary/60 mb-4 font-medium">
+                  <div className="text-primary/60 mb-3 font-medium text-sm">
                     {question.number} →
                   </div>
                 )}
-                <h2 className="text-5xl font-bold text-cream mb-4">
+                <h2 className="text-4xl font-bold text-cream mb-4" style={{ fontWeight: 700 }}>
                   {question.title}
                 </h2>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {["Yes", "No", "Sometimes"].map((choice, index) => (
                   <button
                     key={choice}
                     onClick={onNext}
-                    className="w-full p-6 rounded-xl bg-cream/10 hover:bg-primary/20 border-2 border-cream/20 hover:border-primary transition-all flex items-center gap-4 text-left group"
+                    className="w-full p-4 rounded-lg bg-cream/10 hover:bg-primary/20 border border-cream/20 hover:border-primary transition-all flex items-center gap-3 text-left group"
                   >
-                    <span className="text-cream/60 group-hover:text-primary font-medium">
+                    <span className="text-cream/60 group-hover:text-primary font-medium text-sm">
                       {String.fromCharCode(65 + index)}
                     </span>
-                    <span className="text-xl text-cream font-medium">{choice}</span>
+                    <span className="text-lg text-cream font-medium">{choice}</span>
                   </button>
                 ))}
               </div>
             </div>
           ) : (
             <div className="max-w-2xl text-center">
-              <h2 className="text-6xl font-bold text-primary mb-6">
+              <h2 className="text-5xl font-bold text-primary mb-4" style={{ fontWeight: 700 }}>
                 {question.title}
               </h2>
-              <p className="text-xl text-cream/80 mb-8">
+              <p className="text-lg text-cream/70 mb-6">
                 We appreciate you taking the time to share your thoughts.
               </p>
               <Button
                 onClick={() => window.location.reload()}
-                className="bg-primary hover:bg-primary/90 text-brown-dark font-semibold text-lg px-8 py-6"
+                className="bg-primary hover:bg-primary/90 text-brown-dark font-semibold px-6 py-3 h-auto"
               >
                 Start over
               </Button>

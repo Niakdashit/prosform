@@ -27,13 +27,12 @@ export const QuestionSidebar = ({
   onQuestionSelect,
 }: QuestionSidebarProps) => {
   return (
-    <div className="w-80 bg-card border-r border-border flex flex-col">
-      <div className="p-4 border-b border-border">
-        <h2 className="text-lg font-semibold text-foreground mb-2">How are we doing?</h2>
-        <Button variant="outline" size="sm" className="w-full">
-          <Plus className="w-4 h-4 mr-2" />
-          Add content
-        </Button>
+    <div className="w-64 bg-background border-r border-border flex flex-col">
+      <div className="p-3 border-b border-border flex items-center gap-2">
+        <div className="w-8 h-8 bg-muted rounded flex items-center justify-center">
+          <div className="w-4 h-4 bg-foreground/20 rounded-sm" />
+        </div>
+        <h2 className="text-sm font-medium text-foreground">How are we doing?</h2>
       </div>
 
       <ScrollArea className="flex-1">
@@ -47,27 +46,27 @@ export const QuestionSidebar = ({
                 key={question.id}
                 onClick={() => onQuestionSelect(question.id)}
                 className={cn(
-                  "w-full p-3 rounded-lg mb-2 flex items-start gap-3 transition-all",
-                  "hover:bg-muted/50",
-                  isActive && "bg-muted border border-primary/20"
+                  "w-full p-2.5 rounded-md mb-1 flex items-start gap-2.5 transition-all",
+                  "hover:bg-muted",
+                  isActive && "bg-muted"
                 )}
               >
                 <div className={cn(
-                  "w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0",
-                  question.type === "welcome" && "bg-accent/10 text-accent-foreground",
-                  question.type === "text" && "bg-blue-500/10 text-blue-600",
-                  question.type === "rating" && "bg-green-500/10 text-green-600",
-                  question.type === "choice" && "bg-purple-500/10 text-purple-600",
-                  question.type === "ending" && "bg-accent/10 text-accent-foreground"
+                  "w-7 h-7 rounded flex items-center justify-center flex-shrink-0 text-xs font-semibold",
+                  question.type === "welcome" && "bg-pink-100 text-pink-600",
+                  question.type === "text" && "bg-blue-100 text-blue-600",
+                  question.type === "rating" && "bg-green-100 text-green-600",
+                  question.type === "choice" && "bg-purple-100 text-purple-600",
+                  question.type === "ending" && "bg-cyan-100 text-cyan-600"
                 )}>
                   {question.number ? (
-                    <span className="text-sm font-semibold">{question.number}</span>
+                    <span>{question.number}</span>
                   ) : (
-                    Icon && <Icon className="w-4 h-4" />
+                    Icon && <Icon className="w-3.5 h-3.5" />
                   )}
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-foreground line-clamp-2">
+                  <p className="text-xs text-foreground line-clamp-2 leading-relaxed">
                     {question.title}
                   </p>
                 </div>
@@ -77,9 +76,9 @@ export const QuestionSidebar = ({
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t border-border">
-        <Button variant="ghost" size="sm" className="w-full">
-          <Plus className="w-4 h-4 mr-2" />
+      <div className="p-2 border-t border-border">
+        <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8">
+          <Plus className="w-3 h-3 mr-2" />
           Endings
         </Button>
       </div>
