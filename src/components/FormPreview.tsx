@@ -144,7 +144,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
@@ -262,7 +264,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
@@ -472,7 +476,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
@@ -595,7 +601,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
@@ -707,7 +715,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
@@ -798,7 +808,9 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
                       <PopoverTrigger asChild>
                         <button
-                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-20"
+                          type="button"
+                          onClick={() => setShowVariableMenu(!showVariableMenu)}
+                          className="absolute -top-2 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50"
                           style={{ 
                             backgroundColor: 'rgba(245, 184, 0, 0.15)',
                             color: '#F5B800',
@@ -809,8 +821,10 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         </button>
                       </PopoverTrigger>
                       <PopoverContent 
-                        className="w-72 p-2" 
+                        className="w-72 p-2 z-50" 
                         align="end"
+                        side="bottom"
+                        sideOffset={8}
                         style={{
                           backgroundColor: '#4A4138',
                           border: '1px solid rgba(245, 184, 0, 0.3)',
@@ -837,7 +851,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     </Popover>
                   )}
                   <h2
-                    className="text-[56px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                    ref={titleRef}
+                    className="text-[56px] font-bold mb-6 leading-[1.1] cursor-text hover:opacity-80 transition-opacity"
                     style={{ 
                       color: '#FFFFFF', 
                       fontWeight: 700, 
@@ -856,7 +871,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className="text-xl mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                      ref={subtitleRef}
+                      className="text-xl mb-8 cursor-text hover:opacity-80 transition-opacity"
                       style={{ 
                         color: '#B8A892',
                         outline: editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
