@@ -187,6 +187,43 @@ export const FormBuilder = () => {
     }
   }, [isMobile]);
 
+  // Sync form data to localStorage for preview window
+  useEffect(() => {
+    const formData = {
+      questions,
+      currentQuestionIndex: previewQuestionIndex,
+      viewMode,
+      theme: {
+        fontFamily: 'inter',
+        fontSize: 16,
+        textColor: '#ffffff',
+        backgroundColor: '#4a4138',
+        buttonColor: '#ffffff',
+        systemColor: '#f5ca3c',
+        accentColor: '#f9c31f',
+        buttonStyle: 'rounded',
+        buttonSize: 'medium',
+        borderColor: '#4A4138',
+        borderWidth: 1,
+        borderRadius: 8,
+        titleSize: 32,
+        descriptionSize: 16,
+        questionSpacing: 1,
+        inputPadding: 12,
+        pageMargins: 32,
+        shadowIntensity: 20,
+        animationSpeed: 'normal',
+      },
+      layout: viewMode,
+      isMobileResponsive: true,
+    };
+    
+    localStorage.setItem('formPreviewData', JSON.stringify(formData));
+    
+    // Dispatch custom event for same-tab updates
+    window.dispatchEvent(new CustomEvent('formPreviewUpdate', { detail: formData }));
+  }, [questions, previewQuestionIndex, viewMode]);
+
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {
@@ -318,12 +355,6 @@ export const FormBuilder = () => {
         {!isFullPreview && (
           <TopToolbar 
             onAddContent={() => setIsAddContentModalOpen(true)}
-            onPreview={() => {
-              setIsFullPreview(true);
-              setPreviewQuestionIndex(0);
-              // Set viewMode based on device: desktop shows desktop, mobile shows mobile
-              setViewMode(isMobile ? 'mobile' : 'desktop');
-            }}
           />
         )}
         
