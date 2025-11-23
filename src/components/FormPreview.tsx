@@ -278,7 +278,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           style={{ 
                             color: '#F5CA3C', 
                             fontWeight: 700, 
-                            fontSize: viewMode === 'desktop' ? '64px' : '48px',
+                            fontSize: viewMode === 'desktop' ? '64px' : '32px',
                             letterSpacing: '-0.02em',
                             outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                             padding: '4px',
@@ -372,6 +372,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           className="text-[16px] mb-8 leading-[1.6] cursor-text hover:opacity-80 transition-opacity" 
                           style={{ 
                             color: '#B8A892',
+                            fontSize: viewMode === 'desktop' ? '16px' : '14px',
                             outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
                             padding: '4px',
                             margin: '-4px',
@@ -727,14 +728,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Mobile layouts
                   if (mobileLayout === 'mobile-vertical') {
                     return (
-                      <div className="flex flex-col gap-8 items-center py-8 px-6 w-full">
+                      <div className="flex flex-col gap-6 items-center py-6 px-4 w-full">
                         <ImageBlock />
                         <TextContent />
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-horizontal') {
                     return (
-                      <div className="flex items-center gap-6 py-8 px-6 w-full">
+                      <div className="flex items-center gap-4 py-6 px-4 w-full">
                         <div className="flex-1">
                           <TextContent />
                         </div>
@@ -743,7 +744,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     );
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex flex-col gap-8 items-center justify-center py-8 px-6 w-full text-center">
+                      <div className="flex flex-col gap-6 items-center justify-center py-6 px-4 w-full text-center">
                         <ImageBlock />
                         <TextContent centered />
                       </div>
@@ -757,7 +758,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                           className="absolute inset-0 w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
-                        <div className="relative z-10 flex items-center justify-center h-full px-6">
+                        <div className="relative z-10 flex items-center justify-center h-full px-4">
                           <TextContent centered />
                         </div>
                       </div>
@@ -774,11 +775,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 })()}
               </div>
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
-              <div className="w-full h-full flex items-center justify-center px-24">
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
                 <div className="w-full max-w-[700px]">
                   <div className="mb-10">
                     {question.number && (
-                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                      <div className="mb-5 font-semibold" style={{ color: '#F5B800', fontSize: viewMode === 'desktop' ? '18px' : '14px' }}>
                         {question.number} →
                       </div>
                     )}
@@ -873,10 +874,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       )}
 
                       <h2 
-                        className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                        className="font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                           color: '#FFFFFF', 
                           fontWeight: 700, 
+                          fontSize: viewMode === 'desktop' ? '56px' : '32px',
                           letterSpacing: '-0.02em',
                           outline: editingField === 'text-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                           padding: '4px',
@@ -1158,7 +1160,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : question.type === "choice" || question.type === "dropdown" || question.type === "yesno" || question.type === "picture-choice" ? (
-              <div className="w-full h-full flex items-center justify-center px-24">
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
                 <div className="w-full max-w-[700px] relative">
                   {editingField === 'choice-title' && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1206,15 +1208,16 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   )}
                   <div className="mb-10">
                     {question.number && (
-                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                      <div className="mb-5 font-semibold" style={{ color: '#F5B800', fontSize: viewMode === 'desktop' ? '18px' : '14px' }}>
                         {question.number} →
                       </div>
                     )}
                     <h2 
-                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      className="font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#FFFFFF', 
                         fontWeight: 700, 
+                        fontSize: viewMode === 'desktop' ? '56px' : '32px',
                         letterSpacing: '-0.02em',
                         outline: editingField === 'choice-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                         padding: '4px',
@@ -1272,7 +1275,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : question.type === "file" ? (
-              <div className="w-full h-full flex items-center justify-center px-24">
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
                 <div className="w-full max-w-[700px] relative">
                   {editingField === 'file-title' && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1325,10 +1328,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       </div>
                     )}
                     <h2 
-                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      className="font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#FFFFFF', 
                         fontWeight: 700, 
+                        fontSize: viewMode === 'desktop' ? '56px' : '32px',
                         letterSpacing: '-0.02em',
                         outline: editingField === 'file-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                         padding: '4px',
@@ -1365,7 +1369,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : question.type === "statement" ? (
-              <div className="w-full h-full flex items-center justify-center px-24">
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
                 <div className="w-full max-w-[700px] text-center relative">
                   {(editingField === 'statement-title' || editingField === 'statement-subtitle') && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1414,10 +1418,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     </Popover>
                   )}
                   <h2
-                    className="text-[56px] font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity"
+                    className="font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity"
                     style={{ 
                       color: '#FFFFFF', 
                       fontWeight: 700, 
+                      fontSize: viewMode === 'desktop' ? '56px' : '32px',
                       letterSpacing: '-0.02em',
                       outline: editingField === 'statement-title' ? '2px solid rgba(255, 255, 255, 0.5)' : 'none',
                       padding: '4px',
@@ -1462,7 +1467,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center px-24">
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px' }}>
                 <div className="w-full max-w-[700px] text-center relative">
                   {(editingField === 'ending-title' || editingField === 'ending-subtitle') && (
                     <Popover open={showVariableMenu} onOpenChange={setShowVariableMenu}>
@@ -1515,10 +1520,11 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   )}
 
                   <h2 
-                    className="text-[72px] font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                    className="font-bold mb-8 leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                     style={{ 
                       color: '#F5B800', 
                       fontWeight: 700, 
+                      fontSize: viewMode === 'desktop' ? '72px' : '40px',
                       letterSpacing: '-0.03em',
                       outline: editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
                       padding: '4px',
