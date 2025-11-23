@@ -210,6 +210,67 @@ export const FormBuilder = () => {
     });
   };
 
+  const duplicateQuestion = (id: string) => {
+    setQuestions(prev => {
+      const questionIndex = prev.findIndex(q => q.id === id);
+      if (questionIndex === -1) return prev;
+      
+      const questionToDuplicate = prev[questionIndex];
+      const newQuestion = {
+        ...questionToDuplicate,
+        id: `question-${Date.now()}`,
+        title: `${questionToDuplicate.title} (copy)`,
+      };
+      
+      const result = Array.from(prev);
+      result.splice(questionIndex + 1, 0, newQuestion);
+      
+      // Update question numbers for non-welcome/ending questions
+      return result.map((q, index) => {
+        if (q.type !== "welcome" && q.type !== "ending") {
+          const regularQuestions = result.filter(r => r.type !== "welcome" && r.type !== "ending");
+          const newNumber = regularQuestions.indexOf(q) + 1;
+          return { ...q, number: newNumber };
+        }
+        return q;
+      });
+    });
+    toast.success("Question duplicated");
+  };
+
+  const deleteQuestion = (id: string) => {
+    setQuestions(prev => {
+      const questionToDelete = prev.find(q => q.id === id);
+      if (!questionToDelete) return prev;
+      
+      // Prevent deletion of welcome and ending screens
+      if (questionToDelete.type === "welcome" || questionToDelete.type === "ending") {
+        toast.error("Cannot delete Welcome or Ending screen");
+        return prev;
+      }
+      
+      const result = prev.filter(q => q.id !== id);
+      
+      // Update question numbers for non-welcome/ending questions
+      const updated = result.map((q, index) => {
+        if (q.type !== "welcome" && q.type !== "ending") {
+          const regularQuestions = result.filter(r => r.type !== "welcome" && r.type !== "ending");
+          const newNumber = regularQuestions.indexOf(q) + 1;
+          return { ...q, number: newNumber };
+        }
+        return q;
+      });
+      
+      // If the deleted question was active, switch to the first question
+      if (id === activeQuestionId && updated.length > 0) {
+        setActiveQuestionId(updated[0].id);
+      }
+      
+      toast.success("Question deleted");
+      return updated;
+    });
+  };
+
   const handleAddElement = (elementType: string) => {
     // Map element types to question types and variants
     const typeMap: { [key: string]: { type: Question["type"], variant?: string } } = {
@@ -265,6 +326,8 @@ export const FormBuilder = () => {
                     setLeftDrawerOpen(false);
                   }}
                   onReorderQuestions={reorderQuestions}
+                  onDuplicateQuestion={duplicateQuestion}
+                  onDeleteQuestion={deleteQuestion}
                 />
               </DrawerContent>
             </Drawer>
@@ -320,6 +383,8 @@ export const FormBuilder = () => {
               activeQuestionId={activeQuestionId}
               onQuestionSelect={setActiveQuestionId}
               onReorderQuestions={reorderQuestions}
+              onDuplicateQuestion={duplicateQuestion}
+              onDeleteQuestion={deleteQuestion}
             />
             
             <FormPreview
