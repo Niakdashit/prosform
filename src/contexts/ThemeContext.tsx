@@ -13,8 +13,9 @@ export interface ThemeSettings {
   accentColor: string;
   
   // Buttons
-  buttonStyle: 'square' | 'rounded' | 'pill';
+  buttonStyle: 'filled' | 'outline' | 'soft' | 'ghost';
   buttonSize: 'small' | 'medium' | 'large';
+  buttonRadius: number;
   
   // Borders
   borderColor: string;
@@ -39,8 +40,9 @@ const defaultTheme: ThemeSettings = {
   buttonColor: '#ffffff',
   systemColor: '#f5ca3c',
   accentColor: '#f9c31f',
-  buttonStyle: 'rounded',
+  buttonStyle: 'filled',
   buttonSize: 'medium',
+  buttonRadius: 8,
   borderColor: '#4A4138',
   borderWidth: 1,
   borderRadius: 8,

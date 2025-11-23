@@ -440,27 +440,85 @@ export const QuestionSidebar = ({
                 <div className="space-y-4">
                   <div>
                     <Label className="text-xs text-muted-foreground mb-3 block">Button style</Label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {[
-                        { value: "square", label: "Square", radius: "0px" },
-                        { value: "rounded", label: "Rounded", radius: "8px" },
-                        { value: "pill", label: "Pill", radius: "999px" },
-                      ].map((style) => (
+                        { value: "filled", label: "Filled", style: "filled" },
+                        { value: "outline", label: "Outline", style: "outline" },
+                        { value: "soft", label: "Soft", style: "soft" },
+                        { value: "ghost", label: "Ghost", style: "ghost" },
+                      ].map((styleOption) => (
                         <button
-                          key={style.value}
-                          onClick={() => updateTheme({ buttonStyle: style.value as any })}
+                          key={styleOption.value}
+                          onClick={() => updateTheme({ buttonStyle: styleOption.value as any })}
                           className={cn(
                             "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:border-primary/50",
-                            theme.buttonStyle === style.value ? "border-primary bg-primary/5" : "border-border"
+                            theme.buttonStyle === styleOption.value ? "border-primary bg-primary/5" : "border-border"
                           )}
                         >
                           <div 
-                            className="w-full h-7 bg-foreground flex items-center justify-center text-background text-[10px] font-medium transition-all"
-                            style={{ borderRadius: style.radius }}
+                            className="w-full h-8 flex items-center justify-center text-xs font-semibold transition-all"
+                            style={
+                              styleOption.style === "filled" 
+                                ? { 
+                                    backgroundColor: theme.buttonColor, 
+                                    color: theme.backgroundColor,
+                                    borderRadius: "8px"
+                                  }
+                                : styleOption.style === "outline"
+                                ? {
+                                    backgroundColor: "transparent",
+                                    border: `2px solid ${theme.buttonColor}`,
+                                    color: theme.buttonColor,
+                                    borderRadius: "8px"
+                                  }
+                                : styleOption.style === "soft"
+                                ? {
+                                    backgroundColor: `${theme.buttonColor}20`,
+                                    color: theme.buttonColor,
+                                    borderRadius: "8px"
+                                  }
+                                : {
+                                    backgroundColor: "transparent",
+                                    color: theme.buttonColor,
+                                    borderRadius: "8px"
+                                  }
+                            }
                           >
                             OK
                           </div>
-                          <span className="text-[10px] font-medium">{style.label}</span>
+                          <span className="text-[10px] font-medium">{styleOption.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-3 block">Border radius</Label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { value: 0, label: "Square", radius: "0px" },
+                        { value: 8, label: "Rounded", radius: "8px" },
+                        { value: 999, label: "Pill", radius: "999px" },
+                      ].map((radius) => (
+                        <button
+                          key={radius.value}
+                          onClick={() => updateTheme({ buttonRadius: radius.value })}
+                          className={cn(
+                            "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all hover:border-primary/50",
+                            theme.buttonRadius === radius.value ? "border-primary bg-primary/5" : "border-border"
+                          )}
+                        >
+                          <div 
+                            className="w-full h-8 flex items-center justify-center text-xs font-semibold transition-all"
+                            style={{ 
+                              backgroundColor: theme.buttonColor,
+                              color: theme.backgroundColor,
+                              borderRadius: radius.radius
+                            }}
+                          >
+                            OK
+                          </div>
+                          <span className="text-[10px] font-medium">{radius.label}</span>
                         </button>
                       ))}
                     </div>
@@ -470,9 +528,9 @@ export const QuestionSidebar = ({
                     <Label className="text-xs text-muted-foreground mb-3 block">Button size</Label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { value: "small", label: "Small", height: "h-7", text: "text-xs" },
-                        { value: "medium", label: "Medium", height: "h-9", text: "text-sm" },
-                        { value: "large", label: "Large", height: "h-11", text: "text-base" },
+                        { value: "small", label: "Small", height: "28px", padding: "0 16px", fontSize: "13px" },
+                        { value: "medium", label: "Medium", height: "36px", padding: "0 20px", fontSize: "14px" },
+                        { value: "large", label: "Large", height: "44px", padding: "0 24px", fontSize: "15px" },
                       ].map((size) => (
                         <button
                           key={size.value}
@@ -483,11 +541,15 @@ export const QuestionSidebar = ({
                           )}
                         >
                           <div 
-                            className={cn(
-                              "w-full bg-foreground flex items-center justify-center text-background font-medium transition-all rounded-lg",
-                              size.height,
-                              size.text
-                            )}
+                            className="w-full flex items-center justify-center font-semibold transition-all"
+                            style={{
+                              backgroundColor: theme.buttonColor,
+                              color: theme.backgroundColor,
+                              borderRadius: "8px",
+                              height: size.height,
+                              padding: size.padding,
+                              fontSize: size.fontSize
+                            }}
                           >
                             OK
                           </div>
