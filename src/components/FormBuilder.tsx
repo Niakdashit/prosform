@@ -14,6 +14,7 @@ export interface Question {
   icon?: string;
   number?: number;
   variant?: string; // Pour distinguer short-text, long-text, video, etc.
+  choices?: string[]; // Pour les questions à choix multiples
 }
 
 const defaultQuestions: Question[] = [
@@ -36,7 +37,8 @@ const defaultQuestions: Question[] = [
     type: "choice",
     title: "Thanks, ___. Which department do you...",
     icon: "building",
-    number: 2
+    number: 2,
+    choices: ["Marketing", "Sales", "Engineering", "Other"]
   },
   {
     id: "q3",
@@ -50,21 +52,24 @@ const defaultQuestions: Question[] = [
     type: "choice",
     title: "Do you feel valued?",
     icon: "check",
-    number: 4
+    number: 4,
+    choices: ["Yes", "No", "Sometimes"]
   },
   {
     id: "q5",
     type: "choice",
     title: "Do you feel supported by the...",
     icon: "chart",
-    number: 5
+    number: 5,
+    choices: ["Yes", "No", "Sometimes"]
   },
   {
     id: "q6",
     type: "choice",
     title: "Does leadership clearly...",
     icon: "target",
-    number: 6
+    number: 6,
+    choices: ["Yes", "No", "Sometimes"]
   },
   {
     id: "q7",
