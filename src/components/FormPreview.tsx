@@ -738,7 +738,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                 })()}
               </div>
             ) : question.type === "text" || question.type === "email" || question.type === "phone" || question.type === "number" || question.type === "date" ? (
-              <div className="w-full h-full flex items-center justify-center px-24">
+              <div className="w-full h-full flex items-center justify-center px-16">
                 <div className="w-full max-w-[700px]">
                   <div className="mb-10">
                     {question.number && (
