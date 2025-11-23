@@ -42,47 +42,47 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           className="w-full max-w-4xl mx-auto px-8"
         >
           {question.type === "welcome" ? (
-            <div className="flex items-center justify-center w-full h-full">
-              <div className="w-full max-w-[1400px] grid grid-cols-[0.85fr_1.15fr] gap-24 items-center" style={{ padding: '80px 120px' }}>
+            <div className="flex items-center justify-center w-full h-full px-16">
+              <div className="w-full max-w-[1200px] grid grid-cols-[1fr_1fr] gap-20 items-center">
                 <div>
-                  <h1 className="font-bold mb-6 leading-[1.05]" style={{ 
+                  <h1 className="font-bold mb-8 leading-[1.1]" style={{ 
                     color: '#F5CA3C', 
                     fontWeight: 700, 
-                    fontSize: '72px',
-                    letterSpacing: '-0.03em' 
+                    fontSize: '80px',
+                    letterSpacing: '-0.02em' 
                   }}>
                     {question.title}
                   </h1>
-                  <p className="text-[17px] mb-14 leading-[1.65]" style={{ color: '#B8A892' }}>
+                  <p className="text-[18px] mb-12 leading-[1.6]" style={{ color: '#B8A892' }}>
                     {question.subtitle}
                   </p>
                   <button
                     onClick={onNext}
-                    className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
+                    className="flex items-center gap-3 px-8 font-semibold transition-opacity hover:opacity-90"
                     style={{ 
                       backgroundColor: '#F5CA3C', 
                       color: '#3D3731',
-                      height: '60px',
-                      borderRadius: '30px',
-                      fontSize: '18px',
+                      height: '64px',
+                      borderRadius: '32px',
+                      fontSize: '19px',
                       border: 'none',
                       boxShadow: 'none'
                     }}
                   >
                     <span>Give feedback</span>
-                    <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.6)', fontSize: '15px' }}>
+                    <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '15px' }}>
                       press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
                     </span>
                   </button>
-                  <div className="flex items-center gap-2.5 mt-5" style={{ color: '#B8A892', fontSize: '14px' }}>
+                  <div className="flex items-center gap-2.5 mt-6" style={{ color: '#A89A8A', fontSize: '15px' }}>
                     <Clock className="w-4 h-4" />
                     <span>Takes X minutes</span>
                   </div>
                 </div>
                 <div className="flex justify-end">
                   <div
-                    className="overflow-hidden w-[520px] h-[520px] max-w-full rounded-[40px]"
-                    style={{ borderRadius: "40px" }}
+                    className="overflow-hidden w-[500px] h-[500px] max-w-full"
+                    style={{ borderRadius: "44px" }}
                   >
                     <img
                       src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
