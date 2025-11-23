@@ -533,7 +533,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                           placeholder={question.placeholder || "Type your answer here..."}
-                          className="bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-5 min-h-[200px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] resize-none transition-colors"
+                          className="bg-transparent border-0 border-b-2 rounded-none text-2xl px-0 py-3 min-h-[200px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#F5B800] placeholder:text-[#8B7E6E] resize-none transition-colors"
                           style={{ 
                             borderColor: '#F5B800',
                             color: '#F5B800'
