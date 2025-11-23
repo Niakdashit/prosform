@@ -1101,14 +1101,14 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       </PopoverContent>
                     </Popover>
                   )}
-                  <div className="mb-10">
+                  <div className="mb-8">
                     {question.number && (
-                      <div className="mb-5 font-semibold text-lg" style={{ color: '#F5B800' }}>
+                      <div className="mb-4 font-semibold text-base" style={{ color: '#F5B800' }}>
                         {question.number} →
                       </div>
                     )}
                     <h2 
-                      className="text-[56px] font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
+                      className="text-4xl font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                         color: '#FFFFFF', 
                         fontWeight: 700, 
@@ -1137,7 +1137,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     {Array.from({ length: question.ratingCount || 5 }, (_, i) => i + 1).map((rating) => {
                       const getRatingIcon = () => {
                         const iconProps = {
-                          size: 32,
+                          size: 24,
                           fill: '#F5B800',
                           color: '#F5B800',
                           strokeWidth: 2
@@ -1165,7 +1165,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       return (
                         <div
                           key={rating}
-                          className="w-20 h-20 rounded-xl transition-all flex items-center justify-center font-semibold cursor-default"
+                          className="w-16 h-16 rounded-xl transition-all flex items-center justify-center font-semibold cursor-default"
                           style={{
                             backgroundColor: 'rgba(255,255,255,0.1)',
                             border: '1px solid rgba(255,255,255,0.2)',
