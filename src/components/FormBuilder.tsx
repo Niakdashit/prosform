@@ -9,7 +9,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 
 export interface Question {
   id: string;
@@ -169,7 +169,7 @@ export const defaultQuestions: Question[] = [
   }
 ];
 
-export const FormBuilder = () => {
+const FormBuilderContent = () => {
   const isMobile = useIsMobile();
   const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
@@ -179,6 +179,7 @@ export const FormBuilder = () => {
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [isFullPreview, setIsFullPreview] = useState(false);
   const [previewQuestionIndex, setPreviewQuestionIndex] = useState(0);
+  const { theme } = useTheme();
 
   // Force mobile view mode on mobile devices
   useEffect(() => {
@@ -193,27 +194,7 @@ export const FormBuilder = () => {
       questions,
       currentQuestionIndex: previewQuestionIndex,
       viewMode,
-      theme: {
-        fontFamily: 'inter',
-        fontSize: 16,
-        textColor: '#ffffff',
-        backgroundColor: '#4a4138',
-        buttonColor: '#ffffff',
-        systemColor: '#f5ca3c',
-        accentColor: '#f9c31f',
-        buttonStyle: 'rounded',
-        buttonSize: 'medium',
-        borderColor: '#4A4138',
-        borderWidth: 1,
-        borderRadius: 8,
-        titleSize: 32,
-        descriptionSize: 16,
-        questionSpacing: 1,
-        inputPadding: 12,
-        pageMargins: 32,
-        shadowIntensity: 20,
-        animationSpeed: 'normal',
-      },
+      theme,
       layout: viewMode,
       isMobileResponsive: true,
     };
@@ -222,7 +203,7 @@ export const FormBuilder = () => {
     
     // Dispatch custom event for same-tab updates
     window.dispatchEvent(new CustomEvent('formPreviewUpdate', { detail: formData }));
-  }, [questions, previewQuestionIndex, viewMode]);
+  }, [questions, previewQuestionIndex, viewMode, theme]);
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
@@ -350,151 +331,157 @@ export const FormBuilder = () => {
   };
 
   return (
-    <ThemeProvider>
-      <div className="flex flex-col h-screen bg-muted overflow-hidden">
-        {!isFullPreview && (
-          <TopToolbar 
-            onAddContent={() => setIsAddContentModalOpen(true)}
+    <div className="flex flex-col h-screen bg-muted overflow-hidden">
+      {!isFullPreview && (
+        <TopToolbar 
+          onAddContent={() => setIsAddContentModalOpen(true)}
+        />
+      )}
+      
+      {isFullPreview ? (
+        <div className="fixed inset-0 flex items-center justify-center bg-transparent z-40">
+          <button
+            onClick={() => setIsFullPreview(false)}
+            className="absolute top-4 left-4 z-50 px-4 py-2 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
+            style={{
+              backgroundColor: '#4A4138',
+              border: '1px solid rgba(245, 184, 0, 0.3)',
+              color: '#F5CA3C'
+            }}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="text-xs font-medium">Exit Preview</span>
+          </button>
+          
+          <FormPreview
+            question={questions[previewQuestionIndex]}
+            onUpdateQuestion={updateQuestion}
+            viewMode={viewMode}
+            onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+            isMobileResponsive={true}
+            allQuestions={questions}
+            onNext={() => {
+              if (previewQuestionIndex < questions.length - 1) {
+                setPreviewQuestionIndex(prev => prev + 1);
+              }
+            }}
           />
-        )}
-        
-        {isFullPreview ? (
-          <div className="fixed inset-0 flex items-center justify-center bg-transparent z-40">
-            <button
-              onClick={() => setIsFullPreview(false)}
-              className="absolute top-4 left-4 z-50 px-4 py-2 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
-              style={{
-                backgroundColor: '#4A4138',
-                border: '1px solid rgba(245, 184, 0, 0.3)',
-                color: '#F5CA3C'
-              }}
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span className="text-xs font-medium">Exit Preview</span>
-            </button>
-            
-            <FormPreview
-              question={questions[previewQuestionIndex]}
-              onUpdateQuestion={updateQuestion}
-              viewMode={viewMode}
-              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              isMobileResponsive={true}
-              allQuestions={questions}
-              onNext={() => {
-                if (previewQuestionIndex < questions.length - 1) {
-                  setPreviewQuestionIndex(prev => prev + 1);
-                }
-              }}
-            />
-          </div>
-        ) : (
-          <div className="flex flex-1 overflow-hidden relative">
-        {isMobile ? (
-          <>
-            {/* Mobile: Drawers with trigger buttons */}
-            <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
-              <DrawerContent className="h-[85vh]">
-                <QuestionSidebar
-                  questions={questions}
-                  activeQuestionId={activeQuestionId}
-                  onQuestionSelect={(id) => {
-                    setActiveQuestionId(id);
-                    setLeftDrawerOpen(false);
-                  }}
-                  onReorderQuestions={reorderQuestions}
-                  onDuplicateQuestion={duplicateQuestion}
-                  onDeleteQuestion={deleteQuestion}
-                />
-              </DrawerContent>
-            </Drawer>
+        </div>
+      ) : (
+        <div className="flex flex-1 overflow-hidden relative">
+      {isMobile ? (
+        <>
+          {/* Mobile: Drawers with trigger buttons */}
+          <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
+            <DrawerContent className="h-[85vh]">
+              <QuestionSidebar
+                questions={questions}
+                activeQuestionId={activeQuestionId}
+                onQuestionSelect={(id) => {
+                  setActiveQuestionId(id);
+                  setLeftDrawerOpen(false);
+                }}
+                onReorderQuestions={reorderQuestions}
+                onDuplicateQuestion={duplicateQuestion}
+                onDeleteQuestion={deleteQuestion}
+              />
+            </DrawerContent>
+          </Drawer>
 
-            <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
-              <DrawerContent className="h-[85vh]">
-                <SettingsPanel 
-                  question={activeQuestion} 
-                  onUpdateQuestion={updateQuestion}
-                  onViewModeChange={setViewMode}
-                />
-              </DrawerContent>
-            </Drawer>
+          <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
+            <DrawerContent className="h-[85vh]">
+              <SettingsPanel 
+                question={activeQuestion} 
+                onUpdateQuestion={updateQuestion}
+                onViewModeChange={setViewMode}
+              />
+            </DrawerContent>
+          </Drawer>
 
-            {/* Left drawer trigger button */}
-            <Button
-              onClick={() => setLeftDrawerOpen(true)}
-              className="fixed left-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
-              variant="default"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
+          {/* Left drawer trigger button */}
+          <Button
+            onClick={() => setLeftDrawerOpen(true)}
+            className="fixed left-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
+            variant="default"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
 
-            {/* Right drawer trigger button */}
-            <Button
-              onClick={() => setRightDrawerOpen(true)}
-              className="fixed right-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
-              variant="default"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
+          {/* Right drawer trigger button */}
+          <Button
+            onClick={() => setRightDrawerOpen(true)}
+            className="fixed right-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
+            variant="default"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
 
-            {/* Full screen preview */}
-            <FormPreview
-              question={activeQuestion}
-              onUpdateQuestion={updateQuestion}
-              viewMode="mobile"
-              onToggleViewMode={() => {}} // No toggle on mobile
-              isMobileResponsive={true}
-              allQuestions={questions}
-              onNext={() => {
-                const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
-                if (currentIndex < questions.length - 1) {
-                  setActiveQuestionId(questions[currentIndex + 1].id);
-                }
-              }}
-            />
-          </>
-        ) : (
-          <>
-            {/* Desktop: Side panels */}
-            <QuestionSidebar
-              questions={questions}
-              activeQuestionId={activeQuestionId}
-              onQuestionSelect={setActiveQuestionId}
-              onReorderQuestions={reorderQuestions}
-              onDuplicateQuestion={duplicateQuestion}
-              onDeleteQuestion={deleteQuestion}
-            />
-            
-            <FormPreview
-              question={activeQuestion}
-              onUpdateQuestion={updateQuestion}
-              viewMode={viewMode}
-              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              isMobileResponsive={false}
-              allQuestions={questions}
-              onNext={() => {
-                const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
-                if (currentIndex < questions.length - 1) {
-                  setActiveQuestionId(questions[currentIndex + 1].id);
-                }
-              }}
-            />
-            
-            <SettingsPanel 
-              question={activeQuestion} 
-              onUpdateQuestion={updateQuestion}
-              onViewModeChange={setViewMode}
-            />
-          </>
-        )}
-          </div>
-        )}
+          {/* Full screen preview */}
+          <FormPreview
+            question={activeQuestion}
+            onUpdateQuestion={updateQuestion}
+            viewMode="mobile"
+            onToggleViewMode={() => {}} // No toggle on mobile
+            isMobileResponsive={true}
+            allQuestions={questions}
+            onNext={() => {
+              const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+              if (currentIndex < questions.length - 1) {
+                setActiveQuestionId(questions[currentIndex + 1].id);
+              }
+            }}
+          />
+        </>
+      ) : (
+        <>
+          {/* Desktop: Side panels */}
+          <QuestionSidebar
+            questions={questions}
+            activeQuestionId={activeQuestionId}
+            onQuestionSelect={setActiveQuestionId}
+            onReorderQuestions={reorderQuestions}
+            onDuplicateQuestion={duplicateQuestion}
+            onDeleteQuestion={deleteQuestion}
+          />
+          
+          <FormPreview
+            question={activeQuestion}
+            onUpdateQuestion={updateQuestion}
+            viewMode={viewMode}
+            onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+            isMobileResponsive={false}
+            allQuestions={questions}
+            onNext={() => {
+              const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+              if (currentIndex < questions.length - 1) {
+                setActiveQuestionId(questions[currentIndex + 1].id);
+              }
+            }}
+          />
+          
+          <SettingsPanel 
+            question={activeQuestion} 
+            onUpdateQuestion={updateQuestion}
+            onViewModeChange={setViewMode}
+          />
+        </>
+      )}
+        </div>
+      )}
 
-        <AddContentModal
-        isOpen={isAddContentModalOpen}
-        onClose={() => setIsAddContentModalOpen(false)}
-        onSelectElement={handleAddElement}
-      />
-    </div>
+      <AddContentModal
+      isOpen={isAddContentModalOpen}
+      onClose={() => setIsAddContentModalOpen(false)}
+      onSelectElement={handleAddElement}
+    />
+  </div>
+  );
+};
+
+export const FormBuilder = () => {
+  return (
+    <ThemeProvider>
+      <FormBuilderContent />
     </ThemeProvider>
   );
 };
