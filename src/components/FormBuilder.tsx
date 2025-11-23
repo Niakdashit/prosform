@@ -13,6 +13,7 @@ export interface Question {
   subtitle?: string;
   icon?: string;
   number?: number;
+  variant?: string; // Pour distinguer short-text, long-text, video, etc.
 }
 
 const defaultQuestions: Question[] = [
@@ -94,23 +95,23 @@ export const FormBuilder = () => {
   };
 
   const handleAddElement = (elementType: string) => {
-    // Map element types to question types
-    const typeMap: { [key: string]: Question["type"] } = {
-      "short-text": "text",
-      "long-text": "text",
-      "multiple-choice": "choice",
-      "dropdown": "choice",
-      "yes-no": "choice",
-      "rating": "rating",
-      "opinion-scale": "rating",
-      "ranking": "rating",
-      "number": "text",
-      "date": "text",
-      "checkbox": "choice",
-      "video": "text",
+    // Map element types to question types and variants
+    const typeMap: { [key: string]: { type: Question["type"], variant?: string } } = {
+      "short-text": { type: "text", variant: "short" },
+      "long-text": { type: "text", variant: "long" },
+      "multiple-choice": { type: "choice", variant: "multiple" },
+      "dropdown": { type: "choice", variant: "dropdown" },
+      "yes-no": { type: "choice", variant: "yesno" },
+      "rating": { type: "rating", variant: "stars" },
+      "opinion-scale": { type: "rating", variant: "scale" },
+      "ranking": { type: "rating", variant: "ranking" },
+      "number": { type: "text", variant: "number" },
+      "date": { type: "text", variant: "date" },
+      "checkbox": { type: "choice", variant: "checkbox" },
+      "video": { type: "text", variant: "video" },
     };
 
-    const questionType = typeMap[elementType] || "text";
+    const mapping = typeMap[elementType] || { type: "text", variant: "short" };
     
     // Update the active question's type
     if (activeQuestion) {
@@ -118,8 +119,11 @@ export const FormBuilder = () => {
         toast.error("Cannot change Welcome or Ending screen type");
         return;
       }
-      updateQuestion(activeQuestion.id, { type: questionType });
-      toast.success(`Element changed to ${elementType.replace('-', ' ')}`);
+      updateQuestion(activeQuestion.id, { 
+        type: mapping.type,
+        variant: mapping.variant 
+      });
+      toast.success(`Changed to ${elementType.replace('-', ' ')}`);
     }
   };
 
