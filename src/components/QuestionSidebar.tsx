@@ -99,16 +99,16 @@ export const QuestionSidebar = ({
                 >
                   <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                   <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                    "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
                     questionIcon.color
                   )}>
                     {question.number ? (
                       <>
-                        <Icon className="w-4 h-4" />
-                        <span className="text-[10px] font-semibold ml-0.5">{question.number}</span>
+                        <Icon className="w-3.5 h-3.5" />
+                        <span className="text-[9px] font-bold ml-0.5">{question.number}</span>
                       </>
                     ) : (
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-4 h-4" />
                     )}
                   </div>
                   <div className="flex-1 text-left min-w-0 pt-1">
@@ -195,8 +195,8 @@ export const QuestionSidebar = ({
                     )}
                   >
                     <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200/80 text-gray-700 font-bold">
-                      <span className="text-sm">A</span>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gray-200/80 text-gray-700 font-bold">
+                      <span className="text-xs">A</span>
                     </div>
                     <div className="flex-1 text-left min-w-0 pt-1">
                       <p className="text-xs text-foreground line-clamp-2 leading-relaxed">
