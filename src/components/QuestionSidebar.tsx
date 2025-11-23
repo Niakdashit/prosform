@@ -297,8 +297,29 @@ export const QuestionSidebar = ({
                         <SelectItem value="roboto" className="text-xs">Roboto</SelectItem>
                         <SelectItem value="poppins" className="text-xs">Poppins</SelectItem>
                         <SelectItem value="montserrat" className="text-xs">Montserrat</SelectItem>
+                        <SelectItem value="lato" className="text-xs">Lato</SelectItem>
+                        <SelectItem value="opensans" className="text-xs">Open Sans</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Font size</Label>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="12"
+                        max="20"
+                        step="1"
+                        defaultValue="16"
+                        className="w-full h-1.5 accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>Small</span>
+                        <span>16px</span>
+                        <span>Large</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -317,6 +338,14 @@ export const QuestionSidebar = ({
                   </div>
                   
                   <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Background color</Label>
+                    <div className="flex gap-2">
+                      <Input type="color" defaultValue="#ffffff" className="h-8 w-16" />
+                      <Input type="text" defaultValue="#ffffff" className="h-8 text-xs flex-1" />
+                    </div>
+                  </div>
+                  
+                  <div>
                     <Label className="text-xs text-muted-foreground mb-2 block">Button color</Label>
                     <div className="flex gap-2">
                       <Input type="color" defaultValue="#3b82f6" className="h-8 w-16" />
@@ -325,10 +354,18 @@ export const QuestionSidebar = ({
                   </div>
 
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">System color</Label>
+                    <Label className="text-xs text-muted-foreground mb-2 block">System color (lines, progress)</Label>
                     <div className="flex gap-2">
                       <Input type="color" defaultValue="#6b7280" className="h-8 w-16" />
                       <Input type="text" defaultValue="#6b7280" className="h-8 text-xs flex-1" />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Accent color</Label>
+                    <div className="flex gap-2">
+                      <Input type="color" defaultValue="#8b5cf6" className="h-8 w-16" />
+                      <Input type="text" defaultValue="#8b5cf6" className="h-8 text-xs flex-1" />
                     </div>
                   </div>
                 </div>
@@ -346,9 +383,181 @@ export const QuestionSidebar = ({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="square" className="text-xs">Square</SelectItem>
-                        <SelectItem value="rounded" className="text-xs">Rounded</SelectItem>
-                        <SelectItem value="pill" className="text-xs">Pill</SelectItem>
+                        <SelectItem value="square" className="text-xs">Square (0px)</SelectItem>
+                        <SelectItem value="rounded" className="text-xs">Rounded (8px)</SelectItem>
+                        <SelectItem value="pill" className="text-xs">Pill (999px)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Button size</Label>
+                    <Select defaultValue="medium">
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="small" className="text-xs">Small</SelectItem>
+                        <SelectItem value="medium" className="text-xs">Medium</SelectItem>
+                        <SelectItem value="large" className="text-xs">Large</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h3 className="text-sm font-semibold mb-3">Borders</h3>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Border color</Label>
+                    <div className="flex gap-2">
+                      <Input type="color" defaultValue="#e5e7eb" className="h-8 w-16" />
+                      <Input type="text" defaultValue="#e5e7eb" className="h-8 text-xs flex-1" />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Border width</Label>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="4"
+                        step="0.5"
+                        defaultValue="1"
+                        className="w-full h-1.5 accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>None</span>
+                        <span>1px</span>
+                        <span>Thick</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Border radius</Label>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="24"
+                        step="2"
+                        defaultValue="8"
+                        className="w-full h-1.5 accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>Sharp</span>
+                        <span>8px</span>
+                        <span>Round</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h3 className="text-sm font-semibold mb-3">Spacing</h3>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Question spacing</Label>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="2"
+                        step="0.1"
+                        defaultValue="1"
+                        className="w-full h-1.5 accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>Compact</span>
+                        <span>1x</span>
+                        <span>Spacious</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Input padding</Label>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="8"
+                        max="24"
+                        step="2"
+                        defaultValue="12"
+                        className="w-full h-1.5 accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>Tight</span>
+                        <span>12px</span>
+                        <span>Loose</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Page margins</Label>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="16"
+                        max="64"
+                        step="4"
+                        defaultValue="32"
+                        className="w-full h-1.5 accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>Narrow</span>
+                        <span>32px</span>
+                        <span>Wide</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h3 className="text-sm font-semibold mb-3">Effects</h3>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Shadow intensity</Label>
+                    <div className="space-y-2">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="10"
+                        defaultValue="20"
+                        className="w-full h-1.5 accent-primary cursor-pointer"
+                      />
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
+                        <span>None</span>
+                        <span>20%</span>
+                        <span>Strong</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Animation speed</Label>
+                    <Select defaultValue="normal">
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none" className="text-xs">No animations</SelectItem>
+                        <SelectItem value="slow" className="text-xs">Slow (500ms)</SelectItem>
+                        <SelectItem value="normal" className="text-xs">Normal (300ms)</SelectItem>
+                        <SelectItem value="fast" className="text-xs">Fast (150ms)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
