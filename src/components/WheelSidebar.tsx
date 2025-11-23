@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WheelConfig } from "./WheelBuilder";
 import { Plus, Palette, LayoutList, Gift, Home, Mail, Award } from "lucide-react";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
+import { WheelBorderStyleSelector } from "@/components/ui/WheelBorderStyleSelector";
 
 interface WheelSidebarProps {
   config: WheelConfig;
@@ -26,6 +27,8 @@ export const WheelSidebar = ({
   onDeleteSegment,
 }: WheelSidebarProps) => {
   const { theme, updateTheme } = useTheme();
+  const borderColorInputRef = useRef<HTMLInputElement | null>(null);
+  const [isWheelSectionOpen, setIsWheelSectionOpen] = useState(false);
 
   const views = [
     { id: 'welcome' as const, label: 'Welcome', icon: Home },
@@ -197,6 +200,65 @@ export const WheelSidebar = ({
                   </div>
                 </div>
               </div>
+
+              {activeView === 'wheel' && (
+                <>
+                  <Separator />
+
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setIsWheelSectionOpen((prev) => !prev)}
+                      className="w-full flex items-center justify-between mb-1 px-1 py-1 rounded-md hover:bg-muted/60 transition-colors"
+                    >
+                      <span className="text-sm font-semibold">Wheel</span>
+                      <span className="text-xs text-muted-foreground">
+                        {isWheelSectionOpen ? 'Masquer' : 'Afficher'}
+                      </span>
+                    </button>
+
+                    {isWheelSectionOpen && (
+                      <div className="space-y-2 mt-1">
+                        <Label className="text-xs text-muted-foreground mb-1 block">Border style</Label>
+                        <WheelBorderStyleSelector
+                          value={theme.wheelBorderStyle}
+                          onChange={(value) => {
+                            updateTheme({ wheelBorderStyle: value });
+                            if (value === 'classic') {
+                              // Ouvrir automatiquement le color picker natif
+                              setTimeout(() => {
+                                if (borderColorInputRef.current) {
+                                  borderColorInputRef.current.click();
+                                }
+                              }, 0);
+                            }
+                          }}
+                        />
+                        {theme.wheelBorderStyle === 'classic' && (
+                          <div className="mt-2 space-y-1">
+                            <Label className="text-xs text-muted-foreground mb-1 block">Border color</Label>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                ref={borderColorInputRef}
+                                type="color"
+                                value={theme.wheelBorderCustomColor || '#d4d4d8'}
+                                onChange={(e) => updateTheme({ wheelBorderCustomColor: e.target.value })}
+                                className="h-7 w-10 p-0"
+                              />
+                              <Input
+                                type="text"
+                                value={theme.wheelBorderCustomColor || '#d4d4d8'}
+                                onChange={(e) => updateTheme({ wheelBorderCustomColor: e.target.value })}
+                                className="h-7 text-[11px] flex-1 font-mono"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           </ScrollArea>
         </TabsContent>

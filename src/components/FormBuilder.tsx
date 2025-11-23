@@ -9,7 +9,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export interface Question {
   id: string;

@@ -20,6 +20,9 @@ export interface ThemeSettings {
   borderColor: string;
   borderWidth: number;
   borderRadius: number;
+  // Wheel
+  wheelBorderStyle: 'classic' | 'gold' | 'silver' | 'neonBlue' | 'neonPink' | 'rainbow' | 'royalRoulette';
+  wheelBorderCustomColor?: string;
   
   // Spacing
   questionSpacing: number;
@@ -44,6 +47,8 @@ const defaultTheme: ThemeSettings = {
   borderColor: '#4A4138',
   borderWidth: 1,
   borderRadius: 8,
+  wheelBorderStyle: 'classic',
+   wheelBorderCustomColor: '#d4d4d8',
   questionSpacing: 1,
   inputPadding: 12,
   pageMargins: 32,

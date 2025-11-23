@@ -5,6 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Monitor, Smartphone } from "lucide-react";
 import { useState, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import SmartWheel from "./SmartWheel/SmartWheel";
+import { LayoutWrapper } from "./layouts/LayoutWrapper";
+import { WelcomeLayouts } from "./layouts/WelcomeLayouts";
+import { ContactLayouts } from "./layouts/ContactLayouts";
+import { WheelLayouts } from "./layouts/WheelLayouts";
+import { EndingLayouts } from "./layouts/EndingLayouts";
 
 interface WheelPreviewProps {
   config: WheelConfig;
@@ -31,6 +37,22 @@ export const WheelPreview = ({
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const { theme } = useTheme();
 
+  const getCurrentLayout = () => {
+    const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
+    switch (activeView) {
+      case 'welcome':
+        return config.welcomeScreen[layoutKey];
+      case 'contact':
+        return config.contactForm[layoutKey];
+      case 'wheel':
+        return config.wheelScreen[layoutKey];
+      case 'ending':
+        return config.endingScreen[layoutKey];
+      default:
+        return viewMode === 'desktop' ? 'desktop-centered' : 'mobile-vertical';
+    }
+  };
+
   const handleSpin = () => {
     setIsSpinning(true);
     
@@ -55,62 +77,32 @@ export const WheelPreview = ({
   };
 
   const renderContent = () => {
+    const currentLayout = getCurrentLayout();
+
     switch (activeView) {
       case 'welcome':
         return (
-          <div className="flex w-full h-full items-center justify-center p-8">
-            <div className="text-center max-w-md">
-              {editingField === 'welcome-title' ? (
-                <input
-                  autoFocus
-                  className="text-4xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center"
-                  style={{ color: theme.textColor }}
-                  value={config.welcomeScreen.title}
-                  onChange={(e) => onUpdateConfig({ 
-                    welcomeScreen: { ...config.welcomeScreen, title: e.target.value } 
-                  })}
-                  onBlur={() => setEditingField(null)}
-                />
-              ) : (
-                <h1 
-                  className="text-4xl font-bold mb-4 cursor-pointer hover:opacity-80"
-                  style={{ color: theme.textColor }}
-                  onClick={() => setEditingField('welcome-title')}
-                >
-                  {config.welcomeScreen.title}
-                </h1>
-              )}
-              
-              {editingField === 'welcome-subtitle' ? (
-                <input
-                  autoFocus
-                  className="text-lg mb-8 w-full bg-transparent border-b border-primary outline-none text-center"
-                  style={{ color: theme.textColor }}
-                  value={config.welcomeScreen.subtitle}
-                  onChange={(e) => onUpdateConfig({ 
-                    welcomeScreen: { ...config.welcomeScreen, subtitle: e.target.value } 
-                  })}
-                  onBlur={() => setEditingField(null)}
-                />
-              ) : (
-                <p 
-                  className="text-lg mb-8 cursor-pointer hover:opacity-80"
-                  style={{ color: theme.textColor }}
-                  onClick={() => setEditingField('welcome-subtitle')}
-                >
-                  {config.welcomeScreen.subtitle}
-                </p>
-              )}
-              
-              <Button 
-                onClick={onNext}
-                style={{ backgroundColor: theme.buttonColor, color: theme.textColor }}
-                className="text-lg px-8 py-6"
-              >
-                {config.welcomeScreen.buttonText}
-              </Button>
-            </div>
-          </div>
+          <WelcomeLayouts
+            layout={currentLayout}
+            viewMode={viewMode}
+            title={config.welcomeScreen.title}
+            subtitle={config.welcomeScreen.subtitle}
+            buttonText={config.welcomeScreen.buttonText}
+            onButtonClick={onNext}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+            editingField={editingField}
+            onEditTitle={() => setEditingField('welcome-title')}
+            onEditSubtitle={() => setEditingField('welcome-subtitle')}
+            onTitleChange={(value) => onUpdateConfig({ 
+              welcomeScreen: { ...config.welcomeScreen, title: value } 
+            })}
+            onSubtitleChange={(value) => onUpdateConfig({ 
+              welcomeScreen: { ...config.welcomeScreen, subtitle: value } 
+            })}
+            onBlur={() => setEditingField(null)}
+          />
         );
 
       case 'contact':
@@ -119,117 +111,58 @@ export const WheelPreview = ({
           return null;
         }
         return (
-          <div className="flex w-full h-full items-center justify-center p-8">
-            <div className="w-full max-w-md">
-              <h2 className="text-3xl font-bold mb-2 text-center" style={{ color: theme.textColor }}>
-                {config.contactForm.title}
-              </h2>
-              <p className="text-center mb-6" style={{ color: theme.textColor, opacity: 0.8 }}>
-                {config.contactForm.subtitle}
-              </p>
-              
-              <div className="space-y-4">
-                {config.contactForm.fields.map(field => (
-                  <div key={field.type}>
-                    <Input
-                      type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-                      placeholder={field.label}
-                      value={contactData[field.type]}
-                      onChange={(e) => setContactData(prev => ({ ...prev, [field.type]: e.target.value }))}
-                      required={field.required}
-                      className="h-12"
-                    />
-                  </div>
-                ))}
-                
-                <Button 
-                  onClick={onNext}
-                  className="w-full h-12 text-lg"
-                  style={{ backgroundColor: theme.buttonColor, color: theme.textColor }}
-                >
-                  Continuer
-                </Button>
-              </div>
-            </div>
-          </div>
+          <ContactLayouts
+            layout={currentLayout}
+            viewMode={viewMode}
+            title={config.contactForm.title}
+            subtitle={config.contactForm.subtitle}
+            fields={config.contactForm.fields}
+            contactData={contactData}
+            onFieldChange={(type, value) => setContactData(prev => ({ ...prev, [type]: value }))}
+            onSubmit={onNext}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+          />
         );
 
       case 'wheel':
         return (
-          <div className="flex w-full h-full items-center justify-center p-8">
-            <div className="flex flex-col items-center gap-8">
-              <div className="relative">
-                <svg width="400" height="400" viewBox="0 0 400 400" className={isSpinning ? "animate-spin" : ""}>
-                  {config.segments.map((segment, index) => {
-                    const angle = (360 / config.segments.length) * index;
-                    const nextAngle = (360 / config.segments.length) * (index + 1);
-                    const startAngle = (angle - 90) * Math.PI / 180;
-                    const endAngle = (nextAngle - 90) * Math.PI / 180;
-                    
-                    const x1 = 200 + 180 * Math.cos(startAngle);
-                    const y1 = 200 + 180 * Math.sin(startAngle);
-                    const x2 = 200 + 180 * Math.cos(endAngle);
-                    const y2 = 200 + 180 * Math.sin(endAngle);
-                    
-                    const largeArc = (nextAngle - angle) > 180 ? 1 : 0;
-                    
-                    return (
-                      <g key={segment.id}>
-                        <path
-                          d={`M 200 200 L ${x1} ${y1} A 180 180 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                          fill={segment.color}
-                          stroke="white"
-                          strokeWidth="2"
-                        />
-                        <text
-                          x={200 + 120 * Math.cos((angle + nextAngle) / 2 * Math.PI / 180 - Math.PI / 2)}
-                          y={200 + 120 * Math.sin((angle + nextAngle) / 2 * Math.PI / 180 - Math.PI / 2)}
-                          fill="white"
-                          fontSize="14"
-                          fontWeight="bold"
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                        >
-                          {segment.label}
-                        </text>
-                      </g>
-                    );
-                  })}
-                  <circle cx="200" cy="200" r="30" fill="white" stroke={theme.buttonColor} strokeWidth="4" />
-                </svg>
-                
-                {/* Indicator arrow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2">
-                  <div className="w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[30px]" 
-                    style={{ borderTopColor: theme.buttonColor }}
-                  />
-                </div>
-              </div>
-              
-              <Button
-                onClick={handleSpin}
-                disabled={isSpinning}
-                className="text-lg px-12 py-6"
-                style={{ backgroundColor: theme.buttonColor, color: theme.textColor }}
-              >
-                {isSpinning ? 'Rotation...' : 'TOURNER'}
-              </Button>
-            </div>
-          </div>
+          <WheelLayouts
+            layout={currentLayout}
+            viewMode={viewMode}
+            segments={config.segments}
+            isSpinning={isSpinning}
+            onSpin={() => setIsSpinning(true)}
+            onResult={(segment) => console.log('Segment gagné:', segment)}
+            onComplete={(prize) => {
+              setIsSpinning(false);
+              setWonPrize(prize);
+              setTimeout(() => onNext(), 1000);
+            }}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+          />
         );
 
       case 'ending':
         return (
-          <div className="flex w-full h-full items-center justify-center p-8">
-            <div className="text-center max-w-md">
-              <h1 className="text-4xl font-bold mb-4" style={{ color: theme.textColor }}>
-                {config.endingScreen.title}
-              </h1>
-              <p className="text-xl" style={{ color: theme.textColor }}>
-                {config.endingScreen.subtitle.replace('{{prize}}', wonPrize || '')}
-              </p>
-            </div>
-          </div>
+          <EndingLayouts
+            layout={currentLayout}
+            viewMode={viewMode}
+            title={config.endingScreen.title}
+            subtitle={config.endingScreen.subtitle}
+            wonPrize={wonPrize}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+            onRestart={() => {
+              // Reset state - navigation handled by parent
+              setWonPrize(null);
+              setContactData({ name: '', email: '', phone: '' });
+            }}
+          />
         );
     }
   };
@@ -277,7 +210,13 @@ export const WheelPreview = ({
             transition={{ duration: 0.3 }}
             className="w-full h-full"
           >
-            {renderContent()}
+            <LayoutWrapper
+              layout={getCurrentLayout()}
+              viewMode={viewMode}
+              backgroundColor={theme.backgroundColor}
+            >
+              {renderContent()}
+            </LayoutWrapper>
           </motion.div>
         </AnimatePresence>
       </div>

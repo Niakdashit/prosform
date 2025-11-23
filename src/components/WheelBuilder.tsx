@@ -8,6 +8,7 @@ import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 
 export interface WheelSegment {
   id: string;
@@ -28,19 +29,27 @@ export interface WheelConfig {
     title: string;
     subtitle: string;
     buttonText: string;
-    mobileLayout?: string;
-    desktopLayout?: string;
+    mobileLayout: MobileLayoutType;
+    desktopLayout: DesktopLayoutType;
   };
   contactForm: {
     enabled: boolean;
     title: string;
     subtitle: string;
     fields: ContactField[];
+    mobileLayout: MobileLayoutType;
+    desktopLayout: DesktopLayoutType;
+  };
+  wheelScreen: {
+    mobileLayout: MobileLayoutType;
+    desktopLayout: DesktopLayoutType;
   };
   segments: WheelSegment[];
   endingScreen: {
     title: string;
     subtitle: string;
+    mobileLayout: MobileLayoutType;
+    desktopLayout: DesktopLayoutType;
   };
 }
 
@@ -60,7 +69,13 @@ const defaultWheelConfig: WheelConfig = {
       { type: 'name', required: true, label: 'Nom complet' },
       { type: 'email', required: true, label: 'Email' },
       { type: 'phone', required: false, label: 'Téléphone' }
-    ]
+    ],
+    mobileLayout: "mobile-vertical",
+    desktopLayout: "desktop-centered"
+  },
+  wheelScreen: {
+    mobileLayout: "mobile-vertical",
+    desktopLayout: "desktop-centered"
   },
   segments: [
     { id: '1', label: '10% de réduction', color: '#FF6B6B', probability: 20 },
@@ -72,7 +87,9 @@ const defaultWheelConfig: WheelConfig = {
   ],
   endingScreen: {
     title: "Félicitations !",
-    subtitle: "Vous avez gagné {{prize}}"
+    subtitle: "Vous avez gagné {{prize}}",
+    mobileLayout: "mobile-vertical",
+    desktopLayout: "desktop-centered"
   }
 };
 

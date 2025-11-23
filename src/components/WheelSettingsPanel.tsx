@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { LayoutSelector } from "./LayoutSelector";
+import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 
 interface WheelSettingsPanelProps {
   config: WheelConfig;
@@ -24,7 +26,23 @@ export const WheelSettingsPanel = ({
     switch (activeView) {
       case 'welcome':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <div>
+              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+              <LayoutSelector
+                desktopLayout={config.welcomeScreen.desktopLayout}
+                mobileLayout={config.welcomeScreen.mobileLayout}
+                onDesktopLayoutChange={(layout) => onUpdateConfig({
+                  welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
+                })}
+                onMobileLayoutChange={(layout) => onUpdateConfig({
+                  welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
+                })}
+              />
+            </div>
+            
+            <Separator />
+            
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
               <Input 
@@ -41,7 +59,23 @@ export const WheelSettingsPanel = ({
 
       case 'contact':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <div>
+              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+              <LayoutSelector
+                desktopLayout={config.contactForm.desktopLayout}
+                mobileLayout={config.contactForm.mobileLayout}
+                onDesktopLayoutChange={(layout) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, desktopLayout: layout }
+                })}
+                onMobileLayoutChange={(layout) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, mobileLayout: layout }
+                })}
+              />
+            </div>
+            
+            <Separator />
+            
             <div className="flex items-center justify-between">
               <Label className="text-xs font-normal">Enable contact form</Label>
               <Switch 
@@ -108,7 +142,23 @@ export const WheelSettingsPanel = ({
 
       case 'wheel':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <div>
+              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+              <LayoutSelector
+                desktopLayout={config.wheelScreen.desktopLayout}
+                mobileLayout={config.wheelScreen.mobileLayout}
+                onDesktopLayoutChange={(layout) => onUpdateConfig({
+                  wheelScreen: { ...config.wheelScreen, desktopLayout: layout }
+                })}
+                onMobileLayoutChange={(layout) => onUpdateConfig({
+                  wheelScreen: { ...config.wheelScreen, mobileLayout: layout }
+                })}
+              />
+            </div>
+            
+            <Separator />
+            
             <Label className="text-xs text-muted-foreground">Segments configuration</Label>
             {config.segments.map((segment) => (
               <div key={segment.id} className="p-3 border rounded-lg space-y-2">
@@ -160,7 +210,23 @@ export const WheelSettingsPanel = ({
 
       case 'ending':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <div>
+              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+              <LayoutSelector
+                desktopLayout={config.endingScreen.desktopLayout}
+                mobileLayout={config.endingScreen.mobileLayout}
+                onDesktopLayoutChange={(layout) => onUpdateConfig({
+                  endingScreen: { ...config.endingScreen, desktopLayout: layout }
+                })}
+                onMobileLayoutChange={(layout) => onUpdateConfig({
+                  endingScreen: { ...config.endingScreen, mobileLayout: layout }
+                })}
+              />
+            </div>
+            
+            <Separator />
+            
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Title</Label>
               <Input 
