@@ -23,14 +23,14 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
   return (
     <div className="flex-1 flex items-center justify-center bg-brown-dark relative overflow-hidden">
       {/* Logo */}
-      <div className="absolute top-8 left-8">
-        <div className="flex gap-1">
-          <div className="w-3 h-3 rounded-full bg-primary rotate-45" />
-          <div className="w-3 h-3 rounded-full bg-primary rotate-45" />
+      <div className="absolute top-6 left-6">
+        <div className="flex gap-0.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
         </div>
-        <div className="flex gap-1 mt-1">
-          <div className="w-3 h-3 rounded-full bg-primary rotate-45" />
-          <div className="w-3 h-3 rounded-full bg-primary rotate-45" />
+        <div className="flex gap-0.5 mt-0.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+          <div className="w-2.5 h-2.5 rounded-full bg-primary" />
         </div>
       </div>
 
@@ -44,31 +44,31 @@ export const FormPreview = ({ question, onNext }: FormPreviewProps) => {
           className="w-full max-w-4xl mx-auto px-8"
         >
           {question.type === "welcome" ? (
-            <div className="grid grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-2 gap-16 items-center max-w-5xl">
               <div>
-                <h1 className="text-5xl font-bold text-primary mb-4 leading-tight" style={{ fontWeight: 700 }}>
+                <h1 className="text-[3.5rem] font-bold text-primary mb-5 leading-[1.1]" style={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
                   {question.title}
                 </h1>
-                <p className="text-lg text-cream/70 mb-8">
+                <p className="text-base text-cream/60 mb-8 leading-relaxed">
                   {question.subtitle}
                 </p>
                 <Button
                   onClick={onNext}
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-brown-dark font-semibold px-6 py-5 rounded-md h-auto"
+                  className="bg-primary hover:bg-primary/90 text-brown-dark font-semibold px-6 py-3 rounded-md h-auto text-base"
                 >
                   Give feedback
-                  <span className="ml-2 text-sm">press Enter ↵</span>
+                  <span className="ml-3 text-sm opacity-70">press Enter ↵</span>
                 </Button>
-                <div className="flex items-center gap-2 mt-4 text-cream/60 text-sm">
-                  <Clock className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2 mt-3 text-cream/50 text-xs">
+                  <Clock className="w-3 h-3" />
                   <span>Takes X minutes</span>
                 </div>
               </div>
               <div className="relative">
-                <div className="aspect-square bg-cream rounded-3xl overflow-hidden shadow-2xl">
+                <div className="aspect-[4/3] bg-cream rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]">
                   <img
-                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=600&h=600&fit=crop"
+                    src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=600&h=450&fit=crop"
                     alt="Feedback illustration"
                     className="w-full h-full object-cover"
                   />
