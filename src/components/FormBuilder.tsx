@@ -9,7 +9,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export interface Question {
   id: string;
@@ -41,7 +41,7 @@ export interface Question {
   blockSpacing?: number;
 }
 
-export const defaultQuestions: Question[] = [
+const defaultQuestions: Question[] = [
   {
     id: "welcome",
     type: "welcome",
@@ -169,7 +169,7 @@ export const defaultQuestions: Question[] = [
   }
 ];
 
-const FormBuilderContent = () => {
+export const FormBuilder = () => {
   const isMobile = useIsMobile();
   const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
@@ -179,7 +179,6 @@ const FormBuilderContent = () => {
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [isFullPreview, setIsFullPreview] = useState(false);
   const [previewQuestionIndex, setPreviewQuestionIndex] = useState(0);
-  const { theme } = useTheme();
 
   // Force mobile view mode on mobile devices
   useEffect(() => {
@@ -187,23 +186,6 @@ const FormBuilderContent = () => {
       setViewMode('mobile');
     }
   }, [isMobile]);
-
-  // Sync form data to localStorage for preview window
-  useEffect(() => {
-    const formData = {
-      questions,
-      currentQuestionIndex: previewQuestionIndex,
-      viewMode,
-      theme,
-      layout: viewMode,
-      isMobileResponsive: true,
-    };
-    
-    localStorage.setItem('formPreviewData', JSON.stringify(formData));
-    
-    // Dispatch custom event for same-tab updates
-    window.dispatchEvent(new CustomEvent('formPreviewUpdate', { detail: formData }));
-  }, [questions, previewQuestionIndex, viewMode, theme]);
 
   const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
@@ -331,157 +313,157 @@ const FormBuilderContent = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-muted overflow-hidden">
-      {!isFullPreview && (
-        <TopToolbar 
-          onAddContent={() => setIsAddContentModalOpen(true)}
-        />
-      )}
-      
-      {isFullPreview ? (
-        <div className="fixed inset-0 flex items-center justify-center bg-transparent z-40">
-          <button
-            onClick={() => setIsFullPreview(false)}
-            className="absolute top-4 left-4 z-50 px-4 py-2 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
-            style={{
-              backgroundColor: '#4A4138',
-              border: '1px solid rgba(245, 184, 0, 0.3)',
-              color: '#F5CA3C'
-            }}
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span className="text-xs font-medium">Exit Preview</span>
-          </button>
-          
-          <FormPreview
-            question={questions[previewQuestionIndex]}
-            onUpdateQuestion={updateQuestion}
-            viewMode={viewMode}
-            onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-            isMobileResponsive={true}
-            allQuestions={questions}
-            onNext={() => {
-              if (previewQuestionIndex < questions.length - 1) {
-                setPreviewQuestionIndex(prev => prev + 1);
-              }
-            }}
-          />
-        </div>
-      ) : (
-        <div className="flex flex-1 overflow-hidden relative">
-      {isMobile ? (
-        <>
-          {/* Mobile: Drawers with trigger buttons */}
-          <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
-            <DrawerContent className="h-[85vh]">
-              <QuestionSidebar
-                questions={questions}
-                activeQuestionId={activeQuestionId}
-                onQuestionSelect={(id) => {
-                  setActiveQuestionId(id);
-                  setLeftDrawerOpen(false);
-                }}
-                onReorderQuestions={reorderQuestions}
-                onDuplicateQuestion={duplicateQuestion}
-                onDeleteQuestion={deleteQuestion}
-              />
-            </DrawerContent>
-          </Drawer>
-
-          <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
-            <DrawerContent className="h-[85vh]">
-              <SettingsPanel 
-                question={activeQuestion} 
-                onUpdateQuestion={updateQuestion}
-                onViewModeChange={setViewMode}
-              />
-            </DrawerContent>
-          </Drawer>
-
-          {/* Left drawer trigger button */}
-          <Button
-            onClick={() => setLeftDrawerOpen(true)}
-            className="fixed left-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
-            variant="default"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
-
-          {/* Right drawer trigger button */}
-          <Button
-            onClick={() => setRightDrawerOpen(true)}
-            className="fixed right-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
-            variant="default"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-
-          {/* Full screen preview */}
-          <FormPreview
-            question={activeQuestion}
-            onUpdateQuestion={updateQuestion}
-            viewMode="mobile"
-            onToggleViewMode={() => {}} // No toggle on mobile
-            isMobileResponsive={true}
-            allQuestions={questions}
-            onNext={() => {
-              const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
-              if (currentIndex < questions.length - 1) {
-                setActiveQuestionId(questions[currentIndex + 1].id);
-              }
-            }}
-          />
-        </>
-      ) : (
-        <>
-          {/* Desktop: Side panels */}
-          <QuestionSidebar
-            questions={questions}
-            activeQuestionId={activeQuestionId}
-            onQuestionSelect={setActiveQuestionId}
-            onReorderQuestions={reorderQuestions}
-            onDuplicateQuestion={duplicateQuestion}
-            onDeleteQuestion={deleteQuestion}
-          />
-          
-          <FormPreview
-            question={activeQuestion}
-            onUpdateQuestion={updateQuestion}
-            viewMode={viewMode}
-            onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-            isMobileResponsive={false}
-            allQuestions={questions}
-            onNext={() => {
-              const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
-              if (currentIndex < questions.length - 1) {
-                setActiveQuestionId(questions[currentIndex + 1].id);
-              }
-            }}
-          />
-          
-          <SettingsPanel 
-            question={activeQuestion} 
-            onUpdateQuestion={updateQuestion}
-            onViewModeChange={setViewMode}
-          />
-        </>
-      )}
-        </div>
-      )}
-
-      <AddContentModal
-      isOpen={isAddContentModalOpen}
-      onClose={() => setIsAddContentModalOpen(false)}
-      onSelectElement={handleAddElement}
-    />
-  </div>
-  );
-};
-
-export const FormBuilder = () => {
-  return (
     <ThemeProvider>
-      <FormBuilderContent />
+      <div className="flex flex-col h-screen bg-muted overflow-hidden">
+        {!isFullPreview && (
+          <TopToolbar 
+            onAddContent={() => setIsAddContentModalOpen(true)}
+            onPreview={() => {
+              setIsFullPreview(true);
+              setPreviewQuestionIndex(0);
+              // Set viewMode based on device: desktop shows desktop, mobile shows mobile
+              setViewMode(isMobile ? 'mobile' : 'desktop');
+            }}
+          />
+        )}
+        
+        {isFullPreview ? (
+          <div className="fixed inset-0 flex items-center justify-center bg-transparent z-40">
+            <button
+              onClick={() => setIsFullPreview(false)}
+              className="absolute top-4 left-4 z-50 px-4 py-2 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
+              style={{
+                backgroundColor: '#4A4138',
+                border: '1px solid rgba(245, 184, 0, 0.3)',
+                color: '#F5CA3C'
+              }}
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-xs font-medium">Exit Preview</span>
+            </button>
+            
+            <FormPreview
+              question={questions[previewQuestionIndex]}
+              onUpdateQuestion={updateQuestion}
+              viewMode={viewMode}
+              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+              isMobileResponsive={true}
+              allQuestions={questions}
+              onNext={() => {
+                if (previewQuestionIndex < questions.length - 1) {
+                  setPreviewQuestionIndex(prev => prev + 1);
+                }
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-1 overflow-hidden relative">
+        {isMobile ? (
+          <>
+            {/* Mobile: Drawers with trigger buttons */}
+            <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
+              <DrawerContent className="h-[85vh]">
+                <QuestionSidebar
+                  questions={questions}
+                  activeQuestionId={activeQuestionId}
+                  onQuestionSelect={(id) => {
+                    setActiveQuestionId(id);
+                    setLeftDrawerOpen(false);
+                  }}
+                  onReorderQuestions={reorderQuestions}
+                  onDuplicateQuestion={duplicateQuestion}
+                  onDeleteQuestion={deleteQuestion}
+                />
+              </DrawerContent>
+            </Drawer>
+
+            <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
+              <DrawerContent className="h-[85vh]">
+                <SettingsPanel 
+                  question={activeQuestion} 
+                  onUpdateQuestion={updateQuestion}
+                  onViewModeChange={setViewMode}
+                />
+              </DrawerContent>
+            </Drawer>
+
+            {/* Left drawer trigger button */}
+            <Button
+              onClick={() => setLeftDrawerOpen(true)}
+              className="fixed left-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
+              variant="default"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+
+            {/* Right drawer trigger button */}
+            <Button
+              onClick={() => setRightDrawerOpen(true)}
+              className="fixed right-2 top-1/2 -translate-y-1/2 z-50 h-12 w-10 p-0 shadow-lg"
+              variant="default"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+
+            {/* Full screen preview */}
+            <FormPreview
+              question={activeQuestion}
+              onUpdateQuestion={updateQuestion}
+              viewMode="mobile"
+              onToggleViewMode={() => {}} // No toggle on mobile
+              isMobileResponsive={true}
+              allQuestions={questions}
+              onNext={() => {
+                const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+                if (currentIndex < questions.length - 1) {
+                  setActiveQuestionId(questions[currentIndex + 1].id);
+                }
+              }}
+            />
+          </>
+        ) : (
+          <>
+            {/* Desktop: Side panels */}
+            <QuestionSidebar
+              questions={questions}
+              activeQuestionId={activeQuestionId}
+              onQuestionSelect={setActiveQuestionId}
+              onReorderQuestions={reorderQuestions}
+              onDuplicateQuestion={duplicateQuestion}
+              onDeleteQuestion={deleteQuestion}
+            />
+            
+            <FormPreview
+              question={activeQuestion}
+              onUpdateQuestion={updateQuestion}
+              viewMode={viewMode}
+              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+              isMobileResponsive={false}
+              allQuestions={questions}
+              onNext={() => {
+                const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+                if (currentIndex < questions.length - 1) {
+                  setActiveQuestionId(questions[currentIndex + 1].id);
+                }
+              }}
+            />
+            
+            <SettingsPanel 
+              question={activeQuestion} 
+              onUpdateQuestion={updateQuestion}
+              onViewModeChange={setViewMode}
+            />
+          </>
+        )}
+          </div>
+        )}
+
+        <AddContentModal
+        isOpen={isAddContentModalOpen}
+        onClose={() => setIsAddContentModalOpen(false)}
+        onSelectElement={handleAddElement}
+      />
+    </div>
     </ThemeProvider>
   );
 };

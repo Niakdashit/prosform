@@ -11,7 +11,7 @@ import {
 
 interface TopToolbarProps {
   onAddContent: () => void;
-  onPreview?: () => void;
+  onPreview: () => void;
 }
 
 export const TopToolbar = ({ onAddContent, onPreview }: TopToolbarProps) => {
@@ -37,12 +37,7 @@ export const TopToolbar = ({ onAddContent, onPreview }: TopToolbarProps) => {
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Smartphone className="w-3.5 h-3.5" />
         </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 w-8 p-0" 
-          onClick={() => window.open('/preview', '_blank')}
-        >
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onPreview}>
           <Eye className="w-3.5 h-3.5" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
