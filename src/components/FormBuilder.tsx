@@ -8,13 +8,24 @@ import { toast } from "sonner";
 
 export interface Question {
   id: string;
-  type: "welcome" | "text" | "rating" | "choice" | "ending";
+  type: "welcome" | "text" | "rating" | "choice" | "ending" | "email" | "phone" | "number" | "date" | "dropdown" | "yesno" | "file" | "statement" | "picture-choice";
   title: string;
   subtitle?: string;
   icon?: string;
   number?: number;
-  variant?: string; // Pour distinguer short-text, long-text, video, etc.
-  choices?: string[]; // Pour les questions à choix multiples
+  variant?: string;
+  choices?: string[];
+  required?: boolean;
+  maxLength?: number;
+  minValue?: number;
+  maxValue?: number;
+  step?: number;
+  dateFormat?: string;
+  fileTypes?: string[];
+  maxFileSize?: number;
+  multipleFiles?: boolean;
+  phoneFormat?: string;
+  placeholder?: string;
 }
 
 const defaultQuestions: Question[] = [
@@ -105,15 +116,20 @@ export const FormBuilder = () => {
       "short-text": { type: "text", variant: "short" },
       "long-text": { type: "text", variant: "long" },
       "multiple-choice": { type: "choice", variant: "multiple" },
-      "dropdown": { type: "choice", variant: "dropdown" },
-      "yes-no": { type: "choice", variant: "yesno" },
+      "dropdown": { type: "dropdown" },
+      "yes-no": { type: "yesno" },
       "rating": { type: "rating", variant: "stars" },
       "opinion-scale": { type: "rating", variant: "scale" },
       "ranking": { type: "rating", variant: "ranking" },
-      "number": { type: "text", variant: "number" },
-      "date": { type: "text", variant: "date" },
+      "number": { type: "number" },
+      "date": { type: "date" },
       "checkbox": { type: "choice", variant: "checkbox" },
       "video": { type: "text", variant: "video" },
+      "email": { type: "email" },
+      "phone": { type: "phone" },
+      "file-upload": { type: "file" },
+      "statement": { type: "statement" },
+      "picture-choice": { type: "picture-choice" },
     };
 
     const mapping = typeMap[elementType] || { type: "text", variant: "short" };
