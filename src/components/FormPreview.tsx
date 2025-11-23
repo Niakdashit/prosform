@@ -171,7 +171,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center relative overflow-hidden" style={{ backgroundColor: theme.backgroundColor }}>
+    <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
       {/* Toggle button - hidden on mobile responsive mode */}
       {!isMobileResponsive && (
         <button
