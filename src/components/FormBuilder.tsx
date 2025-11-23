@@ -412,7 +412,6 @@ export const FormBuilder = () => {
               viewMode="mobile"
               onToggleViewMode={() => {}} // No toggle on mobile
               isMobileResponsive={true}
-              isPreviewOnly={true}
               allQuestions={questions}
               onNext={() => {
                 const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
