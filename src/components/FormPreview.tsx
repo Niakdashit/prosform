@@ -36,11 +36,33 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
   const [editingChoiceIndex, setEditingChoiceIndex] = useState<number | null>(null);
   const [selectedCountry, setSelectedCountry] = useState(question?.phoneCountry || 'US');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [formResponses, setFormResponses] = useState<Record<string, string>>({});
+
+  const replaceVariables = (text: string): string => {
+    if (!text) return text;
+    let result = text;
+    Object.entries(formResponses).forEach(([key, value]) => {
+      result = result.replace(new RegExp(`{{${key}}}`, 'g'), value || `[${key}]`);
+    });
+    return result;
+  };
 
   if (!question) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Store response for variable replacement
+    if (question && inputValue.trim()) {
+      const responseKey = question.title.toLowerCase().includes('name') ? 'first_name' : 
+                          question.title.toLowerCase().includes('email') ? 'email' :
+                          question.id;
+      setFormResponses(prev => ({
+        ...prev,
+        [responseKey]: inputValue.trim()
+      }));
+    }
+    
     onNext();
   };
 
@@ -603,7 +625,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                     onFocus={() => setEditingField('ending-title')}
                     onBlur={(e) => handleTitleBlur(e.currentTarget.textContent || '')}
                   >
-                    {question.title}
+                    {editingField === 'ending-title' ? question.title : replaceVariables(question.title)}
                   </h2>
                   {question.subtitle && (
                     <p 
@@ -620,7 +642,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                       onFocus={() => setEditingField('ending-subtitle')}
                       onBlur={(e) => handleSubtitleBlur(e.currentTarget.textContent || '')}
                     >
-                      {question.subtitle}
+                      {editingField === 'ending-subtitle' ? question.subtitle : replaceVariables(question.subtitle)}
                     </p>
                   )}
                   <Button
