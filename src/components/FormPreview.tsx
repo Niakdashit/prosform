@@ -171,7 +171,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
+    <div className={`flex-1 flex items-center justify-center relative overflow-hidden ${isMobileResponsive ? '' : 'bg-gray-100'}`}>
       {/* Toggle button - hidden on mobile responsive mode */}
       {!isMobileResponsive && (
         <button
@@ -201,8 +201,8 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
         className="relative overflow-hidden transition-all duration-300" 
         style={{ 
           backgroundColor: theme.backgroundColor, 
-          width: viewMode === 'desktop' ? '1100px' : '375px', 
-          height: viewMode === 'desktop' ? '620px' : '667px' 
+          width: isMobileResponsive ? '100vw' : (viewMode === 'desktop' ? '1100px' : '375px'),
+          height: isMobileResponsive ? '100vh' : (viewMode === 'desktop' ? '620px' : '667px')
         }}
       >
         {/* Logo */}
