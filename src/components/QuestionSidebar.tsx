@@ -542,25 +542,6 @@ export const QuestionSidebar = ({
                     </div>
                   </div>
                   
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Border radius</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="0"
-                        max="24"
-                        step="2"
-                        value={theme.borderRadius}
-                        onChange={(e) => updateTheme({ borderRadius: parseInt(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>Sharp</span>
-                        <span>{theme.borderRadius}px</span>
-                        <span>Round</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
