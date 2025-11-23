@@ -769,7 +769,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <div className="flex-1 flex items-center justify-center px-5 py-8">
+                        <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                           <div className="w-full max-w-[700px]">
                             <TextContent />
                           </div>
