@@ -1056,7 +1056,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                   </h2>
                   {question.subtitle && (
                     <p 
-                      className="text-xl mb-10 cursor-text hover:opacity-80 transition-opacity"
+                      className="text-xl mb-12 cursor-text hover:opacity-80 transition-opacity"
                       style={{ 
                         color: '#B8A892',
                         outline: editingField === 'statement-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
