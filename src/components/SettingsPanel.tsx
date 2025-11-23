@@ -631,82 +631,31 @@ export const SettingsPanel = ({ question, onUpdateQuestion }: SettingsPanelProps
 
   const renderRatingSettings = () => (
     <>
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
-          <Switch id="required-toggle" defaultChecked className="scale-90" />
-        </div>
+      <div className="flex items-center justify-between">
+        <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
+        <Switch id="required-toggle" defaultChecked className="scale-90" />
       </div>
 
-      {question.variant === 'scale' && (
-        <>
-          <Separator className="my-4" />
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1.5 block">From</Label>
-                <Input type="number" defaultValue="0" className="text-xs h-7" />
-              </div>
-              <span className="text-xs text-muted-foreground mt-5">to</span>
-              <div className="flex-1">
-                <Label className="text-xs text-muted-foreground mb-1.5 block">To</Label>
-                <Input type="number" defaultValue="10" className="text-xs h-7" />
-              </div>
-            </div>
+      <Separator className="my-4" />
 
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1.5 block">0 label</Label>
-              <Input 
-                type="text" 
-                placeholder="Not supported at all"
-                className="text-xs h-7"
-              />
-              <p className="text-[10px] text-muted-foreground mt-1">20/24</p>
-            </div>
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1.5 block">5 label</Label>
-              <Input 
-                type="text" 
-                placeholder="Neutral"
-                className="text-xs h-7"
-              />
-              <p className="text-[10px] text-muted-foreground mt-1">0/24</p>
-            </div>
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1.5 block">10 label</Label>
-              <Input 
-                type="text" 
-                placeholder="Very supported"
-                className="text-xs h-7"
-              />
-              <p className="text-[10px] text-muted-foreground mt-1">14/24</p>
-            </div>
-          </div>
-        </>
-      )}
-
-      {question.variant === 'stars' && (
-        <>
-          <Separator className="my-4" />
-          <div>
-            <Label className="text-xs text-muted-foreground mb-2 block">Number of stars</Label>
-            <Select defaultValue="7">
-              <SelectTrigger className="h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                  <SelectItem key={num} value={String(num)} className="text-xs">
-                    {num}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </>
-      )}
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Rating type</Label>
+        <div className="flex gap-2">
+          <Input type="number" defaultValue="5" className="text-xs h-8 w-16" />
+          <Select defaultValue="stars">
+            <SelectTrigger className="h-8 text-xs flex-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="stars" className="text-xs">⭐ Stars</SelectItem>
+              <SelectItem value="smileys" className="text-xs">😊 Smileys</SelectItem>
+              <SelectItem value="hearts" className="text-xs">❤️ Hearts</SelectItem>
+              <SelectItem value="thumbs" className="text-xs">👍 Thumbs</SelectItem>
+              <SelectItem value="numbers" className="text-xs">🔢 Numbers</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
       <Separator className="my-4" />
 
