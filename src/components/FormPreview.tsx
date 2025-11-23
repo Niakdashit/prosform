@@ -686,18 +686,15 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-card') {
-                      // Card: Texte à gauche, Image remplit tout l'espace droit
+                      // Card: Split 50/50 - Texte à gauche avec padding, Image à droite sans padding
                       return (
-                        <div className="w-full h-full flex items-center gap-0 pl-12">
-                          <div className="flex-1 pr-16">
-                            <TextContent />
+                        <div className="w-full h-full flex">
+                          <div className="w-1/2 flex items-center justify-center px-12">
+                            <div className="max-w-[500px]">
+                              <TextContent />
+                            </div>
                           </div>
-                          <div
-                            className="overflow-hidden h-full flex-1"
-                            style={{ 
-                              borderRadius: "36px 0 0 36px"
-                            }}
-                          >
+                          <div className="w-1/2 h-full">
                             <img
                               src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
                               alt="Feedback illustration"
@@ -707,23 +704,20 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                         </div>
                       );
                     } else if (desktopLayout === 'desktop-panel') {
-                      // Panel: Image remplit tout l'espace gauche, Texte à droite
+                      // Panel: Split 50/50 - Image à gauche sans padding, Texte à droite avec padding
                       return (
-                        <div className="w-full h-full flex items-center gap-0 pr-12">
-                          <div
-                            className="overflow-hidden h-full flex-1"
-                            style={{ 
-                              borderRadius: "0 36px 36px 0"
-                            }}
-                          >
+                        <div className="w-full h-full flex">
+                          <div className="w-1/2 h-full">
                             <img
                               src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
                               alt="Feedback illustration"
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div className="flex-1 pl-16">
-                            <TextContent />
+                          <div className="w-1/2 flex items-center justify-center px-12">
+                            <div className="max-w-[500px]">
+                              <TextContent />
+                            </div>
                           </div>
                         </div>
                       );
