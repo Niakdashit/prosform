@@ -58,8 +58,8 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState<ThemeSettings>(defaultTheme);
+export const ThemeProvider = ({ children, initialTheme }: { children: ReactNode; initialTheme?: ThemeSettings | null }) => {
+  const [theme, setTheme] = useState<ThemeSettings>(initialTheme || defaultTheme);
 
   const updateTheme = (updates: Partial<ThemeSettings>) => {
     setTheme(prev => ({ ...prev, ...updates }));

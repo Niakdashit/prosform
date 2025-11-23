@@ -9,7 +9,7 @@ import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 
 export interface Question {
   id: string;
@@ -171,6 +171,7 @@ const defaultQuestions: Question[] = [
 
 export const FormBuilder = () => {
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
   const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
   const [isAddContentModalOpen, setIsAddContentModalOpen] = useState(false);
@@ -311,20 +312,20 @@ export const FormBuilder = () => {
   };
 
   return (
-    <ThemeProvider>
-      <div className="flex flex-col h-screen bg-muted overflow-hidden">
-        <TopToolbar 
-          onAddContent={() => setIsAddContentModalOpen(true)}
-          onPreview={() => {
-            // Stocker les questions et le viewMode dans localStorage
-            const targetViewMode = isMobile ? 'mobile' : 'desktop';
-            localStorage.setItem('preview-questions', JSON.stringify(questions));
-            localStorage.setItem('preview-viewMode', targetViewMode);
-            
-            // Ouvrir dans un nouvel onglet
-            window.open('/preview', '_blank');
-          }}
-        />
+    <div className="flex flex-col h-screen bg-muted overflow-hidden">
+      <TopToolbar 
+        onAddContent={() => setIsAddContentModalOpen(true)}
+        onPreview={() => {
+          // Stocker les questions, le viewMode et le thème dans localStorage
+          const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          localStorage.setItem('preview-questions', JSON.stringify(questions));
+          localStorage.setItem('preview-viewMode', targetViewMode);
+          localStorage.setItem('preview-theme', JSON.stringify(theme));
+          
+          // Ouvrir dans un nouvel onglet
+          window.open('/preview', '_blank');
+        }}
+      />
         
         <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
@@ -432,6 +433,5 @@ export const FormBuilder = () => {
         onSelectElement={handleAddElement}
       />
     </div>
-    </ThemeProvider>
   );
 };
