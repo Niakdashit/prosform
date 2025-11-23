@@ -425,7 +425,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     if (desktopLayout === 'desktop-left-right') {
                       // Split: Ordre vertical - 1. Image, 2. Titre, 3. Reste
                       const alignment = question.splitAlignment || 'left';
-                      const alignmentClass = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
+                      const alignmentClass = 'items-start';  // Always left aligned like Typeform
                       
                       return (
                         <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide`}>
@@ -443,7 +443,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          <div className="max-w-[600px]" style={{ textAlign: alignment }}>
+                          <div className="max-w-[700px]">
                             <div className="relative">
                               {editingField === 'welcome-title' && (
                                 <>
@@ -742,7 +742,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                   // Mobile layouts
                   if (mobileLayout === 'mobile-vertical') {
                     return (
-                      <div className="flex flex-col gap-6 items-center py-6 px-5 w-full">
+                      <div className="flex flex-col gap-6 py-6 px-5 w-full">
                         <ImageBlock />
                         <TextContent />
                       </div>
@@ -758,7 +758,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                     );
                   } else if (mobileLayout === 'mobile-centered') {
                     return (
-                      <div className="flex flex-col gap-6 items-center justify-center py-6 px-5 w-full text-center">
+                      <div className="flex flex-col gap-6 justify-center py-6 px-5 w-full">
                         <ImageBlock />
                         <TextContent centered />
                       </div>
