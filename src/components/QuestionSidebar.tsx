@@ -7,6 +7,7 @@ interface QuestionSidebarProps {
   questions: Question[];
   activeQuestionId: string;
   onQuestionSelect: (id: string) => void;
+  onReorderQuestions: (startIndex: number, endIndex: number) => void;
 }
 
 const iconMap: Record<string, any> = {
@@ -26,7 +27,25 @@ export const QuestionSidebar = ({
   questions,
   activeQuestionId,
   onQuestionSelect,
+  onReorderQuestions,
 }: QuestionSidebarProps) => {
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/html'));
+    if (dragIndex !== dropIndex) {
+      onReorderQuestions(dragIndex, dropIndex);
+    }
+  };
   return (
     <div className="w-[280px] bg-background border-r border-border flex flex-col">
       {/* Header avec breadcrumb */}
@@ -63,7 +82,7 @@ export const QuestionSidebar = ({
           </div>
 
           {/* Questions (sauf endings) */}
-          {questions.filter(q => q.type !== "ending").map((question) => {
+          {questions.filter(q => q.type !== "ending").map((question, index) => {
             const Icon = iconMap[question.icon || "alignLeft"];
             const isActive = question.id === activeQuestionId;
             
@@ -82,8 +101,12 @@ export const QuestionSidebar = ({
               <button
                 key={question.id}
                 onClick={() => onQuestionSelect(question.id)}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
                 className={cn(
-                  "w-full px-2 py-2.5 rounded-lg mb-1 flex items-start gap-3 transition-colors",
+                  "w-full px-2 py-2.5 rounded-lg mb-1 flex items-start gap-3 transition-colors cursor-move",
                   "hover:bg-muted/50",
                   isActive && "bg-muted"
                 )}
@@ -117,15 +140,20 @@ export const QuestionSidebar = ({
             </div>
             
             {/* Endings list */}
-            {questions.filter(q => q.type === "ending").map((question) => {
+            {questions.filter(q => q.type === "ending").map((question, endingIndex) => {
               const isActive = question.id === activeQuestionId;
+              const fullIndex = questions.findIndex(q => q.id === question.id);
               
               return (
                 <button
                   key={question.id}
                   onClick={() => onQuestionSelect(question.id)}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, fullIndex)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, fullIndex)}
                   className={cn(
-                    "w-full px-2 py-2.5 rounded-lg mb-1 flex items-start gap-3 transition-colors",
+                    "w-full px-2 py-2.5 rounded-lg mb-1 flex items-start gap-3 transition-colors cursor-move",
                     "hover:bg-muted/50",
                     isActive && "bg-muted"
                   )}

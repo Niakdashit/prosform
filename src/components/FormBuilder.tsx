@@ -171,6 +171,24 @@ export const FormBuilder = () => {
     ));
   };
 
+  const reorderQuestions = (startIndex: number, endIndex: number) => {
+    setQuestions(prev => {
+      const result = Array.from(prev);
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      
+      // Update question numbers for non-welcome/ending questions
+      return result.map((q, index) => {
+        if (q.type !== "welcome" && q.type !== "ending") {
+          const regularQuestions = result.filter(r => r.type !== "welcome" && r.type !== "ending");
+          const newNumber = regularQuestions.indexOf(q) + 1;
+          return { ...q, number: newNumber };
+        }
+        return q;
+      });
+    });
+  };
+
   const handleAddElement = (elementType: string) => {
     // Map element types to question types and variants
     const typeMap: { [key: string]: { type: Question["type"], variant?: string } } = {
@@ -217,6 +235,7 @@ export const FormBuilder = () => {
           questions={questions}
           activeQuestionId={activeQuestionId}
           onQuestionSelect={setActiveQuestionId}
+          onReorderQuestions={reorderQuestions}
         />
         
         <FormPreview
