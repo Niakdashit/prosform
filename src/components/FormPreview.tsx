@@ -419,7 +419,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion, viewMode, onTo
                       const alignmentClass = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
                       
                       return (
-                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 px-12 py-12 overflow-y-auto`}>
+                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 px-12 py-12 overflow-y-auto scrollbar-hide`}>
                           <div
                             className="overflow-hidden flex-shrink-0"
                             style={{ 
