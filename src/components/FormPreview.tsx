@@ -143,6 +143,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         <>
                           <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); }}
                             className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
                             style={{ 
@@ -169,6 +170,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                                 {availableVariables.map((variable) => (
                                   <button
                                     key={variable.key}
+                                    onMouseDown={(e) => e.preventDefault()}
                                     onClick={() => insertVariable(variable.key)}
                                     className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
                                   >
@@ -212,6 +214,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         <>
                           <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); }}
                             className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
                             style={{ 
@@ -238,6 +241,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                                 {availableVariables.map((variable) => (
                                   <button
                                     key={variable.key}
+                                    onMouseDown={(e) => e.preventDefault()}
                                     onClick={() => insertVariable(variable.key)}
                                     className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
                                   >
@@ -323,6 +327,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                         <>
                           <button
                             type="button"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); }}
                             className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
                             style={{ 
@@ -349,6 +354,7 @@ export const FormPreview = ({ question, onNext, onUpdateQuestion }: FormPreviewP
                                 {availableVariables.map((variable) => (
                                   <button
                                     key={variable.key}
+                                    onMouseDown={(e) => e.preventDefault()}
                                     onClick={() => insertVariable(variable.key)}
                                     className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
                                   >
