@@ -32,7 +32,9 @@ export interface Question {
   ratingType?: string;
   mobileLayout?: string;
   desktopLayout?: string;
+  image?: string;
 }
+
 
 const defaultQuestions: Question[] = [
   {
