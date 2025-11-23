@@ -70,18 +70,18 @@ export const QuestionSidebar = ({
   return (
     <div className="w-[280px] bg-background border-r border-border flex flex-col">
       <Tabs defaultValue="questions" className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-3 m-3 mb-0">
-          <TabsTrigger value="questions" className="text-xs gap-1">
-            <LayoutList className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Questions</span>
+        <TabsList className="grid w-full grid-cols-3 mx-3 mt-3 mb-0">
+          <TabsTrigger value="questions" className="text-[11px] gap-1 px-2">
+            <LayoutList className="w-3 h-3" />
+            <span>Questions</span>
           </TabsTrigger>
-          <TabsTrigger value="logic" className="text-xs gap-1">
-            <GitBranch className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Logiques</span>
+          <TabsTrigger value="logic" className="text-[11px] gap-1 px-2">
+            <GitBranch className="w-3 h-3" />
+            <span>Logiques</span>
           </TabsTrigger>
-          <TabsTrigger value="style" className="text-xs gap-1">
-            <Palette className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Style</span>
+          <TabsTrigger value="style" className="text-[11px] gap-1 px-2">
+            <Palette className="w-3 h-3" />
+            <span>Style</span>
           </TabsTrigger>
         </TabsList>
 
