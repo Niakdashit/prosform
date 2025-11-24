@@ -85,12 +85,12 @@ export const WheelLayouts = ({
   );
 
   const renderInfo = () => (
-    <div className="flex flex-col items-center justify-center p-8 space-y-6">
+    <div className="flex flex-col items-center justify-center p-12 space-y-6">
       <div className="text-center max-w-md">
-        <h2 className="text-3xl font-bold mb-4" style={{ color: textColor }}>
+        <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: textColor }}>
           Tournez la roue !
         </h2>
-        <p className="text-lg opacity-80" style={{ color: textColor }}>
+        <p className="text-lg md:text-xl opacity-80" style={{ color: textColor }}>
           Tentez votre chance et découvrez ce que vous avez gagné
         </p>
       </div>
@@ -140,11 +140,11 @@ export const WheelLayouts = ({
       case 'desktop-card':
         return (
           <div 
-            className="max-w-3xl w-full rounded-3xl shadow-2xl p-12"
+            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12"
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
           >
             <div className="flex flex-col items-center space-y-8">
-              <h2 className="text-3xl font-bold" style={{ color: textColor }}>
+              <h2 className="text-4xl md:text-5xl font-bold" style={{ color: textColor }}>
                 Tournez la roue !
               </h2>
               {renderWheel()}
@@ -177,10 +177,12 @@ export const WheelLayouts = ({
 
       case 'desktop-wallpaper':
         return (
-          <div className="relative z-10">
+          <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
-            {renderWheel()}
-          </div>
+            <div className="flex items-center justify-center p-12">
+              {renderWheel()}
+            </div>
+          </>
         );
 
       default:
@@ -191,7 +193,7 @@ export const WheelLayouts = ({
       case 'mobile-vertical':
         return (
           <div className="flex flex-col h-full justify-center items-center p-6 space-y-8">
-            <h2 className="text-2xl font-bold text-center" style={{ color: textColor }}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center" style={{ color: textColor }}>
               Tournez la roue !
             </h2>
             {renderWheel()}
