@@ -820,7 +820,7 @@ export const WheelPreview = ({
               };
 
               // Text content component  
-              const TextContent = ({ centered = false }: { centered?: boolean }) => (
+              const TextContent = ({ centered = false, noSpacing = false }: { centered?: boolean; noSpacing?: boolean }) => (
                 <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
                   <h1 
                     className="font-bold cursor-text hover:opacity-80 transition-opacity" 
@@ -830,7 +830,7 @@ export const WheelPreview = ({
                       fontSize: viewMode === 'desktop' ? '64px' : '32px',
                       lineHeight: '1.05',
                       letterSpacing: '-0.02em',
-                      marginBottom: `${(config.wheelScreen.blockSpacing || 1) * 24}px`,
+                      marginBottom: noSpacing ? '12px' : `${(config.wheelScreen.blockSpacing || 1) * 24}px`,
                     }}
                   >
                     Tournez la roue !
@@ -842,7 +842,7 @@ export const WheelPreview = ({
                       color: '#B8A892',
                       fontSize: viewMode === 'desktop' ? '16px' : '14px',
                       lineHeight: '1.6',
-                      marginBottom: `${(config.wheelScreen.blockSpacing || 1) * 32}px`,
+                      marginBottom: noSpacing ? '0' : `${(config.wheelScreen.blockSpacing || 1) * 32}px`,
                     }}
                   >
                     Tentez votre chance et découvrez votre prix
@@ -892,19 +892,25 @@ export const WheelPreview = ({
                   );
                 } else if (desktopLayout === 'desktop-right-left') {
                   return (
-                    <div className="w-full h-full flex items-center gap-16 px-24">
+                    <div 
+                      className="w-full h-full flex items-center px-24"
+                      style={{ gap: `${(config.wheelScreen.blockSpacing || 1) * 4}rem` }}
+                    >
                       <div className="flex-1">
-                        <TextContent />
+                        <TextContent noSpacing />
                       </div>
                       <WheelBlock />
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-centered') {
                   return (
-                    <div className="w-full h-full flex items-center gap-16 px-24">
+                    <div 
+                      className="w-full h-full flex items-center px-24"
+                      style={{ gap: `${(config.wheelScreen.blockSpacing || 1) * 4}rem` }}
+                    >
                       <WheelBlock />
                       <div className="flex-1">
-                        <TextContent />
+                        <TextContent noSpacing />
                       </div>
                     </div>
                   );
@@ -922,26 +928,28 @@ export const WheelPreview = ({
                   );
                 } else if (desktopLayout === 'desktop-card') {
                   return (
-                    <div className="relative w-full h-full flex">
-                      <div className="w-1/2 flex items-center justify-center px-24 z-10">
-                        <div className="max-w-[500px]">
-                          <TextContent />
-                        </div>
-                      </div>
-                      <div className="absolute right-0 top-0 w-1/2 h-full flex items-center justify-center">
-                        <WheelBlock />
+                    <div 
+                      className="relative w-full h-full flex items-center justify-center px-24"
+                      style={{ gap: `${(config.wheelScreen.blockSpacing || 1) * 4}rem` }}
+                    >
+                      <WheelBlock />
+                      <div className="flex-1 max-w-[500px]">
+                        <TextContent noSpacing />
                       </div>
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-panel') {
                   return (
-                    <div className="relative w-full h-full flex">
-                      <div className="absolute left-0 top-0 w-1/2 h-full flex items-center justify-center">
+                    <div 
+                      className="relative w-full h-full flex"
+                      style={{ gap: `${(config.wheelScreen.blockSpacing || 1) * 2}rem` }}
+                    >
+                      <div className="flex-1 flex items-center justify-center">
                         <WheelBlock />
                       </div>
-                      <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
+                      <div className="flex-1 flex items-center justify-center px-24">
                         <div className="max-w-[500px]">
-                          <TextContent />
+                          <TextContent noSpacing />
                         </div>
                       </div>
                     </div>
