@@ -1076,16 +1076,19 @@ export const WheelPreview = ({
                       flexShrink: 0
                     }}
                   >
-                    <SmartWheel
-                      segments={adaptedSegments}
-                      onComplete={(winnerSegment) => {
-                        setIsSpinning(false);
-                        setWonPrize(winnerSegment);
-                        setTimeout(() => onNext(), 1000);
-                      }}
-                      brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                      size={viewMode === 'desktop' ? 380 : 280}
-                    />
+                  <SmartWheel
+                    segments={adaptedSegments}
+                    onComplete={(winnerSegment) => {
+                      setIsSpinning(false);
+                      setWonPrize(winnerSegment);
+                      setTimeout(() => onNext(), 1000);
+                    }}
+                    brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
+                    size={viewMode === 'desktop' ? 380 : 280}
+                    borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
+                    customBorderColor={theme.wheelBorderStyle === 'classic' ? theme.wheelBorderCustomColor : undefined}
+                    showBulbs={true}
+                  />
                   </div>
                 );
               };
@@ -1518,16 +1521,19 @@ export const WheelPreview = ({
                             height: '350px',
                           }}
                         >
-                        <SmartWheel
-                          segments={config.segments.map(seg => ({ ...seg, value: seg.label }))}
-                          onComplete={(winnerSegment) => {
-                            setIsSpinning(false);
-                            setWonPrize(winnerSegment);
-                            setTimeout(() => onNext(), 1000);
-                          }}
-                          brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                          size={280}
-                        />
+                      <SmartWheel
+                        segments={config.segments.map(seg => ({ ...seg, value: seg.label }))}
+                        onComplete={(winnerSegment) => {
+                          setIsSpinning(false);
+                          setWonPrize(winnerSegment);
+                          setTimeout(() => onNext(), 1000);
+                        }}
+                        brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
+                        size={280}
+                        borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
+                        customBorderColor={theme.wheelBorderStyle === 'classic' ? theme.wheelBorderCustomColor : undefined}
+                        showBulbs={true}
+                      />
                       </div>
                       </div>
                     </div>
