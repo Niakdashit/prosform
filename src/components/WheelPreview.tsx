@@ -1668,6 +1668,7 @@ export const WheelPreview = ({
             onSetMenuView={setMenuView}
             availableVariables={availableVariables}
             onInsertVariable={insertVariable}
+            socialLinks={config.endingScreen.socialLinks}
             onRestart={() => {
               setWonPrize(null);
               setContactData({ name: "", email: "", phone: "" });
