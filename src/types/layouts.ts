@@ -83,13 +83,13 @@ export const MOBILE_LAYOUTS: Array<{
   },
   {
     id: 'mobile-centered',
-    name: 'Centré',
+    name: 'Bannière',
     description: 'Contenu centré',
     preview: '/src/assets/layout-mobile-centered.svg'
   },
   {
     id: 'mobile-minimal',
-    name: 'Minimal',
+    name: 'Wallpaper',
     description: 'Design épuré',
     preview: '/src/assets/layout-mobile-minimal.svg'
   }
