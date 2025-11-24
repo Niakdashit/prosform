@@ -1,4 +1,3 @@
-import React from "react";
 import { Question } from "./FormBuilder";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -11,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag, Monitor } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getQuestionIcon, questionIconMap } from "@/lib/questionIcons";
+import { MOBILE_LAYOUTS, DESKTOP_LAYOUTS } from "@/types/layouts";
 import mobileVerticalIcon from "@/assets/layout-mobile-vertical.svg";
 import mobileHorizontalIcon from "@/assets/layout-mobile-horizontal.svg";
 import mobileCenteredIcon from "@/assets/layout-mobile-centered.svg";
@@ -21,6 +21,7 @@ import desktopCenteredIcon from "@/assets/layout-desktop-centered.svg";
 import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
 import desktopCardIcon from "@/assets/layout-desktop-card.svg";
 import desktopPanelIcon from "@/assets/layout-desktop-panel.svg";
+import desktopWallpaperIcon from "@/assets/layout-desktop-wallpaper.svg";
 
 interface SettingsPanelProps {
   question?: Question;
@@ -40,6 +41,7 @@ const LayoutIcon = ({ type }: { type: string }) => {
     "desktop-split": desktopSplitIcon,
     "desktop-card": desktopCardIcon,
     "desktop-panel": desktopPanelIcon,
+    "desktop-wallpaper": desktopWallpaperIcon,
   };
   
   const icon = iconMap[type];
@@ -55,20 +57,15 @@ const LayoutSelector = ({ question, onUpdateQuestion, onViewModeChange }: Settin
   const shouldShowLayout = ['welcome', 'statement', 'picture-choice', 'file'].includes(question.type);
   if (!shouldShowLayout) return null;
 
-  const mobileLayouts = [
-    { value: "mobile-vertical", label: "Stack" },
-    { value: "mobile-centered", label: "Centered" },
-    { value: "mobile-minimal", label: "Minimal" },
-  ];
+  const mobileLayouts = MOBILE_LAYOUTS.map(layout => ({
+    value: layout.id,
+    label: layout.name
+  }));
 
-  const desktopLayouts = [
-    { value: "desktop-left-right", label: "Split" },
-    { value: "desktop-right-left", label: "Stack" },
-    { value: "desktop-centered", label: "Centered" },
-    { value: "desktop-split", label: "Wallpaper" },
-    { value: "desktop-card", label: "Card" },
-    { value: "desktop-panel", label: "Panel" },
-  ];
+  const desktopLayouts = DESKTOP_LAYOUTS.map(layout => ({
+    value: layout.id,
+    label: layout.name
+  }));
 
   const currentMobileLayout = question.mobileLayout || "mobile-vertical";
   const currentDesktopLayout = question.desktopLayout || "desktop-left-right";
