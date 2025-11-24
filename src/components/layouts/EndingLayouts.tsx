@@ -260,9 +260,9 @@ export const EndingLayouts = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+                style={{ backgroundColor: '#1877F2', color: '#FFFFFF' }}
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-5 h-5" fill="currentColor" />
               </a>
             )}
             {socialLinks.twitter && (
@@ -271,9 +271,9 @@ export const EndingLayouts = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+                style={{ backgroundColor: '#1DA1F2', color: '#FFFFFF' }}
               >
-                <Twitter className="w-5 h-5" />
+                <Twitter className="w-5 h-5" fill="currentColor" />
               </a>
             )}
             {socialLinks.instagram && (
@@ -282,7 +282,7 @@ export const EndingLayouts = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+                style={{ background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)', color: '#FFFFFF' }}
               >
                 <Instagram className="w-5 h-5" />
               </a>
@@ -293,9 +293,9 @@ export const EndingLayouts = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+                style={{ backgroundColor: '#0A66C2', color: '#FFFFFF' }}
               >
-                <Linkedin className="w-5 h-5" />
+                <Linkedin className="w-5 h-5" fill="currentColor" />
               </a>
             )}
           </div>
