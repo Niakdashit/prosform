@@ -5,8 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Trash2, GripVertical, Image as ImageIcon, X } from "lucide-react";
 import { WheelSegment } from "./WheelBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ImageUploadModal } from "./ImageUploadModal";
-import { useState } from "react";
+import { useRef } from "react";
 
 interface SegmentsModalProps {
   open: boolean;
@@ -25,20 +24,27 @@ export const SegmentsModal = ({
   onAddSegment,
   onDeleteSegment
 }: SegmentsModalProps) => {
-  const [imageUploadOpen, setImageUploadOpen] = useState(false);
-  const [currentSegmentId, setCurrentSegmentId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const currentSegmentIdRef = useRef<string | null>(null);
 
-  const handleImageSelect = (imageData: string) => {
-    if (currentSegmentId) {
-      onUpdateSegment(currentSegmentId, { icon: imageData });
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && currentSegmentIdRef.current) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onUpdateSegment(currentSegmentIdRef.current!, { icon: reader.result as string });
+      };
+      reader.readAsDataURL(file);
     }
-    setImageUploadOpen(false);
-    setCurrentSegmentId(null);
+    // Reset the input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const openImageUpload = (segmentId: string) => {
-    setCurrentSegmentId(segmentId);
-    setImageUploadOpen(true);
+    currentSegmentIdRef.current = segmentId;
+    fileInputRef.current?.click();
   };
 
   return (
@@ -165,10 +171,12 @@ export const SegmentsModal = ({
         </div>
       </DialogContent>
 
-      <ImageUploadModal
-        open={imageUploadOpen}
-        onOpenChange={setImageUploadOpen}
-        onImageSelect={handleImageSelect}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="hidden"
       />
     </Dialog>
   );
