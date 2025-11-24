@@ -4,6 +4,7 @@ import { WheelSidebar } from "./WheelSidebar";
 import { WheelPreview } from "./WheelPreview";
 import { WheelSettingsPanel } from "./WheelSettingsPanel";
 import { WheelTopToolbar } from "./WheelTopToolbar";
+import { SegmentsModal } from "./SegmentsModal";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -124,6 +125,7 @@ export const WheelBuilder = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
 
   useEffect(() => {
     if (isMobile) {
@@ -224,7 +226,10 @@ export const WheelBuilder = () => {
                     setActiveView(view);
                     setLeftDrawerOpen(false);
                   }}
-                  onAddSegment={addSegment}
+                  onOpenSegmentsModal={() => {
+                    setSegmentsModalOpen(true);
+                    setLeftDrawerOpen(false);
+                  }}
                   onDuplicateSegment={duplicateSegment}
                   onReorderSegments={reorderSegments}
                   onDeleteSegment={deleteSegment}
@@ -282,7 +287,7 @@ export const WheelBuilder = () => {
               config={config}
               activeView={activeView}
               onViewSelect={setActiveView}
-              onAddSegment={addSegment}
+              onOpenSegmentsModal={() => setSegmentsModalOpen(true)}
               onDuplicateSegment={duplicateSegment}
               onReorderSegments={reorderSegments}
               onDeleteSegment={deleteSegment}
@@ -314,6 +319,15 @@ export const WheelBuilder = () => {
           </>
         )}
       </div>
+
+      <SegmentsModal
+        open={segmentsModalOpen}
+        onOpenChange={setSegmentsModalOpen}
+        segments={config.segments}
+        onUpdateSegment={updateSegment}
+        onAddSegment={addSegment}
+        onDeleteSegment={deleteSegment}
+      />
     </div>
   );
 };

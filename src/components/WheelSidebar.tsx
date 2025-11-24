@@ -21,7 +21,7 @@ interface WheelSidebarProps {
   config: WheelConfig;
   activeView: 'welcome' | 'contact' | 'wheel' | 'ending';
   onViewSelect: (view: 'welcome' | 'contact' | 'wheel' | 'ending') => void;
-  onAddSegment: () => void;
+  onOpenSegmentsModal: () => void;
   onDuplicateSegment: (id: string) => void;
   onReorderSegments: (startIndex: number, endIndex: number) => void;
   onDeleteSegment: (id: string) => void;
@@ -31,7 +31,7 @@ export const WheelSidebar = ({
   config,
   activeView,
   onViewSelect,
-  onAddSegment,
+  onOpenSegmentsModal,
   onDuplicateSegment,
   onReorderSegments,
   onDeleteSegment,
@@ -128,8 +128,9 @@ export const WheelSidebar = ({
               <div className="flex items-center justify-between mb-3 px-2">
                 <span className="text-sm font-semibold text-foreground">Segments</span>
                 <button 
-                  onClick={onAddSegment}
+                  onClick={onOpenSegmentsModal}
                   className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
+                  title="Configurer les segments"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
