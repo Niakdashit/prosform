@@ -201,22 +201,22 @@ export const WheelPreview = ({
               justifyContent: viewMode === "desktop" ? "center" : "flex-start",
               padding:
                 viewMode === "desktop"
-                  ? currentLayout === "desktop-card" || currentLayout === "desktop-panel"
+                  ? config.welcomeScreen.desktopLayout === "desktop-card" || config.welcomeScreen.desktopLayout === "desktop-panel"
                     ? "0"
                     : "0 64px"
-                  : currentLayout === "mobile-centered"
+                  : config.welcomeScreen.mobileLayout === "mobile-centered"
                   ? "0"
                   : "24px 20px",
               paddingLeft:
-                viewMode === "mobile" && currentLayout === "mobile-centered"
+                viewMode === "mobile" && config.welcomeScreen.mobileLayout === "mobile-centered"
                   ? 0
-                  : viewMode === "desktop" && (currentLayout === "desktop-card" || currentLayout === "desktop-panel")
+                  : viewMode === "desktop" && (config.welcomeScreen.desktopLayout === "desktop-card" || config.welcomeScreen.desktopLayout === "desktop-panel")
                   ? 0
                   : "7%",
               paddingRight:
-                viewMode === "mobile" && currentLayout === "mobile-centered"
+                viewMode === "mobile" && config.welcomeScreen.mobileLayout === "mobile-centered"
                   ? 0
-                  : viewMode === "desktop" && (currentLayout === "desktop-card" || currentLayout === "desktop-panel")
+                  : viewMode === "desktop" && (config.welcomeScreen.desktopLayout === "desktop-card" || config.welcomeScreen.desktopLayout === "desktop-panel")
                   ? 0
                   : "7%",
             }}
@@ -288,201 +288,31 @@ export const WheelPreview = ({
               // Text content component  
               const TextContent = ({ centered = false }: { centered?: boolean }) => (
                 <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
-                  <div className="relative">
-                    {editingField === 'welcome-title' && (
-                      <>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-
-                        {showVariableMenu && variableTarget === 'title' && (
-                          <div
-                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                            style={{
-                              top: '32px',
-                              right: 0,
-                              backgroundColor: '#4A4138',
-                              border: '1px solid rgba(245, 184, 0, 0.3)',
-                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            {menuView === 'main' ? (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => console.log('Réécriture AI')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                </button>
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('variables')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('main')}
-                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                >
-                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                </button>
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <h1 
-                      className="font-bold cursor-text hover:opacity-80 transition-opacity" 
-                      style={{ 
-                        color: theme.accentColor, 
-                        fontWeight: 700, 
-                        fontSize: viewMode === 'desktop' ? '64px' : '32px',
-                        lineHeight: '1.05',
-                        letterSpacing: '-0.02em',
-                        marginBottom: `${24}px`,
-                        outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                        padding: '4px',
-                        marginTop: '-4px',
-                        marginLeft: '-4px',
-                        marginRight: '-4px',
-                        borderRadius: '4px'
-                      }}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onFocus={() => setEditingField('welcome-title')}
-                      onBlur={(e) => handleTitleBlur('welcome-title', e.currentTarget.textContent || '')}
-                    >
-                      {config.welcomeScreen.title}
-                    </h1>
-                  </div>
+                  <h1 
+                    className="font-bold cursor-text hover:opacity-80 transition-opacity" 
+                    style={{ 
+                      color: theme.accentColor, 
+                      fontWeight: 700, 
+                      fontSize: viewMode === 'desktop' ? '64px' : '32px',
+                      lineHeight: '1.05',
+                      letterSpacing: '-0.02em',
+                      marginBottom: '24px',
+                    }}
+                  >
+                    {config.welcomeScreen.title}
+                  </h1>
                   
-                  <div className="relative">
-                    {editingField === 'welcome-subtitle' && (
-                      <>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-
-                        {showVariableMenu && variableTarget === 'subtitle' && (
-                          <div
-                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                            style={{
-                              top: '32px',
-                              right: 0,
-                              backgroundColor: '#4A4138',
-                              border: '1px solid rgba(245, 184, 0, 0.3)',
-                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            {menuView === 'main' ? (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => console.log('Réécriture AI')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                </button>
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('variables')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('main')}
-                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                >
-                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                </button>
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <p 
-                      className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
-                      style={{ 
-                        color: '#B8A892',
-                        fontSize: viewMode === 'desktop' ? '16px' : '14px',
-                        lineHeight: '1.6',
-                        marginBottom: `${32}px`,
-                        outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
-                        padding: '4px',
-                        marginTop: '-4px',
-                        marginLeft: '-4px',
-                        marginRight: '-4px',
-                        borderRadius: '4px'
-                      }}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onFocus={() => setEditingField('welcome-subtitle')}
-                      onBlur={(e) => handleSubtitleBlur('welcome-subtitle', e.currentTarget.textContent || '')}
-                    >
-                      {config.welcomeScreen.subtitle}
-                    </p>
-                  </div>
+                  <p 
+                    className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
+                    style={{ 
+                      color: '#B8A892',
+                      fontSize: viewMode === 'desktop' ? '16px' : '14px',
+                      lineHeight: '1.6',
+                      marginBottom: '32px',
+                    }}
+                  >
+                    {config.welcomeScreen.subtitle}
+                  </p>
                   
                   <button
                     onClick={onNext}
@@ -509,173 +339,381 @@ export const WheelPreview = ({
                 </div>
               );
 
-              // Desktop layouts - COPIÉ EXACTEMENT DE FORMPREVIEW
+              // Desktop layouts
               if (viewMode === 'desktop') {
                 if (desktopLayout === 'desktop-left-right') {
-                  const alignment = 'left';
-                  const alignmentClass = 'items-start';
-                  
                   return (
-                    <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide`}>
-                      <ImageBlock />
-                      <TextContent />
+                    <div className="w-full h-full flex flex-col items-start justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide">
+                      <div
+                        className="overflow-hidden flex-shrink-0"
+                        style={{ 
+                          borderRadius: "36px",
+                          width: '320px',
+                          height: '320px',
+                        }}
+                      >
+                        <img
+                          src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
+                          alt="Feedback illustration"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="max-w-[700px]">
+                        <h1 
+                          className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
+                          style={{ color: '#F5CA3C' }}
+                        >
+                          {config.welcomeScreen.title}
+                        </h1>
+                        
+                        <p 
+                          className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                          style={{ color: '#B8A892' }}
+                        >
+                          {config.welcomeScreen.subtitle}
+                        </p>
+                        
+                        <div className="mt-10" style={{ marginTop: '32px' }}>
+                          <button 
+                            onClick={onNext}
+                            className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3"
+                            style={{ 
+                              backgroundColor: '#F5CA3C',
+                              color: '#3D3731'
+                            }}
+                          >
+                            <span>{config.welcomeScreen.buttonText || "Start"}</span>
+                            <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
+                              press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
+                            </span>
+                          </button>
+                          <div className="inline-flex items-center gap-2.5 mt-2" style={{ color: '#A89A8A', fontSize: '14px' }}>
+                            <Clock className="w-4 h-4" />
+                            <span>Takes X minutes</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   );
-                }
-
-                if (desktopLayout === 'desktop-right-left') {
+                } else if (desktopLayout === 'desktop-right-left') {
                   return (
-                    <div className="w-full h-full flex items-center justify-between gap-12 px-16">
-                      <div className="flex-1 max-w-md">
+                    <div className="w-full h-full flex items-center gap-16 px-24">
+                      <div className="flex-1">
                         <TextContent />
                       </div>
                       <ImageBlock />
                     </div>
                   );
-                }
-
-                if (desktopLayout === 'desktop-centered') {
+                } else if (desktopLayout === 'desktop-centered') {
                   return (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-8 px-16">
+                    <div className="w-full h-full flex items-center gap-16 px-24">
                       <ImageBlock />
-                      <div className="max-w-2xl w-full">
-                        <TextContent centered={true} />
+                      <div className="flex-1">
+                        <TextContent />
                       </div>
                     </div>
                   );
-                }
-
-                if (desktopLayout === 'desktop-card') {
+                } else if (desktopLayout === 'desktop-split') {
                   return (
-                    <div className="w-full h-full flex items-center justify-center p-8">
-                      <div 
-                        className="flex items-center gap-8 p-12 rounded-3xl shadow-2xl max-w-5xl"
-                        style={{ backgroundColor: theme.backgroundColor }}
-                      >
-                        <ImageBlock />
-                        <div className="flex-1">
+                    <div className="absolute inset-0">
+                      {uploadedImage ? (
+                        <img
+                          src={uploadedImage}
+                          alt="Background"
+                          className="absolute inset-0 w-full h-full object-cover"
+                          style={{
+                            transform: `rotate(${imageRotation}deg)`,
+                            transition: 'transform 0.3s ease'
+                          }}
+                        />
+                      ) : (
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                          <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                            Upload Background Image
+                          </p>
+                          <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                            Click to browse
+                          </p>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                      {uploadedImage && (
+                        <div className="absolute top-4 right-4 z-20 opacity-0 hover:opacity-100 transition-opacity flex items-center gap-2">
+                          <button
+                            onClick={() => setShowUploadModal(true)}
+                            className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                            style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                            title="Change image"
+                          >
+                            <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                          </button>
+                          <button
+                            onClick={() => setShowEditorModal(true)}
+                            className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                            style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                            title="Edit image"
+                          >
+                            <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                          </button>
+                        </div>
+                      )}
+                      <div className="relative z-10 flex items-center justify-center h-full px-16">
+                        <div className="max-w-[700px] text-center">
+                          <TextContent centered />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else if (desktopLayout === 'desktop-card') {
+                  return (
+                    <div className="relative w-full h-full flex">
+                      <div className="w-1/2 flex items-center justify-center px-24 z-10">
+                        <div className="max-w-[500px]">
+                          <TextContent />
+                        </div>
+                      </div>
+                      <div className="absolute right-0 top-0 w-1/2 h-full group">
+                        {uploadedImage ? (
+                          <>
+                            <img
+                              src={uploadedImage}
+                              alt="Feedback illustration"
+                              className="w-full h-full object-cover"
+                              style={{
+                                transform: `rotate(${imageRotation}deg)`,
+                                transition: 'transform 0.3s ease'
+                              }}
+                            />
+                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                              <button
+                                onClick={() => setShowUploadModal(true)}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Change image"
+                              >
+                                <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
+                              <button
+                                onClick={() => setShowEditorModal(true)}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Edit image"
+                              >
+                                <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                          >
+                            <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                            <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                              Upload Image
+                            </p>
+                            <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                              Click to browse
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                } else if (desktopLayout === 'desktop-panel') {
+                  return (
+                    <div className="relative w-full h-full flex">
+                        <div className="absolute left-0 top-0 w-1/2 h-full group">
+                          {uploadedImage ? (
+                            <>
+                              <img
+                                src={uploadedImage}
+                                alt="Feedback illustration"
+                                className="w-full h-full object-cover"
+                                style={{
+                                  transform: `rotate(${imageRotation}deg)`,
+                                  transition: 'transform 0.3s ease'
+                                }}
+                              />
+                              <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                                <button
+                                  onClick={() => setShowUploadModal(true)}
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  title="Change image"
+                                >
+                                  <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                </button>
+                                <button
+                                  onClick={() => setShowEditorModal(true)}
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  title="Edit image"
+                                >
+                                  <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                </button>
+                              </div>
+                            </>
+                        ) : (
+                          <div
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                          >
+                            <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                            <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                              Upload Image
+                            </p>
+                            <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                              Click to browse
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
+                        <div className="max-w-[500px]">
                           <TextContent />
                         </div>
                       </div>
                     </div>
                   );
                 }
+              }
 
-                if (desktopLayout === 'desktop-panel') {
-                  return (
-                    <div className="w-full h-full flex">
-                      <div className="flex-1 flex items-center justify-center p-12">
-                        <TextContent />
-                      </div>
-                      <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.05)' }}>
-                        <ImageBlock />
-                      </div>
+              // Mobile layouts
+              if (mobileLayout === 'mobile-vertical') {
+                return (
+                  <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
+                    <ImageBlock />
+                    <TextContent />
+                  </div>
+                );
+              } else if (mobileLayout === 'mobile-horizontal') {
+                return (
+                  <div className="flex gap-4 py-6 px-5 w-full max-w-[700px]">
+                    <div className="flex-1">
+                      <TextContent />
                     </div>
-                  );
-                }
-
-                if (desktopLayout === 'desktop-split') {
-                  return (
-                    <div className="w-full h-full flex">
-                      <div className="w-1/2 flex items-center justify-center p-12">
-                        <ImageBlock />
-                      </div>
-                      <div className="w-1/2 flex items-center justify-center p-12" style={{ backgroundColor: 'rgba(0,0,0,0.02)' }}>
-                        <TextContent />
-                      </div>
-                    </div>
-                  );
-                }
-
-                if (desktopLayout === 'desktop-wallpaper') {
-                  return (
-                    <div className="w-full h-full relative flex items-center justify-center">
-                      <div className="absolute inset-0 overflow-hidden">
-                        {uploadedImage && (
+                    <ImageBlock />
+                  </div>
+                );
+              } else if (mobileLayout === 'mobile-centered') {
+                return (
+                  <div className="flex flex-col w-full h-full">
+                    <div className="w-full relative group" style={{ height: '40%', minHeight: '250px' }}>
+                      {uploadedImage ? (
+                        <>
                           <img
                             src={uploadedImage}
-                            alt="Background"
-                            className="w-full h-full object-cover opacity-30"
+                            alt="Banner"
+                            className="w-full h-full object-cover"
+                            style={{
+                              transform: `rotate(${imageRotation}deg)`,
+                              transition: 'transform 0.3s ease'
+                            }}
                           />
-                        )}
-                      </div>
-                      <div className="relative z-10 max-w-2xl px-12">
-                        <TextContent centered={true} />
-                      </div>
-                    </div>
-                  );
-                }
-              }
-
-              // Mobile layouts - COPIÉ EXACTEMENT DE FORMPREVIEW
-              if (viewMode === 'mobile') {
-                if (mobileLayout === 'mobile-vertical') {
-                  return (
-                    <div className="w-full h-full flex flex-col items-start justify-start gap-6 px-5 py-8 overflow-y-auto">
-                      <ImageBlock />
-                      <TextContent />
-                    </div>
-                  );
-                }
-
-                if (mobileLayout === 'mobile-horizontal') {
-                  return (
-                    <div className="w-full h-full flex flex-col justify-center px-5 py-8 gap-4">
-                      <div className="flex items-center gap-4">
-                        <ImageBlock />
-                        <div className="flex-1">
-                          <h1 
-                            className="text-2xl font-bold mb-2 cursor-text" 
-                            style={{ color: theme.accentColor }}
-                            contentEditable
-                            suppressContentEditableWarning
-                            onFocus={() => setEditingField('welcome-title')}
-                            onBlur={(e) => handleTitleBlur('welcome-title', e.currentTarget.textContent || '')}
-                          >
-                            {config.welcomeScreen.title}
-                          </h1>
+                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                            <button
+                              onClick={() => setShowUploadModal(true)}
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Change image"
+                            >
+                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                            </button>
+                            <button
+                              onClick={() => setShowEditorModal(true)}
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                              title="Edit image"
+                            >
+                              <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
+                          <p className="text-sm font-medium" style={{ color: '#F5B800' }}>
+                            Upload Banner
+                          </p>
+                          <p className="text-xs mt-1" style={{ color: '#A89A8A' }}>
+                            Click to browse
+                          </p>
                         </div>
+                      )}
+                    </div>
+                    <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+                      <div className="w-full max-w-[700px]">
+                        <TextContent />
                       </div>
-                      <p 
-                        className="text-sm mb-4 cursor-text" 
-                        style={{ color: '#B8A892' }}
-                        contentEditable
-                        suppressContentEditableWarning
-                        onFocus={() => setEditingField('welcome-subtitle')}
-                        onBlur={(e) => handleSubtitleBlur('welcome-subtitle', e.currentTarget.textContent || '')}
+                    </div>
+                  </div>
+                );
+              } else if (mobileLayout === 'mobile-minimal') {
+                return (
+                  <div className="absolute inset-0">
+                    {uploadedImage ? (
+                      <img
+                        src={uploadedImage}
+                        alt="Background"
+                        className="absolute inset-0 w-full h-full object-cover"
+                        style={{
+                          transform: `rotate(${imageRotation}deg)`,
+                          transition: 'transform 0.3s ease'
+                        }}
+                      />
+                    ) : (
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                       >
-                        {config.welcomeScreen.subtitle}
-                      </p>
-                      <button
-                        onClick={onNext}
-                        className="w-full py-3 rounded-full font-semibold"
-                        style={{ backgroundColor: theme.buttonColor, color: '#3D3731' }}
-                      >
-                        {config.welcomeScreen.buttonText || "Start"}
-                      </button>
+                        <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
+                        <p className="text-sm font-medium" style={{ color: '#F5B800' }}>
+                          Upload Background
+                        </p>
+                        <p className="text-xs mt-1" style={{ color: '#A89A8A' }}>
+                          Click to browse
+                        </p>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                    {uploadedImage && (
+                      <div className="absolute top-4 right-4 z-20 opacity-0 hover:opacity-100 transition-opacity flex items-center gap-2">
+                        <button
+                          onClick={() => setShowUploadModal(true)}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                          title="Change image"
+                        >
+                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <button
+                          onClick={() => setShowEditorModal(true)}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                          title="Edit image"
+                        >
+                          <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                      </div>
+                    )}
+                    <div className="relative z-10 flex items-center justify-center h-full px-8">
+                      <div className="w-full max-w-[700px] text-center">
+                        <TextContent centered />
+                      </div>
                     </div>
-                  );
-                }
-
-                if (mobileLayout === 'mobile-centered') {
-                  return (
-                    <div className="w-full h-full flex flex-col items-center justify-center px-6 py-8 gap-6">
-                      <ImageBlock />
-                      <TextContent centered={true} />
-                    </div>
-                  );
-                }
-
-                if (mobileLayout === 'mobile-minimal') {
-                  return (
-                    <div className="w-full h-full flex flex-col justify-center px-6 py-8">
-                      <TextContent />
-                    </div>
-                  );
-                }
+                  </div>
+                );
               }
 
-              return <TextContent />;
+              return null;
             })()}
           </div>
         );
