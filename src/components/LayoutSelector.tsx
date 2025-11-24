@@ -18,81 +18,75 @@ export const LayoutSelector = ({
   const [activeTab, setActiveTab] = useState<'desktop' | 'mobile'>('desktop');
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2 border-b">
+    <div className="space-y-2">
+      <div className="flex gap-1 border-b border-border/50">
         <button
           onClick={() => setActiveTab('desktop')}
-          className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+          className={`flex items-center gap-1.5 px-2 py-1 border-b-2 transition-colors ${
             activeTab === 'desktop'
               ? 'border-primary text-primary'
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
-          <Monitor className="w-4 h-4" />
-          <span className="text-sm font-medium">Desktop</span>
+          <Monitor className="w-3 h-3" />
+          <span className="text-xs font-medium">Desktop</span>
         </button>
         <button
           onClick={() => setActiveTab('mobile')}
-          className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+          className={`flex items-center gap-1.5 px-2 py-1 border-b-2 transition-colors ${
             activeTab === 'mobile'
               ? 'border-primary text-primary'
               : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
-          <Smartphone className="w-4 h-4" />
-          <span className="text-sm font-medium">Mobile</span>
+          <Smartphone className="w-3 h-3" />
+          <span className="text-xs font-medium">Mobile</span>
         </button>
       </div>
 
       {activeTab === 'desktop' ? (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {DESKTOP_LAYOUTS.map((layout) => (
             <button
               key={layout.id}
               onClick={() => onDesktopLayoutChange(layout.id)}
-              className={`p-3 rounded-lg border-2 transition-all hover:shadow-md ${
+              className={`p-2 rounded border transition-all ${
                 desktopLayout === layout.id
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/50'
               }`}
             >
-              <div className="aspect-video bg-muted rounded mb-2 overflow-hidden flex items-center justify-center">
+              <div className="aspect-video bg-muted rounded mb-1.5 overflow-hidden flex items-center justify-center">
                 <img 
                   src={layout.preview} 
                   alt={layout.name}
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div className="text-xs font-medium text-center">{layout.name}</div>
-              <div className="text-[10px] text-muted-foreground text-center mt-1">
-                {layout.description}
-              </div>
+              <div className="text-[10px] font-medium text-center leading-tight">{layout.name}</div>
             </button>
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {MOBILE_LAYOUTS.map((layout) => (
             <button
               key={layout.id}
               onClick={() => onMobileLayoutChange(layout.id)}
-              className={`p-3 rounded-lg border-2 transition-all hover:shadow-md ${
+              className={`p-2 rounded border transition-all ${
                 mobileLayout === layout.id
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/50'
               }`}
             >
-              <div className="aspect-[9/16] bg-muted rounded mb-2 overflow-hidden flex items-center justify-center max-h-32">
+              <div className="aspect-[9/16] bg-muted rounded mb-1.5 overflow-hidden flex items-center justify-center max-h-24">
                 <img 
                   src={layout.preview} 
                   alt={layout.name}
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div className="text-xs font-medium text-center">{layout.name}</div>
-              <div className="text-[10px] text-muted-foreground text-center mt-1">
-                {layout.description}
-              </div>
+              <div className="text-[10px] font-medium text-center leading-tight">{layout.name}</div>
             </button>
           ))}
         </div>
