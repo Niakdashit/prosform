@@ -49,7 +49,7 @@ export const ContactLayouts = ({
       {editingField === 'contact-title' ? (
         <input
           autoFocus
-          className="text-4xl md:text-5xl font-bold mb-4 text-center w-full bg-transparent border-b-2 border-primary outline-none"
+          className="text-4xl md:text-5xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center"
           style={{ color: textColor }}
           value={title}
           onChange={(e) => onTitleChange?.(e.target.value)}
@@ -68,7 +68,7 @@ export const ContactLayouts = ({
       {editingField === 'contact-subtitle' ? (
         <textarea
           autoFocus
-          className="text-lg md:text-xl text-center mb-8 w-full bg-transparent border-b border-primary outline-none resize-none"
+          className="text-lg md:text-xl mb-8 w-full bg-transparent border-b border-primary outline-none text-center resize-none"
           style={{ color: textColor, opacity: 0.8 }}
           value={subtitle}
           onChange={(e) => onSubtitleChange?.(e.target.value)}
@@ -77,8 +77,8 @@ export const ContactLayouts = ({
         />
       ) : (
         <p 
-          className="text-lg md:text-xl text-center mb-8 opacity-80 cursor-pointer hover:opacity-100 transition-opacity" 
-          style={{ color: textColor }}
+          className="text-lg md:text-xl text-center mb-8 cursor-pointer hover:opacity-100 transition-opacity" 
+          style={{ color: textColor, opacity: 0.8 }}
           onClick={onEditSubtitle}
         >
           {subtitle}
