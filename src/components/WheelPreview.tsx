@@ -781,14 +781,15 @@ export const WheelPreview = ({
               if (viewMode === 'desktop') {
                 if (desktopLayout === 'desktop-left-right') {
                   return (
-                    <div className="w-full h-full flex flex-col items-start justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide">
-                      <div
-                        className="flex-shrink-0 flex items-center justify-center"
-                        style={{ 
-                          width: '350px',
-                          height: '350px',
-                        }}
-                      >
+                    <div className="w-full h-full flex items-center justify-center px-24">
+                      <div className="flex flex-col items-center gap-10">
+                        <div
+                          className="flex-shrink-0 flex items-center justify-center"
+                          style={{ 
+                            width: '350px',
+                            height: '350px',
+                          }}
+                        >
                         <SmartWheel
                           segments={config.segments.map(seg => ({ ...seg, value: seg.label }))}
                           onComplete={(winnerSegment) => {
@@ -800,7 +801,7 @@ export const WheelPreview = ({
                           size={280}
                         />
                       </div>
-                      <div className="max-w-[700px]">
+                      <div className="max-w-[700px] text-center">
                         <h1 
                           className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
                           style={{ color: '#F5CA3C' }}
@@ -814,6 +815,7 @@ export const WheelPreview = ({
                         >
                           Tentez votre chance et découvrez votre prix
                         </p>
+                        </div>
                       </div>
                     </div>
                   );
