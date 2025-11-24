@@ -928,20 +928,16 @@ export const WheelPreview = ({
                   );
                  } else if (desktopLayout === 'desktop-card') {
                   return (
-                    <div className="relative w-full h-full flex items-center justify-center p-8" style={{ backgroundColor: theme.backgroundColor }}>
-                      <div 
-                        className="bg-card rounded-2xl shadow-2xl p-12"
-                        style={{ 
-                          display: 'flex',
-                          gap: `${(config.wheelScreen.blockSpacing || 1) * 4}rem`,
-                          alignItems: 'center'
-                        }}
-                      >
-                        <div className="flex-1 max-w-[500px]">
-                          <TextContent noSpacing />
-                        </div>
-                        <WheelBlock />
+                    <div 
+                      className="relative w-full h-full flex items-center justify-center"
+                      style={{ 
+                        gap: `${(config.wheelScreen.blockSpacing || 1) * 4}rem`,
+                      }}
+                    >
+                      <div className="flex-1 max-w-[500px]">
+                        <TextContent noSpacing />
                       </div>
+                      <WheelBlock />
                     </div>
                   );
                  } else if (desktopLayout === 'desktop-panel') {
