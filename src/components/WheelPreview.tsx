@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { WheelConfig } from "./WheelBuilder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Monitor, Smartphone } from "lucide-react";
+import { Monitor, Smartphone, Sparkles } from "lucide-react";
 import { useState, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import SmartWheel from "./SmartWheel/SmartWheel";
@@ -35,7 +35,91 @@ export const WheelPreview = ({
   const [contactData, setContactData] = useState({ name: '', email: '', phone: '' });
   const [isSpinning, setIsSpinning] = useState(false);
   const [wonPrize, setWonPrize] = useState<string | null>(null);
+  const [showVariableMenu, setShowVariableMenu] = useState(false);
+  const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
+  const [menuView, setMenuView] = useState<'main' | 'variables'>('main');
   const { theme } = useTheme();
+
+  const availableVariables = [
+    { key: 'first_name', label: 'First name', description: "User's first name" },
+    { key: 'email', label: 'Email', description: "User's email address" },
+    { key: 'prize', label: 'Prize', description: "Won prize" },
+  ];
+
+  const insertVariable = (variableKey: string) => {
+    if (!editingField) return;
+
+    if (editingField === 'welcome-title') {
+      onUpdateConfig({ 
+        welcomeScreen: { 
+          ...config.welcomeScreen, 
+          title: config.welcomeScreen.title + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'welcome-subtitle') {
+      onUpdateConfig({ 
+        welcomeScreen: { 
+          ...config.welcomeScreen, 
+          subtitle: config.welcomeScreen.subtitle + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'contact-title') {
+      onUpdateConfig({ 
+        contactForm: { 
+          ...config.contactForm, 
+          title: config.contactForm.title + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'contact-subtitle') {
+      onUpdateConfig({ 
+        contactForm: { 
+          ...config.contactForm, 
+          subtitle: config.contactForm.subtitle + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'ending-title') {
+      onUpdateConfig({ 
+        endingScreen: { 
+          ...config.endingScreen, 
+          title: config.endingScreen.title + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'ending-subtitle') {
+      onUpdateConfig({ 
+        endingScreen: { 
+          ...config.endingScreen, 
+          subtitle: config.endingScreen.subtitle + `{{${variableKey}}}` 
+        } 
+      });
+    }
+
+    setShowVariableMenu(false);
+    setMenuView('main');
+  };
+
+  const handleTitleBlur = (field: string, value: string) => {
+    if (field === 'welcome-title' && value.trim() !== config.welcomeScreen.title) {
+      onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, title: value.trim() } });
+    } else if (field === 'contact-title' && value.trim() !== config.contactForm.title) {
+      onUpdateConfig({ contactForm: { ...config.contactForm, title: value.trim() } });
+    } else if (field === 'ending-title' && value.trim() !== config.endingScreen.title) {
+      onUpdateConfig({ endingScreen: { ...config.endingScreen, title: value.trim() } });
+    }
+    setEditingField(null);
+    setShowVariableMenu(false);
+  };
+
+  const handleSubtitleBlur = (field: string, value: string) => {
+    if (field === 'welcome-subtitle' && value.trim() !== config.welcomeScreen.subtitle) {
+      onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitle: value.trim() } });
+    } else if (field === 'contact-subtitle' && value.trim() !== config.contactForm.subtitle) {
+      onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: value.trim() } });
+    } else if (field === 'ending-subtitle' && value.trim() !== config.endingScreen.subtitle) {
+      onUpdateConfig({ endingScreen: { ...config.endingScreen, subtitle: value.trim() } });
+    }
+    setEditingField(null);
+    setShowVariableMenu(false);
+  };
 
   const getCurrentLayout = () => {
     const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
@@ -93,15 +177,21 @@ export const WheelPreview = ({
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
             editingField={editingField}
-            onEditTitle={() => setEditingField('welcome-title')}
-            onEditSubtitle={() => setEditingField('welcome-subtitle')}
-            onTitleChange={(value) => onUpdateConfig({ 
-              welcomeScreen: { ...config.welcomeScreen, title: value } 
-            })}
-            onSubtitleChange={(value) => onUpdateConfig({ 
-              welcomeScreen: { ...config.welcomeScreen, subtitle: value } 
-            })}
-            onBlur={() => setEditingField(null)}
+            onFocusTitle={() => setEditingField('welcome-title')}
+            onFocusSubtitle={() => setEditingField('welcome-subtitle')}
+            onBlurTitle={(value) => handleTitleBlur('welcome-title', value)}
+            onBlurSubtitle={(value) => handleSubtitleBlur('welcome-subtitle', value)}
+            showVariableMenu={showVariableMenu}
+            variableTarget={variableTarget}
+            menuView={menuView}
+            onToggleVariableMenu={(target) => {
+              setVariableTarget(target);
+              setShowVariableMenu(prev => !prev);
+              setMenuView('main');
+            }}
+            onSetMenuView={setMenuView}
+            availableVariables={availableVariables}
+            onInsertVariable={insertVariable}
           />
         );
 
