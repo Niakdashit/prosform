@@ -930,7 +930,7 @@ export const WheelPreview = ({
                   return (
                     <div className="relative w-full h-full flex items-center justify-center p-8" style={{ backgroundColor: theme.backgroundColor }}>
                       <div 
-                        className="bg-card rounded-2xl shadow-2xl p-12"
+                        className="bg-background rounded-2xl shadow-2xl p-12"
                         style={{ 
                           display: 'flex',
                           gap: `${(config.wheelScreen.blockSpacing || 1) * 4}rem`,
