@@ -155,14 +155,94 @@ export const EndingLayouts = ({
         </h1>
       </div>
       
-      <div 
-        className="text-xl md:text-2xl font-semibold mb-6 p-6 rounded-2xl"
-        style={{ 
-          backgroundColor: buttonColor + '15',
-          color: buttonColor 
-        }}
-      >
-        {subtitle.replace('{{prize}}', wonPrize || '')}
+      <div className="relative">
+        {editingField === 'ending-subtitle' && (
+          <>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => onToggleVariableMenu?.('subtitle')}
+              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+              style={{ 
+                backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                color: '#F5B800',
+                backdropFilter: 'blur(8px)'
+              }}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+            </button>
+
+            {showVariableMenu && variableTarget === 'subtitle' && (
+              <div
+                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                style={{
+                  top: '32px',
+                  right: 0,
+                  backgroundColor: '#4A4138',
+                  border: '1px solid rgba(245, 184, 0, 0.3)',
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                }}
+              >
+                {menuView === 'main' ? (
+                  <div className="space-y-1">
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => console.log('Réécriture AI')}
+                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                    >
+                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l&apos;IA</div>
+                    </button>
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => onSetMenuView?.('variables')}
+                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                    >
+                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => onSetMenuView?.('main')}
+                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                    >
+                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                    </button>
+                    {availableVariables.map((variable) => (
+                      <button
+                        key={variable.key}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => onInsertVariable?.(variable.key)}
+                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                      >
+                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        <div 
+          className="text-xl md:text-2xl font-semibold mb-6 p-6 rounded-2xl cursor-text hover:opacity-80 transition-opacity"
+          style={{ 
+            backgroundColor: buttonColor + '15',
+            color: buttonColor,
+            outline: editingField === 'ending-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+          }}
+          contentEditable
+          suppressContentEditableWarning
+          onFocus={onFocusSubtitle}
+          onBlur={(e) => onBlurSubtitle?.(e.currentTarget.textContent || '')}
+        >
+          {subtitle.replace('{{prize}}', wonPrize || '')}
+        </div>
       </div>
       
       <p className="text-lg md:text-xl mb-8 opacity-80" style={{ color: textColor }}>
