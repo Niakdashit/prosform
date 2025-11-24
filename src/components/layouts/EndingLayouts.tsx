@@ -50,9 +50,10 @@ export const EndingLayouts = ({
       </div>
       
       {editingField === 'ending-title' ? (
-        <input
+        <textarea
           autoFocus
-          className="text-4xl md:text-5xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center"
+          rows={2}
+          className="text-4xl md:text-5xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center resize-none"
           style={{ color: textColor }}
           value={title}
           onChange={(e) => onTitleChange?.(e.target.value)}
