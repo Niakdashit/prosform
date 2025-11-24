@@ -52,7 +52,7 @@ export const EndingLayouts = ({
       {editingField === 'ending-title' ? (
         <input
           autoFocus
-          className="text-4xl md:text-5xl font-bold mb-4 text-center w-full bg-transparent border-b-2 border-primary outline-none"
+          className="text-4xl md:text-5xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center"
           style={{ color: textColor }}
           value={title}
           onChange={(e) => onTitleChange?.(e.target.value)}
