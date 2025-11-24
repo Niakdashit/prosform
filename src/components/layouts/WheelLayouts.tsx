@@ -87,10 +87,10 @@ export const WheelLayouts = ({
   const renderInfo = () => (
     <div className="flex flex-col items-center justify-center p-12 space-y-6">
       <div className="text-center max-w-md">
-        <h2 className="text-3xl md:text-5xl font-bold mb-4" style={{ color: textColor }}>
+        <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: textColor }}>
           Tournez la roue !
         </h2>
-        <p className="text-xl md:text-2xl opacity-80" style={{ color: textColor }}>
+        <p className="text-lg md:text-xl opacity-80" style={{ color: textColor }}>
           Tentez votre chance et découvrez ce que vous avez gagné
         </p>
       </div>
@@ -144,7 +144,7 @@ export const WheelLayouts = ({
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
           >
             <div className="flex flex-col items-center space-y-8">
-              <h2 className="text-3xl md:text-5xl font-bold" style={{ color: textColor }}>
+              <h2 className="text-4xl md:text-5xl font-bold" style={{ color: textColor }}>
                 Tournez la roue !
               </h2>
               {renderWheel()}
@@ -193,7 +193,7 @@ export const WheelLayouts = ({
       case 'mobile-vertical':
         return (
           <div className="flex flex-col h-full justify-center items-center p-6 space-y-8">
-            <h2 className="text-3xl md:text-5xl font-bold text-center" style={{ color: textColor }}>
+            <h2 className="text-4xl md:text-5xl font-bold text-center" style={{ color: textColor }}>
               Tournez la roue !
             </h2>
             {renderWheel()}
