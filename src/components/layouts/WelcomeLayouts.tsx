@@ -341,18 +341,6 @@ export const WelcomeLayouts = ({
           </div>
         );
 
-      case 'mobile-horizontal':
-        return (
-          <div className="flex h-full">
-            <div className="min-w-full flex items-center justify-center snap-center p-6">
-              {renderVisual()}
-            </div>
-            <div className="min-w-full flex items-center justify-center snap-center p-6">
-              {renderContent()}
-            </div>
-          </div>
-        );
-
       case 'mobile-centered':
         return (
           <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>

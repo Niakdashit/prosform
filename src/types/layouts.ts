@@ -10,7 +10,6 @@ export type DesktopLayoutType =
 
 export type MobileLayoutType = 
   | 'mobile-vertical'       // Vertical classique
-  | 'mobile-horizontal'     // Horizontal scroll
   | 'mobile-centered'       // Centré
   | 'mobile-minimal';       // Minimal sans distraction
 
@@ -81,12 +80,6 @@ export const MOBILE_LAYOUTS: Array<{
     name: 'Vertical',
     description: 'Layout vertical classique',
     preview: '/src/assets/layout-mobile-vertical.svg'
-  },
-  {
-    id: 'mobile-horizontal',
-    name: 'Horizontal',
-    description: 'Scroll horizontal',
-    preview: '/src/assets/layout-mobile-horizontal.svg'
   },
   {
     id: 'mobile-centered',

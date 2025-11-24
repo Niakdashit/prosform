@@ -221,18 +221,6 @@ export const WheelLayouts = ({
           </div>
         );
 
-      case 'mobile-horizontal':
-        return (
-          <div className="flex h-full">
-            <div className="min-w-full flex items-center justify-center snap-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-              {renderContent()}
-            </div>
-            <div className="min-w-full flex items-center justify-center snap-center p-6">
-              {renderWheel()}
-            </div>
-          </div>
-        );
-
       case 'mobile-centered':
         return (
           <div className="flex flex-col items-center justify-center py-8 space-y-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
