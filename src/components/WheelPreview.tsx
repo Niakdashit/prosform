@@ -237,6 +237,8 @@ export const WheelPreview = ({
           <WheelLayouts
             layout={currentLayout}
             viewMode={viewMode}
+            title={config.welcomeScreen.title}
+            subtitle={config.welcomeScreen.subtitle}
             segments={config.segments}
             isSpinning={isSpinning}
             onSpin={() => setIsSpinning(true)}

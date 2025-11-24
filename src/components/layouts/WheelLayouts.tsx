@@ -6,6 +6,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 interface WheelLayoutProps {
   layout: DesktopLayoutType | MobileLayoutType;
   viewMode: 'desktop' | 'mobile';
+  title: string;
+  subtitle: string;
   segments: WheelSegment[];
   isSpinning: boolean;
   onSpin: () => void;
@@ -19,6 +21,8 @@ interface WheelLayoutProps {
 export const WheelLayouts = ({
   layout,
   viewMode,
+  title,
+  subtitle,
   segments,
   isSpinning,
   onSpin,
@@ -43,6 +47,27 @@ export const WheelLayouts = ({
     }
     return layout === 'desktop-panel' ? 350 : 400;
   };
+
+  const renderContent = () => (
+    <div className="text-center w-full max-w-[700px]">
+      <h1 
+        className="text-4xl md:text-5xl font-bold mb-4"
+        style={{ color: textColor }}
+      >
+        {title}
+      </h1>
+      
+      <p 
+        className="text-lg md:text-xl mb-8"
+        style={{ 
+          color: textColor, 
+          opacity: 0.9
+        }}
+      >
+        {subtitle}
+      </p>
+    </div>
+  );
 
   const renderWheel = () => (
     <div className="flex items-center justify-center">
@@ -84,38 +109,17 @@ export const WheelLayouts = ({
     </div>
   );
 
-  const renderInfo = () => (
-    <div className="flex flex-col items-center justify-center p-12 space-y-6">
-      <div className="text-center max-w-md">
-        <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: textColor }}>
-          Tournez la roue !
-        </h2>
-        <p className="text-lg md:text-xl opacity-80" style={{ color: textColor }}>
-          Tentez votre chance et découvrez ce que vous avez gagné
-        </p>
-      </div>
-      <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-        {segments.slice(0, 4).map((seg, idx) => (
-          <div 
-            key={idx}
-            className="p-4 rounded-lg text-center"
-            style={{ backgroundColor: seg.color, color: '#ffffff' }}
-          >
-            <div className="font-semibold text-sm">{seg.label}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 
   if (viewMode === 'desktop') {
     switch (layout as DesktopLayoutType) {
       case 'desktop-left-right':
         return (
           <>
-            {renderInfo()}
             <div className="flex items-center justify-center p-12">
-              {renderWheel()}
+              <div className="flex flex-col items-center space-y-8">
+                {renderContent()}
+                {renderWheel()}
+              </div>
             </div>
           </>
         );
@@ -126,14 +130,19 @@ export const WheelLayouts = ({
             <div className="flex items-center justify-center p-12">
               {renderWheel()}
             </div>
-            {renderInfo()}
+            <div className="flex items-center justify-center p-12">
+              {renderContent()}
+            </div>
           </>
         );
 
       case 'desktop-centered':
         return (
           <div className="flex items-center justify-center p-12">
-            {renderWheel()}
+            <div className="flex flex-col items-center space-y-8">
+              {renderContent()}
+              {renderWheel()}
+            </div>
           </div>
         );
 
@@ -144,9 +153,7 @@ export const WheelLayouts = ({
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
           >
             <div className="flex flex-col items-center space-y-8">
-              <h2 className="text-4xl md:text-5xl font-bold" style={{ color: textColor }}>
-                Tournez la roue !
-              </h2>
+              {renderContent()}
               {renderWheel()}
             </div>
           </div>
@@ -156,21 +163,25 @@ export const WheelLayouts = ({
         return (
           <>
             <div 
-              className="flex items-center justify-center p-8"
+              className="flex items-center justify-center p-12"
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
             >
-              {renderWheel()}
+              <div className="flex flex-col items-center space-y-8">
+                {renderContent()}
+                {renderWheel()}
+              </div>
             </div>
-            {renderInfo()}
           </>
         );
 
       case 'desktop-split':
         return (
           <>
-            {renderInfo()}
-            <div className="flex items-center justify-center p-12 border-l border-gray-200">
-              {renderWheel()}
+            <div className="flex items-center justify-center p-12 border-r border-gray-200">
+              <div className="flex flex-col items-center space-y-8">
+                {renderContent()}
+                {renderWheel()}
+              </div>
             </div>
           </>
         );
@@ -180,31 +191,41 @@ export const WheelLayouts = ({
           <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
             <div className="flex items-center justify-center p-12">
-              {renderWheel()}
+              <div className="flex flex-col items-center space-y-8">
+                {renderContent()}
+                {renderWheel()}
+              </div>
             </div>
           </>
         );
 
       default:
-        return renderWheel();
+        return (
+          <div className="flex flex-col items-center space-y-8">
+            {renderContent()}
+            {renderWheel()}
+          </div>
+        );
     }
   } else {
     switch (layout as MobileLayoutType) {
       case 'mobile-vertical':
         return (
-          <div className="flex flex-col h-full justify-center items-center py-8 space-y-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            <h2 className="text-4xl md:text-5xl font-bold text-center" style={{ color: textColor }}>
-              Tournez la roue !
-            </h2>
-            {renderWheel()}
+          <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+              {renderContent()}
+            </div>
+            <div className="flex-1 flex items-center justify-center p-6">
+              {renderWheel()}
+            </div>
           </div>
         );
 
       case 'mobile-horizontal':
         return (
           <div className="flex h-full">
-            <div className="min-w-full flex items-center justify-center snap-center p-6">
-              {renderInfo()}
+            <div className="min-w-full flex items-center justify-center snap-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+              {renderContent()}
             </div>
             <div className="min-w-full flex items-center justify-center snap-center p-6">
               {renderWheel()}
@@ -214,20 +235,27 @@ export const WheelLayouts = ({
 
       case 'mobile-centered':
         return (
-          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+          <div className="flex flex-col items-center justify-center py-8 space-y-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+            {renderContent()}
             {renderWheel()}
           </div>
         );
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center py-4 space-y-6" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+          <div className="flex flex-col items-center justify-center py-6 space-y-6" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+            {renderContent()}
             {renderWheel()}
           </div>
         );
 
       default:
-        return renderWheel();
+        return (
+          <div className="flex flex-col items-center space-y-8">
+            {renderContent()}
+            {renderWheel()}
+          </div>
+        );
     }
   }
 };
