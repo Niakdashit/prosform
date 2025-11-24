@@ -749,31 +749,214 @@ export const WheelPreview = ({
               // Text content component  
               const TextContent = ({ centered = false, noSpacing = false }: { centered?: boolean; noSpacing?: boolean }) => (
                 <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
-                  <h1 
-                    className="font-bold cursor-text hover:opacity-80 transition-opacity" 
-                    style={{ 
-                      color: theme.accentColor, 
-                      fontWeight: 700, 
-                      fontSize: viewMode === 'desktop' ? '64px' : '32px',
-                      lineHeight: '1.05',
-                      letterSpacing: '-0.02em',
-                      marginBottom: noSpacing ? '12px' : `${(config.wheelScreen.blockSpacing || 1) * 24}px`,
-                    }}
-                  >
-                    Tournez la roue !
-                  </h1>
+                  <div className="relative">
+                    {editingField === 'wheel-title' && (
+                      <>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+
+                        {showVariableMenu && variableTarget === 'title' && (
+                          <div
+                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                            style={{
+                              top: '32px',
+                              right: 0,
+                              backgroundColor: '#4A4138',
+                              border: '1px solid rgba(245, 184, 0, 0.3)',
+                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                            }}
+                          >
+                            {menuView === 'main' ? (
+                              <div className="space-y-1">
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => console.log('Réécriture AI')}
+                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                >
+                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                </button>
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => setMenuView('variables')}
+                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                >
+                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="space-y-1">
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => setMenuView('main')}
+                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                >
+                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                </button>
+                                {availableVariables.map((variable) => (
+                                  <button
+                                    key={variable.key}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => insertVariable(variable.key)}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    <h1 
+                      className="font-bold cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: theme.accentColor, 
+                        fontWeight: 700, 
+                        fontSize: viewMode === 'desktop' ? '64px' : '32px',
+                        lineHeight: '1.05',
+                        letterSpacing: '-0.02em',
+                        marginBottom: noSpacing ? '12px' : `${(config.wheelScreen.blockSpacing || 1) * 24}px`,
+                        outline: editingField === 'wheel-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                        padding: '4px',
+                        marginTop: '-4px',
+                        marginLeft: '-4px',
+                        marginRight: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('wheel-title')}
+                      onBlur={(e) => {
+                        const value = e.currentTarget.textContent || '';
+                        if (value.trim()) {
+                          // Pour l'instant, le titre est hardcodé. On pourrait ajouter un state pour le gérer
+                          console.log('Wheel title updated:', value);
+                        }
+                        setEditingField(null);
+                      }}
+                    >
+                      Tournez la roue !
+                    </h1>
+                  </div>
                   
-                  <p 
-                    className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
-                    style={{ 
-                      color: '#B8A892',
-                      fontSize: viewMode === 'desktop' ? '16px' : '14px',
-                      lineHeight: '1.6',
-                      marginBottom: noSpacing ? '0' : `${(config.wheelScreen.blockSpacing || 1) * 32}px`,
-                    }}
-                  >
-                    Tentez votre chance et découvrez votre prix
-                  </p>
+                  <div className="relative">
+                    {editingField === 'wheel-subtitle' && (
+                      <>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                          style={{ 
+                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                            color: '#F5B800',
+                            backdropFilter: 'blur(8px)'
+                          }}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                        </button>
+
+                        {showVariableMenu && variableTarget === 'subtitle' && (
+                          <div
+                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                            style={{
+                              top: '32px',
+                              right: 0,
+                              backgroundColor: '#4A4138',
+                              border: '1px solid rgba(245, 184, 0, 0.3)',
+                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                            }}
+                          >
+                            {menuView === 'main' ? (
+                              <div className="space-y-1">
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => console.log('Réécriture AI')}
+                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                >
+                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                </button>
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => setMenuView('variables')}
+                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                >
+                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="space-y-1">
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => setMenuView('main')}
+                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                >
+                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                </button>
+                                {availableVariables.map((variable) => (
+                                  <button
+                                    key={variable.key}
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => insertVariable(variable.key)}
+                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                  >
+                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    <p 
+                      className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
+                      style={{ 
+                        color: '#B8A892',
+                        fontSize: viewMode === 'desktop' ? '16px' : '14px',
+                        lineHeight: '1.6',
+                        marginBottom: noSpacing ? '0' : `${(config.wheelScreen.blockSpacing || 1) * 32}px`,
+                        outline: editingField === 'wheel-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                        padding: '4px',
+                        marginTop: '-4px',
+                        marginLeft: '-4px',
+                        marginRight: '-4px',
+                        borderRadius: '4px'
+                      }}
+                      contentEditable
+                      suppressContentEditableWarning
+                      onFocus={() => setEditingField('wheel-subtitle')}
+                      onBlur={(e) => {
+                        const value = e.currentTarget.textContent || '';
+                        if (value.trim()) {
+                          console.log('Wheel subtitle updated:', value);
+                        }
+                        setEditingField(null);
+                      }}
+                    >
+                      Tentez votre chance et découvrez votre prix
+                    </p>
+                  </div>
                 </div>
               );
 
@@ -784,19 +967,205 @@ export const WheelPreview = ({
                     <div className="w-full h-full flex items-center justify-center px-24">
                       <div className="flex flex-col items-center gap-10">
                         <div className="max-w-[700px] text-center">
-                          <h1 
-                            className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
-                            style={{ color: '#F5CA3C' }}
-                          >
-                            Tournez la roue !
-                          </h1>
+                          <div className="relative">
+                            {editingField === 'wheel-title-center' && (
+                              <>
+                                <button
+                                  type="button"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                                  className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                                  style={{ 
+                                    backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                                    color: '#F5B800',
+                                    backdropFilter: 'blur(8px)'
+                                  }}
+                                >
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                </button>
+
+                                {showVariableMenu && variableTarget === 'title' && (
+                                  <div
+                                    className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                                    style={{
+                                      top: '32px',
+                                      right: 0,
+                                      backgroundColor: '#4A4138',
+                                      border: '1px solid rgba(245, 184, 0, 0.3)',
+                                      boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                                    }}
+                                  >
+                                    {menuView === 'main' ? (
+                                      <div className="space-y-1">
+                                        <button
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => console.log('Réécriture AI')}
+                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                        >
+                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                        </button>
+                                        <button
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => setMenuView('variables')}
+                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                        >
+                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-1">
+                                        <button
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => setMenuView('main')}
+                                          className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                        >
+                                          <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                        </button>
+                                        {availableVariables.map((variable) => (
+                                          <button
+                                            key={variable.key}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => insertVariable(variable.key)}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                          >
+                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </>
+                            )}
+
+                            <h1 
+                              className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
+                              style={{ 
+                                color: '#F5CA3C',
+                                outline: editingField === 'wheel-title-center' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                                padding: '4px',
+                                marginTop: '-4px',
+                                marginLeft: '-4px',
+                                marginRight: '-4px',
+                                borderRadius: '4px'
+                              }}
+                              contentEditable
+                              suppressContentEditableWarning
+                              onFocus={() => setEditingField('wheel-title-center')}
+                              onBlur={(e) => {
+                                const value = e.currentTarget.textContent || '';
+                                if (value.trim()) {
+                                  console.log('Wheel title center updated:', value);
+                                }
+                                setEditingField(null);
+                              }}
+                            >
+                              Tournez la roue !
+                            </h1>
+                          </div>
                           
-                          <p 
-                            className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
-                            style={{ color: '#B8A892' }}
-                          >
-                            Tentez votre chance et découvrez votre prix
-                          </p>
+                          <div className="relative">
+                            {editingField === 'wheel-subtitle-center' && (
+                              <>
+                                <button
+                                  type="button"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
+                                  className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+                                  style={{ 
+                                    backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                                    color: '#F5B800',
+                                    backdropFilter: 'blur(8px)'
+                                  }}
+                                >
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                </button>
+
+                                {showVariableMenu && variableTarget === 'subtitle' && (
+                                  <div
+                                    className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                                    style={{
+                                      top: '32px',
+                                      right: 0,
+                                      backgroundColor: '#4A4138',
+                                      border: '1px solid rgba(245, 184, 0, 0.3)',
+                                      boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                                    }}
+                                  >
+                                    {menuView === 'main' ? (
+                                      <div className="space-y-1">
+                                        <button
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => console.log('Réécriture AI')}
+                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                        >
+                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
+                                        </button>
+                                        <button
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => setMenuView('variables')}
+                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                        >
+                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-1">
+                                        <button
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => setMenuView('main')}
+                                          className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                                        >
+                                          <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                                        </button>
+                                        {availableVariables.map((variable) => (
+                                          <button
+                                            key={variable.key}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onClick={() => insertVariable(variable.key)}
+                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                                          >
+                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </>
+                            )}
+
+                            <p 
+                              className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                              style={{ 
+                                color: '#B8A892',
+                                outline: editingField === 'wheel-subtitle-center' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+                                padding: '4px',
+                                marginTop: '-4px',
+                                marginLeft: '-4px',
+                                marginRight: '-4px',
+                                borderRadius: '4px'
+                              }}
+                              contentEditable
+                              suppressContentEditableWarning
+                              onFocus={() => setEditingField('wheel-subtitle-center')}
+                              onBlur={(e) => {
+                                const value = e.currentTarget.textContent || '';
+                                if (value.trim()) {
+                                  console.log('Wheel subtitle center updated:', value);
+                                }
+                                setEditingField(null);
+                              }}
+                            >
+                              Tentez votre chance et découvrez votre prix
+                            </p>
+                          </div>
                         </div>
                         <div
                           className="flex-shrink-0 flex items-center justify-center"
