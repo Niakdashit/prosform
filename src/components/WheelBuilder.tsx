@@ -5,7 +5,7 @@ import { WheelPreview } from "./WheelPreview";
 import { WheelSettingsPanel } from "./WheelSettingsPanel";
 import { WheelTopToolbar } from "./WheelTopToolbar";
 import { SegmentsModal } from "./SegmentsModal";
-import { CampaignSettingsModal } from "./CampaignSettingsModal";
+import { CampaignSettings } from "./CampaignSettings";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -127,7 +127,7 @@ export const WheelBuilder = () => {
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
-  const [campaignSettingsOpen, setCampaignSettingsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'design' | 'campaign'>('design');
 
   useEffect(() => {
     if (isMobile) {
@@ -214,10 +214,14 @@ export const WheelBuilder = () => {
           localStorage.setItem('wheel-theme', JSON.stringify(theme));
           window.open('/wheel-preview', '_blank');
         }}
-        onCampaignSettings={() => setCampaignSettingsOpen(true)}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
         
-      <div className="flex flex-1 overflow-hidden relative">
+      {activeTab === 'campaign' ? (
+        <CampaignSettings />
+      ) : (
+        <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
@@ -322,6 +326,7 @@ export const WheelBuilder = () => {
           </>
         )}
       </div>
+      )}
 
       <SegmentsModal
         open={segmentsModalOpen}
@@ -330,11 +335,6 @@ export const WheelBuilder = () => {
         onUpdateSegment={updateSegment}
         onAddSegment={addSegment}
         onDeleteSegment={deleteSegment}
-      />
-
-      <CampaignSettingsModal
-        open={campaignSettingsOpen}
-        onOpenChange={setCampaignSettingsOpen}
       />
     </div>
   );
