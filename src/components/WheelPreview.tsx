@@ -783,6 +783,21 @@ export const WheelPreview = ({
                   return (
                     <div className="w-full h-full flex items-center justify-center px-24">
                       <div className="flex flex-col items-center gap-10">
+                        <div className="max-w-[700px] text-center">
+                          <h1 
+                            className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
+                            style={{ color: '#F5CA3C' }}
+                          >
+                            Tournez la roue !
+                          </h1>
+                          
+                          <p 
+                            className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                            style={{ color: '#B8A892' }}
+                          >
+                            Tentez votre chance et découvrez votre prix
+                          </p>
+                        </div>
                         <div
                           className="flex-shrink-0 flex items-center justify-center"
                           style={{ 
@@ -801,21 +816,6 @@ export const WheelPreview = ({
                           size={280}
                         />
                       </div>
-                      <div className="max-w-[700px] text-center">
-                        <h1 
-                          className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
-                          style={{ color: '#F5CA3C' }}
-                        >
-                          Tournez la roue !
-                        </h1>
-                        
-                        <p 
-                          className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
-                          style={{ color: '#B8A892' }}
-                        >
-                          Tentez votre chance et découvrez votre prix
-                        </p>
-                        </div>
                       </div>
                     </div>
                   );
