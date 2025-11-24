@@ -25,6 +25,7 @@ interface WheelSidebarProps {
   onDuplicateSegment: (id: string) => void;
   onReorderSegments: (startIndex: number, endIndex: number) => void;
   onDeleteSegment: (id: string) => void;
+  onGoToDotation: () => void;
 }
 
 export const WheelSidebar = ({
@@ -35,6 +36,7 @@ export const WheelSidebar = ({
   onDuplicateSegment,
   onReorderSegments,
   onDeleteSegment,
+  onGoToDotation,
 }: WheelSidebarProps) => {
   const { theme, updateTheme } = useTheme();
   const borderColorInputRef = useRef<HTMLInputElement | null>(null);
@@ -127,13 +129,22 @@ export const WheelSidebar = ({
 
               <div className="flex items-center justify-between mb-3 px-2">
                 <span className="text-sm font-semibold text-foreground">Segments</span>
-                <button 
-                  onClick={onOpenSegmentsModal}
-                  className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
-                  title="Configurer les segments"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button 
+                    onClick={onGoToDotation}
+                    className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
+                    title="Gérer les dotations"
+                  >
+                    <Gift className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={onOpenSegmentsModal}
+                    className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
+                    title="Configurer les segments"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               {config.segments.map((segment, index) => (

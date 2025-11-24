@@ -128,6 +128,7 @@ export const WheelBuilder = () => {
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'campaign'>('design');
+  const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
 
   useEffect(() => {
     if (isMobile) {
@@ -219,7 +220,7 @@ export const WheelBuilder = () => {
       />
         
       {activeTab === 'campaign' ? (
-        <CampaignSettings />
+        <CampaignSettings defaultTab={campaignDefaultTab} />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
@@ -240,6 +241,11 @@ export const WheelBuilder = () => {
                   onDuplicateSegment={duplicateSegment}
                   onReorderSegments={reorderSegments}
                   onDeleteSegment={deleteSegment}
+                  onGoToDotation={() => {
+                    setActiveTab('campaign');
+                    setCampaignDefaultTab('dotation');
+                    setLeftDrawerOpen(false);
+                  }}
                 />
               </DrawerContent>
             </Drawer>
@@ -298,6 +304,10 @@ export const WheelBuilder = () => {
               onDuplicateSegment={duplicateSegment}
               onReorderSegments={reorderSegments}
               onDeleteSegment={deleteSegment}
+              onGoToDotation={() => {
+                setActiveTab('campaign');
+                setCampaignDefaultTab('dotation');
+              }}
             />
             
             <WheelPreview
