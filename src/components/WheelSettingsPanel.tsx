@@ -475,6 +475,55 @@ export const WheelSettingsPanel = ({
                 </div>
               </>
             )}
+            
+            <Separator />
+            
+            <Label className="text-xs text-muted-foreground">Segments configuration</Label>
+            {config.segments.map((segment) => (
+              <div key={segment.id} className="p-3 border rounded-lg space-y-2">
+                <div>
+                  <Label className="text-[10px] text-muted-foreground mb-1 block">Label</Label>
+                  <Input 
+                    type="text" 
+                    value={segment.label}
+                    onChange={(e) => onUpdateSegment(segment.id, { label: e.target.value })}
+                    className="text-xs h-7"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-[10px] text-muted-foreground mb-1 block">Color</Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      type="color" 
+                      value={segment.color}
+                      onChange={(e) => onUpdateSegment(segment.id, { color: e.target.value })}
+                      className="h-7 w-14" 
+                    />
+                    <Input 
+                      type="text" 
+                      value={segment.color}
+                      onChange={(e) => onUpdateSegment(segment.id, { color: e.target.value })}
+                      className="h-7 text-xs flex-1" 
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-[10px] text-muted-foreground mb-1 block">
+                    Probability: {segment.probability}%
+                  </Label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={segment.probability || 0}
+                    onChange={(e) => onUpdateSegment(segment.id, { probability: parseInt(e.target.value) })}
+                    className="w-full h-1.5 accent-primary cursor-pointer"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         );
 
