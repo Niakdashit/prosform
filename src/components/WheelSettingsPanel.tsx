@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, X } from "lucide-react";
 import { WallpaperUploadModal } from "./WallpaperUploadModal";
 import { useState } from "react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface WheelSettingsPanelProps {
   config: WheelConfig;
@@ -575,73 +576,78 @@ export const WheelSettingsPanel = ({
 
             <Separator />
 
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Réseaux sociaux</Label>
-              
-              <div>
-                <Label className="text-[10px] text-muted-foreground mb-1 block">Facebook URL</Label>
-                <Input 
-                  type="url" 
-                  value={config.endingScreen.socialLinks?.facebook || ''}
-                  onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { 
-                      ...config.endingScreen, 
-                      socialLinks: { ...config.endingScreen.socialLinks, facebook: e.target.value } 
-                    } 
-                  })}
-                  className="text-xs h-7"
-                  placeholder="https://facebook.com/..."
-                />
-              </div>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="social" className="border-none">
+                <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline py-2">
+                  Réseaux sociaux
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pt-2">
+                  <div>
+                    <Label className="text-[10px] text-muted-foreground mb-1 block">Facebook URL</Label>
+                    <Input 
+                      type="url" 
+                      value={config.endingScreen.socialLinks?.facebook || ''}
+                      onChange={(e) => onUpdateConfig({ 
+                        endingScreen: { 
+                          ...config.endingScreen, 
+                          socialLinks: { ...config.endingScreen.socialLinks, facebook: e.target.value } 
+                        } 
+                      })}
+                      className="text-xs h-7"
+                      placeholder="https://facebook.com/..."
+                    />
+                  </div>
 
-              <div>
-                <Label className="text-[10px] text-muted-foreground mb-1 block">Twitter URL</Label>
-                <Input 
-                  type="url" 
-                  value={config.endingScreen.socialLinks?.twitter || ''}
-                  onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { 
-                      ...config.endingScreen, 
-                      socialLinks: { ...config.endingScreen.socialLinks, twitter: e.target.value } 
-                    } 
-                  })}
-                  className="text-xs h-7"
-                  placeholder="https://twitter.com/..."
-                />
-              </div>
+                  <div>
+                    <Label className="text-[10px] text-muted-foreground mb-1 block">Twitter URL</Label>
+                    <Input 
+                      type="url" 
+                      value={config.endingScreen.socialLinks?.twitter || ''}
+                      onChange={(e) => onUpdateConfig({ 
+                        endingScreen: { 
+                          ...config.endingScreen, 
+                          socialLinks: { ...config.endingScreen.socialLinks, twitter: e.target.value } 
+                        } 
+                      })}
+                      className="text-xs h-7"
+                      placeholder="https://twitter.com/..."
+                    />
+                  </div>
 
-              <div>
-                <Label className="text-[10px] text-muted-foreground mb-1 block">Instagram URL</Label>
-                <Input 
-                  type="url" 
-                  value={config.endingScreen.socialLinks?.instagram || ''}
-                  onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { 
-                      ...config.endingScreen, 
-                      socialLinks: { ...config.endingScreen.socialLinks, instagram: e.target.value } 
-                    } 
-                  })}
-                  className="text-xs h-7"
-                  placeholder="https://instagram.com/..."
-                />
-              </div>
+                  <div>
+                    <Label className="text-[10px] text-muted-foreground mb-1 block">Instagram URL</Label>
+                    <Input 
+                      type="url" 
+                      value={config.endingScreen.socialLinks?.instagram || ''}
+                      onChange={(e) => onUpdateConfig({ 
+                        endingScreen: { 
+                          ...config.endingScreen, 
+                          socialLinks: { ...config.endingScreen.socialLinks, instagram: e.target.value } 
+                        } 
+                      })}
+                      className="text-xs h-7"
+                      placeholder="https://instagram.com/..."
+                    />
+                  </div>
 
-              <div>
-                <Label className="text-[10px] text-muted-foreground mb-1 block">LinkedIn URL</Label>
-                <Input 
-                  type="url" 
-                  value={config.endingScreen.socialLinks?.linkedin || ''}
-                  onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { 
-                      ...config.endingScreen, 
-                      socialLinks: { ...config.endingScreen.socialLinks, linkedin: e.target.value } 
-                    } 
-                  })}
-                  className="text-xs h-7"
-                  placeholder="https://linkedin.com/..."
-                />
-              </div>
-            </div>
+                  <div>
+                    <Label className="text-[10px] text-muted-foreground mb-1 block">LinkedIn URL</Label>
+                    <Input 
+                      type="url" 
+                      value={config.endingScreen.socialLinks?.linkedin || ''}
+                      onChange={(e) => onUpdateConfig({ 
+                        endingScreen: { 
+                          ...config.endingScreen, 
+                          socialLinks: { ...config.endingScreen.socialLinks, linkedin: e.target.value } 
+                        } 
+                      })}
+                      className="text-xs h-7"
+                      placeholder="https://linkedin.com/..."
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
             <Separator />
             
