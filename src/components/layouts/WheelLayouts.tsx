@@ -128,10 +128,10 @@ export const WheelLayouts = ({
         return (
           <>
             <div className="flex items-center justify-center p-12">
-              <div className="flex flex-col items-center space-y-8">
-                {renderContent()}
-                {renderWheel()}
-              </div>
+              {renderContent()}
+            </div>
+            <div className="flex items-center justify-center p-12">
+              {renderWheel()}
             </div>
           </>
         );
@@ -178,10 +178,10 @@ export const WheelLayouts = ({
               className="flex items-center justify-center p-12"
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
             >
-              <div className="flex flex-col items-center space-y-8">
-                {renderContent()}
-                {renderWheel()}
-              </div>
+              {renderContent()}
+            </div>
+            <div className="flex items-center justify-center p-12">
+              {renderWheel()}
             </div>
           </>
         );
@@ -190,10 +190,10 @@ export const WheelLayouts = ({
         return (
           <>
             <div className="flex items-center justify-center p-12 border-r border-gray-200">
-              <div className="flex flex-col items-center space-y-8">
-                {renderContent()}
-                {renderWheel()}
-              </div>
+              {renderContent()}
+            </div>
+            <div className="flex items-center justify-center p-12">
+              {renderWheel()}
             </div>
           </>
         );
