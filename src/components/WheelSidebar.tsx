@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WheelConfig } from "./WheelBuilder";
-import { Plus, Palette, LayoutList, Gift, Home, Mail, Award } from "lucide-react";
+import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, GripVertical, MoreVertical, Copy, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -10,12 +10,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
 import { WheelBorderStyleSelector } from "@/components/ui/WheelBorderStyleSelector";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface WheelSidebarProps {
   config: WheelConfig;
   activeView: 'welcome' | 'contact' | 'wheel' | 'ending';
   onViewSelect: (view: 'welcome' | 'contact' | 'wheel' | 'ending') => void;
   onAddSegment: () => void;
+  onDuplicateSegment: (id: string) => void;
+  onReorderSegments: (startIndex: number, endIndex: number) => void;
   onDeleteSegment: (id: string) => void;
 }
 
@@ -24,11 +32,46 @@ export const WheelSidebar = ({
   activeView,
   onViewSelect,
   onAddSegment,
+  onDuplicateSegment,
+  onReorderSegments,
   onDeleteSegment,
 }: WheelSidebarProps) => {
   const { theme, updateTheme } = useTheme();
   const borderColorInputRef = useRef<HTMLInputElement | null>(null);
   const [isWheelSectionOpen, setIsWheelSectionOpen] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', index.toString());
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverIndex(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/html'));
+    if (dragIndex !== dropIndex) {
+      onReorderSegments(dragIndex, dropIndex);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   const views = [
     { id: 'welcome' as const, label: 'Welcome', icon: Home },
@@ -92,11 +135,23 @@ export const WheelSidebar = ({
                 </button>
               </div>
               
-              {config.segments.map((segment) => (
+              {config.segments.map((segment, index) => (
                 <div
                   key={segment.id}
-                  className="w-full px-2 py-2.5 rounded-lg mb-1 flex items-center gap-2 hover:bg-muted/50"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={cn(
+                    "group w-full px-2 py-2.5 rounded-lg mb-1 flex items-center gap-2 transition-all cursor-move",
+                    "hover:bg-muted/50",
+                    draggedIndex === index && "opacity-50",
+                    dragOverIndex === index && "bg-muted"
+                  )}
                 >
+                  <GripVertical className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                   <div 
                     className="w-4 h-4 rounded flex-shrink-0"
                     style={{ backgroundColor: segment.color }}
@@ -109,6 +164,29 @@ export const WheelSidebar = ({
                       {segment.probability}%
                     </p>
                   </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button 
+                        onClick={(e) => e.stopPropagation()}
+                        className="opacity-0 group-hover:opacity-100 hover:bg-muted rounded p-1 transition-all"
+                      >
+                        <MoreVertical className="w-3 h-3" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onDuplicateSegment(segment.id)}>
+                        <Copy className="w-3 h-3 mr-2" />
+                        Dupliquer
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => onDeleteSegment(segment.id)}
+                        className="text-destructive"
+                      >
+                        <Trash2 className="w-3 h-3 mr-2" />
+                        Supprimer
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ))}
             </div>
