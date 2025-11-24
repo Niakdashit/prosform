@@ -3,9 +3,10 @@ import { Eye, Share2, Settings, Palette, Smartphone, RotateCcw, Gift } from "luc
 
 interface WheelTopToolbarProps {
   onPreview: () => void;
+  onCampaignSettings: () => void;
 }
 
-export const WheelTopToolbar = ({ onPreview }: WheelTopToolbarProps) => {
+export const WheelTopToolbar = ({ onPreview, onCampaignSettings }: WheelTopToolbarProps) => {
   return (
     <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
       <div className="flex items-center gap-1.5">
@@ -13,7 +14,12 @@ export const WheelTopToolbar = ({ onPreview }: WheelTopToolbarProps) => {
           <Palette className="w-3.5 h-3.5" />
           Design
         </Button>
-        <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs px-2.5">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="gap-1.5 h-8 text-xs px-2.5"
+          onClick={onCampaignSettings}
+        >
           <Gift className="w-3.5 h-3.5" />
           Paramètres et dotations
         </Button>
