@@ -176,8 +176,13 @@ export const WelcomeLayouts = ({
     switch (layout as MobileLayoutType) {
       case 'mobile-vertical':
         return (
-          <div className="flex flex-col h-full justify-center p-6">
-            {renderContent()}
+          <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center p-6">
+              {renderVisual()}
+            </div>
+            <div className="flex-1 flex items-center justify-center p-6">
+              {renderContent()}
+            </div>
           </div>
         );
 
@@ -202,7 +207,8 @@ export const WelcomeLayouts = ({
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center p-6">
+          <div className="flex flex-col items-center justify-center p-6 space-y-8">
+            <div className="text-5xl">🎡</div>
             {renderContent()}
           </div>
         );
