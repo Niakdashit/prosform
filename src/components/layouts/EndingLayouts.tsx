@@ -59,15 +59,6 @@ export const EndingLayouts = ({
 
   const renderContent = () => (
     <div className="text-center w-full max-w-2xl px-8">
-      <div className="mb-8 flex justify-center">
-        <div 
-          className="w-20 h-20 rounded-full flex items-center justify-center animate-scale-in"
-          style={{ backgroundColor: buttonColor + '20' }}
-        >
-          <Check className="w-10 h-10" style={{ color: buttonColor }} />
-        </div>
-      </div>
-      
       <div className="relative mb-6">
         {editingField === 'ending-title' && (
           <>
@@ -321,76 +312,16 @@ export const EndingLayouts = ({
   const renderVisual = () => null;
 
   if (viewMode === 'desktop') {
-    switch (layout as DesktopLayoutType) {
-      case 'desktop-left-right':
-      case 'desktop-right-left':
-      case 'desktop-centered':
-        return (
-          <div className="flex items-center justify-center p-12">
-            {renderContent()}
-          </div>
-        );
-
-      case 'desktop-card':
-        return (
-          <div 
-            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
-          >
-            {renderContent()}
-          </div>
-        );
-
-      case 'desktop-panel':
-        return (
-          <div 
-            className="flex items-center justify-center p-12"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.02)' }}
-          >
-            {renderContent()}
-          </div>
-        );
-
-      case 'desktop-split':
-        return (
-          <>
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm -z-10" />
-            <div className="flex items-center justify-center p-12">
-              {renderContent()}
-            </div>
-          </>
-        );
-
-      default:
-        return (
-          <div className="flex items-center justify-center p-12">
-            {renderContent()}
-          </div>
-        );
-    }
+    return (
+      <div className="flex items-center justify-center h-full p-12">
+        {renderContent()}
+      </div>
+    );
   } else {
-    switch (layout as MobileLayoutType) {
-      case 'mobile-vertical':
-      case 'mobile-centered':
-        return (
-          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderContent()}
-          </div>
-        );
-
-      case 'mobile-minimal':
-        return (
-          <div className="flex flex-col items-center justify-center py-6" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderContent()}
-          </div>
-        );
-
-      default:
-        return (
-          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderContent()}
-          </div>
-        );
-    }
+    return (
+      <div className="flex items-center justify-center h-full py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+        {renderContent()}
+      </div>
+    );
   }
 };
