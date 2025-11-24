@@ -176,6 +176,24 @@ export const WheelSettingsPanel = ({
                     </Button>
                   )}
                 </div>
+                
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Overlay opacity: {((config.welcomeScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
+                  </Label>
+                  <Slider
+                    value={[(config.welcomeScreen.overlayOpacity ?? 0.6) * 100]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, overlayOpacity: value / 100 }
+                    })}
+                    min={0}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
+                </div>
               </>
             )}
           </div>
@@ -305,6 +323,24 @@ export const WheelSettingsPanel = ({
                         </Button>
                       )}
                     </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-2 block">
+                        Overlay opacity: {((config.contactForm.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
+                      </Label>
+                      <Slider
+                        value={[(config.contactForm.overlayOpacity ?? 0.6) * 100]}
+                        onValueChange={([value]) => onUpdateConfig({
+                          contactForm: { ...config.contactForm, overlayOpacity: value / 100 }
+                        })}
+                        min={0}
+                        max={100}
+                        step={5}
+                        className="w-full"
+                      />
+                    </div>
                   </>
                 )}
 
@@ -417,6 +453,24 @@ export const WheelSettingsPanel = ({
                       Ajouter une image
                     </Button>
                   )}
+                </div>
+                
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Overlay opacity: {((config.wheelScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
+                  </Label>
+                  <Slider
+                    value={[(config.wheelScreen.overlayOpacity ?? 0.6) * 100]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      wheelScreen: { ...config.wheelScreen, overlayOpacity: value / 100 }
+                    })}
+                    min={0}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
                 </div>
               </>
             )}
@@ -585,6 +639,24 @@ export const WheelSettingsPanel = ({
                       Ajouter une image
                     </Button>
                   )}
+                </div>
+                
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Overlay opacity: {((config.endingScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
+                  </Label>
+                  <Slider
+                    value={[(config.endingScreen.overlayOpacity ?? 0.6) * 100]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      endingScreen: { ...config.endingScreen, overlayOpacity: value / 100 }
+                    })}
+                    min={0}
+                    max={100}
+                    step={5}
+                    className="w-full"
+                  />
                 </div>
               </>
             )}
