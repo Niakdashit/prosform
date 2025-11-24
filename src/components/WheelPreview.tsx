@@ -797,11 +797,10 @@ export const WheelPreview = ({
 
                 return (
                   <div
-                    className="overflow-hidden relative group flex items-center justify-center"
+                    className="flex items-center justify-center"
                     style={{ 
-                      borderRadius: "36px",
-                      width: viewMode === 'desktop' ? '420px' : currentLayoutType === 'mobile-horizontal' ? '140px' : '280px',
-                      height: viewMode === 'desktop' ? '420px' : currentLayoutType === 'mobile-horizontal' ? '140px' : '280px',
+                      width: viewMode === 'desktop' ? '450px' : currentLayoutType === 'mobile-horizontal' ? '160px' : '320px',
+                      height: viewMode === 'desktop' ? '450px' : currentLayoutType === 'mobile-horizontal' ? '160px' : '320px',
                       maxWidth: '100%',
                       flexShrink: 0
                     }}
@@ -814,7 +813,7 @@ export const WheelPreview = ({
                         setTimeout(() => onNext(), 1000);
                       }}
                       brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                      size={viewMode === 'desktop' ? 400 : currentLayoutType === 'mobile-horizontal' ? 130 : 260}
+                      size={viewMode === 'desktop' ? 380 : currentLayoutType === 'mobile-horizontal' ? 140 : 280}
                     />
                   </div>
                 );
@@ -857,11 +856,10 @@ export const WheelPreview = ({
                   return (
                     <div className="w-full h-full flex flex-col items-start justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide">
                       <div
-                        className="overflow-hidden flex-shrink-0"
+                        className="flex-shrink-0 flex items-center justify-center"
                         style={{ 
-                          borderRadius: "36px",
-                          width: '320px',
-                          height: '320px',
+                          width: '350px',
+                          height: '350px',
                         }}
                       >
                         <SmartWheel
@@ -872,7 +870,7 @@ export const WheelPreview = ({
                             setTimeout(() => onNext(), 1000);
                           }}
                           brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                          size={300}
+                          size={280}
                         />
                       </div>
                       <div className="max-w-[700px]">
