@@ -4,8 +4,8 @@ export type DesktopLayoutType =
   | 'desktop-left-right'    // Contenu à gauche, visuel à droite
   | 'desktop-right-left'    // Visuel à gauche, contenu à droite
   | 'desktop-centered'      // Contenu centré
-  | 'desktop-card'          // Carte centrée avec background
-  | 'desktop-panel'         // Panel latéral
+  | 'desktop-card'          // Split right - Contenu à gauche, roue à droite
+  | 'desktop-panel'         // Split left - Roue à gauche, contenu à droite
   | 'desktop-split'         // Split 50/50
   | 'desktop-wallpaper';    // Fond plein écran avec overlay
 
@@ -53,14 +53,14 @@ export const DESKTOP_LAYOUTS: Array<{
   },
   {
     id: 'desktop-card',
-    name: 'Carte',
-    description: 'Carte centrée avec fond',
+    name: 'Split right',
+    description: 'Contenu à gauche, roue à droite',
     preview: '/src/assets/layout-desktop-card.svg'
   },
   {
     id: 'desktop-panel',
-    name: 'Panel',
-    description: 'Panel latéral élégant',
+    name: 'Split left',
+    description: 'Roue à gauche, contenu à droite',
     preview: '/src/assets/layout-desktop-panel.svg'
   },
   {
