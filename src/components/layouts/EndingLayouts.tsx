@@ -227,12 +227,17 @@ export const EndingLayouts = ({
           </>
         )}
 
-        <div 
-          className="inline-block text-xl md:text-2xl font-semibold px-8 py-4 rounded-2xl cursor-text hover:opacity-90 transition-opacity"
+        <p 
+          className="text-xl md:text-2xl mb-8 cursor-text hover:opacity-80 transition-opacity"
           style={{ 
-            backgroundColor: buttonColor + '15',
-            color: buttonColor,
+            color: textColor,
+            opacity: 0.9,
             outline: editingField === 'ending-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+            padding: '4px',
+            marginTop: '-4px',
+            marginLeft: '-4px',
+            marginRight: '-4px',
+            borderRadius: '4px'
           }}
           contentEditable
           suppressContentEditableWarning
@@ -240,7 +245,7 @@ export const EndingLayouts = ({
           onBlur={(e) => onBlurSubtitle?.(e.currentTarget.textContent || '')}
         >
           {subtitle.replace('{{prize}}', wonPrize || '')}
-        </div>
+        </p>
       </div>
       
       {socialLinks && (Object.values(socialLinks).some(link => link)) && (
