@@ -1,6 +1,6 @@
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { Button } from "@/components/ui/button";
-import { Check, Gift, PartyPopper, Sparkles } from "lucide-react";
+import { Check, Gift, PartyPopper, Sparkles, Facebook, Twitter, Instagram, Linkedin, Share2 } from "lucide-react";
 
 interface EndingLayoutProps {
   layout: DesktopLayoutType | MobileLayoutType;
@@ -24,6 +24,12 @@ interface EndingLayoutProps {
   availableVariables?: Array<{ key: string; label: string; description: string }>;
   onInsertVariable?: (variableKey: string) => void;
   onRestart?: () => void;
+  socialLinks?: {
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    linkedin?: string;
+  };
 }
 
 export const EndingLayouts = ({
@@ -47,21 +53,22 @@ export const EndingLayouts = ({
   onSetMenuView,
   availableVariables = [],
   onInsertVariable,
-  onRestart
+  onRestart,
+  socialLinks
 }: EndingLayoutProps) => {
 
   const renderContent = () => (
-    <div className="text-center w-full max-w-2xl">
-      <div className="mb-6 flex justify-center">
+    <div className="text-center w-full max-w-2xl px-8">
+      <div className="mb-8 flex justify-center">
         <div 
-          className="w-24 h-24 rounded-full flex items-center justify-center"
+          className="w-20 h-20 rounded-full flex items-center justify-center animate-scale-in"
           style={{ backgroundColor: buttonColor + '20' }}
         >
-          <PartyPopper className="w-12 h-12" style={{ color: buttonColor }} />
+          <Check className="w-10 h-10" style={{ color: buttonColor }} />
         </div>
       </div>
       
-      <div className="relative">
+      <div className="relative mb-6">
         {editingField === 'ending-title' && (
           <>
             <button
@@ -136,7 +143,7 @@ export const EndingLayouts = ({
         )}
 
         <h1 
-          className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity"
+          className="text-3xl md:text-4xl font-bold cursor-text hover:opacity-80 transition-opacity"
           style={{ 
             color: textColor,
             outline: editingField === 'ending-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
@@ -155,7 +162,7 @@ export const EndingLayouts = ({
         </h1>
       </div>
       
-      <div className="relative">
+      <div className="relative mb-8">
         {editingField === 'ending-subtitle' && (
           <>
             <button
@@ -230,7 +237,7 @@ export const EndingLayouts = ({
         )}
 
         <div 
-          className="text-xl md:text-2xl font-semibold mb-6 p-6 rounded-2xl cursor-text hover:opacity-80 transition-opacity"
+          className="inline-block text-xl md:text-2xl font-semibold px-8 py-4 rounded-2xl cursor-text hover:opacity-90 transition-opacity"
           style={{ 
             backgroundColor: buttonColor + '15',
             color: buttonColor,
@@ -245,15 +252,65 @@ export const EndingLayouts = ({
         </div>
       </div>
       
-      <p className="text-lg md:text-xl mb-8 opacity-80" style={{ color: textColor }}>
-        Votre gain vous sera envoyé par email dans les plus brefs délais
-      </p>
+      {socialLinks && (Object.values(socialLinks).some(link => link)) && (
+        <div className="mb-8">
+          <p className="text-sm mb-4 opacity-70" style={{ color: textColor }}>
+            Partagez votre victoire
+          </p>
+          <div className="flex justify-center gap-3">
+            {socialLinks.facebook && (
+              <a 
+                href={socialLinks.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+              >
+                <Facebook className="w-5 h-5" />
+              </a>
+            )}
+            {socialLinks.twitter && (
+              <a 
+                href={socialLinks.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+              >
+                <Twitter className="w-5 h-5" />
+              </a>
+            )}
+            {socialLinks.instagram && (
+              <a 
+                href={socialLinks.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+            )}
+            {socialLinks.linkedin && (
+              <a 
+                href={socialLinks.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{ backgroundColor: buttonColor + '15', color: buttonColor }}
+              >
+                <Linkedin className="w-5 h-5" />
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       {onRestart && (
         <Button 
           onClick={onRestart}
-          variant="outline"
-          className="h-12 px-8 text-lg"
+          className="h-11 px-8 text-base font-medium rounded-full hover-scale"
+          style={{ backgroundColor: buttonColor, color: '#3D3731' }}
         >
           Rejouer
         </Button>
@@ -261,63 +318,15 @@ export const EndingLayouts = ({
     </div>
   );
 
-  const renderConfetti = () => (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(20)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute animate-bounce"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animationDelay: `${Math.random() * 2}s`,
-            animationDuration: `${2 + Math.random() * 2}s`
-          }}
-        >
-          <Sparkles 
-            className="w-4 h-4"
-            style={{ color: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1'][i % 4] }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderVisual = () => (
-    <div className="flex items-center justify-center p-8 relative">
-      <div className="w-full max-w-md aspect-square rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center relative overflow-hidden">
-        <Gift className="w-32 h-32" style={{ color: buttonColor }} />
-        {renderConfetti()}
-      </div>
-    </div>
-  );
+  const renderVisual = () => null;
 
   if (viewMode === 'desktop') {
     switch (layout as DesktopLayoutType) {
       case 'desktop-left-right':
-        return (
-          <>
-            <div className="flex items-center justify-center p-12 relative">
-              {renderContent()}
-            </div>
-            {renderVisual()}
-          </>
-        );
-
       case 'desktop-right-left':
-        return (
-          <>
-            {renderVisual()}
-            <div className="flex items-center justify-center p-12 relative">
-              {renderContent()}
-            </div>
-          </>
-        );
-
       case 'desktop-centered':
         return (
-          <div className="flex items-center justify-center p-12 relative">
-            {renderConfetti()}
+          <div className="flex items-center justify-center p-12">
             {renderContent()}
           </div>
         );
@@ -325,75 +334,63 @@ export const EndingLayouts = ({
       case 'desktop-card':
         return (
           <div 
-            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12 relative overflow-hidden"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
+            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
           >
-            {renderConfetti()}
             {renderContent()}
           </div>
         );
 
       case 'desktop-panel':
         return (
-          <>
-            <div 
-              className="flex items-center justify-center p-12 relative"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
-            >
-              {renderContent()}
-            </div>
-            {renderVisual()}
-          </>
+          <div 
+            className="flex items-center justify-center p-12"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.02)' }}
+          >
+            {renderContent()}
+          </div>
         );
 
       case 'desktop-split':
         return (
           <>
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm -z-10" />
             <div className="flex items-center justify-center p-12">
-              {renderConfetti()}
               {renderContent()}
             </div>
           </>
         );
 
       default:
-        return renderContent();
+        return (
+          <div className="flex items-center justify-center p-12">
+            {renderContent()}
+          </div>
+        );
     }
   } else {
     switch (layout as MobileLayoutType) {
       case 'mobile-vertical':
-        return (
-          <div className="flex flex-col h-full relative">
-            {renderConfetti()}
-            <div className="flex-1 flex items-center justify-center p-6">
-              {renderVisual()}
-            </div>
-            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-              {renderContent()}
-            </div>
-          </div>
-        );
-
       case 'mobile-centered':
         return (
-          <div className="flex items-center justify-center py-8 relative" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderConfetti()}
+          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderContent()}
           </div>
         );
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center py-6 space-y-8 relative" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderConfetti()}
-            <Gift className="w-20 h-20" style={{ color: buttonColor }} />
+          <div className="flex flex-col items-center justify-center py-6" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderContent()}
           </div>
         );
 
       default:
-        return renderContent();
+        return (
+          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+            {renderContent()}
+          </div>
+        );
     }
   }
 };
