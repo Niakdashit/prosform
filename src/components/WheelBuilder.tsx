@@ -5,6 +5,7 @@ import { WheelPreview } from "./WheelPreview";
 import { WheelSettingsPanel } from "./WheelSettingsPanel";
 import { WheelTopToolbar } from "./WheelTopToolbar";
 import { SegmentsModal } from "./SegmentsModal";
+import { CampaignSettingsModal } from "./CampaignSettingsModal";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -126,6 +127,7 @@ export const WheelBuilder = () => {
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
+  const [campaignSettingsOpen, setCampaignSettingsOpen] = useState(false);
 
   useEffect(() => {
     if (isMobile) {
@@ -212,6 +214,7 @@ export const WheelBuilder = () => {
           localStorage.setItem('wheel-theme', JSON.stringify(theme));
           window.open('/wheel-preview', '_blank');
         }}
+        onCampaignSettings={() => setCampaignSettingsOpen(true)}
       />
         
       <div className="flex flex-1 overflow-hidden relative">
@@ -327,6 +330,11 @@ export const WheelBuilder = () => {
         onUpdateSegment={updateSegment}
         onAddSegment={addSegment}
         onDeleteSegment={deleteSegment}
+      />
+
+      <CampaignSettingsModal
+        open={campaignSettingsOpen}
+        onOpenChange={setCampaignSettingsOpen}
       />
     </div>
   );
