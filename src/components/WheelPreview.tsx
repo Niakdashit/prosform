@@ -423,7 +423,10 @@ export const WheelPreview = ({
                       ) : (
                         <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: theme.backgroundColor }} />
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                      <div 
+                        className="absolute inset-0 bg-black" 
+                        style={{ opacity: config.welcomeScreen.overlayOpacity ?? 0.6 }}
+                      />
                       <div className="relative z-10 flex items-center justify-center h-full px-16">
                         <div className="max-w-[700px] text-center">
                           <TextContent centered />
@@ -622,7 +625,10 @@ export const WheelPreview = ({
                     ) : (
                       <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: theme.backgroundColor }} />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                    <div 
+                      className="absolute inset-0 bg-black" 
+                      style={{ opacity: config.welcomeScreen.overlayOpacity ?? 0.6 }}
+                    />
                     <div className="relative z-10 flex items-center justify-center h-full px-8">
                       <div className="w-full max-w-[700px] text-center">
                         <TextContent centered />

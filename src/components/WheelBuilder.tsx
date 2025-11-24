@@ -34,6 +34,7 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayOpacity?: number;
   };
   contactForm: {
     enabled: boolean;
@@ -44,12 +45,14 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayOpacity?: number;
   };
   wheelScreen: {
     blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayOpacity?: number;
   };
   segments: WheelSegment[];
   endingScreen: {
@@ -59,6 +62,7 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayOpacity?: number;
   };
 }
 
