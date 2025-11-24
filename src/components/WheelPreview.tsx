@@ -889,9 +889,11 @@ export const WheelPreview = ({
               // Mobile layouts
               if (mobileLayout === 'mobile-vertical') {
                 return (
-                  <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
-                    <WheelBlock />
-                    <TextContent />
+                  <div className="w-full h-full flex items-center justify-center px-5">
+                    <div className="flex flex-col items-center gap-8 max-w-[700px]">
+                      <TextContent centered />
+                      <WheelBlock />
+                    </div>
                   </div>
                 );
               } else if (mobileLayout === 'mobile-centered') {
