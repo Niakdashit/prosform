@@ -13,6 +13,28 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 
+export interface Prize {
+  id: string;
+  name: string;
+  description?: string;
+  quantity: number;
+  remaining: number;
+  value?: string;
+  attributionMethod: 'instant' | 'calendar';
+  calendarDate?: string;
+  calendarTime?: string;
+  timeWindow?: number;
+  assignedSegments?: string[];
+  priority?: number;
+  maxWinsPerIP?: number;
+  maxWinsPerEmail?: number;
+  maxWinsPerDevice?: number;
+  verificationPeriod?: number;
+  notifyAdminOnWin?: boolean;
+  notifyAdminOnDepletion?: boolean;
+  status: 'active' | 'depleted' | 'scheduled';
+}
+
 export interface WheelSegment {
   id: string;
   label: string;
@@ -130,6 +152,18 @@ export const WheelBuilder = () => {
   const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'campaign'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
+  const [prizes, setPrizes] = useState<Prize[]>([
+    {
+      id: 'prize-1',
+      name: 'Iphone 14 PRO MAX',
+      quantity: 10,
+      remaining: 10,
+      attributionMethod: 'calendar',
+      calendarDate: '2025-11-24',
+      calendarTime: '12:00',
+      status: 'active'
+    }
+  ]);
 
   useEffect(() => {
     if (isMobile) {
@@ -206,6 +240,25 @@ export const WheelBuilder = () => {
     toast.success("Segment supprimé");
   };
 
+  const handleAddPrize = () => {
+    // Cette fonction sera appelée depuis CampaignSettings
+  };
+
+  const handleSavePrize = (prize: Prize) => {
+    const existingPrize = prizes.find(p => p.id === prize.id);
+    if (existingPrize) {
+      setPrizes(prizes.map(p => p.id === prize.id ? { ...prize, remaining: p.remaining, status: p.status } : p));
+    } else {
+      setPrizes([...prizes, { ...prize, remaining: prize.quantity, status: 'active' as const }]);
+    }
+    toast.success("Lot enregistré");
+  };
+
+  const handleDeletePrize = (id: string) => {
+    setPrizes(prizes.filter(p => p.id !== id));
+    toast.success("Lot supprimé");
+  };
+
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <WheelTopToolbar 
@@ -221,7 +274,12 @@ export const WheelBuilder = () => {
       />
         
       {activeTab === 'campaign' ? (
-        <CampaignSettings defaultTab={campaignDefaultTab} />
+        <CampaignSettings 
+          defaultTab={campaignDefaultTab}
+          prizes={prizes}
+          onSavePrize={handleSavePrize}
+          onDeletePrize={handleDeletePrize}
+        />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
@@ -346,6 +404,7 @@ export const WheelBuilder = () => {
         onUpdateSegment={updateSegment}
         onAddSegment={addSegment}
         onDeleteSegment={deleteSegment}
+        prizes={prizes}
       />
     </div>
   );

@@ -10,39 +10,22 @@ import { useState, useEffect } from "react";
 import { PrizeModal } from "./PrizeModal";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-
-interface Prize {
-  id: string;
-  name: string;
-  description?: string;
-  quantity: number;
-  remaining: number;
-  value?: string;
-  attributionMethod: 'instant' | 'calendar';
-  calendarDate?: string;
-  calendarTime?: string;
-  assignedSegments?: string[];
-  status: 'active' | 'depleted' | 'scheduled';
-}
+import { Prize } from "./WheelBuilder";
 
 interface CampaignSettingsProps {
   defaultTab?: string;
+  prizes: Prize[];
+  onSavePrize: (prize: Prize) => void;
+  onDeletePrize: (id: string) => void;
 }
 
-export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProps) => {
+export const CampaignSettings = ({ 
+  defaultTab = "canaux",
+  prizes,
+  onSavePrize,
+  onDeletePrize
+}: CampaignSettingsProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
-  const [prizes, setPrizes] = useState<Prize[]>([
-    {
-      id: 'prize-1',
-      name: 'Iphone 14 PRO MAX',
-      quantity: 10,
-      remaining: 10,
-      attributionMethod: 'calendar',
-      calendarDate: '2025-11-24',
-      calendarTime: '12:00',
-      status: 'active'
-    }
-  ]);
   const [prizeModalOpen, setPrizeModalOpen] = useState(false);
   const [editingPrize, setEditingPrize] = useState<Prize | null>(null);
 
@@ -70,15 +53,11 @@ export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProp
   };
 
   const handleSavePrize = (prize: Prize) => {
-    if (editingPrize) {
-      setPrizes(prizes.map(p => p.id === prize.id ? { ...prize, remaining: p.remaining } : p));
-    } else {
-      setPrizes([...prizes, { ...prize, remaining: prize.quantity, status: 'active' as const }]);
-    }
+    onSavePrize(prize);
   };
 
   const handleDeletePrize = (id: string) => {
-    setPrizes(prizes.filter(p => p.id !== id));
+    onDeletePrize(id);
   };
 
   return (

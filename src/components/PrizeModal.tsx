@@ -9,26 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Gift } from "lucide-react";
 import { useState } from "react";
-
-interface Prize {
-  id: string;
-  name: string;
-  description?: string;
-  quantity: number;
-  value?: string;
-  attributionMethod: 'instant' | 'calendar' | 'random';
-  calendarDate?: string;
-  calendarTime?: string;
-  timeWindow?: number;
-  assignedSegments?: string[];
-  priority?: number;
-  maxWinsPerIP?: number;
-  maxWinsPerEmail?: number;
-  maxWinsPerDevice?: number;
-  verificationPeriod?: number;
-  notifyAdminOnWin?: boolean;
-  notifyAdminOnDepletion?: boolean;
-}
+import { Prize } from "./WheelBuilder";
 
 interface PrizeModalProps {
   open: boolean;
@@ -45,12 +26,13 @@ export const PrizeModal = ({
   onSave,
   segments
 }: PrizeModalProps) => {
-  const [formData, setFormData] = useState<Prize>(
+  const [formData, setFormData] = useState<Partial<Prize>>(
     prize || {
       id: `prize-${Date.now()}`,
       name: '',
       description: '',
       quantity: 1,
+      remaining: 1,
       value: '',
       attributionMethod: 'instant',
       timeWindow: 1,
@@ -62,11 +44,12 @@ export const PrizeModal = ({
       verificationPeriod: 24,
       notifyAdminOnWin: false,
       notifyAdminOnDepletion: false,
+      status: 'active'
     }
   );
 
   const handleSave = () => {
-    onSave(formData);
+    onSave(formData as Prize);
     onOpenChange(false);
   };
 
