@@ -51,17 +51,29 @@ export const WheelLayouts = ({
   const renderContent = () => (
     <div className="text-center w-full max-w-[700px]">
       <h1 
-        className="text-4xl md:text-5xl font-bold mb-4"
-        style={{ color: textColor }}
+        className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity"
+        style={{ 
+          color: textColor,
+          padding: '4px',
+          marginTop: '-4px',
+          marginLeft: '-4px',
+          marginRight: '-4px',
+          borderRadius: '4px'
+        }}
       >
         {title}
       </h1>
       
       <p 
-        className="text-lg md:text-xl mb-8"
+        className="text-lg md:text-xl mb-8 cursor-text hover:opacity-80 transition-opacity"
         style={{ 
           color: textColor, 
-          opacity: 0.9
+          opacity: 0.9,
+          padding: '4px',
+          marginTop: '-4px',
+          marginLeft: '-4px',
+          marginRight: '-4px',
+          borderRadius: '4px'
         }}
       >
         {subtitle}
