@@ -16,6 +16,12 @@ interface ContactLayoutProps {
   backgroundColor: string;
   textColor: string;
   buttonColor: string;
+  editingField?: string | null;
+  onEditTitle?: () => void;
+  onEditSubtitle?: () => void;
+  onTitleChange?: (value: string) => void;
+  onSubtitleChange?: (value: string) => void;
+  onBlur?: () => void;
 }
 
 export const ContactLayouts = ({
@@ -29,17 +35,55 @@ export const ContactLayouts = ({
   onSubmit,
   backgroundColor,
   textColor,
-  buttonColor
+  buttonColor,
+  editingField,
+  onEditTitle,
+  onEditSubtitle,
+  onTitleChange,
+  onSubtitleChange,
+  onBlur
 }: ContactLayoutProps) => {
 
   const renderForm = () => (
     <div className="w-full max-w-md">
-      <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center" style={{ color: textColor }}>
-        {title}
-      </h2>
-      <p className="text-lg md:text-xl text-center mb-8 opacity-80" style={{ color: textColor }}>
-        {subtitle}
-      </p>
+      {editingField === 'contact-title' ? (
+        <input
+          autoFocus
+          className="text-4xl md:text-5xl font-bold mb-4 text-center w-full bg-transparent border-b-2 border-primary outline-none"
+          style={{ color: textColor }}
+          value={title}
+          onChange={(e) => onTitleChange?.(e.target.value)}
+          onBlur={onBlur}
+        />
+      ) : (
+        <h2 
+          className="text-4xl md:text-5xl font-bold mb-4 text-center cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ color: textColor }}
+          onClick={onEditTitle}
+        >
+          {title}
+        </h2>
+      )}
+      
+      {editingField === 'contact-subtitle' ? (
+        <textarea
+          autoFocus
+          className="text-lg md:text-xl text-center mb-8 w-full bg-transparent border-b border-primary outline-none resize-none"
+          style={{ color: textColor, opacity: 0.8 }}
+          value={subtitle}
+          onChange={(e) => onSubtitleChange?.(e.target.value)}
+          onBlur={onBlur}
+          rows={2}
+        />
+      ) : (
+        <p 
+          className="text-lg md:text-xl text-center mb-8 opacity-80 cursor-pointer hover:opacity-100 transition-opacity" 
+          style={{ color: textColor }}
+          onClick={onEditSubtitle}
+        >
+          {subtitle}
+        </p>
+      )}
       
       <div className="space-y-4">
         {fields.map(field => (
