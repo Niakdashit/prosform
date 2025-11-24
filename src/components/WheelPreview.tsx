@@ -755,24 +755,249 @@ export const WheelPreview = ({
 
       case 'wheel':
         return (
-          <WheelLayouts
-            layout={currentLayout}
-            viewMode={viewMode}
-            title={config.welcomeScreen.title}
-            subtitle={config.welcomeScreen.subtitle}
-            segments={config.segments}
-            isSpinning={isSpinning}
-            onSpin={() => setIsSpinning(true)}
-            onResult={(segment) => console.log('Segment gagné:', segment)}
-            onComplete={(prize) => {
-              setIsSpinning(false);
-              setWonPrize(prize);
-              setTimeout(() => onNext(), 1000);
+          <div
+            className="flex w-full h-full"
+            style={{
+              alignItems: viewMode === "desktop" ? "center" : "flex-start",
+              justifyContent: viewMode === "desktop" ? "center" : "flex-start",
+              padding:
+                viewMode === "desktop"
+                  ? config.wheelScreen.desktopLayout === "desktop-card" || config.wheelScreen.desktopLayout === "desktop-panel"
+                    ? "0"
+                    : "0 64px"
+                  : config.wheelScreen.mobileLayout === "mobile-centered"
+                  ? "0"
+                  : "24px 20px",
+              paddingLeft:
+                viewMode === "mobile" && config.wheelScreen.mobileLayout === "mobile-centered"
+                  ? 0
+                  : viewMode === "desktop" && (config.wheelScreen.desktopLayout === "desktop-card" || config.wheelScreen.desktopLayout === "desktop-panel")
+                  ? 0
+                  : "7%",
+              paddingRight:
+                viewMode === "mobile" && config.wheelScreen.mobileLayout === "mobile-centered"
+                  ? 0
+                  : viewMode === "desktop" && (config.wheelScreen.desktopLayout === "desktop-card" || config.wheelScreen.desktopLayout === "desktop-panel")
+                  ? 0
+                  : "7%",
             }}
-            backgroundColor={theme.backgroundColor}
-            textColor={theme.textColor}
-            buttonColor={theme.buttonColor}
-          />
+          >
+            {(() => {
+              const desktopLayout = config.wheelScreen.desktopLayout || "desktop-left-right";
+              const mobileLayout = config.wheelScreen.mobileLayout || "mobile-vertical";
+              const currentLayoutType = viewMode === "desktop" ? desktopLayout : mobileLayout;
+
+              // Wheel component
+              const WheelBlock = () => {
+                // Adapter les segments pour SmartWheel
+                const adaptedSegments = config.segments.map(seg => ({
+                  ...seg,
+                  value: seg.label
+                }));
+
+                return (
+                  <div
+                    className="overflow-hidden relative group flex items-center justify-center"
+                    style={{ 
+                      borderRadius: "36px",
+                      width: viewMode === 'desktop' ? '420px' : currentLayoutType === 'mobile-horizontal' ? '140px' : '280px',
+                      height: viewMode === 'desktop' ? '420px' : currentLayoutType === 'mobile-horizontal' ? '140px' : '280px',
+                      maxWidth: '100%',
+                      flexShrink: 0
+                    }}
+                  >
+                    <SmartWheel
+                      segments={adaptedSegments}
+                      onComplete={(winnerSegment) => {
+                        setIsSpinning(false);
+                        setWonPrize(winnerSegment);
+                        setTimeout(() => onNext(), 1000);
+                      }}
+                      brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
+                      size={viewMode === 'desktop' ? 400 : currentLayoutType === 'mobile-horizontal' ? 130 : 260}
+                    />
+                  </div>
+                );
+              };
+
+              // Text content component  
+              const TextContent = ({ centered = false }: { centered?: boolean }) => (
+                <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
+                  <h1 
+                    className="font-bold cursor-text hover:opacity-80 transition-opacity" 
+                    style={{ 
+                      color: theme.accentColor, 
+                      fontWeight: 700, 
+                      fontSize: viewMode === 'desktop' ? '64px' : '32px',
+                      lineHeight: '1.05',
+                      letterSpacing: '-0.02em',
+                      marginBottom: '24px',
+                    }}
+                  >
+                    Tournez la roue !
+                  </h1>
+                  
+                  <p 
+                    className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
+                    style={{ 
+                      color: '#B8A892',
+                      fontSize: viewMode === 'desktop' ? '16px' : '14px',
+                      lineHeight: '1.6',
+                      marginBottom: '32px',
+                    }}
+                  >
+                    Tentez votre chance et découvrez votre prix
+                  </p>
+                </div>
+              );
+
+              // Desktop layouts
+              if (viewMode === 'desktop') {
+                if (desktopLayout === 'desktop-left-right') {
+                  return (
+                    <div className="w-full h-full flex flex-col items-start justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide">
+                      <div
+                        className="overflow-hidden flex-shrink-0"
+                        style={{ 
+                          borderRadius: "36px",
+                          width: '320px',
+                          height: '320px',
+                        }}
+                      >
+                        <SmartWheel
+                          segments={config.segments.map(seg => ({ ...seg, value: seg.label }))}
+                          onComplete={(winnerSegment) => {
+                            setIsSpinning(false);
+                            setWonPrize(winnerSegment);
+                            setTimeout(() => onNext(), 1000);
+                          }}
+                          brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
+                          size={300}
+                        />
+                      </div>
+                      <div className="max-w-[700px]">
+                        <h1 
+                          className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
+                          style={{ color: '#F5CA3C' }}
+                        >
+                          Tournez la roue !
+                        </h1>
+                        
+                        <p 
+                          className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
+                          style={{ color: '#B8A892' }}
+                        >
+                          Tentez votre chance et découvrez votre prix
+                        </p>
+                      </div>
+                    </div>
+                  );
+                } else if (desktopLayout === 'desktop-right-left') {
+                  return (
+                    <div className="w-full h-full flex items-center gap-16 px-24">
+                      <div className="flex-1">
+                        <TextContent />
+                      </div>
+                      <WheelBlock />
+                    </div>
+                  );
+                } else if (desktopLayout === 'desktop-centered') {
+                  return (
+                    <div className="w-full h-full flex items-center gap-16 px-24">
+                      <WheelBlock />
+                      <div className="flex-1">
+                        <TextContent />
+                      </div>
+                    </div>
+                  );
+                } else if (desktopLayout === 'desktop-split') {
+                  return (
+                    <div className="absolute inset-0">
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                      <div className="relative z-10 flex items-center justify-center h-full px-16">
+                        <div className="max-w-[700px] text-center flex flex-col items-center gap-8">
+                          <TextContent centered />
+                          <WheelBlock />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else if (desktopLayout === 'desktop-card') {
+                  return (
+                    <div className="relative w-full h-full flex">
+                      <div className="w-1/2 flex items-center justify-center px-24 z-10">
+                        <div className="max-w-[500px]">
+                          <TextContent />
+                        </div>
+                      </div>
+                      <div className="absolute right-0 top-0 w-1/2 h-full flex items-center justify-center">
+                        <WheelBlock />
+                      </div>
+                    </div>
+                  );
+                } else if (desktopLayout === 'desktop-panel') {
+                  return (
+                    <div className="relative w-full h-full flex">
+                      <div className="absolute left-0 top-0 w-1/2 h-full flex items-center justify-center">
+                        <WheelBlock />
+                      </div>
+                      <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
+                        <div className="max-w-[500px]">
+                          <TextContent />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              }
+
+              // Mobile layouts
+              if (mobileLayout === 'mobile-vertical') {
+                return (
+                  <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
+                    <WheelBlock />
+                    <TextContent />
+                  </div>
+                );
+              } else if (mobileLayout === 'mobile-horizontal') {
+                return (
+                  <div className="flex gap-4 py-6 px-5 w-full max-w-[700px]">
+                    <div className="flex-1">
+                      <TextContent />
+                    </div>
+                    <WheelBlock />
+                  </div>
+                );
+              } else if (mobileLayout === 'mobile-centered') {
+                return (
+                  <div className="flex flex-col w-full h-full">
+                    <div className="w-full relative flex items-center justify-center" style={{ height: '40%', minHeight: '250px' }}>
+                      <WheelBlock />
+                    </div>
+                    <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+                      <div className="w-full max-w-[700px]">
+                        <TextContent />
+                      </div>
+                    </div>
+                  </div>
+                );
+              } else if (mobileLayout === 'mobile-minimal') {
+                return (
+                  <div className="absolute inset-0">
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+                    <div className="relative z-10 flex items-center justify-center h-full px-8">
+                      <div className="w-full max-w-[700px] text-center flex flex-col items-center gap-6">
+                        <TextContent centered />
+                        <WheelBlock />
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return null;
+            })()}
+          </div>
         );
 
       case 'ending':
