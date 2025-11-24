@@ -6,7 +6,6 @@ import { Monitor, Smartphone, Sparkles, Upload, ImagePlus, Edit3, Clock } from "
 import { useState, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import SmartWheel from "./SmartWheel/SmartWheel";
-import { LayoutWrapper } from "./layouts/LayoutWrapper";
 import { WelcomeLayouts } from "./layouts/WelcomeLayouts";
 import { ContactLayouts } from "./layouts/ContactLayouts";
 import { WheelLayouts } from "./layouts/WheelLayouts";
@@ -149,22 +148,6 @@ export const WheelPreview = ({
     setShowVariableMenu(false);
   };
 
-  const getCurrentLayout = () => {
-    const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
-    switch (activeView) {
-      case 'welcome':
-        return config.welcomeScreen[layoutKey];
-      case 'contact':
-        return config.contactForm[layoutKey];
-      case 'wheel':
-        return config.wheelScreen[layoutKey];
-      case 'ending':
-        return config.endingScreen[layoutKey];
-      default:
-        return viewMode === 'desktop' ? 'desktop-centered' : 'mobile-vertical';
-    }
-  };
-
   const handleSpin = () => {
     setIsSpinning(true);
     
@@ -189,6 +172,21 @@ export const WheelPreview = ({
   };
 
   const renderContent = () => {
+    // Calculate current layout for non-welcome views
+    const getCurrentLayout = () => {
+      const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
+      switch (activeView) {
+        case 'contact':
+          return config.contactForm[layoutKey];
+        case 'wheel':
+          return config.wheelScreen[layoutKey];
+        case 'ending':
+          return config.endingScreen[layoutKey];
+        default:
+          return viewMode === 'desktop' ? 'desktop-centered' : 'mobile-vertical';
+      }
+    };
+    
     const currentLayout = getCurrentLayout();
 
     switch (activeView) {
@@ -890,13 +888,7 @@ export const WheelPreview = ({
             transition={{ duration: 0.3 }}
             className="w-full h-full"
           >
-            <LayoutWrapper
-              layout={getCurrentLayout()}
-              viewMode={viewMode}
-              backgroundColor={theme.backgroundColor}
-            >
-              {renderContent()}
-            </LayoutWrapper>
+            {renderContent()}
           </motion.div>
         </AnimatePresence>
       </div>
