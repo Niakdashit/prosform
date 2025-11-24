@@ -26,9 +26,9 @@ export const WheelSettingsPanel = ({
     switch (activeView) {
       case 'welcome':
         return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
               <LayoutSelector
                 desktopLayout={config.welcomeScreen.desktopLayout}
                 mobileLayout={config.welcomeScreen.mobileLayout}
@@ -59,9 +59,9 @@ export const WheelSettingsPanel = ({
 
       case 'contact':
         return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
               <LayoutSelector
                 desktopLayout={config.contactForm.desktopLayout}
                 mobileLayout={config.contactForm.mobileLayout}
@@ -142,9 +142,9 @@ export const WheelSettingsPanel = ({
 
       case 'wheel':
         return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
               <LayoutSelector
                 desktopLayout={config.wheelScreen.desktopLayout}
                 mobileLayout={config.wheelScreen.mobileLayout}
@@ -210,9 +210,9 @@ export const WheelSettingsPanel = ({
 
       case 'ending':
         return (
-          <div className="space-y-6">
-            <div>
-              <Label className="text-sm font-semibold mb-3 block">Layout</Label>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
               <LayoutSelector
                 desktopLayout={config.endingScreen.desktopLayout}
                 mobileLayout={config.endingScreen.mobileLayout}
