@@ -324,6 +324,16 @@ export const WheelPreview = ({
           height: viewMode === 'desktop' ? '620px' : '667px' 
         }}
       >
+        {/* Logo */}
+        <div className="absolute top-8 left-8">
+          <div className="grid grid-cols-2 gap-1">
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
+          </div>
+        </div>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView}
