@@ -6,11 +6,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Gift, Upload, Eye, Save } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export const CampaignSettings = () => {
-  const [activeTab, setActiveTab] = useState("canaux");
+interface CampaignSettingsProps {
+  defaultTab?: string;
+}
+
+export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProps) => {
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [prizes, setPrizes] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (defaultTab) {
+      setActiveTab(defaultTab);
+    }
+  }, [defaultTab]);
 
   return (
     <div className="flex flex-col h-full bg-background">
