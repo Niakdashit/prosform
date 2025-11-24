@@ -950,13 +950,13 @@ export const WheelPreview = ({
                       className="relative w-full h-full flex"
                       style={{ gap: `${(config.wheelScreen.blockSpacing || 1) * 2}rem` }}
                     >
-                      <div className="flex-1 flex items-center justify-center">
-                        <WheelBlock />
-                      </div>
                       <div className="flex-1 flex items-center justify-center px-24">
                         <div className="max-w-[500px]">
                           <TextContent noSpacing />
                         </div>
+                      </div>
+                      <div className="flex-1 flex items-center justify-center">
+                        <WheelBlock />
                       </div>
                     </div>
                   );
