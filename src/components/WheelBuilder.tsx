@@ -30,6 +30,7 @@ export interface WheelConfig {
     title: string;
     subtitle: string;
     buttonText: string;
+    blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
   };
@@ -37,11 +38,13 @@ export interface WheelConfig {
     enabled: boolean;
     title: string;
     subtitle: string;
+    blockSpacing: number;
     fields: ContactField[];
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
   };
   wheelScreen: {
+    blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
   };
@@ -49,6 +52,7 @@ export interface WheelConfig {
   endingScreen: {
     title: string;
     subtitle: string;
+    blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
   };
@@ -59,6 +63,7 @@ const defaultWheelConfig: WheelConfig = {
     title: "Tentez votre chance !",
     subtitle: "Tournez la roue et gagnez des prix incroyables",
     buttonText: "Tourner la roue",
+    blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-left-right"
   },
@@ -66,6 +71,7 @@ const defaultWheelConfig: WheelConfig = {
     enabled: true,
     title: "Vos coordonnées",
     subtitle: "Pour vous envoyer votre gain",
+    blockSpacing: 1,
     fields: [
       { type: 'name', required: true, label: 'Nom complet' },
       { type: 'email', required: true, label: 'Email' },
@@ -75,6 +81,7 @@ const defaultWheelConfig: WheelConfig = {
     desktopLayout: "desktop-centered"
   },
   wheelScreen: {
+    blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
   },
@@ -89,6 +96,7 @@ const defaultWheelConfig: WheelConfig = {
   endingScreen: {
     title: "Félicitations !",
     subtitle: "Vous avez gagné {{prize}}",
+    blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
   }

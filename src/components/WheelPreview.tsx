@@ -294,7 +294,7 @@ export const WheelPreview = ({
                       fontSize: viewMode === 'desktop' ? '64px' : '32px',
                       lineHeight: '1.05',
                       letterSpacing: '-0.02em',
-                      marginBottom: '24px',
+                      marginBottom: `${(config.welcomeScreen.blockSpacing || 1) * 24}px`,
                     }}
                   >
                     {config.welcomeScreen.title}
@@ -306,7 +306,7 @@ export const WheelPreview = ({
                       color: '#B8A892',
                       fontSize: viewMode === 'desktop' ? '16px' : '14px',
                       lineHeight: '1.6',
-                      marginBottom: '32px',
+                      marginBottom: `${(config.welcomeScreen.blockSpacing || 1) * 32}px`,
                     }}
                   >
                     {config.welcomeScreen.subtitle}
@@ -371,7 +371,7 @@ export const WheelPreview = ({
                           {config.welcomeScreen.subtitle}
                         </p>
                         
-                        <div className="mt-10" style={{ marginTop: '32px' }}>
+                        <div className="mt-10" style={{ marginTop: `${(config.welcomeScreen.blockSpacing || 1) * 32}px` }}>
                           <button 
                             onClick={onNext}
                             className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3"
@@ -830,7 +830,7 @@ export const WheelPreview = ({
                       fontSize: viewMode === 'desktop' ? '64px' : '32px',
                       lineHeight: '1.05',
                       letterSpacing: '-0.02em',
-                      marginBottom: '24px',
+                      marginBottom: `${(config.wheelScreen.blockSpacing || 1) * 24}px`,
                     }}
                   >
                     Tournez la roue !
@@ -842,7 +842,7 @@ export const WheelPreview = ({
                       color: '#B8A892',
                       fontSize: viewMode === 'desktop' ? '16px' : '14px',
                       lineHeight: '1.6',
-                      marginBottom: '32px',
+                      marginBottom: `${(config.wheelScreen.blockSpacing || 1) * 32}px`,
                     }}
                   >
                     Tentez votre chance et découvrez votre prix
