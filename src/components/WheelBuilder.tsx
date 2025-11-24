@@ -6,6 +6,7 @@ import { WheelSettingsPanel } from "./WheelSettingsPanel";
 import { WheelTopToolbar } from "./WheelTopToolbar";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
@@ -132,13 +133,49 @@ export const WheelBuilder = () => {
       ...prev,
       segments: [...prev.segments, newSegment]
     }));
+    toast.success("Segment ajouté");
+  };
+
+  const duplicateSegment = (id: string) => {
+    setConfig(prev => {
+      const segmentIndex = prev.segments.findIndex(s => s.id === id);
+      if (segmentIndex === -1) return prev;
+      
+      const segmentToDuplicate = prev.segments[segmentIndex];
+      const newSegment = {
+        ...segmentToDuplicate,
+        id: `segment-${Date.now()}`,
+        label: `${segmentToDuplicate.label} (copie)`,
+      };
+      
+      const newSegments = [...prev.segments];
+      newSegments.splice(segmentIndex + 1, 0, newSegment);
+      
+      return { ...prev, segments: newSegments };
+    });
+    toast.success("Segment dupliqué");
+  };
+
+  const reorderSegments = (startIndex: number, endIndex: number) => {
+    setConfig(prev => {
+      const newSegments = Array.from(prev.segments);
+      const [removed] = newSegments.splice(startIndex, 1);
+      newSegments.splice(endIndex, 0, removed);
+      return { ...prev, segments: newSegments };
+    });
   };
 
   const deleteSegment = (id: string) => {
+    if (config.segments.length <= 2) {
+      toast.error("La roue doit avoir au moins 2 segments");
+      return;
+    }
+    
     setConfig(prev => ({
       ...prev,
       segments: prev.segments.filter(s => s.id !== id)
     }));
+    toast.success("Segment supprimé");
   };
 
   return (
@@ -166,6 +203,8 @@ export const WheelBuilder = () => {
                     setLeftDrawerOpen(false);
                   }}
                   onAddSegment={addSegment}
+                  onDuplicateSegment={duplicateSegment}
+                  onReorderSegments={reorderSegments}
                   onDeleteSegment={deleteSegment}
                 />
               </DrawerContent>
@@ -222,6 +261,8 @@ export const WheelBuilder = () => {
               activeView={activeView}
               onViewSelect={setActiveView}
               onAddSegment={addSegment}
+              onDuplicateSegment={duplicateSegment}
+              onReorderSegments={reorderSegments}
               onDeleteSegment={deleteSegment}
             />
             
