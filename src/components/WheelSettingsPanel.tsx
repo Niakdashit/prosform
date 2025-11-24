@@ -7,6 +7,8 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 
 interface WheelSettingsPanelProps {
   config: WheelConfig;
@@ -73,6 +75,19 @@ export const WheelSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            {(config.welcomeScreen.desktopLayout === 'desktop-split' || config.welcomeScreen.mobileLayout === 'mobile-minimal') && (
+              <>
+                <Separator />
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
+                  <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
+                    <Upload className="w-3 h-3 mr-2" />
+                    Upload image
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         );
 
@@ -151,6 +166,19 @@ export const WheelSettingsPanel = ({
                   />
                 </div>
 
+                {(config.contactForm.desktopLayout === 'desktop-split' || config.contactForm.mobileLayout === 'mobile-minimal') && (
+                  <>
+                    <Separator />
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
+                      <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
+                        <Upload className="w-3 h-3 mr-2" />
+                        Upload image
+                      </Button>
+                    </div>
+                  </>
+                )}
+
                 <Separator />
 
                 <div className="space-y-3">
@@ -211,6 +239,19 @@ export const WheelSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            {(config.wheelScreen.desktopLayout === 'desktop-split' || config.wheelScreen.mobileLayout === 'mobile-minimal') && (
+              <>
+                <Separator />
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
+                  <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
+                    <Upload className="w-3 h-3 mr-2" />
+                    Upload image
+                  </Button>
+                </div>
+              </>
+            )}
             
             <Separator />
             
@@ -327,6 +368,19 @@ export const WheelSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            {(config.endingScreen.desktopLayout === 'desktop-split' || config.endingScreen.mobileLayout === 'mobile-minimal') && (
+              <>
+                <Separator />
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
+                  <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
+                    <Upload className="w-3 h-3 mr-2" />
+                    Upload image
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         );
     }
