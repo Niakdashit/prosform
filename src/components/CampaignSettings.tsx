@@ -5,8 +5,25 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Gift, Upload, Eye, Save } from "lucide-react";
+import { Plus, Gift, Upload, Eye, Save, Trash2, Calendar } from "lucide-react";
 import { useState, useEffect } from "react";
+import { PrizeModal } from "./PrizeModal";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+
+interface Prize {
+  id: string;
+  name: string;
+  description?: string;
+  quantity: number;
+  remaining: number;
+  value?: string;
+  attributionMethod: 'instant' | 'calendar';
+  calendarDate?: string;
+  calendarTime?: string;
+  assignedSegments?: string[];
+  status: 'active' | 'depleted' | 'scheduled';
+}
 
 interface CampaignSettingsProps {
   defaultTab?: string;
@@ -14,13 +31,55 @@ interface CampaignSettingsProps {
 
 export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
-  const [prizes, setPrizes] = useState<any[]>([]);
+  const [prizes, setPrizes] = useState<Prize[]>([
+    {
+      id: 'prize-1',
+      name: 'Iphone 14 PRO MAX',
+      quantity: 10,
+      remaining: 10,
+      attributionMethod: 'calendar',
+      calendarDate: '2025-11-24',
+      calendarTime: '12:00',
+      status: 'active'
+    }
+  ]);
+  const [prizeModalOpen, setPrizeModalOpen] = useState(false);
+  const [editingPrize, setEditingPrize] = useState<Prize | null>(null);
+
+  // Segments factices pour l'exemple
+  const segments = [
+    { id: 'seg-1', label: '10% de réduction' },
+    { id: 'seg-2', label: 'Livraison gratuite' },
+    { id: 'seg-3', label: '20% de réduction' },
+  ];
 
   useEffect(() => {
     if (defaultTab) {
       setActiveTab(defaultTab);
     }
   }, [defaultTab]);
+
+  const handleAddPrize = () => {
+    setEditingPrize(null);
+    setPrizeModalOpen(true);
+  };
+
+  const handleEditPrize = (prize: Prize) => {
+    setEditingPrize(prize);
+    setPrizeModalOpen(true);
+  };
+
+  const handleSavePrize = (prize: Prize) => {
+    if (editingPrize) {
+      setPrizes(prizes.map(p => p.id === prize.id ? { ...prize, remaining: p.remaining } : p));
+    } else {
+      setPrizes([...prizes, { ...prize, remaining: prize.quantity, status: 'active' as const }]);
+    }
+  };
+
+  const handleDeletePrize = (id: string) => {
+    setPrizes(prizes.filter(p => p.id !== id));
+  };
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -226,7 +285,7 @@ export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProp
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => setPrizes([...prizes, { id: Date.now(), name: "", quantity: 1 }])}
+                          onClick={handleAddPrize}
                         >
                           <Plus className="w-4 h-4 mr-2" />
                           Ajouter un lot
@@ -239,7 +298,7 @@ export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProp
                           <p className="text-muted-foreground mb-4">Aucun lot configuré</p>
                           <Button 
                             variant="default"
-                            onClick={() => setPrizes([{ id: Date.now(), name: "", quantity: 1 }])}
+                            onClick={handleAddPrize}
                           >
                             <Plus className="w-4 h-4 mr-2" />
                             Créer le premier lot
@@ -248,37 +307,82 @@ export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProp
                       ) : (
                         <div className="space-y-4">
                           {prizes.map((prize) => (
-                            <div key={prize.id} className="border rounded-lg p-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <Label>Nom du lot</Label>
-                                  <Input 
-                                    placeholder="Ex: iPhone 15 Pro"
-                                    className="mt-1.5"
-                                  />
+                            <div key={prize.id} className="border rounded-lg p-4 hover:bg-muted/30 transition-colors">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <h5 className="font-medium text-lg">{prize.name}</h5>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    {prize.attributionMethod === 'calendar' && (
+                                      <Badge variant="secondary" className="gap-1">
+                                        <Calendar className="w-3 h-3" />
+                                        Calendrier
+                                      </Badge>
+                                    )}
+                                    {prize.attributionMethod === 'instant' && (
+                                      <Badge variant="secondary" className="gap-1">
+                                        <Gift className="w-3 h-3" />
+                                        Instantané
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </div>
-                                <div>
-                                  <Label>Quantité disponible</Label>
-                                  <Input 
-                                    type="number"
-                                    min="1"
-                                    defaultValue="1"
-                                    className="mt-1.5"
-                                  />
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handleEditPrize(prize)}
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-destructive hover:text-destructive"
+                                    onClick={() => handleDeletePrize(prize.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
                                 </div>
                               </div>
+
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="text-muted-foreground">Progression</span>
+                                  <span className="font-medium">
+                                    {prize.quantity - prize.remaining} / {prize.quantity}
+                                  </span>
+                                </div>
+                                <Progress 
+                                  value={((prize.quantity - prize.remaining) / prize.quantity) * 100} 
+                                  className="h-2"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                  {prize.remaining} lots restants
+                                </p>
+                              </div>
+
+                              <Badge 
+                                variant={prize.status === 'active' ? 'default' : 'secondary'}
+                                className="mt-3"
+                              >
+                                {prize.status === 'active' ? 'Actif' : prize.status === 'depleted' ? 'Épuisé' : 'Programmé'}
+                              </Badge>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
 
-                    <div className="mt-6 pt-6 border-t">
-                      <Button variant="ghost" size="sm" className="gap-2">
+                    <details className="mt-6 border rounded-lg" open>
+                      <summary className="px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors flex items-center gap-2">
                         <Eye className="w-4 h-4" />
-                        Paramètres avancés
-                      </Button>
-                    </div>
+                        <span className="text-sm font-medium">Paramètres avancés</span>
+                      </summary>
+                      <div className="p-4 border-t text-sm text-muted-foreground">
+                        Les paramètres avancés sont configurés individuellement pour chaque lot
+                      </div>
+                    </details>
                   </div>
                 </TabsContent>
 
@@ -436,6 +540,14 @@ export const CampaignSettings = ({ defaultTab = "canaux" }: CampaignSettingsProp
           </Tabs>
         </div>
       </div>
+
+      <PrizeModal
+        open={prizeModalOpen}
+        onOpenChange={setPrizeModalOpen}
+        prize={editingPrize}
+        onSave={handleSavePrize}
+        segments={segments}
+      />
     </div>
   );
 };
