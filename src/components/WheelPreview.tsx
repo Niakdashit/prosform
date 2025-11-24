@@ -214,15 +214,21 @@ export const WheelPreview = ({
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
             editingField={editingField}
-            onEditTitle={() => setEditingField('contact-title')}
-            onEditSubtitle={() => setEditingField('contact-subtitle')}
-            onTitleChange={(value) => onUpdateConfig({ 
-              contactForm: { ...config.contactForm, title: value } 
-            })}
-            onSubtitleChange={(value) => onUpdateConfig({ 
-              contactForm: { ...config.contactForm, subtitle: value } 
-            })}
-            onBlur={() => setEditingField(null)}
+            onFocusTitle={() => setEditingField('contact-title')}
+            onFocusSubtitle={() => setEditingField('contact-subtitle')}
+            onBlurTitle={(value) => handleTitleBlur('contact-title', value)}
+            onBlurSubtitle={(value) => handleSubtitleBlur('contact-subtitle', value)}
+            showVariableMenu={showVariableMenu}
+            variableTarget={variableTarget}
+            menuView={menuView}
+            onToggleVariableMenu={(target) => {
+              setVariableTarget(target);
+              setShowVariableMenu(prev => !prev);
+              setMenuView('main');
+            }}
+            onSetMenuView={setMenuView}
+            availableVariables={availableVariables}
+            onInsertVariable={insertVariable}
           />
         );
 
@@ -258,15 +264,21 @@ export const WheelPreview = ({
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
             editingField={editingField}
-            onEditTitle={() => setEditingField('ending-title')}
-            onEditSubtitle={() => setEditingField('ending-subtitle')}
-            onTitleChange={(value) => onUpdateConfig({ 
-              endingScreen: { ...config.endingScreen, title: value } 
-            })}
-            onSubtitleChange={(value) => onUpdateConfig({ 
-              endingScreen: { ...config.endingScreen, subtitle: value } 
-            })}
-            onBlur={() => setEditingField(null)}
+            onFocusTitle={() => setEditingField('ending-title')}
+            onFocusSubtitle={() => setEditingField('ending-subtitle')}
+            onBlurTitle={(value) => handleTitleBlur('ending-title', value)}
+            onBlurSubtitle={(value) => handleSubtitleBlur('ending-subtitle', value)}
+            showVariableMenu={showVariableMenu}
+            variableTarget={variableTarget}
+            menuView={menuView}
+            onToggleVariableMenu={(target) => {
+              setVariableTarget(target);
+              setShowVariableMenu(prev => !prev);
+              setMenuView('main');
+            }}
+            onSetMenuView={setMenuView}
+            availableVariables={availableVariables}
+            onInsertVariable={insertVariable}
             onRestart={() => {
               setWonPrize(null);
               setContactData({ name: "", email: "", phone: "" });

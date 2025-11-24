@@ -12,11 +12,17 @@ interface EndingLayoutProps {
   textColor: string;
   buttonColor: string;
   editingField?: string | null;
-  onEditTitle?: () => void;
-  onEditSubtitle?: () => void;
-  onTitleChange?: (value: string) => void;
-  onSubtitleChange?: (value: string) => void;
-  onBlur?: () => void;
+  onFocusTitle?: () => void;
+  onFocusSubtitle?: () => void;
+  onBlurTitle?: (value: string) => void;
+  onBlurSubtitle?: (value: string) => void;
+  showVariableMenu?: boolean;
+  variableTarget?: 'title' | 'subtitle' | null;
+  menuView?: 'main' | 'variables';
+  onToggleVariableMenu?: (target: 'title' | 'subtitle') => void;
+  onSetMenuView?: (view: 'main' | 'variables') => void;
+  availableVariables?: Array<{ key: string; label: string; description: string }>;
+  onInsertVariable?: (variableKey: string) => void;
   onRestart?: () => void;
 }
 
@@ -30,11 +36,17 @@ export const EndingLayouts = ({
   textColor,
   buttonColor,
   editingField,
-  onEditTitle,
-  onEditSubtitle,
-  onTitleChange,
-  onSubtitleChange,
-  onBlur,
+  onFocusTitle,
+  onFocusSubtitle,
+  onBlurTitle,
+  onBlurSubtitle,
+  showVariableMenu,
+  variableTarget,
+  menuView,
+  onToggleVariableMenu,
+  onSetMenuView,
+  availableVariables = [],
+  onInsertVariable,
   onRestart
 }: EndingLayoutProps) => {
 
@@ -49,25 +61,99 @@ export const EndingLayouts = ({
         </div>
       </div>
       
-      {editingField === 'ending-title' ? (
-        <textarea
-          autoFocus
-          rows={2}
-          className="text-4xl md:text-5xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center resize-none"
-          style={{ color: textColor }}
-          value={title}
-          onChange={(e) => onTitleChange?.(e.target.value)}
-          onBlur={onBlur}
-        />
-      ) : (
+      <div className="relative">
+        {editingField === 'ending-title' && (
+          <>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => onToggleVariableMenu?.('title')}
+              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
+              style={{ 
+                backgroundColor: 'rgba(245, 184, 0, 0.15)',
+                color: '#F5B800',
+                backdropFilter: 'blur(8px)'
+              }}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+            </button>
+
+            {showVariableMenu && variableTarget === 'title' && (
+              <div
+                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
+                style={{
+                  top: '32px',
+                  right: 0,
+                  backgroundColor: '#4A4138',
+                  border: '1px solid rgba(245, 184, 0, 0.3)',
+                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                }}
+              >
+                {menuView === 'main' ? (
+                  <div className="space-y-1">
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => console.log('Réécriture AI')}
+                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                    >
+                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
+                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l&apos;IA</div>
+                    </button>
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => onSetMenuView?.('variables')}
+                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                    >
+                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
+                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <button
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => onSetMenuView?.('main')}
+                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
+                    >
+                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
+                    </button>
+                    {availableVariables.map((variable) => (
+                      <button
+                        key={variable.key}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => onInsertVariable?.(variable.key)}
+                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
+                      >
+                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
+                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
         <h1 
-          className="text-4xl md:text-5xl font-bold mb-4 cursor-pointer hover:opacity-80 transition-opacity" 
-          style={{ color: textColor }}
-          onClick={onEditTitle}
+          className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity"
+          style={{ 
+            color: textColor,
+            outline: editingField === 'ending-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
+            padding: '4px',
+            marginTop: '-4px',
+            marginLeft: '-4px',
+            marginRight: '-4px',
+            borderRadius: '4px'
+          }}
+          contentEditable
+          suppressContentEditableWarning
+          onFocus={onFocusTitle}
+          onBlur={(e) => onBlurTitle?.(e.currentTarget.textContent || '')}
         >
           {title}
         </h1>
-      )}
+      </div>
       
       <div 
         className="text-xl md:text-2xl font-semibold mb-6 p-6 rounded-2xl"
