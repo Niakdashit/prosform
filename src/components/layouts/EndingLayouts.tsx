@@ -42,7 +42,7 @@ export const EndingLayouts = ({
       </h1>
       
       <div 
-        className="text-2xl md:text-3xl font-semibold mb-6 p-6 rounded-2xl"
+        className="text-xl md:text-2xl font-semibold mb-6 p-6 rounded-2xl"
         style={{ 
           backgroundColor: buttonColor + '15',
           color: buttonColor 
@@ -51,7 +51,7 @@ export const EndingLayouts = ({
         {subtitle.replace('{{prize}}', wonPrize || '')}
       </div>
       
-      <p className="text-lg mb-8 opacity-80" style={{ color: textColor }}>
+      <p className="text-lg md:text-xl mb-8 opacity-80" style={{ color: textColor }}>
         Votre gain vous sera envoyé par email dans les plus brefs délais
       </p>
 
@@ -59,7 +59,7 @@ export const EndingLayouts = ({
         <Button 
           onClick={onRestart}
           variant="outline"
-          className="text-lg px-8 py-6"
+          className="h-12 px-8 text-lg"
         >
           Rejouer
         </Button>
@@ -164,11 +164,13 @@ export const EndingLayouts = ({
 
       case 'desktop-wallpaper':
         return (
-          <div className="relative z-10">
+          <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
-            {renderConfetti()}
-            {renderContent()}
-          </div>
+            <div className="flex items-center justify-center p-12">
+              {renderConfetti()}
+              {renderContent()}
+            </div>
+          </>
         );
 
       default:

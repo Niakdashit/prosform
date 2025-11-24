@@ -83,8 +83,8 @@ export const WelcomeLayouts = ({
       
       <Button 
         onClick={onButtonClick}
+        className="h-12 px-8 text-lg"
         style={{ backgroundColor: buttonColor, color: textColor }}
-        className="text-lg px-12 py-6 rounded-full shadow-lg hover:scale-105 transition-transform"
       >
         {buttonText}
       </Button>
@@ -163,9 +163,12 @@ export const WelcomeLayouts = ({
 
       case 'desktop-wallpaper':
         return (
-          <div className="flex items-center justify-center w-full h-full">
-            {renderContent()}
-          </div>
+          <>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
+            <div className="flex items-center justify-center p-12">
+              {renderContent()}
+            </div>
+          </>
         );
 
       default:

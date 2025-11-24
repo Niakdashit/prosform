@@ -34,10 +34,10 @@ export const ContactLayouts = ({
 
   const renderForm = () => (
     <div className="w-full max-w-md">
-      <h2 className="text-3xl font-bold mb-2 text-center" style={{ color: textColor }}>
+      <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center" style={{ color: textColor }}>
         {title}
       </h2>
-      <p className="text-center mb-6" style={{ color: textColor, opacity: 0.8 }}>
+      <p className="text-lg md:text-xl text-center mb-8 opacity-80" style={{ color: textColor }}>
         {subtitle}
       </p>
       
@@ -138,10 +138,12 @@ export const ContactLayouts = ({
 
       case 'desktop-wallpaper':
         return (
-          <div className="relative z-10">
+          <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
-            {renderForm()}
-          </div>
+            <div className="flex items-center justify-center p-12">
+              {renderForm()}
+            </div>
+          </>
         );
 
       default:
@@ -151,8 +153,13 @@ export const ContactLayouts = ({
     switch (layout as MobileLayoutType) {
       case 'mobile-vertical':
         return (
-          <div className="flex flex-col h-full justify-center p-6">
-            {renderForm()}
+          <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center p-6">
+              {renderVisual()}
+            </div>
+            <div className="flex-1 flex items-center justify-center p-6">
+              {renderForm()}
+            </div>
           </div>
         );
 
@@ -177,7 +184,8 @@ export const ContactLayouts = ({
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center p-6">
+          <div className="flex flex-col items-center justify-center p-6 space-y-8">
+            <div className="text-6xl">📝</div>
             {renderForm()}
           </div>
         );
