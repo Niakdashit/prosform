@@ -2,9 +2,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical, Image as ImageIcon, X } from "lucide-react";
 import { WheelSegment } from "./WheelBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ImageUploadModal } from "./ImageUploadModal";
+import { useState } from "react";
 
 interface SegmentsModalProps {
   open: boolean;
@@ -23,6 +25,22 @@ export const SegmentsModal = ({
   onAddSegment,
   onDeleteSegment
 }: SegmentsModalProps) => {
+  const [imageUploadOpen, setImageUploadOpen] = useState(false);
+  const [currentSegmentId, setCurrentSegmentId] = useState<string | null>(null);
+
+  const handleImageSelect = (imageData: string) => {
+    if (currentSegmentId) {
+      onUpdateSegment(currentSegmentId, { icon: imageData });
+    }
+    setImageUploadOpen(false);
+    setCurrentSegmentId(null);
+  };
+
+  const openImageUpload = (segmentId: string) => {
+    setCurrentSegmentId(segmentId);
+    setImageUploadOpen(true);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh]">
@@ -63,21 +81,53 @@ export const SegmentsModal = ({
                   />
                 </div>
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">Couleur</Label>
-                  <div className="flex gap-2">
-                    <Input 
-                      type="color" 
-                      value={segment.color}
-                      onChange={(e) => onUpdateSegment(segment.id, { color: e.target.value })}
-                      className="h-9 w-16 cursor-pointer" 
-                    />
-                    <Input 
-                      type="text" 
-                      value={segment.color}
-                      onChange={(e) => onUpdateSegment(segment.id, { color: e.target.value })}
-                      className="h-9 text-sm flex-1" 
-                    />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1.5 block">Couleur</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        type="color" 
+                        value={segment.color}
+                        onChange={(e) => onUpdateSegment(segment.id, { color: e.target.value })}
+                        className="h-9 w-16 cursor-pointer" 
+                      />
+                      <Input 
+                        type="text" 
+                        value={segment.color}
+                        onChange={(e) => onUpdateSegment(segment.id, { color: e.target.value })}
+                        className="h-9 text-sm flex-1" 
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1.5 block">Image</Label>
+                    {segment.icon ? (
+                      <div className="relative h-9 border rounded-md overflow-hidden flex items-center justify-center bg-muted">
+                        <img 
+                          src={segment.icon} 
+                          alt={segment.label}
+                          className="h-full w-full object-cover"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-0 right-0 h-6 w-6 bg-destructive/80 hover:bg-destructive text-destructive-foreground"
+                          onClick={() => onUpdateSegment(segment.id, { icon: undefined })}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="h-9 w-full gap-2"
+                        onClick={() => openImageUpload(segment.id)}
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                        Ajouter
+                      </Button>
+                    )}
                   </div>
                 </div>
 
@@ -114,6 +164,12 @@ export const SegmentsModal = ({
           </Button>
         </div>
       </DialogContent>
+
+      <ImageUploadModal
+        open={imageUploadOpen}
+        onOpenChange={setImageUploadOpen}
+        onImageSelect={handleImageSelect}
+      />
     </Dialog>
   );
 };
