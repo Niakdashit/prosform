@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
@@ -52,6 +53,24 @@ export const WheelSettingsPanel = ({
                   welcomeScreen: { ...config.welcomeScreen, buttonText: e.target.value } 
                 })}
                 className="text-xs h-8"
+              />
+            </div>
+
+            <Separator />
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Block spacing: {config.welcomeScreen.blockSpacing}x
+              </Label>
+              <Slider
+                value={[config.welcomeScreen.blockSpacing]}
+                onValueChange={([value]) => onUpdateConfig({
+                  welcomeScreen: { ...config.welcomeScreen, blockSpacing: value }
+                })}
+                min={0.5}
+                max={3}
+                step={0.25}
+                className="w-full"
               />
             </div>
           </div>
@@ -115,6 +134,24 @@ export const WheelSettingsPanel = ({
                 </div>
 
                 <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.contactForm.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.contactForm.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
+
+                <Separator />
 
                 <div className="space-y-3">
                   <Label className="text-xs text-muted-foreground">Fields</Label>
@@ -154,6 +191,24 @@ export const WheelSettingsPanel = ({
                 onMobileLayoutChange={(layout) => onUpdateConfig({
                   wheelScreen: { ...config.wheelScreen, mobileLayout: layout }
                 })}
+              />
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Block spacing: {config.wheelScreen.blockSpacing}x
+              </Label>
+              <Slider
+                value={[config.wheelScreen.blockSpacing]}
+                onValueChange={([value]) => onUpdateConfig({
+                  wheelScreen: { ...config.wheelScreen, blockSpacing: value }
+                })}
+                min={0.5}
+                max={3}
+                step={0.25}
+                className="w-full"
               />
             </div>
             
@@ -253,6 +308,24 @@ export const WheelSettingsPanel = ({
               <p className="text-[10px] text-muted-foreground mt-1">
                 Utilisez {'{{'} prize{'}}'} pour afficher le lot gagné
               </p>
+            </div>
+
+            <Separator />
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Block spacing: {config.endingScreen.blockSpacing}x
+              </Label>
+              <Slider
+                value={[config.endingScreen.blockSpacing]}
+                onValueChange={([value]) => onUpdateConfig({
+                  endingScreen: { ...config.endingScreen, blockSpacing: value }
+                })}
+                min={0.5}
+                max={3}
+                step={0.25}
+                className="w-full"
+              />
             </div>
           </div>
         );
