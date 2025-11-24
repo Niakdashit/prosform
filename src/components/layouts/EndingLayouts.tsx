@@ -11,6 +11,12 @@ interface EndingLayoutProps {
   backgroundColor: string;
   textColor: string;
   buttonColor: string;
+  editingField?: string | null;
+  onEditTitle?: () => void;
+  onEditSubtitle?: () => void;
+  onTitleChange?: (value: string) => void;
+  onSubtitleChange?: (value: string) => void;
+  onBlur?: () => void;
   onRestart?: () => void;
 }
 
@@ -23,6 +29,12 @@ export const EndingLayouts = ({
   backgroundColor,
   textColor,
   buttonColor,
+  editingField,
+  onEditTitle,
+  onEditSubtitle,
+  onTitleChange,
+  onSubtitleChange,
+  onBlur,
   onRestart
 }: EndingLayoutProps) => {
 
@@ -37,9 +49,24 @@ export const EndingLayouts = ({
         </div>
       </div>
       
-      <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: textColor }}>
-        {title}
-      </h1>
+      {editingField === 'ending-title' ? (
+        <input
+          autoFocus
+          className="text-4xl md:text-5xl font-bold mb-4 text-center w-full bg-transparent border-b-2 border-primary outline-none"
+          style={{ color: textColor }}
+          value={title}
+          onChange={(e) => onTitleChange?.(e.target.value)}
+          onBlur={onBlur}
+        />
+      ) : (
+        <h1 
+          className="text-4xl md:text-5xl font-bold mb-4 cursor-pointer hover:opacity-80 transition-opacity" 
+          style={{ color: textColor }}
+          onClick={onEditTitle}
+        >
+          {title}
+        </h1>
+      )}
       
       <div 
         className="text-xl md:text-2xl font-semibold mb-6 p-6 rounded-2xl"

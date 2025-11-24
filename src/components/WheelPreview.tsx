@@ -123,6 +123,16 @@ export const WheelPreview = ({
             backgroundColor={theme.backgroundColor}
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
+            editingField={editingField}
+            onEditTitle={() => setEditingField('contact-title')}
+            onEditSubtitle={() => setEditingField('contact-subtitle')}
+            onTitleChange={(value) => onUpdateConfig({ 
+              contactForm: { ...config.contactForm, title: value } 
+            })}
+            onSubtitleChange={(value) => onUpdateConfig({ 
+              contactForm: { ...config.contactForm, subtitle: value } 
+            })}
+            onBlur={() => setEditingField(null)}
           />
         );
 
@@ -157,10 +167,19 @@ export const WheelPreview = ({
             backgroundColor={theme.backgroundColor}
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
+            editingField={editingField}
+            onEditTitle={() => setEditingField('ending-title')}
+            onEditSubtitle={() => setEditingField('ending-subtitle')}
+            onTitleChange={(value) => onUpdateConfig({ 
+              endingScreen: { ...config.endingScreen, title: value } 
+            })}
+            onSubtitleChange={(value) => onUpdateConfig({ 
+              endingScreen: { ...config.endingScreen, subtitle: value } 
+            })}
+            onBlur={() => setEditingField(null)}
             onRestart={() => {
-              // Reset state - navigation handled by parent
               setWonPrize(null);
-              setContactData({ name: '', email: '', phone: '' });
+              setContactData({ name: "", email: "", phone: "" });
             }}
           />
         );
