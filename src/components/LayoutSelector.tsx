@@ -12,7 +12,6 @@ import desktopCenteredIcon from "@/assets/layout-desktop-centered.svg";
 import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
 import desktopCardIcon from "@/assets/layout-desktop-card.svg";
 import desktopPanelIcon from "@/assets/layout-desktop-panel.svg";
-import desktopWallpaperIcon from "@/assets/layout-desktop-wallpaper.svg";
 
 interface LayoutSelectorProps {
   desktopLayout: DesktopLayoutType;
@@ -33,7 +32,6 @@ const LayoutIcon = ({ type }: { type: string }) => {
     "desktop-split": desktopSplitIcon,
     "desktop-card": desktopCardIcon,
     "desktop-panel": desktopPanelIcon,
-    "desktop-wallpaper": desktopWallpaperIcon,
   };
   
   const icon = iconMap[type];

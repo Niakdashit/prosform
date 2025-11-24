@@ -336,16 +336,6 @@ export const ContactLayouts = ({
       case 'desktop-split':
         return (
           <>
-            <div className="flex items-center justify-center p-12 border-r border-gray-200">
-              {renderForm()}
-            </div>
-            {renderVisual()}
-          </>
-        );
-
-      case 'desktop-wallpaper':
-        return (
-          <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
             <div className="flex items-center justify-center p-12">
               {renderForm()}

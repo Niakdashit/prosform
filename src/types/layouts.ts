@@ -6,8 +6,7 @@ export type DesktopLayoutType =
   | 'desktop-centered'      // Contenu centré
   | 'desktop-card'          // Split right - Contenu à gauche, roue à droite
   | 'desktop-panel'         // Split left - Roue à gauche, contenu à droite
-  | 'desktop-split'         // Split 50/50
-  | 'desktop-wallpaper';    // Fond plein écran avec overlay
+  | 'desktop-split';        // Wallpaper - Fond avec overlay
 
 export type MobileLayoutType = 
   | 'mobile-vertical'       // Vertical classique
@@ -65,15 +64,9 @@ export const DESKTOP_LAYOUTS: Array<{
   },
   {
     id: 'desktop-split',
-    name: 'Split 50/50',
-    description: 'Division égale de l\'écran',
-    preview: '/src/assets/layout-desktop-split.svg'
-  },
-  {
-    id: 'desktop-wallpaper',
     name: 'Wallpaper',
     description: 'Fond plein écran avec overlay',
-    preview: '/src/assets/layout-desktop-wallpaper.svg'
+    preview: '/src/assets/layout-desktop-split.svg'
   }
 ];
 
