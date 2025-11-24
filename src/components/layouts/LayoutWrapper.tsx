@@ -39,8 +39,6 @@ export const LayoutWrapper = ({
       switch (layout as MobileLayoutType) {
         case 'mobile-vertical':
           return 'flex flex-col';
-        case 'mobile-horizontal':
-          return 'flex overflow-x-auto snap-x snap-mandatory';
         case 'mobile-centered':
           return 'flex items-center justify-center';
         case 'mobile-minimal':

@@ -230,8 +230,8 @@ export const WheelPreview = ({
                   className="overflow-hidden relative group"
                   style={{ 
                     borderRadius: "36px",
-                    width: viewMode === 'desktop' ? '420px' : currentLayoutType === 'mobile-horizontal' ? '140px' : '280px',
-                    height: viewMode === 'desktop' ? '420px' : currentLayoutType === 'mobile-horizontal' ? '140px' : '280px',
+                    width: viewMode === 'desktop' ? '420px' : '280px',
+                    height: viewMode === 'desktop' ? '420px' : '280px',
                     maxWidth: '100%',
                     flexShrink: 0
                   }}
@@ -589,15 +589,6 @@ export const WheelPreview = ({
                     <TextContent />
                   </div>
                 );
-              } else if (mobileLayout === 'mobile-horizontal') {
-                return (
-                  <div className="flex gap-4 py-6 px-5 w-full max-w-[700px]">
-                    <div className="flex-1">
-                      <TextContent />
-                    </div>
-                    <ImageBlock />
-                  </div>
-                );
               } else if (mobileLayout === 'mobile-centered') {
                 return (
                   <div className="flex flex-col w-full h-full">
@@ -799,8 +790,8 @@ export const WheelPreview = ({
                   <div
                     className="flex items-center justify-center"
                     style={{ 
-                      width: viewMode === 'desktop' ? '450px' : currentLayoutType === 'mobile-horizontal' ? '160px' : '320px',
-                      height: viewMode === 'desktop' ? '450px' : currentLayoutType === 'mobile-horizontal' ? '160px' : '320px',
+                      width: viewMode === 'desktop' ? '450px' : '320px',
+                      height: viewMode === 'desktop' ? '450px' : '320px',
                       maxWidth: '100%',
                       flexShrink: 0
                     }}
@@ -813,7 +804,7 @@ export const WheelPreview = ({
                         setTimeout(() => onNext(), 1000);
                       }}
                       brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                      size={viewMode === 'desktop' ? 380 : currentLayoutType === 'mobile-horizontal' ? 140 : 280}
+                      size={viewMode === 'desktop' ? 380 : 280}
                     />
                   </div>
                 );
@@ -963,15 +954,6 @@ export const WheelPreview = ({
                   <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
                     <WheelBlock />
                     <TextContent />
-                  </div>
-                );
-              } else if (mobileLayout === 'mobile-horizontal') {
-                return (
-                  <div className="flex gap-4 py-6 px-5 w-full max-w-[700px]">
-                    <div className="flex-1">
-                      <TextContent />
-                    </div>
-                    <WheelBlock />
                   </div>
                 );
               } else if (mobileLayout === 'mobile-centered') {

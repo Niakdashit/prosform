@@ -3,7 +3,6 @@ import { Monitor, Smartphone } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import mobileVerticalIcon from "@/assets/layout-mobile-vertical.svg";
-import mobileHorizontalIcon from "@/assets/layout-mobile-horizontal.svg";
 import mobileCenteredIcon from "@/assets/layout-mobile-centered.svg";
 import mobileMinimalIcon from "@/assets/layout-mobile-minimal.svg";
 import desktopLeftRightIcon from "@/assets/layout-desktop-left-right.svg";
@@ -23,7 +22,6 @@ interface LayoutSelectorProps {
 const LayoutIcon = ({ type }: { type: string }) => {
   const iconMap: Record<string, string> = {
     "mobile-vertical": mobileVerticalIcon,
-    "mobile-horizontal": mobileHorizontalIcon,
     "mobile-centered": mobileCenteredIcon,
     "mobile-minimal": mobileMinimalIcon,
     "desktop-left-right": desktopLeftRightIcon,
