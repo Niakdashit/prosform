@@ -19,6 +19,7 @@ export interface WheelSegment {
   color: string;
   probability?: number;
   icon?: string;
+  prizeId?: string;
 }
 
 export interface ContactField {

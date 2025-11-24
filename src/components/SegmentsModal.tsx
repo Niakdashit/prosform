@@ -2,10 +2,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, GripVertical, Image as ImageIcon, X } from "lucide-react";
+import { Plus, Trash2, GripVertical, Image as ImageIcon, X, Gift } from "lucide-react";
 import { WheelSegment } from "./WheelBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 
 interface SegmentsModalProps {
   open: boolean;
@@ -26,6 +28,33 @@ export const SegmentsModal = ({
 }: SegmentsModalProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentSegmentIdRef = useRef<string | null>(null);
+  const [customPrizes, setCustomPrizes] = useState<Array<{ id: string; name: string }>>([]);
+  const [isAddingPrize, setIsAddingPrize] = useState(false);
+  const [newPrizeName, setNewPrizeName] = useState("");
+
+  // Liste de lots prédéfinis + lots personnalisés
+  const availablePrizes = [
+    { id: "none", name: "Aucun lot" },
+    { id: "prize1", name: "10% de réduction" },
+    { id: "prize2", name: "Livraison gratuite" },
+    { id: "prize3", name: "20% de réduction" },
+    { id: "prize4", name: "Cadeau surprise" },
+    { id: "prize5", name: "15% de réduction" },
+    { id: "prize6", name: "Bon d'achat 50€" },
+    ...customPrizes,
+  ];
+
+  const handleAddCustomPrize = () => {
+    if (newPrizeName.trim()) {
+      const newPrize = {
+        id: `custom-${Date.now()}`,
+        name: newPrizeName.trim()
+      };
+      setCustomPrizes([...customPrizes, newPrize]);
+      setNewPrizeName("");
+      setIsAddingPrize(false);
+    }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -149,6 +178,74 @@ export const SegmentsModal = ({
                     onChange={(e) => onUpdateSegment(segment.id, { probability: parseInt(e.target.value) })}
                     className="w-full h-2 accent-primary cursor-pointer"
                   />
+                </div>
+
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                    <Gift className="w-3.5 h-3.5" />
+                    Lot associé
+                  </Label>
+                  <Select 
+                    value={(segment as any).prizeId || "none"} 
+                    onValueChange={(value) => onUpdateSegment(segment.id, { prizeId: value } as any)}
+                  >
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue placeholder="Sélectionner un lot" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availablePrizes.map((prize) => (
+                        <SelectItem key={prize.id} value={prize.id} className="text-sm">
+                          {prize.name}
+                        </SelectItem>
+                      ))}
+                      <Separator className="my-1" />
+                      {!isAddingPrize ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start h-8 text-xs"
+                          onClick={() => setIsAddingPrize(true)}
+                        >
+                          <Plus className="w-3 h-3 mr-2" />
+                          Créer un nouveau lot
+                        </Button>
+                      ) : (
+                        <div className="p-2 space-y-2">
+                          <Input
+                            placeholder="Nom du lot"
+                            value={newPrizeName}
+                            onChange={(e) => setNewPrizeName(e.target.value)}
+                            className="h-8 text-xs"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleAddCustomPrize();
+                              }
+                            }}
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              className="h-7 text-xs flex-1"
+                              onClick={handleAddCustomPrize}
+                            >
+                              Ajouter
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs"
+                              onClick={() => {
+                                setIsAddingPrize(false);
+                                setNewPrizeName("");
+                              }}
+                            >
+                              Annuler
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             ))}
