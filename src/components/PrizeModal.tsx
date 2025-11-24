@@ -161,8 +161,8 @@ export const PrizeModal = ({
               </div>
 
               {formData.attributionMethod === 'calendar' && (
-                <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-4">
-                  <p className="text-sm text-blue-900 dark:text-blue-100">
+                <div className="bg-muted/50 border border-muted-foreground/20 rounded-lg p-4 space-y-4">
+                  <p className="text-sm text-foreground">
                     Le lot sera attribué au participant qui joue exactement à la date et l'heure programmées.
                   </p>
 
@@ -359,7 +359,11 @@ export const PrizeModal = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-          <Button onClick={handleSave} disabled={!formData.name.trim()}>
+          <Button 
+            onClick={handleSave} 
+            disabled={!formData.name.trim()}
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             Enregistrer
           </Button>
         </div>
