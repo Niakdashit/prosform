@@ -937,10 +937,10 @@ export const WheelPreview = ({
                           alignItems: 'center'
                         }}
                       >
-                        <WheelBlock />
                         <div className="flex-1 max-w-[500px]">
                           <TextContent noSpacing />
                         </div>
+                        <WheelBlock />
                       </div>
                     </div>
                   );
