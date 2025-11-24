@@ -8,7 +8,9 @@ import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
+import { WallpaperUploadModal } from "./WallpaperUploadModal";
+import { useState } from "react";
 
 interface WheelSettingsPanelProps {
   config: WheelConfig;
@@ -24,6 +26,55 @@ export const WheelSettingsPanel = ({
   onUpdateConfig,
   onUpdateSegment 
 }: WheelSettingsPanelProps) => {
+  const [wallpaperModalOpen, setWallpaperModalOpen] = useState(false);
+  const [activeWallpaperSection, setActiveWallpaperSection] = useState<'welcome' | 'contact' | 'wheel' | 'ending'>('welcome');
+  
+  const handleWallpaperSelect = (imageUrl: string) => {
+    switch (activeWallpaperSection) {
+      case 'welcome':
+        onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, wallpaperImage: imageUrl } });
+        break;
+      case 'contact':
+        onUpdateConfig({ contactForm: { ...config.contactForm, wallpaperImage: imageUrl } });
+        break;
+      case 'wheel':
+        onUpdateConfig({ wheelScreen: { ...config.wheelScreen, wallpaperImage: imageUrl } });
+        break;
+      case 'ending':
+        onUpdateConfig({ endingScreen: { ...config.endingScreen, wallpaperImage: imageUrl } });
+        break;
+    }
+  };
+
+  const handleRemoveWallpaper = (section: 'welcome' | 'contact' | 'wheel' | 'ending') => {
+    switch (section) {
+      case 'welcome':
+        onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, wallpaperImage: undefined } });
+        break;
+      case 'contact':
+        onUpdateConfig({ contactForm: { ...config.contactForm, wallpaperImage: undefined } });
+        break;
+      case 'wheel':
+        onUpdateConfig({ wheelScreen: { ...config.wheelScreen, wallpaperImage: undefined } });
+        break;
+      case 'ending':
+        onUpdateConfig({ endingScreen: { ...config.endingScreen, wallpaperImage: undefined } });
+        break;
+    }
+  };
+
+  const getCurrentWallpaper = () => {
+    switch (activeWallpaperSection) {
+      case 'welcome':
+        return config.welcomeScreen.wallpaperImage;
+      case 'contact':
+        return config.contactForm.wallpaperImage;
+      case 'wheel':
+        return config.wheelScreen.wallpaperImage;
+      case 'ending':
+        return config.endingScreen.wallpaperImage;
+    }
+  };
   
   const renderSettings = () => {
     switch (activeView) {
@@ -79,12 +130,51 @@ export const WheelSettingsPanel = ({
             {(config.welcomeScreen.desktopLayout === 'desktop-split' || config.welcomeScreen.mobileLayout === 'mobile-minimal') && (
               <>
                 <Separator />
-                <div>
+                <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
-                    <Upload className="w-3 h-3 mr-2" />
-                    Upload image
-                  </Button>
+                  {config.welcomeScreen.wallpaperImage ? (
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg overflow-hidden border">
+                        <img 
+                          src={config.welcomeScreen.wallpaperImage} 
+                          alt="Wallpaper preview" 
+                          className="w-full h-24 object-cover"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 h-6 w-6"
+                          onClick={() => handleRemoveWallpaper('welcome')}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full text-xs h-8"
+                        onClick={() => {
+                          setActiveWallpaperSection('welcome');
+                          setWallpaperModalOpen(true);
+                        }}
+                      >
+                        Changer l'image
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full text-xs h-8 justify-start"
+                      onClick={() => {
+                        setActiveWallpaperSection('welcome');
+                        setWallpaperModalOpen(true);
+                      }}
+                    >
+                      <Upload className="w-3 h-3 mr-2" />
+                      Ajouter une image
+                    </Button>
+                  )}
                 </div>
               </>
             )}
@@ -169,12 +259,51 @@ export const WheelSettingsPanel = ({
                 {(config.contactForm.desktopLayout === 'desktop-split' || config.contactForm.mobileLayout === 'mobile-minimal') && (
                   <>
                     <Separator />
-                    <div>
+                    <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                      <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
-                        <Upload className="w-3 h-3 mr-2" />
-                        Upload image
-                      </Button>
+                      {config.contactForm.wallpaperImage ? (
+                        <div className="space-y-2">
+                          <div className="relative rounded-lg overflow-hidden border">
+                            <img 
+                              src={config.contactForm.wallpaperImage} 
+                              alt="Wallpaper preview" 
+                              className="w-full h-24 object-cover"
+                            />
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-1 right-1 h-6 w-6"
+                              onClick={() => handleRemoveWallpaper('contact')}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="w-full text-xs h-8"
+                            onClick={() => {
+                              setActiveWallpaperSection('contact');
+                              setWallpaperModalOpen(true);
+                            }}
+                          >
+                            Changer l'image
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full text-xs h-8 justify-start"
+                          onClick={() => {
+                            setActiveWallpaperSection('contact');
+                            setWallpaperModalOpen(true);
+                          }}
+                        >
+                          <Upload className="w-3 h-3 mr-2" />
+                          Ajouter une image
+                        </Button>
+                      )}
                     </div>
                   </>
                 )}
@@ -243,12 +372,51 @@ export const WheelSettingsPanel = ({
             {(config.wheelScreen.desktopLayout === 'desktop-split' || config.wheelScreen.mobileLayout === 'mobile-minimal') && (
               <>
                 <Separator />
-                <div>
+                <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
-                    <Upload className="w-3 h-3 mr-2" />
-                    Upload image
-                  </Button>
+                  {config.wheelScreen.wallpaperImage ? (
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg overflow-hidden border">
+                        <img 
+                          src={config.wheelScreen.wallpaperImage} 
+                          alt="Wallpaper preview" 
+                          className="w-full h-24 object-cover"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 h-6 w-6"
+                          onClick={() => handleRemoveWallpaper('wheel')}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full text-xs h-8"
+                        onClick={() => {
+                          setActiveWallpaperSection('wheel');
+                          setWallpaperModalOpen(true);
+                        }}
+                      >
+                        Changer l'image
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full text-xs h-8 justify-start"
+                      onClick={() => {
+                        setActiveWallpaperSection('wheel');
+                        setWallpaperModalOpen(true);
+                      }}
+                    >
+                      <Upload className="w-3 h-3 mr-2" />
+                      Ajouter une image
+                    </Button>
+                  )}
                 </div>
               </>
             )}
@@ -372,12 +540,51 @@ export const WheelSettingsPanel = ({
             {(config.endingScreen.desktopLayout === 'desktop-split' || config.endingScreen.mobileLayout === 'mobile-minimal') && (
               <>
                 <Separator />
-                <div>
+                <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  <Button variant="outline" size="sm" className="w-full text-xs h-8 justify-start">
-                    <Upload className="w-3 h-3 mr-2" />
-                    Upload image
-                  </Button>
+                  {config.endingScreen.wallpaperImage ? (
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg overflow-hidden border">
+                        <img 
+                          src={config.endingScreen.wallpaperImage} 
+                          alt="Wallpaper preview" 
+                          className="w-full h-24 object-cover"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 h-6 w-6"
+                          onClick={() => handleRemoveWallpaper('ending')}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full text-xs h-8"
+                        onClick={() => {
+                          setActiveWallpaperSection('ending');
+                          setWallpaperModalOpen(true);
+                        }}
+                      >
+                        Changer l'image
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full text-xs h-8 justify-start"
+                      onClick={() => {
+                        setActiveWallpaperSection('ending');
+                        setWallpaperModalOpen(true);
+                      }}
+                    >
+                      <Upload className="w-3 h-3 mr-2" />
+                      Ajouter une image
+                    </Button>
+                  )}
                 </div>
               </>
             )}
@@ -387,16 +594,25 @@ export const WheelSettingsPanel = ({
   };
 
   return (
-    <div className="w-[300px] bg-background border-l border-border flex flex-col">
-      <div className="px-4 py-3 border-b">
-        <h3 className="text-sm font-semibold">Settings</h3>
-      </div>
-      
-      <ScrollArea className="flex-1">
-        <div className="p-4">
-          {renderSettings()}
+    <>
+      <div className="w-[300px] bg-background border-l border-border flex flex-col">
+        <div className="px-4 py-3 border-b">
+          <h3 className="text-sm font-semibold">Settings</h3>
         </div>
-      </ScrollArea>
-    </div>
+        
+        <ScrollArea className="flex-1">
+          <div className="p-4">
+            {renderSettings()}
+          </div>
+        </ScrollArea>
+      </div>
+
+      <WallpaperUploadModal
+        open={wallpaperModalOpen}
+        onOpenChange={setWallpaperModalOpen}
+        onImageSelect={handleWallpaperSelect}
+        currentImage={getCurrentWallpaper()}
+      />
+    </>
   );
 };

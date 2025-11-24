@@ -33,6 +33,7 @@ export interface WheelConfig {
     blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
+    wallpaperImage?: string;
   };
   contactForm: {
     enabled: boolean;
@@ -42,11 +43,13 @@ export interface WheelConfig {
     fields: ContactField[];
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
+    wallpaperImage?: string;
   };
   wheelScreen: {
     blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
+    wallpaperImage?: string;
   };
   segments: WheelSegment[];
   endingScreen: {
@@ -55,6 +58,7 @@ export interface WheelConfig {
     blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
+    wallpaperImage?: string;
   };
 }
 
