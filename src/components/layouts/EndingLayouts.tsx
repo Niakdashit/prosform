@@ -51,7 +51,7 @@ export const EndingLayouts = ({
 }: EndingLayoutProps) => {
 
   const renderContent = () => (
-    <div className="text-center max-w-2xl px-8">
+    <div className="text-center w-full max-w-2xl">
       <div className="mb-6 flex justify-center">
         <div 
           className="w-24 h-24 rounded-full flex items-center justify-center"
@@ -299,7 +299,7 @@ export const EndingLayouts = ({
             <div className="flex-1 flex items-center justify-center p-6">
               {renderVisual()}
             </div>
-            <div className="flex-1 flex items-center justify-center p-6">
+            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
               {renderContent()}
             </div>
           </div>
@@ -320,7 +320,7 @@ export const EndingLayouts = ({
 
       case 'mobile-centered':
         return (
-          <div className="flex items-center justify-center p-6 relative">
+          <div className="flex items-center justify-center py-8 relative" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderConfetti()}
             {renderContent()}
           </div>
@@ -328,7 +328,7 @@ export const EndingLayouts = ({
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center p-6 space-y-8 relative">
+          <div className="flex flex-col items-center justify-center py-6 space-y-8 relative" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderConfetti()}
             <Gift className="w-20 h-20" style={{ color: buttonColor }} />
             {renderContent()}

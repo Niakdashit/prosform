@@ -364,7 +364,7 @@ export const ContactLayouts = ({
             <div className="flex-1 flex items-center justify-center p-6">
               {renderVisual()}
             </div>
-            <div className="flex-1 flex items-center justify-center p-6">
+            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
               {renderForm()}
             </div>
           </div>
@@ -384,14 +384,14 @@ export const ContactLayouts = ({
 
       case 'mobile-centered':
         return (
-          <div className="flex items-center justify-center p-6">
+          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderForm()}
           </div>
         );
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center p-6 space-y-8">
+          <div className="flex flex-col items-center justify-center py-6 space-y-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             <div className="text-6xl">📝</div>
             {renderForm()}
           </div>

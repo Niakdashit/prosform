@@ -54,7 +54,7 @@ export const WelcomeLayouts = ({
 }: WelcomeLayoutProps) => {
 
   const renderContent = () => (
-    <div className="text-center max-w-2xl px-8">
+    <div className="text-center w-full max-w-[700px]">
       <div className="relative">
         {editingField === 'welcome-title' && (
           <>
@@ -345,7 +345,7 @@ export const WelcomeLayouts = ({
             <div className="flex-1 flex items-center justify-center p-6">
               {renderVisual()}
             </div>
-            <div className="flex-1 flex items-center justify-center p-6">
+            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
               {renderContent()}
             </div>
           </div>
@@ -365,14 +365,14 @@ export const WelcomeLayouts = ({
 
       case 'mobile-centered':
         return (
-          <div className="flex items-center justify-center p-6">
+          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderContent()}
           </div>
         );
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center p-6 space-y-8">
+          <div className="flex flex-col items-center justify-center py-6 space-y-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             <div className="text-5xl">🎡</div>
             {renderContent()}
           </div>

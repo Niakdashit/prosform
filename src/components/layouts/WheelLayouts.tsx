@@ -192,7 +192,7 @@ export const WheelLayouts = ({
     switch (layout as MobileLayoutType) {
       case 'mobile-vertical':
         return (
-          <div className="flex flex-col h-full justify-center items-center p-6 space-y-8">
+          <div className="flex flex-col h-full justify-center items-center py-8 space-y-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             <h2 className="text-4xl md:text-5xl font-bold text-center" style={{ color: textColor }}>
               Tournez la roue !
             </h2>
@@ -214,14 +214,14 @@ export const WheelLayouts = ({
 
       case 'mobile-centered':
         return (
-          <div className="flex items-center justify-center p-6">
+          <div className="flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderWheel()}
           </div>
         );
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center p-4 space-y-6">
+          <div className="flex flex-col items-center justify-center py-4 space-y-6" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderWheel()}
           </div>
         );
