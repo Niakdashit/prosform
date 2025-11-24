@@ -45,7 +45,7 @@ export const WelcomeLayouts = ({
       {editingField === 'welcome-title' ? (
         <input
           autoFocus
-          className="text-4xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center"
+          className="text-4xl md:text-5xl font-bold mb-4 w-full bg-transparent border-b-2 border-primary outline-none text-center"
           style={{ color: textColor }}
           value={title}
           onChange={(e) => onTitleChange?.(e.target.value)}
@@ -64,7 +64,7 @@ export const WelcomeLayouts = ({
       {editingField === 'welcome-subtitle' ? (
         <textarea
           autoFocus
-          className="text-lg mb-8 w-full bg-transparent border-b border-primary outline-none text-center resize-none"
+          className="text-lg md:text-xl mb-8 w-full bg-transparent border-b border-primary outline-none text-center resize-none"
           style={{ color: textColor }}
           value={subtitle}
           onChange={(e) => onSubtitleChange?.(e.target.value)}
