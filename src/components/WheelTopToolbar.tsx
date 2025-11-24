@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Eye, Share2, Settings, Palette, Smartphone, RotateCcw } from "lucide-react";
+import { Eye, Share2, Settings, Palette, Smartphone, RotateCcw, Gift } from "lucide-react";
 
 interface WheelTopToolbarProps {
   onPreview: () => void;
@@ -12,6 +12,10 @@ export const WheelTopToolbar = ({ onPreview }: WheelTopToolbarProps) => {
         <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs px-2.5">
           <Palette className="w-3.5 h-3.5" />
           Design
+        </Button>
+        <Button variant="ghost" size="sm" className="gap-1.5 h-8 text-xs px-2.5">
+          <Gift className="w-3.5 h-3.5" />
+          Paramètres et dotations
         </Button>
       </div>
 
