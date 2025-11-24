@@ -189,18 +189,6 @@ export const WheelLayouts = ({
       case 'desktop-split':
         return (
           <>
-            <div className="flex items-center justify-center p-12 border-r border-gray-200">
-              {renderContent()}
-            </div>
-            <div className="flex items-center justify-center p-12">
-              {renderWheel()}
-            </div>
-          </>
-        );
-
-      case 'desktop-wallpaper':
-        return (
-          <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
             <div className="flex items-center justify-center p-12">
               <div className="flex flex-col items-center space-y-8">

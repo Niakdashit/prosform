@@ -31,8 +31,6 @@ export const LayoutWrapper = ({
         case 'desktop-panel':
           return 'grid grid-cols-[400px_1fr] gap-0';
         case 'desktop-split':
-          return 'grid grid-cols-2 gap-0';
-        case 'desktop-wallpaper':
           return 'relative flex items-center justify-center';
         default:
           return 'flex items-center justify-center';
