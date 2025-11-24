@@ -248,8 +248,18 @@ export const EndingLayouts = ({
         </p>
       </div>
       
+      {onRestart && (
+        <Button 
+          onClick={onRestart}
+          className="h-11 px-8 text-base font-medium rounded-full hover-scale mb-8"
+          style={{ backgroundColor: buttonColor, color: '#3D3731' }}
+        >
+          Rejouer
+        </Button>
+      )}
+
       {socialLinks && (Object.values(socialLinks).some(link => link)) && (
-        <div className="mb-8">
+        <div>
           <p className="text-sm mb-4 opacity-70" style={{ color: textColor }}>
             Partagez votre victoire
           </p>
@@ -300,16 +310,6 @@ export const EndingLayouts = ({
             )}
           </div>
         </div>
-      )}
-
-      {onRestart && (
-        <Button 
-          onClick={onRestart}
-          className="h-11 px-8 text-base font-medium rounded-full hover-scale"
-          style={{ backgroundColor: buttonColor, color: '#3D3731' }}
-        >
-          Rejouer
-        </Button>
       )}
     </div>
   );
