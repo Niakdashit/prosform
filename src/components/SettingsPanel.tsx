@@ -7,7 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag, Monitor } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag, Monitor, LayoutGrid, List, CircleDot, Square, Type, Underline, BoxSelect, Minus, Hash, Sliders, ToggleLeft, Calendar, ChevronDown, FileUp, Maximize, AlignCenter, AlignLeft, Split, Sparkles, PartyPopper, ExternalLink, Globe, Play, Video, CheckSquare, Palette, RectangleHorizontal, Circle, SquareIcon, Paintbrush } from "lucide-react";
+import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getQuestionIcon, questionIconMap } from "@/lib/questionIcons";
 import { MOBILE_LAYOUTS, DESKTOP_LAYOUTS } from "@/types/layouts";
@@ -142,6 +144,23 @@ const LayoutSelector = ({ question, onUpdateQuestion, onViewModeChange }: Settin
             </SelectContent>
           </Select>
         </div>
+
+        {/* Overlay opacity control for Wallpaper layouts */}
+        {(currentMobileLayout === 'mobile-minimal' || currentDesktopLayout === 'desktop-wallpaper' || currentDesktopLayout === 'desktop-split') && (
+          <div className="mt-4">
+            <Label className="text-xs text-muted-foreground mb-2 block">
+              Overlay opacity: {((question.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
+            </Label>
+            <Slider
+              value={[(question.overlayOpacity ?? 0.6) * 100]}
+              onValueChange={([value]) => onUpdateQuestion?.(question.id, { overlayOpacity: value / 100 })}
+              min={0}
+              max={100}
+              step={5}
+              className="w-full"
+            />
+          </div>
+        )}
       </div>
 
       <Separator className="my-4" />
@@ -168,6 +187,9 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
       file: "File Upload",
       statement: "Statement",
       "picture-choice": "Picture Choice",
+      website: "Website",
+      video: "Video/Audio",
+      checkbox: "Checkbox",
     };
     return labels[question.type] || "Question";
   };
@@ -197,9 +219,244 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     </>
   );
 
+  // Generic Display Style Selector Component
+  const DisplayStyleSelector = <T extends string>({ 
+    label, 
+    options, 
+    value, 
+    onChange,
+    columns = 4
+  }: { 
+    label: string;
+    options: { value: T; icon: React.ComponentType<{ className?: string }>; label: string }[];
+    value: T;
+    onChange: (value: T) => void;
+    columns?: number;
+  }) => (
+    <div>
+      <Label className="text-xs text-muted-foreground mb-2 block">{label}</Label>
+      <div className={`grid grid-cols-${columns} gap-2`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+        {options.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => onChange(option.value)}
+            className={`flex flex-col items-center justify-center p-2 rounded-lg border-2 transition-all ${
+              value === option.value
+                ? 'border-primary bg-primary/5'
+                : 'border-muted hover:border-muted-foreground/30'
+            }`}
+          >
+            <option.icon className={`w-4 h-4 mb-1 ${value === option.value ? 'text-primary' : 'text-muted-foreground'}`} />
+            <span className={`text-[9px] ${value === option.value ? 'text-primary font-medium' : 'text-muted-foreground'}`}>{option.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Style Customization Panel Component
+  const StyleCustomizationPanel = () => {
+    const currentStyle = question.styleCustomization || {};
+    
+    const updateStyleCustomization = (key: string, value: string) => {
+      onUpdateQuestion?.(question.id, {
+        styleCustomization: {
+          ...currentStyle,
+          [key]: value
+        }
+      });
+    };
+
+    const borderRadiusOptions = [
+      { value: 'none', label: 'None', preview: 'rounded-none' },
+      { value: 'small', label: 'Small', preview: 'rounded-sm' },
+      { value: 'medium', label: 'Medium', preview: 'rounded-md' },
+      { value: 'large', label: 'Large', preview: 'rounded-lg' },
+      { value: 'full', label: 'Full', preview: 'rounded-full' },
+    ];
+
+    const presetColors = [
+      '#F5B800', // Yellow (primary)
+      '#3B82F6', // Blue
+      '#10B981', // Green
+      '#EF4444', // Red
+      '#8B5CF6', // Purple
+      '#F97316', // Orange
+      '#EC4899', // Pink
+      '#6B7280', // Gray
+      '#000000', // Black
+      '#FFFFFF', // White
+    ];
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Paintbrush className="w-4 h-4 text-muted-foreground" />
+          <Label className="text-xs font-medium">Style Customization</Label>
+        </div>
+
+        {/* Border Radius */}
+        <div>
+          <Label className="text-xs text-muted-foreground mb-2 block">Border Radius</Label>
+          <div className="flex gap-1">
+            {borderRadiusOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => updateStyleCustomization('borderRadius', option.value)}
+                className={`flex-1 p-2 border-2 transition-all ${
+                  (currentStyle.borderRadius || 'medium') === option.value
+                    ? 'border-primary bg-primary/5'
+                    : 'border-muted hover:border-muted-foreground/30'
+                }`}
+                title={option.label}
+              >
+                <div className={`w-full h-4 bg-muted-foreground/20 ${option.preview}`} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Button Color */}
+        <div>
+          <Label className="text-xs text-muted-foreground mb-2 block">Button Color</Label>
+          <div className="flex gap-1.5 flex-wrap">
+            {presetColors.map((color) => (
+              <button
+                key={color}
+                onClick={() => updateStyleCustomization('buttonColor', color)}
+                className={`w-6 h-6 rounded-full border-2 transition-all ${
+                  currentStyle.buttonColor === color
+                    ? 'border-primary scale-110'
+                    : 'border-transparent hover:scale-105'
+                }`}
+                style={{ backgroundColor: color }}
+                title={color}
+              />
+            ))}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="w-6 h-6 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center hover:border-muted-foreground/50">
+                  <Plus className="w-3 h-3 text-muted-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2" align="start">
+                <Input
+                  type="color"
+                  value={currentStyle.buttonColor || '#F5B800'}
+                  onChange={(e) => updateStyleCustomization('buttonColor', e.target.value)}
+                  className="w-20 h-8 p-0 border-0"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {/* Text Color */}
+        <div>
+          <Label className="text-xs text-muted-foreground mb-2 block">Text Color</Label>
+          <div className="flex gap-1.5 flex-wrap">
+            {['#FFFFFF', '#000000', '#374151', '#6B7280', '#F5B800'].map((color) => (
+              <button
+                key={color}
+                onClick={() => updateStyleCustomization('buttonTextColor', color)}
+                className={`w-6 h-6 rounded-full border-2 transition-all ${
+                  currentStyle.buttonTextColor === color
+                    ? 'border-primary scale-110'
+                    : 'border-muted hover:scale-105'
+                }`}
+                style={{ backgroundColor: color }}
+                title={color}
+              />
+            ))}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="w-6 h-6 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center hover:border-muted-foreground/50">
+                  <Plus className="w-3 h-3 text-muted-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2" align="start">
+                <Input
+                  type="color"
+                  value={currentStyle.buttonTextColor || '#000000'}
+                  onChange={(e) => updateStyleCustomization('buttonTextColor', e.target.value)}
+                  className="w-20 h-8 p-0 border-0"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {/* Border Color */}
+        <div>
+          <Label className="text-xs text-muted-foreground mb-2 block">Border Color</Label>
+          <div className="flex gap-1.5 flex-wrap">
+            {['transparent', '#E5E7EB', '#D1D5DB', '#9CA3AF', '#F5B800', '#3B82F6'].map((color) => (
+              <button
+                key={color}
+                onClick={() => updateStyleCustomization('borderColor', color)}
+                className={`w-6 h-6 rounded-full border-2 transition-all ${
+                  currentStyle.borderColor === color
+                    ? 'border-primary scale-110'
+                    : 'border-muted hover:scale-105'
+                }`}
+                style={{ 
+                  backgroundColor: color === 'transparent' ? 'white' : color,
+                  backgroundImage: color === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none',
+                  backgroundSize: '8px 8px',
+                  backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px'
+                }}
+                title={color}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Background Color */}
+        <div>
+          <Label className="text-xs text-muted-foreground mb-2 block">Background Color</Label>
+          <div className="flex gap-1.5 flex-wrap">
+            {['transparent', '#FFFFFF', '#F3F4F6', '#E5E7EB', '#FEF3C7', '#DBEAFE'].map((color) => (
+              <button
+                key={color}
+                onClick={() => updateStyleCustomization('backgroundColor', color)}
+                className={`w-6 h-6 rounded-full border-2 transition-all ${
+                  currentStyle.backgroundColor === color
+                    ? 'border-primary scale-110'
+                    : 'border-muted hover:scale-105'
+                }`}
+                style={{ 
+                  backgroundColor: color === 'transparent' ? 'white' : color,
+                  backgroundImage: color === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none',
+                  backgroundSize: '8px 8px',
+                  backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px'
+                }}
+                title={color}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderWelcomeSettings = () => (
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      
+      {/* Welcome Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'centered', icon: AlignCenter, label: 'Centered' },
+          { value: 'left', icon: AlignLeft, label: 'Left' },
+          { value: 'split', icon: Split, label: 'Split' },
+          { value: 'fullscreen', icon: Maximize, label: 'Full' },
+        ]}
+        value={question.welcomeDisplayStyle || 'centered'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { welcomeDisplayStyle: value })}
+      />
+
+      <Separator className="my-4" />
       
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -287,6 +544,21 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
   const renderTextSettings = () => (
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      
+      {/* Text Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'default', icon: Type, label: 'Default' },
+          { value: 'underline', icon: Underline, label: 'Underline' },
+          { value: 'boxed', icon: BoxSelect, label: 'Boxed' },
+          { value: 'minimal', icon: Minus, label: 'Minimal' },
+        ]}
+        value={question.textDisplayStyle || 'default'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { textDisplayStyle: value })}
+      />
+
+      <Separator className="my-4" />
       
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -523,6 +795,21 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
+      {/* Date Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'calendar', icon: Calendar, label: 'Calendar' },
+          { value: 'dropdowns', icon: ChevronDown, label: 'Dropdowns' },
+          { value: 'input', icon: Type, label: 'Input' },
+        ]}
+        value={question.dateDisplayStyle || 'calendar'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { dateDisplayStyle: value })}
+        columns={3}
+      />
+
+      <Separator className="my-4" />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -590,6 +877,21 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
+      {/* Dropdown Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'select', icon: ChevronDown, label: 'Select' },
+          { value: 'searchable', icon: List, label: 'Search' },
+          { value: 'buttons', icon: LayoutGrid, label: 'Buttons' },
+        ]}
+        value={question.dropdownDisplayStyle || 'select'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { dropdownDisplayStyle: value })}
+        columns={3}
+      />
+
+      <Separator className="my-4" />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -645,6 +947,26 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
   const renderYesNoSettings = () => (
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      
+      {/* Yes/No Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'buttons', icon: Square, label: 'Buttons' },
+          { value: 'toggle', icon: ToggleLeft, label: 'Toggle' },
+          { value: 'cards', icon: LayoutGrid, label: 'Cards' },
+          { value: 'icons', icon: ThumbsUp, label: 'Icons' },
+        ]}
+        value={question.yesnoDisplayStyle || 'buttons'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { yesnoDisplayStyle: value })}
+      />
+
+      <Separator className="my-4" />
+
+      {/* Style Customization */}
+      <StyleCustomizationPanel />
+
+      <Separator className="my-4" />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -704,6 +1026,21 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
   const renderFileUploadSettings = () => (
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      
+      {/* File Upload Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'dropzone', icon: Upload, label: 'Dropzone' },
+          { value: 'button', icon: FileUp, label: 'Button' },
+          { value: 'minimal', icon: Minus, label: 'Minimal' },
+        ]}
+        value={question.fileDisplayStyle || 'dropzone'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { fileDisplayStyle: value })}
+        columns={3}
+      />
+
+      <Separator className="my-4" />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -922,6 +1259,23 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
+      {/* Rating Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'stars', icon: Star, label: 'Stars' },
+          { value: 'numbers', icon: Hash, label: 'Numbers' },
+          { value: 'emojis', icon: Smile, label: 'Emojis' },
+          { value: 'hearts', icon: Heart, label: 'Hearts' },
+          { value: 'slider', icon: Sliders, label: 'Slider' },
+        ]}
+        value={question.ratingDisplayStyle || 'stars'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { ratingDisplayStyle: value })}
+        columns={5}
+      />
+
+      <Separator className="my-4" />
+      
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
         <Switch 
@@ -1008,6 +1362,39 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
+      {/* Choice Display Style */}
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Display style</Label>
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { value: 'list', icon: List, label: 'List' },
+            { value: 'pills', icon: CircleDot, label: 'Pills' },
+            { value: 'grid', icon: LayoutGrid, label: 'Grid' },
+            { value: 'cards', icon: Square, label: 'Outline' },
+          ].map((style) => (
+            <button
+              key={style.value}
+              onClick={() => onUpdateQuestion?.(question.id, { choiceDisplayStyle: style.value as 'pills' | 'list' | 'grid' | 'cards' })}
+              className={`flex flex-col items-center justify-center p-2 rounded-lg border-2 transition-all ${
+                (question.choiceDisplayStyle || 'list') === style.value
+                  ? 'border-primary bg-primary/5'
+                  : 'border-muted hover:border-muted-foreground/30'
+              }`}
+            >
+              <style.icon className={`w-4 h-4 mb-1 ${(question.choiceDisplayStyle || 'list') === style.value ? 'text-primary' : 'text-muted-foreground'}`} />
+              <span className={`text-[9px] ${(question.choiceDisplayStyle || 'list') === style.value ? 'text-primary font-medium' : 'text-muted-foreground'}`}>{style.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator className="my-4" />
+
+      {/* Style Customization */}
+      <StyleCustomizationPanel />
+
+      <Separator className="my-4" />
+      
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -1080,6 +1467,21 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
   const renderEndingSettings = () => (
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      
+      {/* Ending Display Style */}
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'centered', icon: AlignCenter, label: 'Centered' },
+          { value: 'confetti', icon: PartyPopper, label: 'Confetti' },
+          { value: 'minimal', icon: Minus, label: 'Minimal' },
+          { value: 'redirect', icon: ExternalLink, label: 'Redirect' },
+        ]}
+        value={question.endingDisplayStyle || 'centered'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { endingDisplayStyle: value })}
+      />
+
+      <Separator className="my-4" />
       
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Insert variable</Label>
@@ -1166,6 +1568,160 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     </>
   );
 
+  // Website Settings
+  const renderWebsiteSettings = () => (
+    <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'default', icon: Globe, label: 'Default' },
+          { value: 'card', icon: Square, label: 'Card' },
+          { value: 'minimal', icon: Minus, label: 'Minimal' },
+        ]}
+        value={question.websiteDisplayStyle || 'default'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { websiteDisplayStyle: value })}
+        columns={3}
+      />
+
+      <Separator className="my-4" />
+      
+      <div className="flex items-center justify-between">
+        <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
+      </div>
+
+      <Separator className="my-4" />
+
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Placeholder</Label>
+        <Input 
+          type="text" 
+          value={question.placeholder || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { placeholder: e.target.value })}
+          placeholder="https://example.com"
+          className="text-xs h-8"
+        />
+      </div>
+
+      <Separator className="my-4" />
+
+      <BlockSpacingControl />
+    </>
+  );
+
+  // Video/Audio Settings
+  const renderVideoSettings = () => (
+    <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'dropzone', icon: Upload, label: 'Dropzone' },
+          { value: 'button', icon: FileUp, label: 'Button' },
+          { value: 'embed', icon: Play, label: 'Embed' },
+        ]}
+        value={question.videoDisplayStyle || 'dropzone'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { videoDisplayStyle: value })}
+        columns={3}
+      />
+
+      <Separator className="my-4" />
+      
+      <div className="flex items-center justify-between">
+        <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
+      </div>
+
+      <Separator className="my-4" />
+
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Accepted formats</Label>
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Switch id="video-type" defaultChecked className="scale-90" />
+            <Label htmlFor="video-type" className="text-xs font-normal">Video (MP4, MOV, WebM)</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch id="audio-type" defaultChecked className="scale-90" />
+            <Label htmlFor="audio-type" className="text-xs font-normal">Audio (MP3, WAV, OGG)</Label>
+          </div>
+        </div>
+      </div>
+
+      <Separator className="my-4" />
+
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Max file size (MB)</Label>
+        <Input type="number" defaultValue="100" className="text-xs h-8" />
+      </div>
+
+      <Separator className="my-4" />
+
+      <BlockSpacingControl />
+    </>
+  );
+
+  // Checkbox Settings
+  const renderCheckboxSettings = () => (
+    <>
+      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      
+      <DisplayStyleSelector
+        label="Display style"
+        options={[
+          { value: 'square', icon: Square, label: 'Square' },
+          { value: 'round', icon: CircleDot, label: 'Round' },
+          { value: 'toggle', icon: ToggleLeft, label: 'Toggle' },
+        ]}
+        value={question.checkboxDisplayStyle || 'square'}
+        onChange={(value) => onUpdateQuestion?.(question.id, { checkboxDisplayStyle: value })}
+        columns={3}
+      />
+
+      <Separator className="my-4" />
+      
+      <div className="flex items-center justify-between">
+        <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
+        <Switch 
+          id="required-toggle" 
+          checked={question.required}
+          onCheckedChange={(checked) => onUpdateQuestion?.(question.id, { required: checked })}
+          className="scale-90" 
+        />
+      </div>
+
+      <Separator className="my-4" />
+
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Checkbox label</Label>
+        <Input 
+          type="text" 
+          value={question.placeholder || ""}
+          onChange={(e) => onUpdateQuestion?.(question.id, { placeholder: e.target.value })}
+          placeholder="I agree to the terms"
+          className="text-xs h-8"
+        />
+      </div>
+
+      <Separator className="my-4" />
+
+      <BlockSpacingControl />
+    </>
+  );
+
   const renderSettings = () => {
     switch (question.type) {
       case "welcome":
@@ -1196,6 +1752,12 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
         return renderPictureChoiceSettings();
       case "ending":
         return renderEndingSettings();
+      case "website":
+        return renderWebsiteSettings();
+      case "video":
+        return renderVideoSettings();
+      case "checkbox":
+        return renderCheckboxSettings();
       default:
         return null;
     }

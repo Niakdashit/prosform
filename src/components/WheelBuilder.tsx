@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { WheelSidebar } from "./WheelSidebar";
 import { WheelPreview } from "./WheelPreview";
 import { WheelSettingsPanel } from "./WheelSettingsPanel";
 import { WheelTopToolbar } from "./WheelTopToolbar";
 import { SegmentsModal } from "./SegmentsModal";
 import { CampaignSettings } from "./CampaignSettings";
+import { FloatingToolbar } from "./FloatingToolbar";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -20,7 +21,10 @@ export interface Prize {
   quantity: number;
   remaining: number;
   value?: string;
-  attributionMethod: 'instant' | 'calendar';
+  attributionMethod: 'probability' | 'calendar';
+  // Champs pour méthode probabilité
+  winProbability?: number; // Probabilité de gain en pourcentage (0-100)
+  // Champs pour méthode calendrier
   calendarDate?: string;
   calendarTime?: string;
   timeWindow?: number;
@@ -32,6 +36,11 @@ export interface Prize {
   verificationPeriod?: number;
   notifyAdminOnWin?: boolean;
   notifyAdminOnDepletion?: boolean;
+  // Champs spécifiques Scratch (contenu révélé sous la carte)
+  scratchWinText?: string;
+  scratchLoseText?: string;
+  scratchWinImage?: string;
+  scratchLoseImage?: string;
   status: 'active' | 'depleted' | 'scheduled';
 }
 
@@ -50,21 +59,52 @@ export interface ContactField {
   label: string;
 }
 
+export interface TextStyle {
+  fontFamily?: string;
+  fontSize?: number;
+  textColor?: string;
+  isBold?: boolean;
+  isItalic?: boolean;
+  isUnderline?: boolean;
+  textAlign?: 'left' | 'center' | 'right';
+}
+
 export interface WheelConfig {
   welcomeScreen: {
     title: string;
+    titleHtml?: string;
+    titleStyle?: TextStyle;
+    titleWidth?: number; // percentage 20-100
     subtitle: string;
+    subtitleHtml?: string;
+    subtitleStyle?: TextStyle;
+    subtitleWidth?: number; // percentage 20-100
     buttonText: string;
     blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    showImage?: boolean;
+    splitAlignment?: 'left' | 'center' | 'right';
+    image?: string;
+    imageSettings?: {
+      borderRadius: number;
+      borderWidth: number;
+      borderColor: string;
+      rotation: number;
+    };
   };
   contactForm: {
     enabled: boolean;
     title: string;
+    titleHtml?: string;
+    titleStyle?: TextStyle;
+    titleWidth?: number;
     subtitle: string;
+    subtitleHtml?: string;
+    subtitleStyle?: TextStyle;
+    subtitleWidth?: number;
     blockSpacing: number;
     fields: ContactField[];
     mobileLayout: MobileLayoutType;
@@ -73,6 +113,14 @@ export interface WheelConfig {
     overlayOpacity?: number;
   };
   wheelScreen: {
+    title: string;
+    titleHtml?: string;
+    titleStyle?: TextStyle;
+    titleWidth?: number;
+    subtitle: string;
+    subtitleHtml?: string;
+    subtitleStyle?: TextStyle;
+    subtitleWidth?: number;
     blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
@@ -80,20 +128,35 @@ export interface WheelConfig {
     overlayOpacity?: number;
   };
   segments: WheelSegment[];
-  endingScreen: {
+  endingWin: {
     title: string;
+    titleHtml?: string;
+    titleStyle?: TextStyle;
+    titleWidth?: number;
     subtitle: string;
+    subtitleHtml?: string;
+    subtitleStyle?: TextStyle;
+    subtitleWidth?: number;
     blockSpacing: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
-    socialLinks?: {
-      facebook?: string;
-      twitter?: string;
-      instagram?: string;
-      linkedin?: string;
-    };
+  };
+  endingLose: {
+    title: string;
+    titleHtml?: string;
+    titleStyle?: TextStyle;
+    titleWidth?: number;
+    subtitle: string;
+    subtitleHtml?: string;
+    subtitleStyle?: TextStyle;
+    subtitleWidth?: number;
+    blockSpacing: number;
+    mobileLayout: MobileLayoutType;
+    desktopLayout: DesktopLayoutType;
+    wallpaperImage?: string;
+    overlayOpacity?: number;
   };
 }
 
@@ -120,21 +183,30 @@ const defaultWheelConfig: WheelConfig = {
     desktopLayout: "desktop-centered"
   },
   wheelScreen: {
+    title: "Tournez la roue !",
+    subtitle: "Tentez votre chance et découvrez votre lot",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
   },
   segments: [
-    { id: '1', label: '10% de réduction', color: '#FF6B6B', probability: 20 },
-    { id: '2', label: 'Livraison gratuite', color: '#4ECDC4', probability: 25 },
-    { id: '3', label: '20% de réduction', color: '#45B7D1', probability: 15 },
-    { id: '4', label: 'Cadeau surprise', color: '#FFA07A', probability: 10 },
-    { id: '5', label: '15% de réduction', color: '#98D8C8', probability: 20 },
-    { id: '6', label: 'Réessayez', color: '#F7DC6F', probability: 10 }
+    { id: '1', label: 'Segment 1', color: '#FF6B6B', probability: 16.67 },
+    { id: '2', label: 'Segment 2', color: '#4ECDC4', probability: 16.67 },
+    { id: '3', label: 'Segment 3', color: '#45B7D1', probability: 16.67 },
+    { id: '4', label: 'Segment 4', color: '#FFA07A', probability: 16.67 },
+    { id: '5', label: 'Segment 5', color: '#98D8C8', probability: 16.67 },
+    { id: '6', label: 'Segment 6', color: '#F7DC6F', probability: 16.65 }
   ],
-  endingScreen: {
+  endingWin: {
     title: "Félicitations !",
     subtitle: "Vous avez gagné {{prize}}",
+    blockSpacing: 1,
+    mobileLayout: "mobile-vertical",
+    desktopLayout: "desktop-centered"
+  },
+  endingLose: {
+    title: "Dommage !",
+    subtitle: "Vous n'avez pas gagné cette fois-ci",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
@@ -145,25 +217,14 @@ export const WheelBuilder = () => {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
   const [config, setConfig] = useState<WheelConfig>(defaultWheelConfig);
-  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending'>('welcome');
+  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'design' | 'campaign'>('design');
+  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
-  const [prizes, setPrizes] = useState<Prize[]>([
-    {
-      id: 'prize-1',
-      name: 'Iphone 14 PRO MAX',
-      quantity: 10,
-      remaining: 10,
-      attributionMethod: 'calendar',
-      calendarDate: '2025-11-24',
-      calendarTime: '12:00',
-      status: 'active'
-    }
-  ]);
+  const [prizes, setPrizes] = useState<Prize[]>([]);
 
   useEffect(() => {
     if (isMobile) {
@@ -246,11 +307,32 @@ export const WheelBuilder = () => {
 
   const handleSavePrize = (prize: Prize) => {
     const existingPrize = prizes.find(p => p.id === prize.id);
+
     if (existingPrize) {
-      setPrizes(prizes.map(p => p.id === prize.id ? { ...prize, remaining: p.remaining, status: p.status } : p));
+      const used = Math.max(0, existingPrize.quantity - existingPrize.remaining);
+      const newRemaining = Math.max(0, (prize.quantity ?? existingPrize.quantity) - used);
+
+      setPrizes(prizes.map(p => 
+        p.id === prize.id
+          ? {
+              ...p,
+              ...prize,
+              remaining: newRemaining,
+              status: newRemaining === 0 ? 'depleted' : p.status,
+            }
+          : p
+      ));
     } else {
-      setPrizes([...prizes, { ...prize, remaining: prize.quantity, status: 'active' as const }]);
+      setPrizes([
+        ...prizes,
+        {
+          ...prize,
+          remaining: prize.quantity,
+          status: 'active' as const,
+        },
+      ]);
     }
+
     toast.success("Lot enregistré");
   };
 
@@ -264,10 +346,27 @@ export const WheelBuilder = () => {
       <WheelTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
-          localStorage.setItem('wheel-config', JSON.stringify(config));
-          localStorage.setItem('wheel-viewMode', targetViewMode);
-          localStorage.setItem('wheel-theme', JSON.stringify(theme));
-          window.open('/wheel-preview', '_blank');
+          try {
+            localStorage.setItem('wheel-config', JSON.stringify(config));
+            localStorage.setItem('wheel-viewMode', targetViewMode);
+            localStorage.setItem('wheel-theme', JSON.stringify(theme));
+            window.open('/wheel-preview', '_blank');
+          } catch (e) {
+            console.warn('localStorage full, trying without images:', e);
+            const configWithoutImages = {
+              ...config,
+              welcomeScreen: { ...config.welcomeScreen, image: undefined, imageSettings: undefined }
+            };
+            try {
+              localStorage.setItem('wheel-config', JSON.stringify(configWithoutImages));
+              localStorage.setItem('wheel-viewMode', targetViewMode);
+              localStorage.setItem('wheel-theme', JSON.stringify(theme));
+              window.open('/wheel-preview', '_blank');
+              toast.warning('Preview opened without images (images too large)');
+            } catch (e2) {
+              toast.error('Unable to open preview - data too large');
+            }
+          }
         }}
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -279,6 +378,8 @@ export const WheelBuilder = () => {
           prizes={prizes}
           onSavePrize={handleSavePrize}
           onDeletePrize={handleDeletePrize}
+          gameType="wheel"
+          segments={config.segments.map(s => ({ id: s.id, label: s.label }))}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
@@ -345,12 +446,15 @@ export const WheelBuilder = () => {
               onToggleViewMode={() => {}}
               isMobileResponsive={true}
               onNext={() => {
-                const views: Array<'welcome' | 'contact' | 'wheel' | 'ending'> = ['welcome', 'contact', 'wheel', 'ending'];
+                const views: Array<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'> = ['welcome', 'contact', 'wheel', 'ending-win', 'ending-lose'];
                 const currentIndex = views.indexOf(activeView);
                 if (currentIndex < views.length - 1) {
                   setActiveView(views[currentIndex + 1]);
                 }
               }}
+              onGoToEnding={(isWin) => setActiveView(isWin ? 'ending-win' : 'ending-lose')}
+              prizes={prizes}
+              onUpdatePrize={(updatedPrize) => setPrizes(prev => prev.map(p => p.id === updatedPrize.id ? updatedPrize : p))}
             />
           </>
         ) : (
@@ -367,23 +471,48 @@ export const WheelBuilder = () => {
                 setActiveTab('campaign');
                 setCampaignDefaultTab('dotation');
               }}
+              prizes={prizes}
             />
             
-            <WheelPreview
-              config={config}
-              activeView={activeView}
-              onUpdateConfig={updateConfig}
-              viewMode={viewMode}
-              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              isMobileResponsive={false}
-              onNext={() => {
-                const views: Array<'welcome' | 'contact' | 'wheel' | 'ending'> = ['welcome', 'contact', 'wheel', 'ending'];
-                const currentIndex = views.indexOf(activeView);
-                if (currentIndex < views.length - 1) {
-                  setActiveView(views[currentIndex + 1]);
-                }
-              }}
-            />
+            {/* Preview area */}
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+              {/* Top bar: view toggle on the right */}
+              <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
+                <button
+                  onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105 flex-shrink-0"
+                  style={{ backgroundColor: '#F5B800', color: '#3D3731' }}
+                >
+                  {viewMode === 'desktop' ? (
+                    <><Monitor className="w-4 h-4" /><span className="text-xs font-medium">Desktop</span></>
+                  ) : (
+                    <><Smartphone className="w-4 h-4" /><span className="text-xs font-medium">Mobile</span></>
+                  )}
+                </button>
+              </div>
+              
+              {/* WheelPreview */}
+              <div className="flex-1 flex items-center justify-center overflow-hidden">
+                <WheelPreview
+                  config={config}
+                  activeView={activeView}
+                  onUpdateConfig={updateConfig}
+                  viewMode={viewMode}
+                  onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+                  isMobileResponsive={false}
+                  onNext={() => {
+                    const views: Array<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'> = ['welcome', 'contact', 'wheel', 'ending-win', 'ending-lose'];
+                    const currentIndex = views.indexOf(activeView);
+                    if (currentIndex < views.length - 1) {
+                      setActiveView(views[currentIndex + 1]);
+                    }
+                  }}
+                  onGoToEnding={(isWin) => setActiveView(isWin ? 'ending-win' : 'ending-lose')}
+                  prizes={prizes}
+                  onUpdatePrize={(updatedPrize) => setPrizes(prev => prev.map(p => p.id === updatedPrize.id ? updatedPrize : p))}
+                />
+              </div>
+            </div>
             
             <WheelSettingsPanel 
               config={config}
@@ -406,6 +535,7 @@ export const WheelBuilder = () => {
         onDeleteSegment={deleteSegment}
         prizes={prizes}
       />
+      <FloatingToolbar />
     </div>
   );
 };

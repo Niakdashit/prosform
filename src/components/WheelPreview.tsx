@@ -1,26 +1,38 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { WheelConfig } from "./WheelBuilder";
+import { WheelConfig, Prize } from "./WheelBuilder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Monitor, Smartphone, Sparkles, Upload, ImagePlus, Edit3, Clock } from "lucide-react";
-import { useState, useRef } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Monitor, Smartphone, Sparkles, Upload, ImagePlus, Edit3, Clock, X } from "lucide-react";
+import { useState, useRef, useMemo, useEffect } from "react";
+import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import SmartWheel from "./SmartWheel/SmartWheel";
+import { resetGlobalWheelRotation } from "./SmartWheel/hooks/useWheelAnimation";
+import { determineWinningSegment, consumePrize, DrawResult } from "@/utils/prizeDrawing";
+
+// Variable globale pour stocker le résultat du tirage (persiste entre les re-renders)
+let globalDrawResult: DrawResult | null = null;
+// Variable globale pour stocker la rotation finale de la roue
+let globalFinalRotation: number | null = null;
 import { WelcomeLayouts } from "./layouts/WelcomeLayouts";
 import { ContactLayouts } from "./layouts/ContactLayouts";
 import { WheelLayouts } from "./layouts/WheelLayouts";
 import { EndingLayouts } from "./layouts/EndingLayouts";
 import { ImageUploadModal } from "./ImageUploadModal";
-import { ImageEditorModal } from "./ImageEditorModal";
+import { ImageEditorModal, ImageSettings, defaultSettings } from "./ImageEditorModal";
+import { EditableTextBlock } from "./EditableTextBlock";
 
 interface WheelPreviewProps {
   config: WheelConfig;
-  activeView: 'welcome' | 'contact' | 'wheel' | 'ending';
+  activeView: 'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose';
   onUpdateConfig: (updates: Partial<WheelConfig>) => void;
   viewMode: 'desktop' | 'mobile';
   onToggleViewMode: () => void;
   isMobileResponsive?: boolean;
+  isReadOnly?: boolean;
   onNext: () => void;
+  onGoToEnding?: (isWin: boolean) => void;
+  prizes?: Prize[];
+  onUpdatePrize?: (prize: Prize) => void;
 }
 
 export const WheelPreview = ({ 
@@ -30,21 +42,114 @@ export const WheelPreview = ({
   viewMode, 
   onToggleViewMode, 
   isMobileResponsive = false,
-  onNext 
+  isReadOnly = false,
+  onNext,
+  onGoToEnding,
+  prizes = [],
+  onUpdatePrize
 }: WheelPreviewProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [contactData, setContactData] = useState({ name: '', email: '', phone: '' });
   const [isSpinning, setIsSpinning] = useState(false);
   const [wonPrize, setWonPrize] = useState<string | null>(null);
+  const [wheelDisabled, setWheelDisabled] = useState(false); // Bloquer la roue après le spin
   const [showVariableMenu, setShowVariableMenu] = useState(false);
+  
+  // Fonction pour effectuer le tirage (appelée par SmartWheel via onBeforeSpin)
+  const handleSpinStart = () => {
+    // Convertir les segments pour le tirage
+    const drawSegments = config.segments.map(seg => {
+      const label = seg.label.toLowerCase();
+      const isLosingLabel = label.includes('perdu') || label.includes('perdant') || label.includes('dommage') || label.includes('rejouer') || label.includes('réessayez');
+      return {
+        id: seg.id,
+        label: seg.label,
+        isWinning: seg.prizeId ? true : !isLosingLabel,
+        prizeId: seg.prizeId
+      };
+    });
+
+    // Effectuer le tirage
+    const result = determineWinningSegment({
+      prizes: prizes as any,
+      segments: drawSegments,
+      playTime: new Date()
+    });
+
+    console.log('🎰 [WheelPreview] Tirage effectué:', result);
+    console.log('🎰 [WheelPreview] result.won:', result.won);
+    console.log('🎰 [WheelPreview] result.prize:', result.prize);
+    console.log('🎰 [WheelPreview] result.segment:', result.segment);
+    
+    // Stocker le résultat dans la variable globale (persiste entre les re-renders)
+    globalDrawResult = result;
+    
+    // Retourner l'ID du segment à forcer
+    return result.segment?.id || null;
+  };
   const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
   const [menuView, setMenuView] = useState<'main' | 'variables'>('main');
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [imageRotation, setImageRotation] = useState(0);
+  // Utiliser l'image de la config si disponible
+  const [uploadedImage, setUploadedImage] = useState<string | null>(config.welcomeScreen.image || null);
+  const [imageRotation, setImageRotation] = useState(config.welcomeScreen.imageSettings?.rotation || 0);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
+  const [hardcodedImageHidden, setHardcodedImageHidden] = useState(false);
+  const [imageSettings, setImageSettings] = useState<ImageSettings>(defaultSettings);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
+  const unifiedButtonStyles = getButtonStyles(theme, viewMode);
+
+  // Listen for FloatingToolbar style updates
+  useEffect(() => {
+    const handleStyleUpdate = (e: CustomEvent) => {
+      const { field, updates } = e.detail;
+      
+      // Determine which screen and style to update based on activeView and field
+      const getStyleKey = () => {
+        if (field === 'title') return 'titleStyle';
+        if (field === 'subtitle') return 'subtitleStyle';
+        return null;
+      };
+      
+      const styleKey = getStyleKey();
+      if (!styleKey) return;
+
+      // Get current screen config
+      let screenKey: 'welcomeScreen' | 'contactForm' | 'wheelScreen' | 'endingWin' | 'endingLose';
+      if (activeView === 'welcome') screenKey = 'welcomeScreen';
+      else if (activeView === 'contact') screenKey = 'contactForm';
+      else if (activeView === 'wheel') screenKey = 'wheelScreen';
+      else if (activeView === 'ending-win') screenKey = 'endingWin';
+      else screenKey = 'endingLose';
+
+      const currentScreen = config[screenKey] as any;
+      const currentStyle = currentScreen?.[styleKey] || {};
+      const newStyle = { ...currentStyle };
+      
+      // Handle toggle values
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === 'toggle') {
+          newStyle[key] = !currentStyle[key];
+        } else {
+          newStyle[key] = value;
+        }
+      }
+      
+      onUpdateConfig({ 
+        [screenKey]: { 
+          ...currentScreen, 
+          [styleKey]: newStyle 
+        } 
+      });
+    };
+
+    document.addEventListener('floatingToolbarStyle', handleStyleUpdate as EventListener);
+    
+    return () => {
+      document.removeEventListener('floatingToolbarStyle', handleStyleUpdate as EventListener);
+    };
+  }, [config, activeView, onUpdateConfig]);
 
   const availableVariables = [
     { key: 'first_name', label: 'First name', description: "User's first name" },
@@ -57,8 +162,17 @@ export const WheelPreview = ({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUploadedImage(reader.result as string);
+        const imageData = reader.result as string;
+        setUploadedImage(imageData);
         setImageRotation(0);
+        // Sauvegarder dans la config
+        onUpdateConfig({ 
+          welcomeScreen: { 
+            ...config.welcomeScreen, 
+            image: imageData,
+            imageSettings: { ...imageSettings, rotation: 0 }
+          } 
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -67,10 +181,31 @@ export const WheelPreview = ({
   const handleImageSelect = (imageData: string) => {
     setUploadedImage(imageData);
     setImageRotation(0);
+    // Sauvegarder dans la config
+    onUpdateConfig({ 
+      welcomeScreen: { 
+        ...config.welcomeScreen, 
+        image: imageData,
+        imageSettings: { ...imageSettings, rotation: 0 }
+      } 
+    });
   };
 
-  const handleImageEdit = (rotation: number) => {
-    setImageRotation(rotation);
+  const handleImageEdit = (settings: ImageSettings) => {
+    setImageSettings(settings);
+    setImageRotation(settings.rotation);
+    // Sauvegarder dans la config
+    onUpdateConfig({ 
+      welcomeScreen: { 
+        ...config.welcomeScreen, 
+        imageSettings: {
+          borderRadius: settings.borderRadius,
+          borderWidth: settings.borderWidth,
+          borderColor: settings.borderColor,
+          rotation: settings.rotation
+        }
+      } 
+    });
   };
 
   const insertVariable = (variableKey: string) => {
@@ -104,18 +239,46 @@ export const WheelPreview = ({
           subtitle: config.contactForm.subtitle + `{{${variableKey}}}` 
         } 
       });
-    } else if (editingField === 'ending-title') {
+    } else if (editingField === 'ending-win-title') {
       onUpdateConfig({ 
-        endingScreen: { 
-          ...config.endingScreen, 
-          title: config.endingScreen.title + `{{${variableKey}}}` 
+        endingWin: { 
+          ...config.endingWin, 
+          title: config.endingWin.title + `{{${variableKey}}}` 
         } 
       });
-    } else if (editingField === 'ending-subtitle') {
+    } else if (editingField === 'ending-win-subtitle') {
       onUpdateConfig({ 
-        endingScreen: { 
-          ...config.endingScreen, 
-          subtitle: config.endingScreen.subtitle + `{{${variableKey}}}` 
+        endingWin: { 
+          ...config.endingWin, 
+          subtitle: config.endingWin.subtitle + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'ending-lose-title') {
+      onUpdateConfig({ 
+        endingLose: { 
+          ...config.endingLose, 
+          title: config.endingLose.title + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'ending-lose-subtitle') {
+      onUpdateConfig({ 
+        endingLose: { 
+          ...config.endingLose, 
+          subtitle: config.endingLose.subtitle + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'wheel-title' || editingField === 'wheel-title-center') {
+      onUpdateConfig({ 
+        wheelScreen: { 
+          ...config.wheelScreen, 
+          title: config.wheelScreen.title + `{{${variableKey}}}` 
+        } 
+      });
+    } else if (editingField === 'wheel-subtitle' || editingField === 'wheel-subtitle-center') {
+      onUpdateConfig({ 
+        wheelScreen: { 
+          ...config.wheelScreen, 
+          subtitle: config.wheelScreen.subtitle + `{{${variableKey}}}` 
         } 
       });
     }
@@ -129,8 +292,12 @@ export const WheelPreview = ({
       onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, title: value.trim() } });
     } else if (field === 'contact-title' && value.trim() !== config.contactForm.title) {
       onUpdateConfig({ contactForm: { ...config.contactForm, title: value.trim() } });
-    } else if (field === 'ending-title' && value.trim() !== config.endingScreen.title) {
-      onUpdateConfig({ endingScreen: { ...config.endingScreen, title: value.trim() } });
+    } else if (field === 'ending-win-title' && value.trim() !== config.endingWin.title) {
+      onUpdateConfig({ endingWin: { ...config.endingWin, title: value.trim() } });
+    } else if (field === 'ending-lose-title' && value.trim() !== config.endingLose.title) {
+      onUpdateConfig({ endingLose: { ...config.endingLose, title: value.trim() } });
+    } else if ((field === 'wheel-title' || field === 'wheel-title-center') && value.trim() !== config.wheelScreen.title) {
+      onUpdateConfig({ wheelScreen: { ...config.wheelScreen, title: value.trim() } });
     }
     setEditingField(null);
     setShowVariableMenu(false);
@@ -141,8 +308,12 @@ export const WheelPreview = ({
       onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitle: value.trim() } });
     } else if (field === 'contact-subtitle' && value.trim() !== config.contactForm.subtitle) {
       onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: value.trim() } });
-    } else if (field === 'ending-subtitle' && value.trim() !== config.endingScreen.subtitle) {
-      onUpdateConfig({ endingScreen: { ...config.endingScreen, subtitle: value.trim() } });
+    } else if (field === 'ending-win-subtitle' && value.trim() !== config.endingWin.subtitle) {
+      onUpdateConfig({ endingWin: { ...config.endingWin, subtitle: value.trim() } });
+    } else if (field === 'ending-lose-subtitle' && value.trim() !== config.endingLose.subtitle) {
+      onUpdateConfig({ endingLose: { ...config.endingLose, subtitle: value.trim() } });
+    } else if ((field === 'wheel-subtitle' || field === 'wheel-subtitle-center') && value.trim() !== config.wheelScreen.subtitle) {
+      onUpdateConfig({ wheelScreen: { ...config.wheelScreen, subtitle: value.trim() } });
     }
     setEditingField(null);
     setShowVariableMenu(false);
@@ -180,8 +351,10 @@ export const WheelPreview = ({
           return config.contactForm[layoutKey];
         case 'wheel':
           return config.wheelScreen[layoutKey];
-        case 'ending':
-          return config.endingScreen[layoutKey];
+        case 'ending-win':
+          return config.endingWin[layoutKey];
+        case 'ending-lose':
+          return config.endingLose[layoutKey];
         default:
           return viewMode === 'desktop' ? 'desktop-centered' : 'mobile-vertical';
       }
@@ -195,28 +368,9 @@ export const WheelPreview = ({
           <div
             className="flex w-full h-full"
             style={{
-              alignItems: viewMode === "desktop" ? "center" : "flex-start",
+              alignItems: viewMode === "desktop" && (config.welcomeScreen.desktopLayout === "desktop-left-right" || !config.welcomeScreen.desktopLayout) ? "flex-start" : viewMode === "desktop" ? "center" : "flex-start",
               justifyContent: viewMode === "desktop" ? "center" : "flex-start",
-              padding:
-                viewMode === "desktop"
-                  ? config.welcomeScreen.desktopLayout === "desktop-card" || config.welcomeScreen.desktopLayout === "desktop-panel"
-                    ? "0"
-                    : "0 64px"
-                  : config.welcomeScreen.mobileLayout === "mobile-centered"
-                  ? "0"
-                  : "24px 20px",
-              paddingLeft:
-                viewMode === "mobile" && config.welcomeScreen.mobileLayout === "mobile-centered"
-                  ? 0
-                  : viewMode === "desktop" && (config.welcomeScreen.desktopLayout === "desktop-card" || config.welcomeScreen.desktopLayout === "desktop-panel")
-                  ? 0
-                  : "7%",
-              paddingRight:
-                viewMode === "mobile" && config.welcomeScreen.mobileLayout === "mobile-centered"
-                  ? 0
-                  : viewMode === "desktop" && (config.welcomeScreen.desktopLayout === "desktop-card" || config.welcomeScreen.desktopLayout === "desktop-panel")
-                  ? 0
-                  : "7%",
+              padding: "0",
             }}
           >
             {(() => {
@@ -225,515 +379,169 @@ export const WheelPreview = ({
               const currentLayoutType = viewMode === "desktop" ? desktopLayout : mobileLayout;
 
               // Image component with upload functionality
+              const baseSize = viewMode === 'desktop' ? 320 : 280;
+              const scaledSize = baseSize * (imageSettings.size / 100);
+              
               const ImageBlock = () => (
                 <div
                   className="overflow-hidden relative group"
                   style={{ 
-                    borderRadius: "36px",
-                    width: viewMode === 'desktop' ? '420px' : '280px',
-                    height: viewMode === 'desktop' ? '420px' : '280px',
+                    borderRadius: `${imageSettings.borderRadius}px`,
+                    width: `${scaledSize}px`,
+                    height: `${scaledSize}px`,
                     maxWidth: '100%',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    border: imageSettings.borderWidth > 0 ? `${imageSettings.borderWidth}px solid ${imageSettings.borderColor}` : 'none',
                   }}
                 >
                   {uploadedImage ? (
-                    <>
-                      <img
-                        src={uploadedImage}
-                        alt="Uploaded"
-                        className="w-full h-full object-cover"
-                        style={{
-                          transform: `rotate(${imageRotation}deg)`,
-                          transition: 'transform 0.3s ease'
-                        }}
-                      />
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                        <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Change image"
-                        >
-                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
-                        <button
-                          onClick={() => setShowEditorModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Edit image"
-                        >
-                          <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
-                      </div>
-                    </>
+                    <img
+                      src={uploadedImage}
+                      alt="Uploaded"
+                      className="w-full h-full object-cover"
+                      style={{
+                        transform: `rotate(${imageSettings.rotation}deg) scaleX(${imageSettings.flipH ? -1 : 1}) scaleY(${imageSettings.flipV ? -1 : 1})`,
+                        transition: 'transform 0.3s ease'
+                      }}
+                    />
                   ) : (
                     <div
                       onClick={() => fileInputRef.current?.click()}
                       className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                     >
-                      <Upload className="w-12 h-12 mb-3" style={{ color: theme.buttonColor }} />
-                      <p className="text-sm font-medium" style={{ color: theme.buttonColor }}>
+                      <Upload className="w-12 h-12 mb-3" style={{ color: theme.accentColor }} />
+                      <p className="text-sm font-medium" style={{ color: theme.accentColor }}>
                         Upload Image
                       </p>
-                      <p className="text-xs mt-1" style={{ color: theme.systemColor }}>
+                      <p className="text-xs mt-1" style={{ color: theme.textSecondaryColor }}>
                         Click to browse
                       </p>
                     </div>
                   )}
+                  
+                  {/* Boutons au survol */}
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
+                    <button
+                      onClick={() => setShowEditorModal(true)}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                      style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                      title="Éditer l'image"
+                    >
+                      <Edit3 className="w-4 h-4 text-white" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setUploadedImage(null);
+                        setImageSettings(defaultSettings);
+                        onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, showImage: false, image: undefined, imageSettings: undefined } });
+                      }}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                      title="Supprimer l'image"
+                    >
+                      <X className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
                 </div>
               );
 
               // Text content component  
               const TextContent = ({ centered = false }: { centered?: boolean }) => (
                 <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
-                  <div className="relative">
-                    {editingField === 'welcome-title' && (
-                      <>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-
-                        {showVariableMenu && variableTarget === 'title' && (
-                          <div
-                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                            style={{
-                              top: '32px',
-                              right: 0,
-                              backgroundColor: '#4A4138',
-                              border: '1px solid rgba(245, 184, 0, 0.3)',
-                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            {menuView === 'main' ? (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => console.log('Réécriture AI')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                </button>
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('variables')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('main')}
-                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                >
-                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                </button>
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <h1 
-                      className="font-bold cursor-text hover:opacity-80 transition-opacity" 
+                  {config.welcomeScreen.title && (
+                    <EditableTextBlock
+                      value={config.welcomeScreen.titleHtml || config.welcomeScreen.title}
+                      onChange={(value, html) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, title: value, titleHtml: html } })}
+                      onClear={() => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, title: '', titleHtml: '' } })}
+                      className="font-bold"
                       style={{ 
-                        color: theme.accentColor, 
-                        fontWeight: 700, 
-                        fontSize: viewMode === 'desktop' ? '64px' : '32px',
-                        lineHeight: '1.05',
-                        letterSpacing: '-0.02em',
-                        marginBottom: `${(config.welcomeScreen.blockSpacing || 1) * 24}px`,
-                        outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                        padding: '4px',
-                        marginTop: '-4px',
-                        marginLeft: '-4px',
-                        marginRight: '-4px',
-                        borderRadius: '4px'
+                        color: config.welcomeScreen.titleStyle?.textColor || theme.accentColor, 
+                        fontFamily: config.welcomeScreen.titleStyle?.fontFamily || 'inherit',
+                        fontWeight: config.welcomeScreen.titleStyle?.isBold ? 'bold' : undefined,
+                        fontStyle: config.welcomeScreen.titleStyle?.isItalic ? 'italic' : undefined,
+                        textDecoration: config.welcomeScreen.titleStyle?.isUnderline ? 'underline' : undefined,
+                        textAlign: config.welcomeScreen.titleStyle?.textAlign || (centered ? 'center' : 'left'),
+                        fontSize: config.welcomeScreen.titleStyle?.fontSize ? `${config.welcomeScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '48px' : '28px'),
+                        lineHeight: 1.1
                       }}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onFocus={() => setEditingField('welcome-title')}
-                      onBlur={(e) => handleTitleBlur('welcome-title', e.currentTarget.textContent || '')}
-                    >
-                      {config.welcomeScreen.title}
-                    </h1>
-                  </div>
+                      isEditing={!isReadOnly && editingField === 'welcome-title'}
+                      isReadOnly={isReadOnly}
+                      onFocus={() => !isReadOnly && setEditingField('welcome-title')}
+                      onBlur={() => setEditingField(null)}
+                      showSparkles={!isReadOnly}
+                      showClear={!isReadOnly}
+                      fieldType="title"
+                      width={config.welcomeScreen.titleWidth || 100}
+                      onWidthChange={(width) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, titleWidth: width } })}
+                      marginBottom="16px"
+                    />
+                  )}
                   
-                  <div className="relative">
-                    {editingField === 'welcome-subtitle' && (
-                      <>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-
-                        {showVariableMenu && variableTarget === 'subtitle' && (
-                          <div
-                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                            style={{
-                              top: '32px',
-                              right: 0,
-                              backgroundColor: '#4A4138',
-                              border: '1px solid rgba(245, 184, 0, 0.3)',
-                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            {menuView === 'main' ? (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => console.log('Réécriture AI')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                </button>
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('variables')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('main')}
-                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                >
-                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                </button>
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <p 
-                      className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
+                  {config.welcomeScreen.subtitle && (
+                    <EditableTextBlock
+                      value={config.welcomeScreen.subtitleHtml || config.welcomeScreen.subtitle}
+                      onChange={(value, html) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitle: value, subtitleHtml: html } })}
+                      onClear={() => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitle: '', subtitleHtml: '' } })}
+                      className=""
                       style={{ 
-                        color: '#B8A892',
-                        fontSize: viewMode === 'desktop' ? '16px' : '14px',
-                        lineHeight: '1.6',
-                        marginBottom: `${(config.welcomeScreen.blockSpacing || 1) * 32}px`,
-                        outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
-                        padding: '4px',
-                        marginTop: '-4px',
-                        marginLeft: '-4px',
-                        marginRight: '-4px',
-                        borderRadius: '4px'
+                        color: config.welcomeScreen.subtitleStyle?.textColor || theme.textSecondaryColor, 
+                        fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || 'inherit',
+                        fontWeight: config.welcomeScreen.subtitleStyle?.isBold ? 'bold' : undefined,
+                        fontStyle: config.welcomeScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
+                        textDecoration: config.welcomeScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
+                        textAlign: config.welcomeScreen.subtitleStyle?.textAlign || (centered ? 'center' : 'left'),
+                        opacity: 0.9, 
+                        fontSize: config.welcomeScreen.subtitleStyle?.fontSize ? `${config.welcomeScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '20px' : '16px'),
+                        lineHeight: 1.5
                       }}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onFocus={() => setEditingField('welcome-subtitle')}
-                      onBlur={(e) => handleSubtitleBlur('welcome-subtitle', e.currentTarget.textContent || '')}
+                      isEditing={!isReadOnly && editingField === 'welcome-subtitle'}
+                      isReadOnly={isReadOnly}
+                      onFocus={() => !isReadOnly && setEditingField('welcome-subtitle')}
+                      onBlur={() => setEditingField(null)}
+                      showSparkles={!isReadOnly}
+                      showClear={!isReadOnly}
+                      fieldType="subtitle"
+                      width={config.welcomeScreen.subtitleWidth || 100}
+                      onWidthChange={(width) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitleWidth: width } })}
+                      marginBottom="32px"
+                    />
+                  )}
+
+                  <div className="mt-10" style={{ marginTop: `${(config.welcomeScreen.blockSpacing || 1) * 32}px` }}>
+                    <button
+                      onClick={onNext}
+                      className="flex items-center justify-center font-medium transition-all hover:opacity-90"
+                      style={unifiedButtonStyles}
                     >
-                      {config.welcomeScreen.subtitle}
-                    </p>
+                      <span>{config.welcomeScreen.buttonText || "Commencer"}</span>
+                    </button>
                   </div>
-                  
-                  <button
-                    onClick={onNext}
-                    className="flex items-center gap-3 px-7 font-semibold transition-opacity hover:opacity-90"
-                    style={{ 
-                      backgroundColor: '#F5CA3C', 
-                      color: '#3D3731',
-                      height: '56px',
-                      borderRadius: '28px',
-                      fontSize: '17px',
-                      border: 'none',
-                      boxShadow: 'none'
-                    }}
-                  >
-                    <span>{config.welcomeScreen.buttonText || "Start"}</span>
-                    <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
-                      press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
-                    </span>
-                  </button>
-                  <div className="flex items-center gap-2.5 mt-5" style={{ color: '#A89A8A', fontSize: '14px' }}>
-                    <Clock className="w-4 h-4" />
-                    <span>Takes X minutes</span>
+
                   </div>
-                </div>
-              );
+                );
 
               // Desktop layouts
               if (viewMode === 'desktop') {
                 if (desktopLayout === 'desktop-left-right') {
+                  const align = config.welcomeScreen.splitAlignment || 'left';
+                  const alignmentClass =
+                    align === 'center'
+                      ? 'items-center'
+                      : align === 'right'
+                      ? 'items-end'
+                      : 'items-start';
+                  const justifyClass = config.welcomeScreen.showImage === false ? 'justify-center' : 'justify-start';
+                  const textContainerClass =
+                    align === 'center'
+                      ? 'max-w-[700px] mx-auto'
+                      : align === 'right'
+                      ? 'max-w-[700px] ml-auto'
+                      : 'max-w-[700px]';
+
                   return (
-                    <div className="w-full h-full flex flex-col items-start justify-start gap-10 px-24 py-12 overflow-y-auto scrollbar-hide">
-                      <div
-                        className="overflow-hidden flex-shrink-0"
-                        style={{ 
-                          borderRadius: "36px",
-                          width: '320px',
-                          height: '320px',
-                        }}
-                      >
-                        <img
-                          src="https://images.unsplash.com/photo-1635322966219-b75ed372eb01?w=1600&h=1600&fit=crop"
-                          alt="Feedback illustration"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="max-w-[700px]">
-                        <div className="relative">
-                          {editingField === 'welcome-title' && (
-                            <>
-                              <button
-                                type="button"
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                                className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                                style={{ 
-                                  backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                                  color: '#F5B800',
-                                  backdropFilter: 'blur(8px)'
-                                }}
-                              >
-                                <Sparkles className="w-3.5 h-3.5" />
-                              </button>
-
-                              {showVariableMenu && variableTarget === 'title' && (
-                                <div
-                                  className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                                  style={{
-                                    top: '32px',
-                                    right: 0,
-                                    backgroundColor: '#4A4138',
-                                    border: '1px solid rgba(245, 184, 0, 0.3)',
-                                    boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                                  }}
-                                >
-                                  {menuView === 'main' ? (
-                                    <div className="space-y-1">
-                                      <button
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => console.log('Réécriture AI')}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                      >
-                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                      </button>
-                                      <button
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => setMenuView('variables')}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                      >
-                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <div className="space-y-1">
-                                      <button
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => setMenuView('main')}
-                                        className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                      >
-                                        <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                      </button>
-                                      {availableVariables.map((variable) => (
-                                        <button
-                                          key={variable.key}
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => insertVariable(variable.key)}
-                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                        >
-                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </>
-                          )}
-
-                          <h1 
-                            className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
-                            style={{ 
-                              color: '#F5CA3C',
-                              outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                              padding: '4px',
-                              marginTop: '-4px',
-                              marginLeft: '-4px',
-                              marginRight: '-4px',
-                              borderRadius: '4px'
-                            }}
-                            contentEditable
-                            suppressContentEditableWarning
-                            onFocus={() => setEditingField('welcome-title')}
-                            onBlur={(e) => handleTitleBlur('welcome-title', e.currentTarget.textContent || '')}
-                          >
-                            {config.welcomeScreen.title}
-                          </h1>
-                        </div>
-                        
-                        <div className="relative">
-                          {editingField === 'welcome-subtitle' && (
-                            <>
-                              <button
-                                type="button"
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                                className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                                style={{ 
-                                  backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                                  color: '#F5B800',
-                                  backdropFilter: 'blur(8px)'
-                                }}
-                              >
-                                <Sparkles className="w-3.5 h-3.5" />
-                              </button>
-
-                              {showVariableMenu && variableTarget === 'subtitle' && (
-                                <div
-                                  className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                                  style={{
-                                    top: '32px',
-                                    right: 0,
-                                    backgroundColor: '#4A4138',
-                                    border: '1px solid rgba(245, 184, 0, 0.3)',
-                                    boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                                  }}
-                                >
-                                  {menuView === 'main' ? (
-                                    <div className="space-y-1">
-                                      <button
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => console.log('Réécriture AI')}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                      >
-                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                      </button>
-                                      <button
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => setMenuView('variables')}
-                                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                      >
-                                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <div className="space-y-1">
-                                      <button
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => setMenuView('main')}
-                                        className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                      >
-                                        <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                      </button>
-                                      {availableVariables.map((variable) => (
-                                        <button
-                                          key={variable.key}
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => insertVariable(variable.key)}
-                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                        >
-                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </>
-                          )}
-
-                          <p 
-                            className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
-                            style={{ 
-                              color: '#B8A892',
-                              outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
-                              padding: '4px',
-                              marginTop: '-4px',
-                              marginLeft: '-4px',
-                              marginRight: '-4px',
-                              borderRadius: '4px'
-                            }}
-                            contentEditable
-                            suppressContentEditableWarning
-                            onFocus={() => setEditingField('welcome-subtitle')}
-                            onBlur={(e) => handleSubtitleBlur('welcome-subtitle', e.currentTarget.textContent || '')}
-                          >
-                            {config.welcomeScreen.subtitle}
-                          </p>
-                        </div>
-                        
-                        <div className="mt-10" style={{ marginTop: `${(config.welcomeScreen.blockSpacing || 1) * 32}px` }}>
-                          <button 
-                            onClick={onNext}
-                            className="group px-6 py-3 text-base font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-3"
-                            style={{ 
-                              backgroundColor: '#F5CA3C',
-                              color: '#3D3731'
-                            }}
-                          >
-                            <span>{config.welcomeScreen.buttonText || "Start"}</span>
-                            <span className="font-normal" style={{ color: 'rgba(61, 55, 49, 0.55)', fontSize: '14px' }}>
-                              press <strong style={{ fontWeight: 600 }}>Enter</strong> ↵
-                            </span>
-                          </button>
-                          <div className="inline-flex items-center gap-2.5 mt-2" style={{ color: '#A89A8A', fontSize: '14px' }}>
-                            <Clock className="w-4 h-4" />
-                            <span>Takes X minutes</span>
-                          </div>
-                        </div>
+                    <div className={`w-full h-full flex flex-col ${alignmentClass} ${justifyClass} gap-10 overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
+                      {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
+                      <div className={textContainerClass}>
+                        <TextContent />
                       </div>
                     </div>
                   );
@@ -896,7 +704,7 @@ export const WheelPreview = ({
               // Mobile layouts
               if (mobileLayout === 'mobile-vertical') {
                 return (
-                  <div className="flex flex-col gap-6 py-6 px-5 w-full max-w-[700px]">
+                  <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
                     <ImageBlock />
                     <TextContent />
                   </div>
@@ -950,7 +758,7 @@ export const WheelPreview = ({
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+                    <div className="flex-1 flex items-start justify-center pt-6 pb-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                       <div className="w-full max-w-[700px]">
                         <TextContent />
                       </div>
@@ -1006,8 +814,9 @@ export const WheelPreview = ({
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
             editingField={editingField}
-            onFocusTitle={() => setEditingField('contact-title')}
-            onFocusSubtitle={() => setEditingField('contact-subtitle')}
+            isReadOnly={isReadOnly}
+            onFocusTitle={() => !isReadOnly && setEditingField('contact-title')}
+            onFocusSubtitle={() => !isReadOnly && setEditingField('contact-subtitle')}
             onBlurTitle={(value) => handleTitleBlur('contact-title', value)}
             onBlurSubtitle={(value) => handleSubtitleBlur('contact-subtitle', value)}
             showVariableMenu={showVariableMenu}
@@ -1058,252 +867,137 @@ export const WheelPreview = ({
               const mobileLayout = config.wheelScreen.mobileLayout || "mobile-vertical";
               const currentLayoutType = viewMode === "desktop" ? desktopLayout : mobileLayout;
 
-              // Wheel component
-              const WheelBlock = () => {
-                // Adapter les segments pour SmartWheel
-                const adaptedSegments = config.segments.map(seg => ({
-                  ...seg,
-                  value: seg.label
-                }));
+              // Adapter les segments pour SmartWheel (en dehors du composant pour éviter les re-renders)
+              const adaptedSegments = config.segments.map(seg => ({
+                ...seg,
+                value: seg.label
+              }));
 
-                return (
-                  <div
-                    className="flex items-center justify-center"
-                    style={{ 
-                      width: viewMode === 'desktop' ? '450px' : '320px',
-                      height: viewMode === 'desktop' ? '450px' : '320px',
-                      maxWidth: '100%',
-                      flexShrink: 0
-                    }}
-                  >
-                  <SmartWheel
-                    segments={adaptedSegments}
-                    onComplete={(winnerSegment) => {
-                      setIsSpinning(false);
-                      setWonPrize(winnerSegment);
-                      setTimeout(() => onNext(), 1000);
-                    }}
-                    brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                    size={viewMode === 'desktop' ? 380 : 280}
-                    borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
-                    customBorderColor={theme.wheelBorderStyle === 'classic' ? theme.wheelBorderCustomColor : undefined}
-                    showBulbs={true}
-                  />
-                  </div>
-                );
-              };
+              // Wheel component - utiliser un élément JSX directement au lieu d'une fonction
+              const wheelElement = (
+                <div
+                  className="flex items-center justify-center"
+                  style={{ 
+                    width: viewMode === 'desktop' ? '450px' : '320px',
+                    height: viewMode === 'desktop' ? '450px' : '320px',
+                    maxWidth: '100%',
+                    flexShrink: 0
+                  }}
+                >
+                <SmartWheel
+                  key="wheel-instance" // Clé stable pour éviter les re-montages
+                  segments={adaptedSegments}
+                  disabled={wheelDisabled}
+                  onBeforeSpin={handleSpinStart}
+                  onComplete={(winnerSegment, winnerSegmentId) => {
+                    setIsSpinning(false);
+                    setWheelDisabled(true); // Bloquer la roue après le spin
+                    
+                    // Utiliser le résultat du tirage stocké dans la variable globale
+                    const result = globalDrawResult;
+                    
+                    console.log('🎰 [WheelPreview] onComplete appelé');
+                    console.log('🎰 [WheelPreview] winnerSegment:', winnerSegment);
+                    console.log('🎰 [WheelPreview] winnerSegmentId:', winnerSegmentId);
+                    console.log('🎰 [WheelPreview] globalDrawResult:', result);
+                    
+                    if (result && result.won && result.prize) {
+                      console.log('🎰 [WheelPreview] ✅ Gain confirmé:', result.prize.name);
+                      setWonPrize(result.prize.name);
+                      // Mettre à jour le stock du lot
+                      if (onUpdatePrize) {
+                        onUpdatePrize(consumePrize(result.prize) as Prize);
+                      }
+                      setTimeout(() => {
+                        setWheelDisabled(false); // Réactiver pour le prochain jeu
+                        resetGlobalWheelRotation(); // Reset la rotation pour le prochain jeu
+                        if (onGoToEnding) onGoToEnding(true);
+                        else onNext();
+                      }, 1500);
+                    } else {
+                      console.log('🎰 [WheelPreview] ❌ Pas de gain - result:', result);
+                      console.log('🎰 [WheelPreview] result?.won:', result?.won);
+                      console.log('🎰 [WheelPreview] result?.prize:', result?.prize);
+                      setWonPrize(null);
+                      setTimeout(() => {
+                        setWheelDisabled(false); // Réactiver pour le prochain jeu
+                        resetGlobalWheelRotation(); // Reset la rotation pour le prochain jeu
+                        if (onGoToEnding) onGoToEnding(false);
+                        else onNext();
+                      }, 1500);
+                    }
+                    
+                    // Reset pour le prochain tirage
+                    globalDrawResult = null;
+                  }}
+                  brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
+                  size={viewMode === 'desktop' ? 380 : 280}
+                  borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
+                  customBorderColor={theme.wheelBorderStyle === 'classic' ? theme.wheelBorderCustomColor : undefined}
+                  showBulbs={true}
+                />
+                </div>
+              );
+              
+              // Wrapper pour utiliser dans les layouts
+              const WheelBlock = () => wheelElement;
 
               // Text content component  
               const TextContent = ({ centered = false, noSpacing = false }: { centered?: boolean; noSpacing?: boolean }) => (
                 <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
-                  <div className="relative">
-                    {editingField === 'wheel-title' && (
-                      <>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-
-                        {showVariableMenu && variableTarget === 'title' && (
-                          <div
-                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                            style={{
-                              top: '32px',
-                              right: 0,
-                              backgroundColor: '#4A4138',
-                              border: '1px solid rgba(245, 184, 0, 0.3)',
-                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            {menuView === 'main' ? (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => console.log('Réécriture AI')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                </button>
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('variables')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('main')}
-                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                >
-                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                </button>
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <h1 
-                      className="font-bold cursor-text hover:opacity-80 transition-opacity" 
-                      style={{ 
-                        color: theme.accentColor, 
-                        fontWeight: 700, 
-                        fontSize: viewMode === 'desktop' ? '64px' : '32px',
-                        lineHeight: '1.05',
-                        letterSpacing: '-0.02em',
-                        marginBottom: noSpacing ? '12px' : `${(config.wheelScreen.blockSpacing || 1) * 24}px`,
-                        outline: editingField === 'wheel-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                        padding: '4px',
-                        marginTop: '-4px',
-                        marginLeft: '-4px',
-                        marginRight: '-4px',
-                        borderRadius: '4px'
-                      }}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onFocus={() => setEditingField('wheel-title')}
-                      onBlur={(e) => {
-                        const value = e.currentTarget.textContent || '';
-                        if (value.trim()) {
-                          // Pour l'instant, le titre est hardcodé. On pourrait ajouter un state pour le gérer
-                          console.log('Wheel title updated:', value);
-                        }
-                        setEditingField(null);
-                      }}
-                    >
-                      Tournez la roue !
-                    </h1>
-                  </div>
+                  <EditableTextBlock
+                    value={config.wheelScreen.titleHtml || config.wheelScreen.title}
+                    onChange={(value, html) => onUpdateConfig({ wheelScreen: { ...config.wheelScreen, title: value, titleHtml: html } })}
+                    onClear={() => onUpdateConfig({ wheelScreen: { ...config.wheelScreen, title: '', titleHtml: '' } })}
+                    isEditing={!isReadOnly && editingField === 'wheel-title'}
+                    isReadOnly={isReadOnly}
+                    onFocus={() => !isReadOnly && setEditingField('wheel-title')}
+                    onBlur={() => setEditingField(null)}
+                    className="font-bold"
+                    style={{ 
+                      color: config.wheelScreen.titleStyle?.textColor || theme.accentColor, 
+                      fontFamily: config.wheelScreen.titleStyle?.fontFamily || 'inherit',
+                      fontWeight: config.wheelScreen.titleStyle?.isBold ? 'bold' : 700,
+                      fontStyle: config.wheelScreen.titleStyle?.isItalic ? 'italic' : undefined,
+                      textDecoration: config.wheelScreen.titleStyle?.isUnderline ? 'underline' : undefined,
+                      textAlign: config.wheelScreen.titleStyle?.textAlign || (centered ? 'center' : 'left'),
+                      fontSize: config.wheelScreen.titleStyle?.fontSize ? `${config.wheelScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '64px' : '32px'),
+                      lineHeight: '1.05',
+                      letterSpacing: '-0.02em',
+                    }}
+                    showSparkles={!isReadOnly}
+                    showClear={!isReadOnly}
+                    fieldType="title"
+                    width={config.wheelScreen.titleWidth || 100}
+                    onWidthChange={(width) => onUpdateConfig({ wheelScreen: { ...config.wheelScreen, titleWidth: width } })}
+                    marginBottom={noSpacing ? '12px' : `${(config.wheelScreen.blockSpacing || 1) * 24}px`}
+                  />
                   
-                  <div className="relative">
-                    {editingField === 'wheel-subtitle' && (
-                      <>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                          className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                          style={{ 
-                            backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                            color: '#F5B800',
-                            backdropFilter: 'blur(8px)'
-                          }}
-                        >
-                          <Sparkles className="w-3.5 h-3.5" />
-                        </button>
-
-                        {showVariableMenu && variableTarget === 'subtitle' && (
-                          <div
-                            className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                            style={{
-                              top: '32px',
-                              right: 0,
-                              backgroundColor: '#4A4138',
-                              border: '1px solid rgba(245, 184, 0, 0.3)',
-                              boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            {menuView === 'main' ? (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => console.log('Réécriture AI')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                </button>
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('variables')}
-                                  className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                >
-                                  <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                  <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <button
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => setMenuView('main')}
-                                  className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                >
-                                  <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                </button>
-                                {availableVariables.map((variable) => (
-                                  <button
-                                    key={variable.key}
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => insertVariable(variable.key)}
-                                    className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                  >
-                                    <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                    <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    <p 
-                      className="text-[16px] cursor-text hover:opacity-80 transition-opacity" 
-                      style={{ 
-                        color: '#B8A892',
-                        fontSize: viewMode === 'desktop' ? '16px' : '14px',
-                        lineHeight: '1.6',
-                        marginBottom: noSpacing ? '0' : `${(config.wheelScreen.blockSpacing || 1) * 32}px`,
-                        outline: editingField === 'wheel-subtitle' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                        padding: '4px',
-                        marginTop: '-4px',
-                        marginLeft: '-4px',
-                        marginRight: '-4px',
-                        borderRadius: '4px'
-                      }}
-                      contentEditable
-                      suppressContentEditableWarning
-                      onFocus={() => setEditingField('wheel-subtitle')}
-                      onBlur={(e) => {
-                        const value = e.currentTarget.textContent || '';
-                        if (value.trim()) {
-                          console.log('Wheel subtitle updated:', value);
-                        }
-                        setEditingField(null);
-                      }}
-                    >
-                      Tentez votre chance et découvrez votre prix
-                    </p>
-                  </div>
+                  <EditableTextBlock
+                    value={config.wheelScreen.subtitleHtml || config.wheelScreen.subtitle}
+                    onChange={(value, html) => onUpdateConfig({ wheelScreen: { ...config.wheelScreen, subtitle: value, subtitleHtml: html } })}
+                    onClear={() => onUpdateConfig({ wheelScreen: { ...config.wheelScreen, subtitle: '', subtitleHtml: '' } })}
+                    isEditing={!isReadOnly && editingField === 'wheel-subtitle'}
+                    isReadOnly={isReadOnly}
+                    onFocus={() => !isReadOnly && setEditingField('wheel-subtitle')}
+                    onBlur={() => setEditingField(null)}
+                    style={{ 
+                      color: config.wheelScreen.subtitleStyle?.textColor || '#B8A892',
+                      fontFamily: config.wheelScreen.subtitleStyle?.fontFamily || 'inherit',
+                      fontWeight: config.wheelScreen.subtitleStyle?.isBold ? 'bold' : undefined,
+                      fontStyle: config.wheelScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
+                      textDecoration: config.wheelScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
+                      textAlign: config.wheelScreen.subtitleStyle?.textAlign || (centered ? 'center' : 'left'),
+                      fontSize: config.wheelScreen.subtitleStyle?.fontSize ? `${config.wheelScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '16px' : '14px'),
+                      lineHeight: '1.6',
+                    }}
+                    showSparkles={!isReadOnly}
+                    showClear={!isReadOnly}
+                    fieldType="subtitle"
+                    width={config.wheelScreen.subtitleWidth || 100}
+                    onWidthChange={(width) => onUpdateConfig({ wheelScreen: { ...config.wheelScreen, subtitleWidth: width } })}
+                    marginBottom={noSpacing ? '0' : `${(config.wheelScreen.blockSpacing || 1) * 32}px`}
+                  />
                 </div>
               );
 
@@ -1314,227 +1008,9 @@ export const WheelPreview = ({
                     <div className="w-full h-full flex items-center justify-center px-24">
                       <div className="flex flex-col items-center gap-10">
                         <div className="max-w-[700px] text-center">
-                          <div className="relative">
-                            {editingField === 'wheel-title-center' && (
-                              <>
-                                <button
-                                  type="button"
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                                  className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                                  style={{ 
-                                    backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                                    color: '#F5B800',
-                                    backdropFilter: 'blur(8px)'
-                                  }}
-                                >
-                                  <Sparkles className="w-3.5 h-3.5" />
-                                </button>
-
-                                {showVariableMenu && variableTarget === 'title' && (
-                                  <div
-                                    className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                                    style={{
-                                      top: '32px',
-                                      right: 0,
-                                      backgroundColor: '#4A4138',
-                                      border: '1px solid rgba(245, 184, 0, 0.3)',
-                                      boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                                    }}
-                                  >
-                                    {menuView === 'main' ? (
-                                      <div className="space-y-1">
-                                        <button
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => console.log('Réécriture AI')}
-                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                        >
-                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                        </button>
-                                        <button
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => setMenuView('variables')}
-                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                        >
-                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <div className="space-y-1">
-                                        <button
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => setMenuView('main')}
-                                          className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                        >
-                                          <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                        </button>
-                                        {availableVariables.map((variable) => (
-                                          <button
-                                            key={variable.key}
-                                            onMouseDown={(e) => e.preventDefault()}
-                                            onClick={() => insertVariable(variable.key)}
-                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                          >
-                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </>
-                            )}
-
-                            <h1 
-                              className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity" 
-                              style={{ 
-                                color: '#F5CA3C',
-                                outline: editingField === 'wheel-title-center' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                                padding: '4px',
-                                marginTop: '-4px',
-                                marginLeft: '-4px',
-                                marginRight: '-4px',
-                                borderRadius: '4px'
-                              }}
-                              contentEditable
-                              suppressContentEditableWarning
-                              onFocus={() => setEditingField('wheel-title-center')}
-                              onBlur={(e) => {
-                                const value = e.currentTarget.textContent || '';
-                                if (value.trim()) {
-                                  console.log('Wheel title center updated:', value);
-                                }
-                                setEditingField(null);
-                              }}
-                            >
-                              Tournez la roue !
-                            </h1>
-                          </div>
-                          
-                          <div className="relative">
-                            {editingField === 'wheel-subtitle-center' && (
-                              <>
-                                <button
-                                  type="button"
-                                  onMouseDown={(e) => e.preventDefault()}
-                                  onClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                                  className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-                                  style={{ 
-                                    backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                                    color: '#F5B800',
-                                    backdropFilter: 'blur(8px)'
-                                  }}
-                                >
-                                  <Sparkles className="w-3.5 h-3.5" />
-                                </button>
-
-                                {showVariableMenu && variableTarget === 'subtitle' && (
-                                  <div
-                                    className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                                    style={{
-                                      top: '32px',
-                                      right: 0,
-                                      backgroundColor: '#4A4138',
-                                      border: '1px solid rgba(245, 184, 0, 0.3)',
-                                      boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                                    }}
-                                  >
-                                    {menuView === 'main' ? (
-                                      <div className="space-y-1">
-                                        <button
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => console.log('Réécriture AI')}
-                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                        >
-                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l'IA</div>
-                                        </button>
-                                        <button
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => setMenuView('variables')}
-                                          className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                        >
-                                          <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                                          <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      <div className="space-y-1">
-                                        <button
-                                          onMouseDown={(e) => e.preventDefault()}
-                                          onClick={() => setMenuView('main')}
-                                          className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                                        >
-                                          <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                                        </button>
-                                        {availableVariables.map((variable) => (
-                                          <button
-                                            key={variable.key}
-                                            onMouseDown={(e) => e.preventDefault()}
-                                            onClick={() => insertVariable(variable.key)}
-                                            className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                                          >
-                                            <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                                            <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </>
-                            )}
-
-                            <p 
-                              className="text-base mb-8 cursor-text hover:opacity-80 transition-opacity" 
-                              style={{ 
-                                color: '#B8A892',
-                                outline: editingField === 'wheel-subtitle-center' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-                                padding: '4px',
-                                marginTop: '-4px',
-                                marginLeft: '-4px',
-                                marginRight: '-4px',
-                                borderRadius: '4px'
-                              }}
-                              contentEditable
-                              suppressContentEditableWarning
-                              onFocus={() => setEditingField('wheel-subtitle-center')}
-                              onBlur={(e) => {
-                                const value = e.currentTarget.textContent || '';
-                                if (value.trim()) {
-                                  console.log('Wheel subtitle center updated:', value);
-                                }
-                                setEditingField(null);
-                              }}
-                            >
-                              Tentez votre chance et découvrez votre prix
-                            </p>
-                          </div>
+                          <TextContent centered />
                         </div>
-                        <div
-                          className="flex-shrink-0 flex items-center justify-center"
-                          style={{ 
-                            width: '350px',
-                            height: '350px',
-                          }}
-                        >
-                      <SmartWheel
-                        segments={config.segments.map(seg => ({ ...seg, value: seg.label }))}
-                        onComplete={(winnerSegment) => {
-                          setIsSpinning(false);
-                          setWonPrize(winnerSegment);
-                          setTimeout(() => onNext(), 1000);
-                        }}
-                        brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                        size={280}
-                        borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
-                        customBorderColor={theme.wheelBorderStyle === 'classic' ? theme.wheelBorderCustomColor : undefined}
-                        showBulbs={true}
-                      />
-                      </div>
+                        <WheelBlock />
                       </div>
                     </div>
                   );
@@ -1608,8 +1084,8 @@ export const WheelPreview = ({
               // Mobile layouts
               if (mobileLayout === 'mobile-vertical') {
                 return (
-                  <div className="w-full h-full flex items-center justify-center px-5">
-                    <div className="flex flex-col items-center gap-8 max-w-[700px]">
+                  <div className="w-full h-full flex flex-col items-center justify-start px-5 py-8 overflow-y-auto">
+                    <div className="flex flex-col items-center gap-6 max-w-[700px]">
                       <TextContent centered />
                       <WheelBlock />
                     </div>
@@ -1621,7 +1097,7 @@ export const WheelPreview = ({
                     <div className="w-full relative flex items-center justify-center" style={{ height: '40%', minHeight: '250px' }}>
                       <WheelBlock />
                     </div>
-                    <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+                    <div className="flex-1 flex items-start justify-center pt-6 pb-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                       <div className="w-full max-w-[700px]">
                         <TextContent />
                       </div>
@@ -1647,45 +1123,164 @@ export const WheelPreview = ({
           </div>
         );
 
-      case 'ending':
+      case 'ending-win':
         return (
-          <EndingLayouts
-            layout={currentLayout}
-            viewMode={viewMode}
-            title={config.endingScreen.title}
-            subtitle={config.endingScreen.subtitle}
-            wonPrize={wonPrize}
-            backgroundColor={theme.backgroundColor}
-            textColor={theme.textColor}
-            buttonColor={theme.buttonColor}
-            editingField={editingField}
-            onFocusTitle={() => setEditingField('ending-title')}
-            onFocusSubtitle={() => setEditingField('ending-subtitle')}
-            onBlurTitle={(value) => handleTitleBlur('ending-title', value)}
-            onBlurSubtitle={(value) => handleSubtitleBlur('ending-subtitle', value)}
-            showVariableMenu={showVariableMenu}
-            variableTarget={variableTarget}
-            menuView={menuView}
-            onToggleVariableMenu={(target) => {
-              setVariableTarget(target);
-              setShowVariableMenu(prev => !prev);
-              setMenuView('main');
-            }}
-            onSetMenuView={setMenuView}
-            availableVariables={availableVariables}
-            onInsertVariable={insertVariable}
-            socialLinks={config.endingScreen.socialLinks}
-            onRestart={() => {
-              setWonPrize(null);
-              setContactData({ name: "", email: "", phone: "" });
-            }}
-          />
+          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '35px' }}>
+            <div className="w-full max-w-[700px] text-center">
+              <EditableTextBlock
+                value={config.endingWin.titleHtml || config.endingWin.title.replace('{{prize}}', wonPrize || 'votre lot')}
+                onChange={(value, html) => onUpdateConfig({ endingWin: { ...config.endingWin, title: value, titleHtml: html } })}
+                onClear={() => onUpdateConfig({ endingWin: { ...config.endingWin, title: '', titleHtml: '' } })}
+                className="text-4xl md:text-5xl font-bold"
+                style={{ 
+                  color: config.endingWin.titleStyle?.textColor || theme.textColor,
+                  fontFamily: config.endingWin.titleStyle?.fontFamily || 'inherit',
+                  fontWeight: config.endingWin.titleStyle?.isBold ? 'bold' : undefined,
+                  fontStyle: config.endingWin.titleStyle?.isItalic ? 'italic' : undefined,
+                  textDecoration: config.endingWin.titleStyle?.isUnderline ? 'underline' : undefined,
+                  textAlign: config.endingWin.titleStyle?.textAlign || 'center',
+                  fontSize: config.endingWin.titleStyle?.fontSize ? `${config.endingWin.titleStyle.fontSize}px` : undefined,
+                }}
+                isEditing={!isReadOnly && editingField === 'ending-win-title'}
+                isReadOnly={isReadOnly}
+                onFocus={() => !isReadOnly && setEditingField('ending-win-title')}
+                onBlur={() => setEditingField(null)}
+                showSparkles={!isReadOnly}
+                showClear={!isReadOnly}
+                fieldType="title"
+                width={config.endingWin.titleWidth || 100}
+                onWidthChange={(width) => onUpdateConfig({ endingWin: { ...config.endingWin, titleWidth: width } })}
+                marginBottom="32px"
+              />
+              <EditableTextBlock
+                value={config.endingWin.subtitleHtml || config.endingWin.subtitle.replace('{{prize}}', wonPrize || 'votre lot')}
+                onChange={(value, html) => onUpdateConfig({ endingWin: { ...config.endingWin, subtitle: value, subtitleHtml: html } })}
+                onClear={() => onUpdateConfig({ endingWin: { ...config.endingWin, subtitle: '', subtitleHtml: '' } })}
+                className="text-lg md:text-xl"
+                style={{ 
+                  color: config.endingWin.subtitleStyle?.textColor || theme.textSecondaryColor, 
+                  fontFamily: config.endingWin.subtitleStyle?.fontFamily || 'inherit',
+                  fontWeight: config.endingWin.subtitleStyle?.isBold ? 'bold' : undefined,
+                  fontStyle: config.endingWin.subtitleStyle?.isItalic ? 'italic' : undefined,
+                  textDecoration: config.endingWin.subtitleStyle?.isUnderline ? 'underline' : undefined,
+                  textAlign: config.endingWin.subtitleStyle?.textAlign || 'center',
+                  fontSize: config.endingWin.subtitleStyle?.fontSize ? `${config.endingWin.subtitleStyle.fontSize}px` : undefined,
+                  opacity: 0.8 
+                }}
+                isEditing={!isReadOnly && editingField === 'ending-win-subtitle'}
+                isReadOnly={isReadOnly}
+                onFocus={() => !isReadOnly && setEditingField('ending-win-subtitle')}
+                onBlur={() => setEditingField(null)}
+                showSparkles={!isReadOnly}
+                showClear={!isReadOnly}
+                fieldType="subtitle"
+                width={config.endingWin.subtitleWidth || 100}
+                onWidthChange={(width) => onUpdateConfig({ endingWin: { ...config.endingWin, subtitleWidth: width } })}
+                marginBottom="48px"
+              />
+              
+              <button
+                onClick={() => {
+                  setWonPrize(null);
+                  setContactData({ name: '', email: '', phone: '' });
+                }}
+                className="font-semibold px-8 transition-opacity hover:opacity-90"
+                style={{ 
+                  backgroundColor: '#F5CA3C', 
+                  color: '#3D3731',
+                  height: '56px',
+                  borderRadius: '28px',
+                  fontSize: '17px',
+                  border: 'none'
+                }}
+              >
+                Rejouer
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'ending-lose':
+        return (
+          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '35px' }}>
+            <div className="w-full max-w-[700px] text-center">
+              <EditableTextBlock
+                value={config.endingLose.titleHtml || config.endingLose.title}
+                onChange={(value, html) => onUpdateConfig({ endingLose: { ...config.endingLose, title: value, titleHtml: html } })}
+                onClear={() => onUpdateConfig({ endingLose: { ...config.endingLose, title: '', titleHtml: '' } })}
+                className="text-4xl md:text-5xl font-bold"
+                style={{ 
+                  color: config.endingLose.titleStyle?.textColor || theme.textColor,
+                  fontFamily: config.endingLose.titleStyle?.fontFamily || 'inherit',
+                  fontWeight: config.endingLose.titleStyle?.isBold ? 'bold' : undefined,
+                  fontStyle: config.endingLose.titleStyle?.isItalic ? 'italic' : undefined,
+                  textDecoration: config.endingLose.titleStyle?.isUnderline ? 'underline' : undefined,
+                  textAlign: config.endingLose.titleStyle?.textAlign || 'center',
+                  fontSize: config.endingLose.titleStyle?.fontSize ? `${config.endingLose.titleStyle.fontSize}px` : undefined,
+                }}
+                isEditing={!isReadOnly && editingField === 'ending-lose-title'}
+                isReadOnly={isReadOnly}
+                onFocus={() => !isReadOnly && setEditingField('ending-lose-title')}
+                onBlur={() => setEditingField(null)}
+                showSparkles={!isReadOnly}
+                showClear={!isReadOnly}
+                fieldType="title"
+                width={config.endingLose.titleWidth || 100}
+                onWidthChange={(width) => onUpdateConfig({ endingLose: { ...config.endingLose, titleWidth: width } })}
+                marginBottom="32px"
+              />
+              <EditableTextBlock
+                value={config.endingLose.subtitleHtml || config.endingLose.subtitle}
+                onChange={(value, html) => onUpdateConfig({ endingLose: { ...config.endingLose, subtitle: value, subtitleHtml: html } })}
+                onClear={() => onUpdateConfig({ endingLose: { ...config.endingLose, subtitle: '', subtitleHtml: '' } })}
+                className="text-lg md:text-xl"
+                style={{ 
+                  color: config.endingLose.subtitleStyle?.textColor || theme.textSecondaryColor, 
+                  fontFamily: config.endingLose.subtitleStyle?.fontFamily || 'inherit',
+                  fontWeight: config.endingLose.subtitleStyle?.isBold ? 'bold' : undefined,
+                  fontStyle: config.endingLose.subtitleStyle?.isItalic ? 'italic' : undefined,
+                  textDecoration: config.endingLose.subtitleStyle?.isUnderline ? 'underline' : undefined,
+                  textAlign: config.endingLose.subtitleStyle?.textAlign || 'center',
+                  fontSize: config.endingLose.subtitleStyle?.fontSize ? `${config.endingLose.subtitleStyle.fontSize}px` : undefined,
+                  opacity: 0.8 
+                }}
+                isEditing={!isReadOnly && editingField === 'ending-lose-subtitle'}
+                isReadOnly={isReadOnly}
+                onFocus={() => !isReadOnly && setEditingField('ending-lose-subtitle')}
+                onBlur={() => setEditingField(null)}
+                showSparkles={!isReadOnly}
+                showClear={!isReadOnly}
+                fieldType="subtitle"
+                width={config.endingLose.subtitleWidth || 100}
+                onWidthChange={(width) => onUpdateConfig({ endingLose: { ...config.endingLose, subtitleWidth: width } })}
+                marginBottom="48px"
+              />
+              
+              <button
+                onClick={() => {
+                  setWonPrize(null);
+                  setContactData({ name: '', email: '', phone: '' });
+                }}
+                className="font-semibold px-8 transition-opacity hover:opacity-90"
+                style={{ 
+                  backgroundColor: '#F5CA3C', 
+                  color: '#3D3731',
+                  height: '56px',
+                  borderRadius: '28px',
+                  fontSize: '17px',
+                  border: 'none'
+                }}
+              >
+                Rejouer
+              </button>
+            </div>
+          </div>
         );
     }
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100">
+    <div className={isMobileResponsive ? "w-full h-full relative overflow-hidden" : "flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100"}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -1707,6 +1302,7 @@ export const WheelPreview = ({
         open={showEditorModal}
         onOpenChange={setShowEditorModal}
         imageUrl={uploadedImage || ''}
+        settings={imageSettings}
         onSave={handleImageEdit}
       />
 
@@ -1738,20 +1334,10 @@ export const WheelPreview = ({
         className="relative overflow-hidden transition-all duration-300" 
         style={{ 
           backgroundColor: theme.backgroundColor, 
-          width: viewMode === 'desktop' ? '1100px' : '375px', 
-          height: viewMode === 'desktop' ? '620px' : '667px' 
+          width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
+          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px') 
         }}
       >
-        {/* Logo */}
-        <div className="absolute top-8 left-8">
-          <div className="grid grid-cols-2 gap-1">
-            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
-            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
-            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
-            <div className="w-3.5 h-3.5 rounded-full bg-[#F5CA3C]" />
-          </div>
-        </div>
-
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView}
@@ -1760,6 +1346,17 @@ export const WheelPreview = ({
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
             className="w-full h-full"
+            onClick={(e) => {
+              // Ne pas blur si on clique sur un input, textarea ou button
+              const target = e.target as HTMLElement;
+              if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
+                return;
+              }
+              setEditingField(null);
+              if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                document.activeElement.blur();
+              }
+            }}
           >
             {renderContent()}
           </motion.div>

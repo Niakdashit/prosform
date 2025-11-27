@@ -1,21 +1,36 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { QuestionSidebar } from "./QuestionSidebar";
 import { FormPreview } from "./FormPreview";
 import { SettingsPanel } from "./SettingsPanel";
 import { TopToolbar } from "./TopToolbar";
 import { AddContentModal } from "./AddContentModal";
+import { WorkflowBuilder } from "./workflow/WorkflowBuilder";
+import { TemplateLibrary } from "./templates";
+import { FloatingToolbar } from "./FloatingToolbar";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+// TextStyle type for text formatting
+export interface TextStyle {
+  fontFamily?: string;
+  fontSize?: number;
+  textColor?: string;
+  isBold?: boolean;
+  isItalic?: boolean;
+  isUnderline?: boolean;
+  textAlign?: 'left' | 'center' | 'right';
+}
 
 export interface Question {
   id: string;
-  type: "welcome" | "text" | "rating" | "choice" | "ending" | "email" | "phone" | "number" | "date" | "dropdown" | "yesno" | "file" | "statement" | "picture-choice";
+  type: "welcome" | "text" | "short-text" | "long-text" | "rating" | "choice" | "ending" | "email" | "phone" | "number" | "date" | "dropdown" | "yesno" | "file" | "statement" | "picture-choice" | "website" | "video" | "checkbox";
   title: string;
+  titleHtml?: string; // HTML version of title with inline styles
   subtitle?: string;
+  subtitleHtml?: string; // HTML version of subtitle with inline styles
   icon?: string;
   number?: number;
   variant?: string;
@@ -39,57 +54,120 @@ export interface Question {
   desktopLayout?: string;
   splitAlignment?: 'left' | 'center' | 'right';
   blockSpacing?: number;
+  choiceDisplayStyle?: 'pills' | 'list' | 'grid' | 'cards';
+  // Display styles for different question types
+  textDisplayStyle?: 'default' | 'underline' | 'boxed' | 'minimal';
+  ratingDisplayStyle?: 'stars' | 'numbers' | 'emojis' | 'hearts' | 'slider';
+  yesnoDisplayStyle?: 'buttons' | 'toggle' | 'cards' | 'icons';
+  dateDisplayStyle?: 'calendar' | 'dropdowns' | 'input';
+  fileDisplayStyle?: 'dropzone' | 'button' | 'minimal';
+  welcomeDisplayStyle?: 'centered' | 'left' | 'split' | 'fullscreen';
+  endingDisplayStyle?: 'centered' | 'confetti' | 'minimal' | 'redirect';
+  dropdownDisplayStyle?: 'select' | 'searchable' | 'buttons';
+  websiteDisplayStyle?: 'default' | 'card' | 'minimal';
+  videoDisplayStyle?: 'dropzone' | 'button' | 'embed';
+  checkboxDisplayStyle?: 'square' | 'round' | 'toggle';
+  // Style customization options
+  styleCustomization?: {
+    borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'full';
+    buttonColor?: string;
+    buttonTextColor?: string;
+    borderColor?: string;
+    backgroundColor?: string;
+    hoverColor?: string;
+  };
+  // Image uploadée pour cette question
+  image?: string;
+  imageSettings?: {
+    borderRadius: number;
+    borderWidth: number;
+    borderColor: string;
+    rotation: number;
+  };
+  // Overlay opacity for wallpaper layouts
+  overlayOpacity?: number;
+  // Text styling for title, subtitle, description
+  titleStyle?: {
+    fontFamily?: string;
+    fontSize?: number;
+    textColor?: string;
+    isBold?: boolean;
+    isItalic?: boolean;
+    isUnderline?: boolean;
+    textAlign?: 'left' | 'center' | 'right';
+  };
+  subtitleStyle?: {
+    fontFamily?: string;
+    fontSize?: number;
+    textColor?: string;
+    isBold?: boolean;
+    isItalic?: boolean;
+    isUnderline?: boolean;
+    textAlign?: 'left' | 'center' | 'right';
+  };
+  buttonStyle?: {
+    fontFamily?: string;
+    fontSize?: number;
+    textColor?: string;
+    isBold?: boolean;
+    isItalic?: boolean;
+    isUnderline?: boolean;
+    textAlign?: 'left' | 'center' | 'right';
+  };
+  // Width settings for text blocks (for manual resizing)
+  titleWidth?: number; // percentage (10-100)
+  subtitleWidth?: number; // percentage (10-100)
 }
 
 const defaultQuestions: Question[] = [
   {
     id: "welcome",
     type: "welcome",
-    title: "How are we doing?",
-    subtitle: "Your feedback helps us build an even better place to work.",
-    buttonText: "Give feedback",
+    title: "Ajouter un titre",
+    subtitle: "Ajouter une description pour votre formulaire",
+    buttonText: "Commencer",
     icon: "greeting"
   },
   {
     id: "q1",
     type: "text",
-    title: "First, what's your full name?",
+    title: "Ajouter votre question ici",
     icon: "user",
     number: 1,
     variant: "short",
-    placeholder: "Type your answer here..."
+    placeholder: "Tapez votre réponse..."
   },
   {
     id: "q2",
     type: "email",
-    title: "What's your email address?",
+    title: "Ajouter votre question ici",
     icon: "mail",
     number: 2,
-    placeholder: "name@example.com"
+    placeholder: "nom@exemple.com"
   },
   {
     id: "q3",
     type: "phone",
-    title: "What's your phone number?",
+    title: "Ajouter votre question ici",
     icon: "phone",
     number: 3,
-    placeholder: "+1 (555) 000-0000",
-    phoneCountry: "US"
+    placeholder: "+33 6 00 00 00 00",
+    phoneCountry: "FR"
   },
   {
     id: "q4",
     type: "number",
-    title: "How many years have you been here?",
+    title: "Ajouter votre question ici",
     icon: "hash",
     number: 4,
-    placeholder: "Enter a number",
+    placeholder: "Entrez un nombre",
     minValue: 0,
-    maxValue: 50
+    maxValue: 100
   },
   {
     id: "q5",
     type: "date",
-    title: "When did you start?",
+    title: "Ajouter votre question ici",
     icon: "calendar",
     number: 5,
     dateFormat: "ddmmyyyy"
@@ -97,7 +175,7 @@ const defaultQuestions: Question[] = [
   {
     id: "q6",
     type: "rating",
-    title: "How do you rate the company culture?",
+    title: "Ajouter votre question ici",
     icon: "star",
     number: 6,
     variant: "stars",
@@ -107,38 +185,38 @@ const defaultQuestions: Question[] = [
   {
     id: "q7",
     type: "choice",
-    title: "Which department do you work in?",
+    title: "Ajouter votre question ici",
     icon: "building",
     number: 7,
-    choices: ["Marketing", "Sales", "Engineering", "Other"]
+    choices: ["Option 1", "Option 2", "Option 3", "Option 4"]
   },
   {
     id: "q8",
     type: "dropdown",
-    title: "Select your location",
+    title: "Ajouter votre question ici",
     icon: "map",
     number: 8,
-    choices: ["New York", "London", "Paris", "Tokyo"]
+    choices: ["Option 1", "Option 2", "Option 3", "Option 4"]
   },
   {
     id: "q9",
     type: "yesno",
-    title: "Do you feel valued?",
+    title: "Ajouter votre question ici",
     icon: "check",
     number: 9
   },
   {
     id: "q10",
     type: "picture-choice",
-    title: "Choose your preferred workspace",
+    title: "Ajouter votre question ici",
     icon: "image",
     number: 10,
-    choices: ["Open space", "Private office", "Hybrid"]
+    choices: ["Option 1", "Option 2", "Option 3"]
   },
   {
     id: "q11",
     type: "file",
-    title: "Upload any supporting documents",
+    title: "Ajouter votre question ici",
     icon: "upload",
     number: 11,
     maxFileSize: 10,
@@ -147,15 +225,15 @@ const defaultQuestions: Question[] = [
   {
     id: "q12",
     type: "statement",
-    title: "Thank you for your time!",
-    subtitle: "Your responses will help us improve",
+    title: "Ajouter un message ici",
+    subtitle: "Ajouter une description optionnelle",
     icon: "info",
     number: 12
   },
   {
     id: "q13",
     type: "text",
-    title: "Any additional comments?",
+    title: "Ajouter votre question ici",
     icon: "message",
     number: 13,
     variant: "long",
@@ -164,10 +242,86 @@ const defaultQuestions: Question[] = [
   {
     id: "ending",
     type: "ending",
-    title: "Thanks for your feedback, {{first_name}}!",
+    title: "Merci pour votre participation !",
+    subtitle: "Ajouter un message de fin personnalisé",
     icon: "check"
   }
 ];
+
+// Preview area component with TextToolbar integration - REFACTORED (no context, direct state)
+interface FormBuilderPreviewAreaProps {
+  viewMode: 'desktop' | 'mobile';
+  setViewMode: React.Dispatch<React.SetStateAction<'desktop' | 'mobile'>>;
+  activeQuestion: Question;
+  updateQuestion: (id: string, updates: Partial<Question>) => void;
+  questions: Question[];
+  activeQuestionId: string;
+  setActiveQuestionId: (id: string) => void;
+  templateMeta: any;
+  // New: editing state passed from parent
+  editingField: string | null;
+  setEditingField: (field: string | null) => void;
+}
+
+const FormBuilderPreviewArea = ({
+  viewMode,
+  setViewMode,
+  activeQuestion,
+  updateQuestion,
+  questions,
+  activeQuestionId,
+  setActiveQuestionId,
+  templateMeta,
+  editingField,
+  setEditingField,
+}: FormBuilderPreviewAreaProps) => {
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+      {/* Top bar: TextToolbar centered (only when editing), view toggle on the right */}
+      <div className="flex items-center px-4 pt-6 pb-1 bg-gray-100 relative z-10">
+        {/* Left spacer */}
+        <div className="w-[120px] flex-shrink-0" />
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* ViewMode Toggle Button à droite */}
+        <button
+          onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105 flex-shrink-0"
+          style={{ backgroundColor: '#F5B800', color: '#3D3731' }}
+        >
+          {viewMode === 'desktop' ? (
+            <><Monitor className="w-4 h-4" /><span className="text-xs font-medium">Desktop</span></>
+          ) : (
+            <><Smartphone className="w-4 h-4" /><span className="text-xs font-medium">Mobile</span></>
+          )}
+        </button>
+      </div>
+      
+      {/* FormPreview */}
+      <div className={`flex-1 flex items-center justify-center overflow-hidden ${viewMode === 'desktop' ? '-mt-10' : ''}`}>
+        <FormPreview
+          question={activeQuestion}
+          onUpdateQuestion={updateQuestion}
+          viewMode={viewMode}
+          onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+          isMobileResponsive={false}
+          allQuestions={questions}
+          editingField={editingField}
+          setEditingField={setEditingField}
+          templateMeta={templateMeta}
+          onNext={() => {
+            const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
+            if (currentIndex < questions.length - 1) {
+              setActiveQuestionId(questions[currentIndex + 1].id);
+            }
+          }}
+        />
+      </div>
+    </div>
+  );
+};
 
 export const FormBuilder = () => {
   const isMobile = useIsMobile();
@@ -178,6 +332,23 @@ export const FormBuilder = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'content' | 'design' | 'workflow' | 'templates'>('content');
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [templateMeta, setTemplateMeta] = useState<{
+    layoutStyle?: string;
+    brandName?: string;
+    backgroundImages?: string[];
+    backgroundColor?: string;
+    gradientStart?: string;
+    gradientEnd?: string;
+    gradientAngle?: number;
+    buttonStyle?: string;
+    fontStyle?: string;
+    accentColor?: string;
+    pictureChoiceImages?: string[];
+    desktopLayout?: string;
+    mobileLayout?: string;
+  } | null>(null);
 
   // Force mobile view mode on mobile devices
   useEffect(() => {
@@ -318,17 +489,49 @@ export const FormBuilder = () => {
         onPreview={() => {
           // Stocker les questions, le viewMode et le thème dans localStorage
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
-          localStorage.setItem('preview-questions', JSON.stringify(questions));
-          localStorage.setItem('preview-viewMode', targetViewMode);
-          localStorage.setItem('preview-theme', JSON.stringify(theme));
-          
-          // Ouvrir dans un nouvel onglet
-          window.open('/preview', '_blank');
+          try {
+            localStorage.setItem('preview-questions', JSON.stringify(questions));
+            localStorage.setItem('preview-viewMode', targetViewMode);
+            localStorage.setItem('preview-theme', JSON.stringify(theme));
+            // Ouvrir dans un nouvel onglet
+            window.open('/preview', '_blank');
+          } catch (e) {
+            // Si localStorage est plein (images trop grandes), essayer sans les images
+            console.warn('localStorage full, trying without images:', e);
+            const questionsWithoutImages = questions.map(q => ({
+              ...q,
+              image: undefined,
+              imageSettings: undefined
+            }));
+            try {
+              localStorage.setItem('preview-questions', JSON.stringify(questionsWithoutImages));
+              localStorage.setItem('preview-viewMode', targetViewMode);
+              localStorage.setItem('preview-theme', JSON.stringify(theme));
+              window.open('/preview', '_blank');
+              toast.warning('Preview opened without images (images too large)');
+            } catch (e2) {
+              toast.error('Unable to open preview - data too large');
+            }
+          }
         }}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
         
         <div className="flex flex-1 overflow-hidden relative">
-        {isMobile ? (
+        {activeTab === 'templates' ? (
+          <TemplateLibrary 
+            onSelectTemplate={(newQuestions, meta) => {
+              setQuestions(newQuestions);
+              setActiveQuestionId(newQuestions[0]?.id || "welcome");
+              setTemplateMeta(meta || null);
+              setActiveTab('content');
+              toast.success("Template applied successfully!");
+            }}
+          />
+        ) : activeTab === 'workflow' ? (
+          <WorkflowBuilder questions={questions} />
+        ) : isMobile ? (
           <>
             {/* Mobile: Drawers with trigger buttons */}
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
@@ -383,6 +586,7 @@ export const FormBuilder = () => {
               onToggleViewMode={() => {}} // No toggle on mobile
               isMobileResponsive={true}
               allQuestions={questions}
+              templateMeta={templateMeta}
               onNext={() => {
                 const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
                 if (currentIndex < questions.length - 1) {
@@ -403,19 +607,18 @@ export const FormBuilder = () => {
               onDeleteQuestion={deleteQuestion}
             />
             
-            <FormPreview
-              question={activeQuestion}
-              onUpdateQuestion={updateQuestion}
+            {/* Preview area with TextToolbar */}
+            <FormBuilderPreviewArea
               viewMode={viewMode}
-              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              isMobileResponsive={false}
-              allQuestions={questions}
-              onNext={() => {
-                const currentIndex = questions.findIndex(q => q.id === activeQuestionId);
-                if (currentIndex < questions.length - 1) {
-                  setActiveQuestionId(questions[currentIndex + 1].id);
-                }
-              }}
+              setViewMode={setViewMode}
+              activeQuestion={activeQuestion}
+              updateQuestion={updateQuestion}
+              questions={questions}
+              activeQuestionId={activeQuestionId}
+              setActiveQuestionId={setActiveQuestionId}
+              templateMeta={templateMeta}
+              editingField={editingField}
+              setEditingField={setEditingField}
             />
             
             <SettingsPanel 
@@ -432,6 +635,9 @@ export const FormBuilder = () => {
         onClose={() => setIsAddContentModalOpen(false)}
         onSelectElement={handleAddElement}
       />
+
+      {/* Floating Toolbar for text selection */}
+      <FloatingToolbar />
     </div>
   );
 };

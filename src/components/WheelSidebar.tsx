@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WheelConfig } from "./WheelBuilder";
-import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, GripVertical, MoreVertical, Copy, Trash2 } from "lucide-react";
+import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, GripVertical, MoreVertical, Copy, Trash2, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
 import { WheelBorderStyleSelector } from "@/components/ui/WheelBorderStyleSelector";
+import { ThemeStylePanel } from "@/components/ui/ThemeStylePanel";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,15 +18,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface Prize {
+  id: string;
+  name: string;
+  attributionMethod: 'probability' | 'calendar';
+  winProbability?: number;
+  assignedSegments?: string[];
+  status: 'active' | 'depleted' | 'scheduled';
+  remaining: number;
+}
+
 interface WheelSidebarProps {
   config: WheelConfig;
-  activeView: 'welcome' | 'contact' | 'wheel' | 'ending';
-  onViewSelect: (view: 'welcome' | 'contact' | 'wheel' | 'ending') => void;
+  activeView: 'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose';
+  onViewSelect: (view: 'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose') => void;
   onOpenSegmentsModal: () => void;
   onDuplicateSegment: (id: string) => void;
   onReorderSegments: (startIndex: number, endIndex: number) => void;
   onDeleteSegment: (id: string) => void;
   onGoToDotation: () => void;
+  prizes?: Prize[];
 }
 
 export const WheelSidebar = ({
@@ -37,12 +49,91 @@ export const WheelSidebar = ({
   onReorderSegments,
   onDeleteSegment,
   onGoToDotation,
+  prizes = [],
 }: WheelSidebarProps) => {
-  const { theme, updateTheme } = useTheme();
-  const borderColorInputRef = useRef<HTMLInputElement | null>(null);
-  const [isWheelSectionOpen, setIsWheelSectionOpen] = useState(false);
+  const { theme } = useTheme();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  // Vérifier si au moins un lot utilise la méthode probabilité
+  const hasProbabilityPrizes = prizes.some(p => 
+    p.attributionMethod === 'probability' && 
+    p.status === 'active' && 
+    p.remaining > 0
+  );
+
+  // Vérifier si au moins un lot utilise la méthode calendrier
+  const hasCalendarPrizes = prizes.some(p => 
+    p.attributionMethod === 'calendar' && 
+    p.status === 'active' && 
+    p.remaining > 0
+  );
+
+  // Calculer la probabilité de chaque segment basée sur les lots
+  const getSegmentProbability = (segmentId: string): number => {
+    // Filtrer les lots actifs avec probabilité
+    const activePrizes = prizes.filter(p => 
+      p.attributionMethod === 'probability' && 
+      p.status === 'active' && 
+      p.remaining > 0
+    );
+
+    if (activePrizes.length === 0) {
+      // Pas de lots probabilité configurés, répartition égale
+      return 100 / config.segments.length;
+    }
+
+    // Trouver les lots assignés à ce segment
+    const assignedPrizes = activePrizes.filter(p => 
+      p.assignedSegments?.includes(segmentId)
+    );
+
+    if (assignedPrizes.length > 0) {
+      // Somme des probabilités des lots assignés à ce segment
+      // divisée par le nombre de segments assignés à chaque lot
+      let totalProb = 0;
+      for (const prize of assignedPrizes) {
+        const assignedCount = prize.assignedSegments?.length || 1;
+        totalProb += (prize.winProbability || 0) / assignedCount;
+      }
+      return totalProb;
+    }
+
+    // Segment non assigné : calcul de la probabilité restante
+    const totalAssignedProb = activePrizes.reduce((sum, p) => sum + (p.winProbability || 0), 0);
+    const remainingProb = Math.max(0, 100 - totalAssignedProb);
+    
+    // Compter les segments non assignés
+    const assignedSegmentIds = new Set(activePrizes.flatMap(p => p.assignedSegments || []));
+    const unassignedSegments = config.segments.filter(s => !assignedSegmentIds.has(s.id));
+    
+    if (unassignedSegments.length > 0 && unassignedSegments.some(s => s.id === segmentId)) {
+      return remainingProb / unassignedSegments.length;
+    }
+
+    return 0;
+  };
+
+  // Obtenir les infos calendrier pour un segment
+  const getSegmentCalendarInfo = (segmentId: string): { hasCalendar: boolean; prizeName?: string; date?: string; time?: string } => {
+    const calendarPrize = prizes.find(p => 
+      p.attributionMethod === 'calendar' && 
+      p.status === 'active' && 
+      p.remaining > 0 &&
+      p.assignedSegments?.includes(segmentId)
+    );
+
+    if (calendarPrize) {
+      return {
+        hasCalendar: true,
+        prizeName: calendarPrize.name,
+        date: calendarPrize.calendarDate,
+        time: calendarPrize.calendarTime
+      };
+    }
+
+    return { hasCalendar: false };
+  };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     e.dataTransfer.effectAllowed = 'move';
@@ -79,7 +170,8 @@ export const WheelSidebar = ({
     { id: 'welcome' as const, label: 'Welcome', icon: Home },
     { id: 'contact' as const, label: 'Contact', icon: Mail },
     { id: 'wheel' as const, label: 'Roue', icon: Gift },
-    { id: 'ending' as const, label: 'Ending', icon: Award }
+    { id: 'ending-win' as const, label: 'Ending Gagnant', icon: Award },
+    { id: 'ending-lose' as const, label: 'Ending Perdant', icon: Award }
   ];
 
   return (
@@ -172,9 +264,32 @@ export const WheelSidebar = ({
                     <p className="text-xs text-foreground truncate">
                       {segment.label}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {segment.probability}%
-                    </p>
+                    {(() => {
+                      const calendarInfo = getSegmentCalendarInfo(segment.id);
+                      if (calendarInfo.hasCalendar) {
+                        // Afficher l'heure programmée pour les lots calendrier
+                        return (
+                          <p className="text-[10px] text-amber-600 flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5" />
+                            {calendarInfo.time || '--:--'}
+                          </p>
+                        );
+                      } else if (hasProbabilityPrizes) {
+                        // Afficher la probabilité pour les lots probabilité
+                        return (
+                          <p className="text-[10px] text-muted-foreground">
+                            {getSegmentProbability(segment.id).toFixed(0)}%
+                          </p>
+                        );
+                      } else {
+                        // Aucun lot configuré
+                        return (
+                          <p className="text-[10px] text-muted-foreground">
+                            --
+                          </p>
+                        );
+                      }
+                    })()}
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -206,151 +321,7 @@ export const WheelSidebar = ({
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
-          <ScrollArea className="h-[calc(100vh-140px)]">
-            <div className="p-3 space-y-4 pb-20">
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Typography</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Global font</Label>
-                    <Select value={theme.fontFamily} onValueChange={(value) => updateTheme({ fontFamily: value })}>
-                      <SelectTrigger className="h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="inter" className="text-xs">Inter</SelectItem>
-                        <SelectItem value="roboto" className="text-xs">Roboto</SelectItem>
-                        <SelectItem value="poppins" className="text-xs">Poppins</SelectItem>
-                        <SelectItem value="montserrat" className="text-xs">Montserrat</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Font size</Label>
-                    <div className="space-y-2">
-                      <input
-                        type="range"
-                        min="12"
-                        max="20"
-                        step="1"
-                        value={theme.fontSize}
-                        onChange={(e) => updateTheme({ fontSize: parseInt(e.target.value) })}
-                        className="w-full h-1.5 accent-primary cursor-pointer"
-                      />
-                      <div className="flex justify-between text-[10px] text-muted-foreground">
-                        <span>Small</span>
-                        <span>{theme.fontSize}px</span>
-                        <span>Large</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Colors</h3>
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Text color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.textColor} 
-                        onChange={(e) => updateTheme({ textColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.textColor}
-                        onChange={(e) => updateTheme({ textColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-2 block">Background color</Label>
-                    <div className="flex gap-2">
-                      <Input 
-                        type="color" 
-                        value={theme.backgroundColor}
-                        onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
-                        className="h-8 w-16" 
-                      />
-                      <Input 
-                        type="text" 
-                        value={theme.backgroundColor}
-                        onChange={(e) => updateTheme({ backgroundColor: e.target.value })}
-                        className="h-8 text-xs flex-1" 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {activeView === 'wheel' && (
-                <>
-                  <Separator />
-
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => setIsWheelSectionOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between mb-1 px-1 py-1 rounded-md hover:bg-muted/60 transition-colors"
-                    >
-                      <span className="text-sm font-semibold">Wheel</span>
-                      <span className="text-xs text-muted-foreground">
-                        {isWheelSectionOpen ? 'Masquer' : 'Afficher'}
-                      </span>
-                    </button>
-
-                    {isWheelSectionOpen && (
-                      <div className="space-y-2 mt-1">
-                        <Label className="text-xs text-muted-foreground mb-1 block">Border style</Label>
-                        <WheelBorderStyleSelector
-                          value={theme.wheelBorderStyle}
-                          onChange={(value) => {
-                            updateTheme({ wheelBorderStyle: value });
-                            if (value === 'classic') {
-                              // Ouvrir automatiquement le color picker natif
-                              setTimeout(() => {
-                                if (borderColorInputRef.current) {
-                                  borderColorInputRef.current.click();
-                                }
-                              }, 0);
-                            }
-                          }}
-                        />
-                        {theme.wheelBorderStyle === 'classic' && (
-                          <div className="mt-2 space-y-1">
-                            <Label className="text-xs text-muted-foreground mb-1 block">Border color</Label>
-                            <div className="flex items-center gap-2">
-                              <Input
-                                ref={borderColorInputRef}
-                                type="color"
-                                value={theme.wheelBorderCustomColor || '#d4d4d8'}
-                                onChange={(e) => updateTheme({ wheelBorderCustomColor: e.target.value })}
-                                className="h-7 w-10 p-0"
-                              />
-                              <Input
-                                type="text"
-                                value={theme.wheelBorderCustomColor || '#d4d4d8'}
-                                onChange={(e) => updateTheme({ wheelBorderCustomColor: e.target.value })}
-                                className="h-7 text-[11px] flex-1 font-mono"
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-          </ScrollArea>
+          <ThemeStylePanel />
         </TabsContent>
       </Tabs>
     </div>

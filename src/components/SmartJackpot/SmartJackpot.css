@@ -1,0 +1,120 @@
+.smart-jackpot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.jackpot-frame {
+  position: relative;
+  /* Enlarged to better match Wheel preview presence */
+  width: 520px;
+  height: 360px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jackpot-frame-modern {
+  border-radius: 6px;
+  background-size: cover;
+  width: 330px;  /* 25% larger than 264 */
+  height: 130px; /* ~15% less than 153 to further reduce top/bottom band */
+  padding: 3px 12px; /* adjust gap to stay thin */
+}
+
+.modern-inner {
+  border-radius: 6px;
+  padding: 10px 10px; /* slightly reduced again (~3% more) */
+  display: inline-flex;
+}
+
+.reels-container {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  /* Move the slots lower inside the template without touching the frame */
+  transform: translateY(43%);
+}
+
+/* For the Modern template, we want a more compact layout without the big vertical shift */
+.template-jackpot-6 .reels-container {
+  padding: 6px 16px;
+  transform: translateY(0);
+}
+
+/* Chaque reel agit maintenant comme une fenêtre masquée pour une bande verticale de symboles */
+.reel {
+  width: 80px;
+  height: 80px; /* doit matcher SLOT_HEIGHT dans le TS */
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    0 3px 10px rgba(0, 0, 0, 0.12),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.reel-strip {
+  display: flex;
+  flex-direction: column;
+}
+
+.symbol-wrapper {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* For some templates we want only the icons without white slot background */
+.template-jackpot-2 .reel,  /* Classic Gold */
+.template-jackpot-3 .reel,  /* Neon Glow */
+.template-jackpot-9 .reel { /* Cyber */
+  background: transparent;
+  box-shadow: none;
+}
+
+.symbol {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.symbol-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.spin-button {
+  padding: 16px 48px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #3D3731;
+  background: linear-gradient(145deg, #F5CA3C, #F5B800);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(245, 184, 0, 0.3);
+}
+
+.spin-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 184, 0, 0.4);
+}
+
+.spin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spin-button:active:not(:disabled) {
+  transform: translateY(0);
+}

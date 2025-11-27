@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { FormPreview } from "@/components/FormPreview";
 import { Question } from "@/components/FormBuilder";
 import { ThemeProvider, ThemeSettings } from "@/contexts/ThemeContext";
-import { ChevronLeft } from "lucide-react";
+import { FormPreview } from "@/components/FormPreview";
 
 const PreviewContent = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -10,18 +9,33 @@ const PreviewContent = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   useEffect(() => {
-    // Récupérer les données depuis localStorage
     const storedQuestions = localStorage.getItem('preview-questions');
-    const storedViewMode = localStorage.getItem('preview-viewMode');
+    
+    // Détecter si on est sur mobile (largeur < 768px)
+    const isMobileDevice = window.innerWidth < 768;
     
     if (storedQuestions) {
       setQuestions(JSON.parse(storedQuestions));
     }
     
-    if (storedViewMode) {
-      setViewMode(storedViewMode as 'desktop' | 'mobile');
+    // Forcer le mode mobile si on est sur un appareil mobile
+    if (isMobileDevice) {
+      setViewMode('mobile');
+    } else {
+      const storedViewMode = localStorage.getItem('preview-viewMode');
+      if (storedViewMode) {
+        setViewMode(storedViewMode as 'desktop' | 'mobile');
+      }
     }
   }, []);
+
+  if (questions.length === 0) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
+        <p className="text-white">Chargement...</p>
+      </div>
+    );
+  }
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
@@ -29,41 +43,15 @@ const PreviewContent = () => {
     }
   };
 
-  const handleUpdateQuestion = () => {
-    // No-op dans la prévisualisation
-  };
-
-  if (questions.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <div className="text-center">
-          <p className="text-lg text-gray-600">Chargement de la prévisualisation...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex items-center justify-center h-screen relative bg-gray-100">
-      <button
-        onClick={() => window.close()}
-        className="absolute top-4 left-4 z-50 px-4 py-2 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
-        style={{
-          backgroundColor: '#4A4138',
-          border: '1px solid rgba(245, 184, 0, 0.3)',
-          color: '#F5CA3C'
-        }}
-      >
-        <ChevronLeft className="w-4 h-4" />
-        <span className="text-xs font-medium">Fermer</span>
-      </button>
-      
+    <div className="fixed inset-0 w-screen h-screen overflow-hidden">
       <FormPreview
         question={questions[currentIndex]}
-        onUpdateQuestion={handleUpdateQuestion}
+        onUpdateQuestion={() => {}}
         viewMode={viewMode}
-        onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-        isMobileResponsive={false}
+        onToggleViewMode={() => {}}
+        isMobileResponsive={true}
+        isReadOnly={true}
         allQuestions={questions}
         onNext={handleNext}
       />
@@ -73,13 +61,23 @@ const PreviewContent = () => {
 
 const Preview = () => {
   const [initialTheme, setInitialTheme] = useState<ThemeSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('preview-theme');
     if (storedTheme) {
       setInitialTheme(JSON.parse(storedTheme));
     }
+    setIsLoading(false);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
+        <p className="text-white">Chargement...</p>
+      </div>
+    );
+  }
 
   return (
     <ThemeProvider initialTheme={initialTheme}>

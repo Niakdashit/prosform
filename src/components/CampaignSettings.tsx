@@ -5,36 +5,45 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Gift, Upload, Eye, Save, Trash2, Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Gift, Upload, Eye, Save, Trash2, Calendar, Percent } from "lucide-react";
 import { useState, useEffect } from "react";
 import { PrizeModal } from "./PrizeModal";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Prize } from "./WheelBuilder";
 
+interface JackpotSymbol {
+  id: string;
+  emoji: string;
+  label: string;
+  prizeId?: string;
+}
+
 interface CampaignSettingsProps {
   defaultTab?: string;
   prizes: Prize[];
   onSavePrize: (prize: Prize) => void;
   onDeletePrize: (id: string) => void;
+  gameType?: 'scratch' | 'wheel' | 'jackpot';
+  segments: Array<{ id: string; label: string }>;
+  symbols?: JackpotSymbol[]; // Pour Jackpot uniquement
+  onAddSymbol?: (emoji: string) => void; // Pour ajouter un symbole depuis le modal
 }
 
 export const CampaignSettings = ({ 
   defaultTab = "canaux",
   prizes,
   onSavePrize,
-  onDeletePrize
+  onDeletePrize,
+  gameType = 'wheel',
+  segments,
+  symbols = [],
+  onAddSymbol,
 }: CampaignSettingsProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [prizeModalOpen, setPrizeModalOpen] = useState(false);
   const [editingPrize, setEditingPrize] = useState<Prize | null>(null);
-
-  // Segments factices pour l'exemple
-  const segments = [
-    { id: 'seg-1', label: '10% de réduction' },
-    { id: 'seg-2', label: 'Livraison gratuite' },
-    { id: 'seg-3', label: '20% de réduction' },
-  ];
 
   useEffect(() => {
     if (defaultTab) {
@@ -297,10 +306,10 @@ export const CampaignSettings = ({
                                         Calendrier
                                       </Badge>
                                     )}
-                                    {prize.attributionMethod === 'instant' && (
+                                    {prize.attributionMethod === 'probability' && (
                                       <Badge variant="secondary" className="gap-1">
-                                        <Gift className="w-3 h-3" />
-                                        Instantané
+                                        <Percent className="w-3 h-3" />
+                                        Probabilité {prize.winProbability ? `(${prize.winProbability}%)` : ''}
                                       </Badge>
                                     )}
                                   </div>
@@ -356,10 +365,85 @@ export const CampaignSettings = ({
                     <details className="mt-6 border rounded-lg" open>
                       <summary className="px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors flex items-center gap-2">
                         <Eye className="w-4 h-4" />
-                        <span className="text-sm font-medium">Paramètres avancés</span>
+                        <span className="text-sm font-medium">Paramètres avancés (campagne)</span>
                       </summary>
-                      <div className="p-4 border-t text-sm text-muted-foreground">
-                        Les paramètres avancés sont configurés individuellement pour chaque lot
+                      <div className="p-4 border-t space-y-6 text-sm">
+                        <div>
+                          <Label>Ordre de priorité des lots</Label>
+                          <Select defaultValue="1">
+                            <SelectTrigger className="mt-1.5">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">Séquentiel (ordre défini)</SelectItem>
+                              <SelectItem value="2">Aléatoire</SelectItem>
+                              <SelectItem value="3">Par priorité</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Définit l'ordre global dans lequel les lots sont proposés aux participants.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>Max gains par IP</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              placeholder="Illimité"
+                              className="mt-1.5"
+                            />
+                          </div>
+
+                          <div>
+                            <Label>Max gains par email</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              placeholder="Illimité"
+                              className="mt-1.5"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>Max gains par appareil</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              placeholder="Illimité"
+                              className="mt-1.5"
+                            />
+                          </div>
+
+                          <div>
+                            <Label>Période de vérification (heures)</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              placeholder="24"
+                              className="mt-1.5"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Checkbox id="notifyWin-global" />
+                            <Label htmlFor="notifyWin-global" className="text-sm">
+                              Notifier l'administrateur en cas de gain
+                            </Label>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Checkbox id="notifyDepletion-global" />
+                            <Label htmlFor="notifyDepletion-global" className="text-sm">
+                              Notifier lorsque la dotation est épuisée
+                            </Label>
+                          </div>
+                        </div>
                       </div>
                     </details>
                   </div>
@@ -520,13 +604,16 @@ export const CampaignSettings = ({
         </div>
       </div>
 
-      <PrizeModal
-        open={prizeModalOpen}
-        onOpenChange={setPrizeModalOpen}
-        prize={editingPrize}
-        onSave={handleSavePrize}
-        segments={segments}
-      />
+          <PrizeModal 
+            open={prizeModalOpen}
+            onOpenChange={setPrizeModalOpen}
+            prize={editingPrize}
+            onSave={handleSavePrize}
+            segments={segments}
+            gameType={gameType}
+            symbols={symbols}
+            onAddSymbol={onAddSymbol}
+          />
     </div>
   );
 };

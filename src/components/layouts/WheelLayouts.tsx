@@ -1,7 +1,7 @@
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import SmartWheel from "@/components/SmartWheel/SmartWheel";
 import { WheelSegment } from "@/components/WheelBuilder";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 
 interface WheelLayoutProps {
   layout: DesktopLayoutType | MobileLayoutType;
@@ -34,6 +34,7 @@ export const WheelLayouts = ({
 }: WheelLayoutProps) => {
 
   const { theme } = useTheme();
+  const unifiedButtonStyles = getButtonStyles(theme);
 
   const resolveBorderStyle = (style: typeof theme.wheelBorderStyle) => {
     if (style === 'gold') return 'goldRing';
@@ -95,14 +96,14 @@ export const WheelLayouts = ({
         theme="modern"
         size={getWheelSize()}
         brandColors={{
-          primary: buttonColor,
+          primary: theme.primaryColor,
           secondary: '#ffffff',
-          accent: buttonColor
+          accent: theme.primaryColor
         }}
         customButton={{
           text: 'TOURNER',
-          color: buttonColor,
-          textColor: textColor
+          color: theme.buttonColor,
+          textColor: theme.buttonTextColor
         }}
         borderStyle={resolveBorderStyle(theme.wheelBorderStyle as any) as any}
         customBorderColor={

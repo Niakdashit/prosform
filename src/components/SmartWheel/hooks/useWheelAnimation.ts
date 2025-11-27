@@ -6,6 +6,9 @@ const BASE_ROTATION = 1080; // 3 full rotations
 const POINTER_ANGLE_DEG = -90; // Pointer is at top (-90 degrees)
 const EPSILON = 0.0001; // Small offset to avoid landing exactly on the edge
 
+// Variable globale pour conserver la rotation finale entre les re-renders/remontages
+let globalFinalRotation: number | null = null;
+
 // Types
 interface UseWheelAnimationProps {
   segments: WheelSegment[];
@@ -62,13 +65,24 @@ export const useWheelAnimation = (props: UseWheelAnimationProps) => {
     forcedSegmentId = null
   } = props;
 
-  // State for wheel animation
-  const [wheelState, setWheelState] = useState<WheelState>({
+  // State for wheel animation - utiliser la rotation finale globale si elle existe
+  const [wheelState, setWheelState] = useState<WheelState>(() => ({
     isSpinning: false,
-    rotation: 0,
-    targetRotation: 0,
+    rotation: globalFinalRotation ?? 0,
+    targetRotation: globalFinalRotation ?? 0,
     currentSegment: null
-  });
+  }));
+  
+  // Synchroniser avec la rotation globale au montage si disabled
+  useEffect(() => {
+    if (disabled && globalFinalRotation !== null) {
+      setWheelState(prev => ({
+        ...prev,
+        rotation: globalFinalRotation!,
+        targetRotation: globalFinalRotation!
+      }));
+    }
+  }, [disabled]);
 
   // Refs for animation and state management
   const animationRef = useRef<number | null>(null);
@@ -256,7 +270,9 @@ export const useWheelAnimation = (props: UseWheelAnimationProps) => {
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        // Animation complete
+        // Animation complete - sauvegarder la rotation finale dans la variable globale
+        globalFinalRotation = targetRotationRef.current;
+        
         setWheelState(prev => ({
           ...prev,
           isSpinning: false,
@@ -355,4 +371,9 @@ export const useWheelAnimation = (props: UseWheelAnimationProps) => {
     spin,
     reset
   }), [wheelState, spin, reset]);
+};
+
+// Fonction utilitaire pour réinitialiser la rotation globale (pour un nouveau jeu)
+export const resetGlobalWheelRotation = () => {
+  globalFinalRotation = null;
 };

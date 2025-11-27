@@ -3,8 +3,8 @@ import { Eye, Share2, Settings, Palette, Smartphone, RotateCcw, Gift } from "luc
 
 interface WheelTopToolbarProps {
   onPreview: () => void;
-  activeTab: 'design' | 'campaign';
-  onTabChange: (tab: 'design' | 'campaign') => void;
+  activeTab: 'design' | 'campaign' | 'templates';
+  onTabChange: (tab: 'design' | 'campaign' | 'templates') => void;
 }
 
 export const WheelTopToolbar = ({ onPreview, activeTab, onTabChange }: WheelTopToolbarProps) => {
@@ -18,7 +18,7 @@ export const WheelTopToolbar = ({ onPreview, activeTab, onTabChange }: WheelTopT
           onClick={() => onTabChange('design')}
         >
           <Palette className="w-3.5 h-3.5" />
-          Design
+          Campagne
         </Button>
         <Button 
           variant="ghost" 
@@ -28,6 +28,15 @@ export const WheelTopToolbar = ({ onPreview, activeTab, onTabChange }: WheelTopT
         >
           <Gift className="w-3.5 h-3.5" />
           Paramètres et dotations
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className={`gap-1.5 h-8 text-xs px-2.5 ${activeTab === 'templates' ? 'bg-accent' : ''}`}
+          onClick={() => onTabChange('templates')}
+        >
+          <Palette className="w-3.5 h-3.5" />
+          Templates
         </Button>
       </div>
 

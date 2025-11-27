@@ -45,8 +45,9 @@ export interface SmartWheelProps {
   /** When true, disables the pointer wobble/click animation */
   disablePointerAnimation?: boolean;
   onSpin?: () => void;
+  onBeforeSpin?: () => string | null; // Callback appelé avant le spin, retourne l'ID du segment à forcer
   onResult?: (segment: WheelSegment) => void;
-  onComplete?: (prize: string) => void; // Callback quand le jeu est terminé
+  onComplete?: (prize: string | null, segmentId?: string) => void; // Callback quand le jeu est terminé
   onShowParticipationModal?: () => void; // Callback pour ouvrir le modal de participation au niveau supérieur
   brandColors?: {
     primary: string;

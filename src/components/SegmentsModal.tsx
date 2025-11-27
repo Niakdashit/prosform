@@ -2,11 +2,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, GripVertical, Image as ImageIcon, X, Gift } from "lucide-react";
+import { Plus, Trash2, GripVertical, Image as ImageIcon, X } from "lucide-react";
 import { WheelSegment, Prize } from "./WheelBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRef } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SegmentsModalProps {
   open: boolean;
@@ -29,12 +28,6 @@ export const SegmentsModal = ({
 }: SegmentsModalProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentSegmentIdRef = useRef<string | null>(null);
-
-  // Liste de lots disponibles basée sur les vrais prizes
-  const availablePrizes = [
-    { id: "none", name: "Aucun lot" },
-    ...prizes.map(prize => ({ id: prize.id, name: prize.name }))
-  ];
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -146,41 +139,6 @@ export const SegmentsModal = ({
                   </div>
                 </div>
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">
-                    Probabilité: {segment.probability}%
-                  </Label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={segment.probability || 0}
-                    onChange={(e) => onUpdateSegment(segment.id, { probability: parseInt(e.target.value) })}
-                    className="w-full h-2 accent-primary cursor-pointer"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 flex items-center gap-1.5">
-                    <Gift className="w-3.5 h-3.5" />
-                    Lot associé
-                  </Label>
-                  <Select 
-                    value={(segment as any).prizeId || "none"} 
-                    onValueChange={(value) => onUpdateSegment(segment.id, { prizeId: value } as any)}
-                  >
-                    <SelectTrigger className="h-9 text-sm">
-                      <SelectValue placeholder="Sélectionner un lot" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availablePrizes.map((prize) => (
-                        <SelectItem key={prize.id} value={prize.id} className="text-sm">
-                          {prize.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             ))}
           </div>

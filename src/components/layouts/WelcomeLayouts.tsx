@@ -2,6 +2,18 @@ import { ReactNode } from "react";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
+import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
+import { EditableTextBlock } from "../EditableTextBlock";
+
+interface TextStyle {
+  fontFamily?: string;
+  fontSize?: number;
+  textColor?: string;
+  isBold?: boolean;
+  isItalic?: boolean;
+  isUnderline?: boolean;
+  textAlign?: 'left' | 'center' | 'right';
+}
 
 interface WelcomeLayoutProps {
   layout: DesktopLayoutType | MobileLayoutType;
@@ -19,6 +31,10 @@ interface WelcomeLayoutProps {
   onFocusSubtitle?: () => void;
   onBlurTitle?: (value: string) => void;
   onBlurSubtitle?: (value: string) => void;
+  onChangeTitle?: (value: string, html?: string) => void;
+  onChangeSubtitle?: (value: string, html?: string) => void;
+  onClearTitle?: () => void;
+  onClearSubtitle?: () => void;
   showVariableMenu?: boolean;
   variableTarget?: 'title' | 'subtitle' | null;
   menuView?: 'main' | 'variables';
@@ -26,6 +42,8 @@ interface WelcomeLayoutProps {
   onSetMenuView?: (view: 'main' | 'variables') => void;
   availableVariables?: Array<{ key: string; label: string; description: string }>;
   onInsertVariable?: (variableKey: string) => void;
+  titleStyle?: TextStyle;
+  subtitleStyle?: TextStyle;
 }
 
 export const WelcomeLayouts = ({
@@ -44,213 +62,84 @@ export const WelcomeLayouts = ({
   onFocusSubtitle,
   onBlurTitle,
   onBlurSubtitle,
+  onChangeTitle,
+  onChangeSubtitle,
+  onClearTitle,
+  onClearSubtitle,
   showVariableMenu,
   variableTarget,
   menuView,
   onToggleVariableMenu,
   onSetMenuView,
   availableVariables = [],
-  onInsertVariable
+  onInsertVariable,
+  titleStyle,
+  subtitleStyle
 }: WelcomeLayoutProps) => {
+  const { theme } = useTheme();
+  const unifiedButtonStyles = getButtonStyles(theme);
+
+  // Build style objects from titleStyle/subtitleStyle
+  const getTitleStyles = (): React.CSSProperties => ({
+    color: titleStyle?.textColor || textColor,
+    fontFamily: titleStyle?.fontFamily || 'inherit',
+    fontSize: titleStyle?.fontSize ? `${titleStyle.fontSize}px` : undefined,
+    fontWeight: titleStyle?.isBold ? 'bold' : undefined,
+    fontStyle: titleStyle?.isItalic ? 'italic' : undefined,
+    textDecoration: titleStyle?.isUnderline ? 'underline' : undefined,
+    textAlign: titleStyle?.textAlign || 'center',
+  });
+
+  const getSubtitleStyles = (): React.CSSProperties => ({
+    color: subtitleStyle?.textColor || textColor,
+    fontFamily: subtitleStyle?.fontFamily || 'inherit',
+    fontSize: subtitleStyle?.fontSize ? `${subtitleStyle.fontSize}px` : undefined,
+    fontWeight: subtitleStyle?.isBold ? 'bold' : undefined,
+    fontStyle: subtitleStyle?.isItalic ? 'italic' : undefined,
+    textDecoration: subtitleStyle?.isUnderline ? 'underline' : undefined,
+    textAlign: subtitleStyle?.textAlign || 'center',
+    opacity: 0.9,
+  });
 
   const renderContent = () => (
     <div className="text-center w-full max-w-[700px]">
-      <div className="relative">
-        {editingField === 'welcome-title' && (
-          <>
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => onToggleVariableMenu?.('title')}
-              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-              style={{ 
-                backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                color: '#F5B800',
-                backdropFilter: 'blur(8px)'
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-            </button>
-
-            {showVariableMenu && variableTarget === 'title' && (
-              <div
-                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                style={{
-                  top: '32px',
-                  right: 0,
-                  backgroundColor: '#4A4138',
-                  border: '1px solid rgba(245, 184, 0, 0.3)',
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                }}
-              >
-                {menuView === 'main' ? (
-                  <div className="space-y-1">
-                    <button
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => console.log('Réécriture AI')}
-                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                    >
-                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l&apos;IA</div>
-                    </button>
-                    <button
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => onSetMenuView?.('variables')}
-                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                    >
-                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    <button
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => onSetMenuView?.('main')}
-                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                    >
-                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                    </button>
-                    {availableVariables.map((variable) => (
-                      <button
-                        key={variable.key}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => onInsertVariable?.(variable.key)}
-                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                      >
-                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
-
-        <h1 
-          className="text-4xl md:text-5xl font-bold mb-4 cursor-text hover:opacity-80 transition-opacity"
-          style={{ 
-            color: textColor,
-            outline: editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
-            padding: '4px',
-            marginTop: '-4px',
-            marginLeft: '-4px',
-            marginRight: '-4px',
-            borderRadius: '4px'
-          }}
-          contentEditable
-          suppressContentEditableWarning
-          onFocus={onFocusTitle}
-          onBlur={(e) => onBlurTitle?.(e.currentTarget.textContent || '')}
-        >
-          {title}
-        </h1>
-      </div>
+      <EditableTextBlock
+        value={title}
+        onChange={(value, html) => onChangeTitle?.(value, html)}
+        onClear={() => onClearTitle?.()}
+        onSparklesClick={() => onToggleVariableMenu?.('title')}
+        className="text-4xl md:text-5xl font-bold mb-4"
+        style={getTitleStyles()}
+        isEditing={editingField === 'welcome-title'}
+        onFocus={onFocusTitle}
+        onBlur={() => onBlurTitle?.(title)}
+        showSparkles={true}
+        showClear={true}
+        fieldType="title"
+      />
       
-      <div className="relative">
-        {editingField === 'welcome-subtitle' && (
-          <>
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => onToggleVariableMenu?.('subtitle')}
-              className="absolute -top-3 right-0 w-7 h-7 rounded-md transition-all hover:scale-110 flex items-center justify-center z-50 animate-fade-in"
-              style={{ 
-                backgroundColor: 'rgba(245, 184, 0, 0.15)',
-                color: '#F5B800',
-                backdropFilter: 'blur(8px)'
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-            </button>
-
-            {showVariableMenu && variableTarget === 'subtitle' && (
-              <div
-                className="absolute z-50 w-72 p-2 rounded-md shadow-xl animate-fade-in"
-                style={{
-                  top: '32px',
-                  right: 0,
-                  backgroundColor: '#4A4138',
-                  border: '1px solid rgba(245, 184, 0, 0.3)',
-                  boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                }}
-              >
-                {menuView === 'main' ? (
-                  <div className="space-y-1">
-                    <button
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => console.log('Réécriture AI')}
-                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                    >
-                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Réécriture</div>
-                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Améliorer le texte avec l&apos;IA</div>
-                    </button>
-                    <button
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => onSetMenuView?.('variables')}
-                      className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                    >
-                      <div className="font-medium text-sm" style={{ color: '#F5B800' }}>Variable</div>
-                      <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>Insérer une variable dynamique</div>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    <button
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => onSetMenuView?.('main')}
-                      className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-white/10 mb-2"
-                    >
-                      <div className="text-xs" style={{ color: '#A89A8A' }}>← Retour</div>
-                    </button>
-                    {availableVariables.map((variable) => (
-                      <button
-                        key={variable.key}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => onInsertVariable?.(variable.key)}
-                        className="w-full text-left px-3 py-2.5 rounded-lg transition-colors hover:bg-white/10"
-                      >
-                        <div className="font-medium text-sm" style={{ color: '#F5B800' }}>{variable.label}</div>
-                        <div className="text-xs mt-0.5" style={{ color: '#A89A8A' }}>{variable.description} • {`{{${variable.key}}}`}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
-
-        <p 
-          className="text-lg md:text-xl mb-8 cursor-text hover:opacity-80 transition-opacity"
-          style={{ 
-            color: textColor, 
-            opacity: 0.9,
-            outline: editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
-            padding: '4px',
-            marginTop: '-4px',
-            marginLeft: '-4px',
-            marginRight: '-4px',
-            borderRadius: '4px'
-          }}
-          contentEditable
-          suppressContentEditableWarning
-          onFocus={onFocusSubtitle}
-          onBlur={(e) => onBlurSubtitle?.(e.currentTarget.textContent || '')}
-        >
-          {subtitle}
-        </p>
-      </div>
+      <EditableTextBlock
+        value={subtitle}
+        onChange={(value, html) => onChangeSubtitle?.(value, html)}
+        onClear={() => onClearSubtitle?.()}
+        onSparklesClick={() => onToggleVariableMenu?.('subtitle')}
+        className="text-lg md:text-xl mb-8"
+        style={getSubtitleStyles()}
+        isEditing={editingField === 'welcome-subtitle'}
+        onFocus={onFocusSubtitle}
+        onBlur={() => onBlurSubtitle?.(subtitle)}
+        showSparkles={true}
+        showClear={true}
+        fieldType="subtitle"
+      />
       
-      <Button 
+      <button 
         onClick={onButtonClick}
-        className="h-12 px-8 text-lg"
-        style={{ backgroundColor: buttonColor, color: textColor }}
+        className="flex items-center justify-center font-medium transition-all hover:opacity-90"
+        style={unifiedButtonStyles}
       >
         {buttonText}
-      </Button>
+      </button>
     </div>
   );
 

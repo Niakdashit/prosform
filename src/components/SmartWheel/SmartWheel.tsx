@@ -15,6 +15,7 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
   disabled = false,
   disablePointerAnimation,
   onSpin,
+  onBeforeSpin,
   onResult,
   onComplete,
   onShowParticipationModal,
@@ -172,7 +173,7 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
         });
         
         const prizeLabel = isWinningSegment ? (result?.label || result?.id || 'prize') : null;
-        onComplete(prizeLabel);
+        onComplete(prizeLabel, result?.id);
       }, 2000);
     }
   };
@@ -255,8 +256,16 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
     
     let forcedSegment: string | null = null;
     
-    // Si le système de dotation est activé, déterminer le segment avant de lancer le spin
-    if (useDotationSystem && campaign?.id && participantEmail) {
+    // PRIORITÉ 1: Si onBeforeSpin est fourni, l'appeler pour obtenir le segment à forcer
+    if (onBeforeSpin) {
+      const segmentToForce = onBeforeSpin();
+      if (segmentToForce) {
+        forcedSegment = segmentToForce;
+        console.log('🎯 [SmartWheel] Segment forcé via onBeforeSpin:', segmentToForce);
+      }
+    }
+    // PRIORITÉ 2: Si le système de dotation est activé, déterminer le segment avant de lancer le spin
+    else if (useDotationSystem && campaign?.id && participantEmail) {
       try {
         console.log('🎯 [SmartWheel] Using dotation system');
         

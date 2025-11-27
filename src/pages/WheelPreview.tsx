@@ -6,56 +6,90 @@ import { WheelPreview } from "@/components/WheelPreview";
 const WheelPreviewContent = () => {
   const [config, setConfig] = useState<WheelConfig | null>(null);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending'>('welcome');
+  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
 
   useEffect(() => {
     const savedConfig = localStorage.getItem('wheel-config');
-    const savedViewMode = localStorage.getItem('wheel-viewMode');
+    
+    // Détecter si on est sur mobile (largeur < 768px)
+    const isMobileDevice = window.innerWidth < 768;
     
     if (savedConfig) {
       setConfig(JSON.parse(savedConfig));
     }
-    if (savedViewMode) {
-      setViewMode(savedViewMode as 'desktop' | 'mobile');
+    
+    // Forcer le mode mobile si on est sur un appareil mobile
+    if (isMobileDevice) {
+      setViewMode('mobile');
+    } else {
+      const savedViewMode = localStorage.getItem('wheel-viewMode');
+      if (savedViewMode) {
+        setViewMode(savedViewMode as 'desktop' | 'mobile');
+      }
     }
   }, []);
 
   if (!config) {
     return (
-      <div className="flex items-center justify-center h-screen bg-muted">
-        <p className="text-muted-foreground">Loading...</p>
+      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
+        <p className="text-white">Chargement...</p>
       </div>
     );
   }
 
+  const handleNext = () => {
+    if (activeView === 'welcome') {
+      if (config.contactForm?.enabled) {
+        setActiveView('contact');
+      } else {
+        setActiveView('wheel');
+      }
+    } else if (activeView === 'contact') {
+      setActiveView('wheel');
+    }
+  };
+
+  const handleGoToEnding = (isWin: boolean) => {
+    setActiveView(isWin ? 'ending-win' : 'ending-lose');
+  };
+
   return (
-    <WheelPreview
-      config={config}
-      activeView={activeView}
-      onUpdateConfig={(updates) => setConfig(prev => prev ? { ...prev, ...updates } : null)}
-      viewMode={viewMode}
-      onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-      isMobileResponsive={true}
-      onNext={() => {
-        const views: Array<'welcome' | 'contact' | 'wheel' | 'ending'> = ['welcome', 'contact', 'wheel', 'ending'];
-        const currentIndex = views.indexOf(activeView);
-        if (currentIndex < views.length - 1) {
-          setActiveView(views[currentIndex + 1]);
-        }
-      }}
-    />
+    <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+      <WheelPreview
+        config={config}
+        activeView={activeView}
+        onUpdateConfig={() => {}}
+        viewMode={viewMode}
+        onToggleViewMode={() => {}}
+        isMobileResponsive={true}
+        isReadOnly={true}
+        onNext={handleNext}
+        onGoToEnding={handleGoToEnding}
+        prizes={[]}
+      />
+    </div>
   );
 };
 
 const WheelPreviewPage = () => {
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('wheel-theme');
     if (savedTheme) {
       setTheme(JSON.parse(savedTheme));
     }
+    setIsLoading(false);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
+        <p className="text-white">Chargement...</p>
+      </div>
+    );
+  }
 
   return (
     <ThemeProvider initialTheme={theme}>

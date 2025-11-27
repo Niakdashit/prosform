@@ -15,7 +15,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 interface WheelSettingsPanelProps {
   config: WheelConfig;
-  activeView: 'welcome' | 'contact' | 'wheel' | 'ending';
+  activeView: 'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose';
   onUpdateConfig: (updates: Partial<WheelConfig>) => void;
   onUpdateSegment: (id: string, updates: Partial<WheelSegment>) => void;
   onViewModeChange?: (mode: 'desktop' | 'mobile') => void;
@@ -28,7 +28,7 @@ export const WheelSettingsPanel = ({
   onUpdateSegment 
 }: WheelSettingsPanelProps) => {
   const [wallpaperModalOpen, setWallpaperModalOpen] = useState(false);
-  const [activeWallpaperSection, setActiveWallpaperSection] = useState<'welcome' | 'contact' | 'wheel' | 'ending'>('welcome');
+  const [activeWallpaperSection, setActiveWallpaperSection] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   
   const handleWallpaperSelect = (imageUrl: string) => {
     switch (activeWallpaperSection) {
@@ -41,13 +41,16 @@ export const WheelSettingsPanel = ({
       case 'wheel':
         onUpdateConfig({ wheelScreen: { ...config.wheelScreen, wallpaperImage: imageUrl } });
         break;
-      case 'ending':
-        onUpdateConfig({ endingScreen: { ...config.endingScreen, wallpaperImage: imageUrl } });
+      case 'ending-win':
+        onUpdateConfig({ endingWin: { ...config.endingWin, wallpaperImage: imageUrl } });
+        break;
+      case 'ending-lose':
+        onUpdateConfig({ endingLose: { ...config.endingLose, wallpaperImage: imageUrl } });
         break;
     }
   };
 
-  const handleRemoveWallpaper = (section: 'welcome' | 'contact' | 'wheel' | 'ending') => {
+  const handleRemoveWallpaper = (section: 'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose') => {
     switch (section) {
       case 'welcome':
         onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, wallpaperImage: undefined } });
@@ -58,8 +61,11 @@ export const WheelSettingsPanel = ({
       case 'wheel':
         onUpdateConfig({ wheelScreen: { ...config.wheelScreen, wallpaperImage: undefined } });
         break;
-      case 'ending':
-        onUpdateConfig({ endingScreen: { ...config.endingScreen, wallpaperImage: undefined } });
+      case 'ending-win':
+        onUpdateConfig({ endingWin: { ...config.endingWin, wallpaperImage: undefined } });
+        break;
+      case 'ending-lose':
+        onUpdateConfig({ endingLose: { ...config.endingLose, wallpaperImage: undefined } });
         break;
     }
   };
@@ -72,8 +78,10 @@ export const WheelSettingsPanel = ({
         return config.contactForm.wallpaperImage;
       case 'wheel':
         return config.wheelScreen.wallpaperImage;
-      case 'ending':
-        return config.endingScreen.wallpaperImage;
+      case 'ending-win':
+        return config.endingWin.wallpaperImage;
+      case 'ending-lose':
+        return config.endingLose.wallpaperImage;
     }
   };
   
@@ -478,19 +486,19 @@ export const WheelSettingsPanel = ({
           </div>
         );
 
-      case 'ending':
+      case 'ending-win':
         return (
           <div className="space-y-4">
             <div className="space-y-3">
               <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
               <LayoutSelector
-                desktopLayout={config.endingScreen.desktopLayout}
-                mobileLayout={config.endingScreen.mobileLayout}
+                desktopLayout={config.endingWin.desktopLayout}
+                mobileLayout={config.endingWin.mobileLayout}
                 onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  endingScreen: { ...config.endingScreen, desktopLayout: layout }
+                  endingWin: { ...config.endingWin, desktopLayout: layout }
                 })}
                 onMobileLayoutChange={(layout) => onUpdateConfig({
-                  endingScreen: { ...config.endingScreen, mobileLayout: layout }
+                  endingWin: { ...config.endingWin, mobileLayout: layout }
                 })}
               />
             </div>
@@ -501,9 +509,9 @@ export const WheelSettingsPanel = ({
               <Label className="text-xs text-muted-foreground mb-2 block">Title</Label>
               <Input 
                 type="text" 
-                value={config.endingScreen.title}
+                value={config.endingWin.title}
                 onChange={(e) => onUpdateConfig({ 
-                  endingScreen: { ...config.endingScreen, title: e.target.value } 
+                  endingWin: { ...config.endingWin, title: e.target.value } 
                 })}
                 className="text-xs h-8"
               />
@@ -513,9 +521,9 @@ export const WheelSettingsPanel = ({
               <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
               <Input 
                 type="text" 
-                value={config.endingScreen.subtitle}
+                value={config.endingWin.subtitle}
                 onChange={(e) => onUpdateConfig({ 
-                  endingScreen: { ...config.endingScreen, subtitle: e.target.value } 
+                  endingWin: { ...config.endingWin, subtitle: e.target.value } 
                 })}
                 className="text-xs h-8"
                 placeholder="Use {{prize}} for the won prize"
@@ -526,90 +534,15 @@ export const WheelSettingsPanel = ({
             </div>
 
             <Separator />
-
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="social" className="border-none">
-                <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline py-2">
-                  Réseaux sociaux
-                </AccordionTrigger>
-                <AccordionContent className="space-y-3 pt-2">
-                  <div>
-                    <Label className="text-[10px] text-muted-foreground mb-1 block">Facebook URL</Label>
-                    <Input 
-                      type="url" 
-                      value={config.endingScreen.socialLinks?.facebook || ''}
-                      onChange={(e) => onUpdateConfig({ 
-                        endingScreen: { 
-                          ...config.endingScreen, 
-                          socialLinks: { ...config.endingScreen.socialLinks, facebook: e.target.value } 
-                        } 
-                      })}
-                      className="text-xs h-7"
-                      placeholder="https://facebook.com/..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-[10px] text-muted-foreground mb-1 block">Twitter URL</Label>
-                    <Input 
-                      type="url" 
-                      value={config.endingScreen.socialLinks?.twitter || ''}
-                      onChange={(e) => onUpdateConfig({ 
-                        endingScreen: { 
-                          ...config.endingScreen, 
-                          socialLinks: { ...config.endingScreen.socialLinks, twitter: e.target.value } 
-                        } 
-                      })}
-                      className="text-xs h-7"
-                      placeholder="https://twitter.com/..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-[10px] text-muted-foreground mb-1 block">Instagram URL</Label>
-                    <Input 
-                      type="url" 
-                      value={config.endingScreen.socialLinks?.instagram || ''}
-                      onChange={(e) => onUpdateConfig({ 
-                        endingScreen: { 
-                          ...config.endingScreen, 
-                          socialLinks: { ...config.endingScreen.socialLinks, instagram: e.target.value } 
-                        } 
-                      })}
-                      className="text-xs h-7"
-                      placeholder="https://instagram.com/..."
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-[10px] text-muted-foreground mb-1 block">LinkedIn URL</Label>
-                    <Input 
-                      type="url" 
-                      value={config.endingScreen.socialLinks?.linkedin || ''}
-                      onChange={(e) => onUpdateConfig({ 
-                        endingScreen: { 
-                          ...config.endingScreen, 
-                          socialLinks: { ...config.endingScreen.socialLinks, linkedin: e.target.value } 
-                        } 
-                      })}
-                      className="text-xs h-7"
-                      placeholder="https://linkedin.com/..."
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-
-            <Separator />
             
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.endingScreen.blockSpacing}x
+                Block spacing: {config.endingWin.blockSpacing}x
               </Label>
               <Slider
-                value={[config.endingScreen.blockSpacing]}
+                value={[config.endingWin.blockSpacing]}
                 onValueChange={([value]) => onUpdateConfig({
-                  endingScreen: { ...config.endingScreen, blockSpacing: value }
+                  endingWin: { ...config.endingWin, blockSpacing: value }
                 })}
                 min={0.5}
                 max={3}
@@ -617,76 +550,69 @@ export const WheelSettingsPanel = ({
                 className="w-full"
               />
             </div>
+          </div>
+        );
 
-            {(config.endingScreen.desktopLayout === 'desktop-split' || config.endingScreen.mobileLayout === 'mobile-minimal') && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  {config.endingScreen.wallpaperImage ? (
-                    <div className="space-y-2">
-                      <div className="relative rounded-lg overflow-hidden border">
-                        <img 
-                          src={config.endingScreen.wallpaperImage} 
-                          alt="Wallpaper preview" 
-                          className="w-full h-24 object-cover"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-6 w-6"
-                          onClick={() => handleRemoveWallpaper('ending')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full text-xs h-8"
-                        onClick={() => {
-                          setActiveWallpaperSection('ending');
-                          setWallpaperModalOpen(true);
-                        }}
-                      >
-                        Changer l'image
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full text-xs h-8 justify-start"
-                      onClick={() => {
-                        setActiveWallpaperSection('ending');
-                        setWallpaperModalOpen(true);
-                      }}
-                    >
-                      <Upload className="w-3 h-3 mr-2" />
-                      Ajouter une image
-                    </Button>
-                  )}
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Overlay opacity: {((config.endingScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
-                  </Label>
-                  <Slider
-                    value={[(config.endingScreen.overlayOpacity ?? 0.6) * 100]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      endingScreen: { ...config.endingScreen, overlayOpacity: value / 100 }
-                    })}
-                    min={0}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-              </>
-            )}
+      case 'ending-lose':
+        return (
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+              <LayoutSelector
+                desktopLayout={config.endingLose.desktopLayout}
+                mobileLayout={config.endingLose.mobileLayout}
+                onDesktopLayoutChange={(layout) => onUpdateConfig({
+                  endingLose: { ...config.endingLose, desktopLayout: layout }
+                })}
+                onMobileLayoutChange={(layout) => onUpdateConfig({
+                  endingLose: { ...config.endingLose, mobileLayout: layout }
+                })}
+              />
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Title</Label>
+              <Input 
+                type="text" 
+                value={config.endingLose.title}
+                onChange={(e) => onUpdateConfig({ 
+                  endingLose: { ...config.endingLose, title: e.target.value } 
+                })}
+                className="text-xs h-8"
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
+              <Input 
+                type="text" 
+                value={config.endingLose.subtitle}
+                onChange={(e) => onUpdateConfig({ 
+                  endingLose: { ...config.endingLose, subtitle: e.target.value } 
+                })}
+                className="text-xs h-8"
+              />
+            </div>
+
+            <Separator />
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Block spacing: {config.endingLose.blockSpacing}x
+              </Label>
+              <Slider
+                value={[config.endingLose.blockSpacing]}
+                onValueChange={([value]) => onUpdateConfig({
+                  endingLose: { ...config.endingLose, blockSpacing: value }
+                })}
+                min={0.5}
+                max={3}
+                step={0.25}
+                className="w-full"
+              />
+            </div>
           </div>
         );
     }
@@ -694,13 +620,13 @@ export const WheelSettingsPanel = ({
 
   return (
     <>
-      <div className="w-[300px] bg-background border-l border-border flex flex-col">
-        <div className="px-4 py-3 border-b">
+      <div className="w-[280px] bg-background border-l border-border flex flex-col">
+        <div className="h-12 border-b border-border flex items-center px-3">
           <h3 className="text-sm font-semibold">Settings</h3>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="p-4">
+          <div className="p-3 pb-20">
             {renderSettings()}
           </div>
         </ScrollArea>
