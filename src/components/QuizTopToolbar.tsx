@@ -1,29 +1,67 @@
 import { Button } from "@/components/ui/button";
-import { Eye, Share2, Settings, Smartphone, RotateCcw } from "lucide-react";
+import { Eye, Save, Globe, Home } from "lucide-react";
+import { SaveIndicator } from "./ui/SaveIndicator";
 
 interface QuizTopToolbarProps {
   onPreview: () => void;
+  onBackToDashboard?: () => void;
+  onSave?: () => void;
+  onPublish?: () => void;
+  isSaving?: boolean;
+  lastSaved?: Date | null;
 }
 
-export const QuizTopToolbar = ({ onPreview }: QuizTopToolbarProps) => {
+export const QuizTopToolbar = ({ 
+  onPreview,
+  onBackToDashboard,
+  onSave,
+  onPublish,
+  isSaving,
+  lastSaved
+}: QuizTopToolbarProps) => {
+  const getSaveStatus = () => {
+    if (isSaving) return 'saving';
+    if (lastSaved) return 'saved';
+    return 'idle';
+  };
+
   return (
-    <div className="h-12 bg-card border-b border-border flex items-center justify-end px-3">
+    <div className="h-12 bg-card border-b border-border flex items-center justify-between px-3">
+      {/* Left: Back button */}
+      <div className="flex items-center gap-2">
+        {onBackToDashboard && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 gap-1.5 text-xs px-2.5"
+            onClick={onBackToDashboard}
+          >
+            <Home className="w-3.5 h-3.5" />
+            Dashboard
+          </Button>
+        )}
+        {(isSaving !== undefined || lastSaved !== undefined) && (
+          <SaveIndicator status={getSaveStatus()} />
+        )}
+      </div>
+
+      {/* Right: Action buttons */}
       <div className="flex items-center gap-1">
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Smartphone className="w-3.5 h-3.5" />
-        </Button>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onPreview}>
           <Eye className="w-3.5 h-3.5" />
         </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <RotateCcw className="w-3.5 h-3.5" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Share2 className="w-3.5 h-3.5" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Settings className="w-3.5 h-3.5" />
-        </Button>
+        {onSave && (
+          <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs px-2.5" onClick={onSave}>
+            <Save className="w-3.5 h-3.5" />
+            Sauvegarder
+          </Button>
+        )}
+        {onPublish && (
+          <Button variant="default" size="sm" className="h-8 gap-1.5 text-xs px-2.5" onClick={onPublish}>
+            <Globe className="w-3.5 h-3.5" />
+            Publier
+          </Button>
+        )}
       </div>
     </div>
   );

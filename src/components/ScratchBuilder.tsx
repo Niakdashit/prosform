@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { ScratchSidebar } from "./ScratchSidebar";
 import { ScratchPreview } from "./ScratchPreview";
@@ -6,11 +7,13 @@ import { ScratchSettingsPanel } from "./ScratchSettingsPanel";
 import { ScratchTopToolbar } from "./ScratchTopToolbar";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { PublishModal } from "./PublishModal";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaignAutoSave } from "@/hooks/useCampaignAutoSave";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 
 export interface ScratchPrize {
@@ -224,6 +227,7 @@ const defaultScratchConfig: ScratchConfig = {
 
 export const ScratchBuilder = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [config, setConfig] = useState<ScratchConfig>(defaultScratchConfig);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
@@ -233,6 +237,14 @@ export const ScratchBuilder = () => {
   const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
   const [prizes, setPrizes] = useState<ScratchPrize[]>([]);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+
+  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+    campaignType: 'scratch',
+    title: config.welcomeScreen.title || 'Scratch sans titre',
+    config: { ...config, prizes },
+    enabled: true
+  });
 
   useEffect(() => {
     if (isMobile) {
@@ -347,6 +359,11 @@ export const ScratchBuilder = () => {
         }}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        onBackToDashboard={() => navigate('/dashboard')}
+        onSave={saveCampaign}
+        onPublish={() => setPublishModalOpen(true)}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
       />
         
       {activeTab === 'campaign' ? (
@@ -495,6 +512,14 @@ export const ScratchBuilder = () => {
       </div>
       )}
       <FloatingToolbar />
+      {campaignId && (
+        <PublishModal
+          isOpen={publishModalOpen}
+          onClose={() => setPublishModalOpen(false)}
+          campaignId={campaignId}
+          campaignTitle={config.welcomeScreen.title || 'Scratch sans titre'}
+        />
+      )}
     </div>
   );
 };

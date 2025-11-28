@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { QuestionSidebar } from "./QuestionSidebar";
 import { FormPreview } from "./FormPreview";
@@ -8,11 +9,13 @@ import { AddContentModal } from "./AddContentModal";
 import { WorkflowBuilder } from "./workflow/WorkflowBuilder";
 import { TemplateLibrary } from "./templates";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { PublishModal } from "./PublishModal";
 import { Drawer, DrawerContent, DrawerTrigger } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaignAutoSave } from "@/hooks/useCampaignAutoSave";
 // TextStyle type for text formatting
 export interface TextStyle {
   fontFamily?: string;
@@ -235,6 +238,7 @@ const FormBuilderPreviewArea = ({
 
 export const FormBuilder = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [questions, setQuestions] = useState<Question[]>(defaultQuestions);
   const [activeQuestionId, setActiveQuestionId] = useState("welcome");
@@ -244,6 +248,7 @@ export const FormBuilder = () => {
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'content' | 'design' | 'workflow' | 'templates'>('content');
   const [editingField, setEditingField] = useState<string | null>(null);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
   const [templateMeta, setTemplateMeta] = useState<{
     layoutStyle?: string;
     brandName?: string;
@@ -259,6 +264,13 @@ export const FormBuilder = () => {
     desktopLayout?: string;
     mobileLayout?: string;
   } | null>(null);
+
+  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+    campaignType: 'form',
+    title: questions.find(q => q.type === 'welcome')?.title || 'Form sans titre',
+    config: { questions, templateMeta },
+    enabled: true
+  });
 
   // Force mobile view mode on mobile devices
   useEffect(() => {
@@ -426,6 +438,11 @@ export const FormBuilder = () => {
         }}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        onBackToDashboard={() => navigate('/dashboard')}
+        onSave={saveCampaign}
+        onPublish={() => setPublishModalOpen(true)}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
       />
         
         <div className="flex flex-1 overflow-hidden relative">
@@ -548,6 +565,14 @@ export const FormBuilder = () => {
 
       {/* Floating Toolbar for text selection */}
       <FloatingToolbar />
+      {campaignId && (
+        <PublishModal
+          isOpen={publishModalOpen}
+          onClose={() => setPublishModalOpen(false)}
+          campaignId={campaignId}
+          campaignTitle={questions.find(q => q.type === 'welcome')?.title || 'Form sans titre'}
+        />
+      )}
     </div>
   );
 };
