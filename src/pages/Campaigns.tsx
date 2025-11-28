@@ -13,10 +13,15 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-// Types
 type CampaignType = 'form' | 'wheel' | 'quiz' | 'jackpot' | 'scratch';
-type CampaignStatus = 'online' | 'draft' | 'ended';
+type CampaignStatus = 'draft' | 'online' | 'ended';
 type CampaignMode = 'fullscreen' | 'embed' | 'popup';
 
 interface Campaign {
@@ -30,14 +35,38 @@ interface Campaign {
   createdAt: string;
 }
 
-// Mock data
+// Mock data for campaigns
 const mockCampaigns: Campaign[] = [
-  { id: '1', name: 'Jeu concours été 2024', type: 'wheel', mode: 'fullscreen', status: 'online', daysRemaining: 45, participants: 1247, createdAt: '2024-06-15' },
-  { id: '2', name: 'Quiz produits', type: 'quiz', mode: 'embed', status: 'online', daysRemaining: 12, participants: 856, createdAt: '2024-07-01' },
-  { id: '3', name: 'Formulaire inscription', type: 'form', mode: 'popup', status: 'draft', daysRemaining: null, participants: 0, createdAt: '2024-07-10' },
-  { id: '4', name: 'Jackpot anniversaire', type: 'jackpot', mode: 'fullscreen', status: 'online', daysRemaining: 30, participants: 2341, createdAt: '2024-05-20' },
-  { id: '5', name: 'Scratch & Win', type: 'scratch', mode: 'fullscreen', status: 'ended', daysRemaining: 0, participants: 5621, createdAt: '2024-04-01' },
-  { id: '6', name: 'Sondage satisfaction', type: 'form', mode: 'embed', status: 'draft', daysRemaining: null, participants: 0, createdAt: '2024-07-12' },
+  {
+    id: '1',
+    name: 'Roue de la Fortune - Été 2024',
+    type: 'wheel',
+    mode: 'fullscreen',
+    status: 'online',
+    daysRemaining: 15,
+    participants: 1234,
+    createdAt: '2024-01-15',
+  },
+  {
+    id: '2',
+    name: 'Quiz Produits',
+    type: 'quiz',
+    mode: 'embed',
+    status: 'draft',
+    daysRemaining: null,
+    participants: 0,
+    createdAt: '2024-01-20',
+  },
+  {
+    id: '3',
+    name: 'Jackpot Noël',
+    type: 'jackpot',
+    mode: 'popup',
+    status: 'ended',
+    daysRemaining: 0,
+    participants: 5678,
+    createdAt: '2023-12-01',
+  },
 ];
 
 // Couleurs DA - harmonisées avec /form
@@ -107,7 +136,9 @@ const Campaigns = () => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
 
-  const filteredCampaigns = mockCampaigns.filter(campaign => {
+  const campaigns = mockCampaigns;
+
+  const filteredCampaigns = campaigns.filter(campaign => {
     const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -165,10 +196,10 @@ const Campaigns = () => {
         {/* Stats cards */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'Total campagnes', value: mockCampaigns.length, icon: LayoutGrid },
-            { label: 'En ligne', value: mockCampaigns.filter(c => c.status === 'online').length, icon: CircleDot },
-            { label: 'Participants', value: mockCampaigns.reduce((acc, c) => acc + c.participants, 0).toLocaleString(), icon: Users },
-            { label: 'Ce mois', value: mockCampaigns.filter(c => new Date(c.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length, icon: Calendar },
+            { label: 'Total campagnes', value: campaigns.length, icon: LayoutGrid },
+            { label: 'En ligne', value: campaigns.filter(c => c.status === 'online').length, icon: CircleDot },
+            { label: 'Participants', value: campaigns.reduce((acc, c) => acc + c.participants, 0).toLocaleString(), icon: Users },
+            { label: 'Ce mois', value: campaigns.filter(c => new Date(c.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length, icon: Calendar },
           ].map((stat, i) => (
             <div 
               key={i}
@@ -363,11 +394,18 @@ const Campaigns = () => {
                 </div>
                 
                 <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
-                  <button 
-                    className="p-1.5 rounded transition-colors hover:bg-gray-100"
-                  >
-                    <MoreVertical className="w-4 h-4" style={{ color: colors.muted }} />
-                  </button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="p-1.5 rounded transition-colors hover:bg-gray-100">
+                        <MoreVertical className="w-4 h-4" style={{ color: colors.muted }} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleEditCampaign(campaign)}>
+                        Modifier
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             ))}
@@ -495,6 +533,7 @@ const Campaigns = () => {
             )}
           </div>
         )}
+
       </div>
     </AppLayout>
   );

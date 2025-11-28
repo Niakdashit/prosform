@@ -360,6 +360,15 @@ export const WheelBuilder = () => {
       <WheelTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          // Clear old preview data first to free up space
+          try {
+            localStorage.removeItem('wheel-config');
+            localStorage.removeItem('wheel-viewMode');
+            localStorage.removeItem('wheel-theme');
+          } catch (e) {
+            // Ignore cleanup errors
+          }
+          
           try {
             localStorage.setItem('wheel-config', JSON.stringify(config));
             localStorage.setItem('wheel-viewMode', targetViewMode);
@@ -367,18 +376,36 @@ export const WheelBuilder = () => {
             window.open('/wheel-preview', '_blank');
           } catch (e) {
             console.warn('localStorage full, trying without images:', e);
+            // Remove all background images to reduce size
             const configWithoutImages = {
               ...config,
-              welcomeScreen: { ...config.welcomeScreen, image: undefined, imageSettings: undefined }
+              welcomeScreen: { 
+                ...config.welcomeScreen, 
+                image: undefined, 
+                imageSettings: undefined,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined,
+                wallpaperImage: undefined
+              },
+              endingWin: {
+                ...config.endingWin,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined
+              },
+              endingLose: {
+                ...config.endingLose,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined
+              }
             };
             try {
               localStorage.setItem('wheel-config', JSON.stringify(configWithoutImages));
               localStorage.setItem('wheel-viewMode', targetViewMode);
               localStorage.setItem('wheel-theme', JSON.stringify(theme));
               window.open('/wheel-preview', '_blank');
-              toast.warning('Preview opened without images (images too large)');
+              toast.warning('Preview ouverte sans images (images trop volumineuses)');
             } catch (e2) {
-              toast.error('Unable to open preview - data too large');
+              toast.error('Impossible d\'ouvrir la preview - données trop volumineuses');
             }
           }
         }}
