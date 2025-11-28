@@ -245,11 +245,19 @@ export const WheelBuilder = () => {
   const [prizes, setPrizes] = useState<Prize[]>([]);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
     campaignType: 'wheel',
     title: config.welcomeScreen.title || 'Roue sans titre',
     config: { ...config, prizes },
-    enabled: true
+    enabled: true,
+    onConfigLoaded: (loadedConfig) => {
+      if (loadedConfig) {
+        setConfig(loadedConfig);
+        if (loadedConfig.prizes) {
+          setPrizes(loadedConfig.prizes);
+        }
+      }
+    }
   });
 
   useEffect(() => {

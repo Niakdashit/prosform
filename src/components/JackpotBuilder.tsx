@@ -240,11 +240,19 @@ export const JackpotBuilder = () => {
   const [prizes, setPrizes] = useState<JackpotPrize[]>([]);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
     campaignType: 'jackpot',
     title: config.welcomeScreen.title || 'Jackpot sans titre',
     config: { ...config, prizes },
-    enabled: true
+    enabled: true,
+    onConfigLoaded: (loadedConfig) => {
+      if (loadedConfig) {
+        setConfig(loadedConfig);
+        if (loadedConfig.prizes) {
+          setPrizes(loadedConfig.prizes);
+        }
+      }
+    }
   });
 
   useEffect(() => {

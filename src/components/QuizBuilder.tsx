@@ -214,11 +214,16 @@ export const QuizBuilder = () => {
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
     campaignType: 'quiz',
     title: config.welcomeScreen.title || 'Quiz sans titre',
     config,
-    enabled: true
+    enabled: true,
+    onConfigLoaded: (loadedConfig) => {
+      if (loadedConfig) {
+        setConfig(loadedConfig);
+      }
+    }
   });
 
   useEffect(() => {

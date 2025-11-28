@@ -9,6 +9,7 @@ interface AutoSaveOptions {
   config: any;
   enabled?: boolean;
   debounceMs?: number;
+  onConfigLoaded?: (config: any) => void;
 }
 
 export const useCampaignAutoSave = ({
@@ -17,6 +18,7 @@ export const useCampaignAutoSave = ({
   config,
   enabled = true,
   debounceMs = 2000,
+  onConfigLoaded,
 }: AutoSaveOptions) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [campaignId, setCampaignId] = useState<string | null>(
@@ -24,8 +26,10 @@ export const useCampaignAutoSave = ({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const hasLoadedRef = useRef(false);
 
   // Check authentication
   useEffect(() => {
@@ -41,14 +45,15 @@ export const useCampaignAutoSave = ({
 
   // Load existing campaign if ID provided
   useEffect(() => {
-    if (campaignId && userId) {
+    if (campaignId && userId && !hasLoadedRef.current && onConfigLoaded) {
       loadCampaign();
     }
   }, [campaignId, userId]);
 
   const loadCampaign = async () => {
-    if (!campaignId || !userId) return;
+    if (!campaignId || !userId || hasLoadedRef.current) return;
 
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from("campaigns")
@@ -59,11 +64,17 @@ export const useCampaignAutoSave = ({
 
       if (error) throw error;
 
-      // Campaign loaded - config will be applied by parent component
+      if (data && onConfigLoaded) {
+        hasLoadedRef.current = true;
+        onConfigLoaded(data.config);
+        setLastSaved(new Date(data.last_edited_at));
+      }
       return data;
     } catch (error) {
       console.error("Error loading campaign:", error);
       toast.error("Erreur lors du chargement de la campagne");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -148,6 +159,7 @@ export const useCampaignAutoSave = ({
     campaignId,
     isSaving,
     lastSaved,
+    isLoading,
     saveCampaign: manualSave,
     loadCampaign,
   };
