@@ -17,7 +17,10 @@ import ScratchPreview from "./pages/ScratchPreview";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Analytics from "./pages/Analytics";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import { GDPRBanner } from "./components/GDPRBanner";
 
 const queryClient = new QueryClient();
 
@@ -27,12 +30,15 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <GDPRBanner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/form" element={<Index />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/wheel" element={<Wheel />} />

@@ -20,6 +20,8 @@ import {
   ExternalLink,
   LogOut,
   Pencil,
+  BarChart3,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -164,6 +166,14 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold">Mes Campagnes</h1>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/settings")}
+            >
+              <SettingsIcon className="w-4 h-4 mr-2" />
+              RGPD
+            </Button>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
               Déconnexion
@@ -297,6 +307,15 @@ export default function Dashboard() {
                         >
                           <Pencil className="w-4 h-4 mr-2" />
                           Modifier
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/analytics?id=${campaign.id}`);
+                          }}
+                        >
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          Analytics
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={(e) => {
