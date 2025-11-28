@@ -21,13 +21,17 @@ interface WheelSettingsPanelProps {
   onUpdateConfig: (updates: Partial<WheelConfig>) => void;
   onUpdateSegment: (id: string, updates: Partial<WheelSegment>) => void;
   onViewModeChange?: (mode: 'desktop' | 'mobile') => void;
+  hideSpacingAndBackground?: boolean;
+  hideLayoutAndAlignment?: boolean;
 }
 
 export const WheelSettingsPanel = ({ 
   config, 
   activeView, 
   onUpdateConfig,
-  onUpdateSegment 
+  onUpdateSegment,
+  hideSpacingAndBackground = false,
+  hideLayoutAndAlignment = false
 }: WheelSettingsPanelProps) => {
   const [wallpaperModalOpen, setWallpaperModalOpen] = useState(false);
   const [activeWallpaperSection, setActiveWallpaperSection] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
@@ -92,119 +96,131 @@ export const WheelSettingsPanel = ({
       case 'welcome':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.welcomeScreen.desktopLayout}
-                mobileLayout={config.welcomeScreen.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
+            {!hideLayoutAndAlignment && (
+              <>
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+                  <LayoutSelector
+                    desktopLayout={config.welcomeScreen.desktopLayout}
+                    mobileLayout={config.welcomeScreen.mobileLayout}
+                    onDesktopLayoutChange={(layout) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
+                    })}
+                    onMobileLayoutChange={(layout) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
+                    })}
+                  />
+                </div>
+                
+                <Separator />
 
-            {/* Alignment */}
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
-              <Select
-                value={config.welcomeScreen.alignment || 'left'}
-                onValueChange={(value) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, alignment: value as 'left' | 'center' | 'right' }
-                })}
-              >
-                <SelectTrigger className="h-9 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="left">Left</SelectItem>
-                  <SelectItem value="center">Center</SelectItem>
-                  <SelectItem value="right">Right</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                {/* Alignment */}
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
+                  <Select
+                    value={config.welcomeScreen.alignment || 'left'}
+                    onValueChange={(value) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, alignment: value as 'left' | 'center' | 'right' }
+                    })}
+                  >
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Separator />
+              </>
+            )}
             
-            <Separator />
-            
             <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
+              <Label className="text-xs text-[#8b7355] mb-2 block">Button text</Label>
               <Input 
                 type="text" 
                 value={config.welcomeScreen.buttonText}
                 onChange={(e) => onUpdateConfig({ 
                   welcomeScreen: { ...config.welcomeScreen, buttonText: e.target.value } 
                 })}
-                className="text-xs h-8"
+                className="text-xs h-9 border-gray-200 rounded-lg focus:ring-[#f5ca3c] focus:border-[#f5ca3c]"
               />
             </div>
 
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.welcomeScreen.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.welcomeScreen.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            {!hideSpacingAndBackground && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.welcomeScreen.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.welcomeScreen.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Background Image */}
-            <BackgroundUploader
-              desktopImage={config.welcomeScreen.backgroundImage}
-              mobileImage={config.welcomeScreen.backgroundImageMobile}
-              onDesktopImageChange={(image) => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImage: image }
-              })}
-              onDesktopImageRemove={() => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImage: undefined }
-              })}
-              onMobileImageChange={(image) => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: image }
-              })}
-              onMobileImageRemove={() => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: undefined }
-              })}
-              showApplyToAll={true}
-              applyToAll={config.welcomeScreen.applyBackgroundToAll}
-              onApplyToAllChange={(value) => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
-              })}
-            />
+                {/* Background Image */}
+                <BackgroundUploader
+                  desktopImage={config.welcomeScreen.backgroundImage}
+                  mobileImage={config.welcomeScreen.backgroundImageMobile}
+                  onDesktopImageChange={(image) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImage: image }
+                  })}
+                  onDesktopImageRemove={() => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImage: undefined }
+                  })}
+                  onMobileImageChange={(image) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: image }
+                  })}
+                  onMobileImageRemove={() => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: undefined }
+                  })}
+                  showApplyToAll={true}
+                  applyToAll={config.welcomeScreen.applyBackgroundToAll}
+                  onApplyToAllChange={(value) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
+                  })}
+                />
+              </>
+            )}
           </div>
         );
 
       case 'contact':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.contactForm.desktopLayout}
-                mobileLayout={config.contactForm.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
+            {!hideLayoutAndAlignment && (
+              <>
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+                  <LayoutSelector
+                    desktopLayout={config.contactForm.desktopLayout}
+                    mobileLayout={config.contactForm.mobileLayout}
+                    onDesktopLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, desktopLayout: layout }
+                    })}
+                    onMobileLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, mobileLayout: layout }
+                    })}
+                  />
+                </div>
+                
+                <Separator />
+              </>
+            )}
             
             <div className="flex items-center justify-between">
               <Label className="text-xs font-normal">Enable contact form</Label>
@@ -244,70 +260,162 @@ export const WheelSettingsPanel = ({
                   />
                 </div>
 
-                <Separator />
-                
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Block spacing: {config.contactForm.blockSpacing}x
-                  </Label>
-                  <Slider
-                    value={[config.contactForm.blockSpacing]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, blockSpacing: value }
-                    })}
-                    min={0.5}
-                    max={3}
-                    step={0.25}
-                    className="w-full"
-                  />
-                </div>
-
-                <Separator />
-
-                {/* Background Image */}
-                {config.welcomeScreen.applyBackgroundToAll ? (
-                  <div className="text-xs text-muted-foreground italic">
-                    Background appliqué depuis Welcome Screen
-                  </div>
-                ) : (
-                  <BackgroundUploader
-                    desktopImage={config.contactForm.backgroundImage}
-                    mobileImage={config.contactForm.backgroundImageMobile}
-                    onDesktopImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: image }
-                    })}
-                    onDesktopImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: undefined }
-                    })}
-                    onMobileImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: image }
-                    })}
-                    onMobileImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
-                    })}
-                  />
-                )}
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <Label className="text-xs text-muted-foreground">Fields</Label>
-                  {config.contactForm.fields.map((field, index) => (
-                    <div key={field.type} className="flex items-center justify-between">
-                      <Label className="text-xs font-normal capitalize">{field.label}</Label>
-                      <Switch 
-                        checked={field.required}
-                        onCheckedChange={(checked) => {
-                          const newFields = [...config.contactForm.fields];
-                          newFields[index] = { ...field, required: checked };
-                          onUpdateConfig({ 
-                            contactForm: { ...config.contactForm, fields: newFields } 
-                          });
-                        }}
-                        className="scale-90" 
+                {!hideSpacingAndBackground && (
+                  <>
+                    <Separator />
+                    
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-2 block">
+                        Block spacing: {config.contactForm.blockSpacing}x
+                      </Label>
+                      <Slider
+                        value={[config.contactForm.blockSpacing]}
+                        onValueChange={([value]) => onUpdateConfig({
+                          contactForm: { ...config.contactForm, blockSpacing: value }
+                        })}
+                        min={0.5}
+                        max={3}
+                        step={0.25}
+                        className="w-full"
                       />
                     </div>
+
+                    <Separator />
+
+                    {/* Background Image */}
+                    {config.welcomeScreen.applyBackgroundToAll ? (
+                      <div className="text-xs text-muted-foreground italic">
+                        Background appliqué depuis Welcome Screen
+                      </div>
+                    ) : (
+                      <BackgroundUploader
+                        desktopImage={config.contactForm.backgroundImage}
+                        mobileImage={config.contactForm.backgroundImageMobile}
+                        onDesktopImageChange={(image) => onUpdateConfig({
+                          contactForm: { ...config.contactForm, backgroundImage: image }
+                        })}
+                        onDesktopImageRemove={() => onUpdateConfig({
+                          contactForm: { ...config.contactForm, backgroundImage: undefined }
+                        })}
+                        onMobileImageChange={(image) => onUpdateConfig({
+                          contactForm: { ...config.contactForm, backgroundImageMobile: image }
+                        })}
+                        onMobileImageRemove={() => onUpdateConfig({
+                          contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
+                        })}
+                      />
+                    )}
+
+                    <Separator />
+                  </>
+                )}
+
+                {/* Fields Manager */}
+                <div className="space-y-3">
+                  {config.contactForm.fields.map((field, index) => (
+                    <div key={field.type} className="border border-gray-200 rounded-lg p-3 bg-white">
+                      {/* Field Header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400 cursor-move">⊕</span>
+                          <span className="text-gray-400">▢</span>
+                          <span className="font-medium text-sm text-gray-800">{field.label}</span>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            const newFields = config.contactForm.fields.filter((_, i) => i !== index);
+                            onUpdateConfig({ 
+                              contactForm: { ...config.contactForm, fields: newFields } 
+                            });
+                          }}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      {/* Field Settings */}
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                          <Label className="text-xs text-gray-500 mb-1 block">Label du champ</Label>
+                          <Input 
+                            type="text" 
+                            value={field.label}
+                            onChange={(e) => {
+                              const newFields = [...config.contactForm.fields];
+                              newFields[index] = { ...field, label: e.target.value };
+                              onUpdateConfig({ 
+                                contactForm: { ...config.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-500 mb-1 block">Type de champ</Label>
+                          <Select
+                            value={field.type}
+                            onValueChange={(value) => {
+                              const newFields = [...config.contactForm.fields];
+                              newFields[index] = { ...field, type: value as any };
+                              onUpdateConfig({ 
+                                contactForm: { ...config.contactForm, fields: newFields } 
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="text">Texte</SelectItem>
+                              <SelectItem value="email">Email</SelectItem>
+                              <SelectItem value="phone">Téléphone</SelectItem>
+                              <SelectItem value="name">Nom</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      {/* Required Checkbox */}
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox"
+                          checked={field.required}
+                          onChange={(e) => {
+                            const newFields = [...config.contactForm.fields];
+                            newFields[index] = { ...field, required: e.target.checked };
+                            onUpdateConfig({ 
+                              contactForm: { ...config.contactForm, fields: newFields } 
+                            });
+                          }}
+                          className="w-4 h-4 rounded border-gray-300 text-[#3d3731] focus:ring-[#3d3731]"
+                        />
+                        <Label className="text-xs text-gray-600">Champ obligatoire</Label>
+                      </div>
+                    </div>
                   ))}
+                  
+                  {/* Add Field Button */}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      onClick={() => {
+                        const newField = {
+                          type: 'text' as const,
+                          label: 'Nouveau champ',
+                          required: false
+                        };
+                        onUpdateConfig({ 
+                          contactForm: { 
+                            ...config.contactForm, 
+                            fields: [...config.contactForm.fields, newField] 
+                          } 
+                        });
+                      }}
+                      className="flex-1 h-9 bg-[#3d3731] hover:bg-[#2d2721] text-white text-xs"
+                    >
+                      + Champ
+                    </Button>
+                  </div>
                 </div>
               </>
             )}
@@ -392,48 +500,52 @@ export const WheelSettingsPanel = ({
               </p>
             </div>
 
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.endingWin.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.endingWin.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            {!hideSpacingAndBackground && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.endingWin.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.endingWin.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      endingWin: { ...config.endingWin, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Background Image */}
-            {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
-                Background appliqué depuis Welcome Screen
-              </div>
-            ) : (
-              <BackgroundUploader
-                desktopImage={config.endingWin.backgroundImage}
-                mobileImage={config.endingWin.backgroundImageMobile}
-                onDesktopImageChange={(image) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImage: image }
-                })}
-                onDesktopImageRemove={() => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImage: undefined }
-                })}
-                onMobileImageChange={(image) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImageMobile: image }
-                })}
-                onMobileImageRemove={() => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImageMobile: undefined }
-                })}
-              />
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.endingWin.backgroundImage}
+                    mobileImage={config.endingWin.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImageMobile: undefined }
+                    })}
+                  />
+                )}
+              </>
             )}
           </div>
         );
@@ -465,48 +577,52 @@ export const WheelSettingsPanel = ({
               />
             </div>
 
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.endingLose.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.endingLose.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            {!hideSpacingAndBackground && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.endingLose.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.endingLose.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      endingLose: { ...config.endingLose, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Background Image */}
-            {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
-                Background appliqué depuis Welcome Screen
-              </div>
-            ) : (
-              <BackgroundUploader
-                desktopImage={config.endingLose.backgroundImage}
-                mobileImage={config.endingLose.backgroundImageMobile}
-                onDesktopImageChange={(image) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImage: image }
-                })}
-                onDesktopImageRemove={() => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImage: undefined }
-                })}
-                onMobileImageChange={(image) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImageMobile: image }
-                })}
-                onMobileImageRemove={() => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImageMobile: undefined }
-                })}
-              />
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.endingLose.backgroundImage}
+                    mobileImage={config.endingLose.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImageMobile: undefined }
+                    })}
+                  />
+                )}
+              </>
             )}
           </div>
         );
@@ -515,13 +631,13 @@ export const WheelSettingsPanel = ({
 
   return (
     <>
-      <div className="w-[280px] bg-background border-l border-border flex flex-col">
-        <div className="h-12 border-b border-border flex items-center px-3">
-          <h3 className="text-sm font-semibold">Settings</h3>
+      <div className="w-[280px] bg-white border-l border-gray-200 flex flex-col">
+        <div className="h-12 border-b border-gray-200 flex items-center px-4">
+          <h3 className="text-sm font-semibold text-[#3d3731]">Settings</h3>
         </div>
         
         <ScrollArea className="flex-1">
-          <div className="p-3 pb-20">
+          <div className="p-4 pb-4">
             {renderSettings()}
           </div>
         </ScrollArea>
