@@ -265,7 +265,7 @@ export const FormBuilder = () => {
     mobileLayout?: string;
   } | null>(null);
 
-  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, isPublished, saveCampaign } = useCampaignAutoSave({
     campaignType: 'form',
     title: questions.find(q => q.type === 'welcome')?.title || 'Form sans titre',
     config: { questions, templateMeta },
@@ -451,6 +451,7 @@ export const FormBuilder = () => {
         onPublish={() => setPublishModalOpen(true)}
         isSaving={isSaving}
         lastSaved={lastSaved}
+        isPublished={isPublished}
       />
         
         <div className="flex flex-1 overflow-hidden relative">

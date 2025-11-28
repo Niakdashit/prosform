@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Eye, Save, Globe, Home } from "lucide-react";
 import { SaveIndicator } from "./ui/SaveIndicator";
+import { PublicationBadge } from "./ui/PublicationBadge";
 
 interface QuizTopToolbarProps {
   onPreview: () => void;
@@ -9,6 +10,7 @@ interface QuizTopToolbarProps {
   onPublish?: () => void;
   isSaving?: boolean;
   lastSaved?: Date | null;
+  isPublished?: boolean;
 }
 
 export const QuizTopToolbar = ({ 
@@ -17,7 +19,8 @@ export const QuizTopToolbar = ({
   onSave,
   onPublish,
   isSaving,
-  lastSaved
+  lastSaved,
+  isPublished = false
 }: QuizTopToolbarProps) => {
   const getSaveStatus = () => {
     if (isSaving) return 'saving';
@@ -43,6 +46,7 @@ export const QuizTopToolbar = ({
         {(isSaving !== undefined || lastSaved !== undefined) && (
           <SaveIndicator status={getSaveStatus()} />
         )}
+        <PublicationBadge isPublished={isPublished} />
       </div>
 
       {/* Right: Action buttons */}

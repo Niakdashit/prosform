@@ -239,7 +239,7 @@ export const ScratchBuilder = () => {
   const [prizes, setPrizes] = useState<ScratchPrize[]>([]);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, isPublished, saveCampaign } = useCampaignAutoSave({
     campaignType: 'scratch',
     title: config.welcomeScreen.title || 'Scratch sans titre',
     config: { ...config, prizes },
@@ -372,6 +372,7 @@ export const ScratchBuilder = () => {
         onPublish={() => setPublishModalOpen(true)}
         isSaving={isSaving}
         lastSaved={lastSaved}
+        isPublished={isPublished}
       />
         
       {activeTab === 'campaign' ? (

@@ -245,7 +245,7 @@ export const WheelBuilder = () => {
   const [prizes, setPrizes] = useState<Prize[]>([]);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, isPublished, saveCampaign } = useCampaignAutoSave({
     campaignType: 'wheel',
     title: config.welcomeScreen.title || 'Roue sans titre',
     config: { ...config, prizes },
@@ -409,6 +409,7 @@ export const WheelBuilder = () => {
         onPublish={() => setPublishModalOpen(true)}
         isSaving={isSaving}
         lastSaved={lastSaved}
+        isPublished={isPublished}
       />
         
       {activeTab === 'campaign' ? (

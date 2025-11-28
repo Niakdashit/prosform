@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Eye, Share2, Settings, Palette, Smartphone, RotateCcw, Gift, Home, Save, Globe } from "lucide-react";
 import { SaveIndicator } from "./ui/SaveIndicator";
+import { PublicationBadge } from "./ui/PublicationBadge";
 
 interface WheelTopToolbarProps {
   onPreview: () => void;
@@ -11,6 +12,7 @@ interface WheelTopToolbarProps {
   onPublish?: () => void;
   isSaving?: boolean;
   lastSaved?: Date | null;
+  isPublished?: boolean;
 }
 
 export const WheelTopToolbar = ({ 
@@ -21,7 +23,8 @@ export const WheelTopToolbar = ({
   onSave,
   onPublish,
   isSaving,
-  lastSaved
+  lastSaved,
+  isPublished = false
 }: WheelTopToolbarProps) => {
   const getSaveStatus = () => {
     if (isSaving) return 'saving';
@@ -47,6 +50,7 @@ export const WheelTopToolbar = ({
         {(isSaving !== undefined || lastSaved !== undefined) && (
           <SaveIndicator status={getSaveStatus()} />
         )}
+        <PublicationBadge isPublished={isPublished} />
       </div>
       <div className="flex items-center gap-1.5">
         <Button 

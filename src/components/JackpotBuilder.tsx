@@ -240,7 +240,7 @@ export const JackpotBuilder = () => {
   const [prizes, setPrizes] = useState<JackpotPrize[]>([]);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, isPublished, saveCampaign } = useCampaignAutoSave({
     campaignType: 'jackpot',
     title: config.welcomeScreen.title || 'Jackpot sans titre',
     config: { ...config, prizes },
@@ -407,6 +407,7 @@ export const JackpotBuilder = () => {
         onPublish={() => setPublishModalOpen(true)}
         isSaving={isSaving}
         lastSaved={lastSaved}
+        isPublished={isPublished}
       />
         
       {activeTab === 'campaign' ? (

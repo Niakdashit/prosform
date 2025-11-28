@@ -27,6 +27,7 @@ export const useCampaignAutoSave = ({
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const hasLoadedRef = useRef(false);
@@ -68,6 +69,7 @@ export const useCampaignAutoSave = ({
         hasLoadedRef.current = true;
         onConfigLoaded(data.config);
         setLastSaved(new Date(data.last_edited_at));
+        setIsPublished(data.is_published || false);
       }
       return data;
     } catch (error) {
@@ -160,6 +162,7 @@ export const useCampaignAutoSave = ({
     isSaving,
     lastSaved,
     isLoading,
+    isPublished,
     saveCampaign: manualSave,
     loadCampaign,
   };

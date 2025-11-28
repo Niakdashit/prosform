@@ -214,7 +214,7 @@ export const QuizBuilder = () => {
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, isPublished, saveCampaign } = useCampaignAutoSave({
     campaignType: 'quiz',
     title: config.welcomeScreen.title || 'Quiz sans titre',
     config,
@@ -328,6 +328,7 @@ export const QuizBuilder = () => {
         onPublish={() => setPublishModalOpen(true)}
         isSaving={isSaving}
         lastSaved={lastSaved}
+        isPublished={isPublished}
       />
         
       <div className="flex flex-1 overflow-hidden relative">

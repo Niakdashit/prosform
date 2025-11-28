@@ -1,6 +1,10 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { uploadImageToStorage } from "@/utils/imageUpload";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface BackgroundUploaderProps {
   desktopImage?: string;
@@ -24,7 +28,51 @@ export const BackgroundUploader = ({
   showApplyToAll = false,
   applyToAll = false,
   onApplyToAllChange
-}: BackgroundUploaderProps) => (
+}: BackgroundUploaderProps) => {
+  const [uploadingDesktop, setUploadingDesktop] = useState(false);
+  const [uploadingMobile, setUploadingMobile] = useState(false);
+
+  const handleDesktopUpload = async (file: File) => {
+    setUploadingDesktop(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Vous devez être connecté pour uploader des images");
+        return;
+      }
+
+      const publicUrl = await uploadImageToStorage(file, user.id, 'backgrounds');
+      onDesktopImageChange(publicUrl);
+      toast.success("Image uploadée avec succès");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(error instanceof Error ? error.message : "Erreur lors de l'upload");
+    } finally {
+      setUploadingDesktop(false);
+    }
+  };
+
+  const handleMobileUpload = async (file: File) => {
+    setUploadingMobile(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Vous devez être connecté pour uploader des images");
+        return;
+      }
+
+      const publicUrl = await uploadImageToStorage(file, user.id, 'backgrounds');
+      onMobileImageChange(publicUrl);
+      toast.success("Image uploadée avec succès");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(error instanceof Error ? error.message : "Erreur lors de l'upload");
+    } finally {
+      setUploadingMobile(false);
+    }
+  };
+
+  return (
   <div className="space-y-3">
     <Label className="text-xs text-muted-foreground">Background</Label>
     
@@ -47,20 +95,23 @@ export const BackgroundUploader = ({
         </div>
       ) : (
         <label className="flex items-center gap-2 px-3 py-2 border border-dashed border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
-          <Upload className="w-4 h-4 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Upload</span>
+          {uploadingDesktop ? (
+            <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4 text-muted-foreground" />
+          )}
+          <span className="text-xs text-muted-foreground">
+            {uploadingDesktop ? "Uploading..." : "Upload"}
+          </span>
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             className="hidden"
+            disabled={uploadingDesktop}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  onDesktopImageChange(event.target?.result as string);
-                };
-                reader.readAsDataURL(file);
+                handleDesktopUpload(file);
               }
             }}
           />
@@ -87,20 +138,23 @@ export const BackgroundUploader = ({
         </div>
       ) : (
         <label className="flex items-center gap-2 px-3 py-2 border border-dashed border-border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
-          <Upload className="w-4 h-4 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">Upload</span>
+          {uploadingMobile ? (
+            <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4 text-muted-foreground" />
+          )}
+          <span className="text-xs text-muted-foreground">
+            {uploadingMobile ? "Uploading..." : "Upload"}
+          </span>
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             className="hidden"
+            disabled={uploadingMobile}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                  onMobileImageChange(event.target?.result as string);
-                };
-                reader.readAsDataURL(file);
+                handleMobileUpload(file);
               }
             }}
           />
@@ -118,4 +172,5 @@ export const BackgroundUploader = ({
       </div>
     )}
   </div>
-);
+  );
+};
