@@ -13,12 +13,16 @@ interface ScratchSettingsPanelProps {
   activeView: 'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose';
   onUpdateConfig: (updates: Partial<ScratchConfig>) => void;
   onViewModeChange?: (mode: 'desktop' | 'mobile') => void;
+  hideSpacingAndBackground?: boolean;
+  hideLayoutAndAlignment?: boolean;
 }
 
 export const ScratchSettingsPanel = ({ 
   config, 
   activeView, 
-  onUpdateConfig
+  onUpdateConfig,
+  hideSpacingAndBackground = false,
+  hideLayoutAndAlignment = false
 }: ScratchSettingsPanelProps) => {
   
   const renderSettings = () => {
@@ -26,43 +30,47 @@ export const ScratchSettingsPanel = ({
       case 'welcome':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.welcomeScreen.desktopLayout}
-                mobileLayout={config.welcomeScreen.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
+            {!hideLayoutAndAlignment && (
+              <>
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+                  <LayoutSelector
+                    desktopLayout={config.welcomeScreen.desktopLayout}
+                    mobileLayout={config.welcomeScreen.mobileLayout}
+                    onDesktopLayoutChange={(layout) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
+                    })}
+                    onMobileLayoutChange={(layout) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
+                    })}
+                  />
+                </div>
+                
+                <Separator />
 
-            {/* Alignment */}
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
-              <Select
-                value={config.welcomeScreen.alignment || 'left'}
-                onValueChange={(value) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, alignment: value as 'left' | 'center' | 'right' }
-                })}
-              >
-                <SelectTrigger className="h-9 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="left">Left</SelectItem>
-                  <SelectItem value="center">Center</SelectItem>
-                  <SelectItem value="right">Right</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <Separator />
+                {/* Alignment */}
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
+                  <Select
+                    value={config.welcomeScreen.alignment || 'left'}
+                    onValueChange={(value) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, alignment: value as 'left' | 'center' | 'right' }
+                    })}
+                  >
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <Separator />
+              </>
+            )}
             
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
@@ -76,110 +84,122 @@ export const ScratchSettingsPanel = ({
               />
             </div>
 
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.welcomeScreen.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.welcomeScreen.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            {!hideSpacingAndBackground && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.welcomeScreen.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.welcomeScreen.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      welcomeScreen: { ...config.welcomeScreen, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Background Image */}
-            <BackgroundUploader
-              desktopImage={config.welcomeScreen.backgroundImage}
-              mobileImage={config.welcomeScreen.backgroundImageMobile}
-              onDesktopImageChange={(image) => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImage: image }
-              })}
-              onDesktopImageRemove={() => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImage: undefined }
-              })}
-              onMobileImageChange={(image) => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: image }
-              })}
-              onMobileImageRemove={() => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: undefined }
-              })}
-              showApplyToAll={true}
-              applyToAll={config.welcomeScreen.applyBackgroundToAll}
-              onApplyToAllChange={(value) => onUpdateConfig({
-                welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
-              })}
-            />
+                {/* Background Image */}
+                <BackgroundUploader
+                  desktopImage={config.welcomeScreen.backgroundImage}
+                  mobileImage={config.welcomeScreen.backgroundImageMobile}
+                  onDesktopImageChange={(image) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImage: image }
+                  })}
+                  onDesktopImageRemove={() => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImage: undefined }
+                  })}
+                  onMobileImageChange={(image) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: image }
+                  })}
+                  onMobileImageRemove={() => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: undefined }
+                  })}
+                  showApplyToAll={true}
+                  applyToAll={config.welcomeScreen.applyBackgroundToAll}
+                  onApplyToAllChange={(value) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
+                  })}
+                />
+              </>
+            )}
           </div>
         );
 
       case 'contact':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.contactForm.desktopLayout}
-                mobileLayout={config.contactForm.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, mobileLayout: layout }
-                })}
-              />
-            </div>
+            {!hideLayoutAndAlignment && (
+              <>
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+                  <LayoutSelector
+                    desktopLayout={config.contactForm.desktopLayout}
+                    mobileLayout={config.contactForm.mobileLayout}
+                    onDesktopLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, desktopLayout: layout }
+                    })}
+                    onMobileLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, mobileLayout: layout }
+                    })}
+                  />
+                </div>
+                
+                <Separator />
+              </>
+            )}
             
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.contactForm.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.contactForm.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            {!hideSpacingAndBackground && (
+              <>
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.contactForm.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.contactForm.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Background Image */}
-            {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
-                Background appliqué depuis Welcome Screen
-              </div>
-            ) : (
-              <BackgroundUploader
-                desktopImage={config.contactForm.backgroundImage}
-                mobileImage={config.contactForm.backgroundImageMobile}
-                onDesktopImageChange={(image) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, backgroundImage: image }
-                })}
-                onDesktopImageRemove={() => onUpdateConfig({
-                  contactForm: { ...config.contactForm, backgroundImage: undefined }
-                })}
-                onMobileImageChange={(image) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, backgroundImageMobile: image }
-                })}
-                onMobileImageRemove={() => onUpdateConfig({
-                  contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
-                })}
-              />
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.contactForm.backgroundImage}
+                    mobileImage={config.contactForm.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
+                    })}
+                  />
+                )}
+              </>
             )}
           </div>
         );
@@ -277,48 +297,52 @@ export const ScratchSettingsPanel = ({
               />
             </div>
             
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.scratchScreen.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.scratchScreen.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            {!hideSpacingAndBackground && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.scratchScreen.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.scratchScreen.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
 
-            <Separator />
+                <Separator />
 
-            {/* Background Image */}
-            {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
-                Background appliqué depuis Welcome Screen
-              </div>
-            ) : (
-              <BackgroundUploader
-                desktopImage={config.scratchScreen.backgroundImage}
-                mobileImage={config.scratchScreen.backgroundImageMobile}
-                onDesktopImageChange={(image) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, backgroundImage: image }
-                })}
-                onDesktopImageRemove={() => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, backgroundImage: undefined }
-                })}
-                onMobileImageChange={(image) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, backgroundImageMobile: image }
-                })}
-                onMobileImageRemove={() => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, backgroundImageMobile: undefined }
-                })}
-              />
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.scratchScreen.backgroundImage}
+                    mobileImage={config.scratchScreen.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, backgroundImageMobile: undefined }
+                    })}
+                  />
+                )}
+              </>
             )}
           </div>
         );
@@ -327,45 +351,79 @@ export const ScratchSettingsPanel = ({
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.endingWin.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.endingWin.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, blockSpacing: value }
+              <Label className="text-xs text-muted-foreground mb-2 block">Title</Label>
+              <Input 
+                type="text" 
+                value={config.endingWin.title}
+                onChange={(e) => onUpdateConfig({ 
+                  endingWin: { ...config.endingWin, title: e.target.value } 
                 })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
+                className="text-xs h-8"
               />
             </div>
 
-            <Separator />
-
-            {/* Background Image */}
-            {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
-                Background appliqué depuis Welcome Screen
-              </div>
-            ) : (
-              <BackgroundUploader
-                desktopImage={config.endingWin.backgroundImage}
-                mobileImage={config.endingWin.backgroundImageMobile}
-                onDesktopImageChange={(image) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImage: image }
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
+              <Input 
+                type="text" 
+                value={config.endingWin.subtitle}
+                onChange={(e) => onUpdateConfig({ 
+                  endingWin: { ...config.endingWin, subtitle: e.target.value } 
                 })}
-                onDesktopImageRemove={() => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImage: undefined }
-                })}
-                onMobileImageChange={(image) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImageMobile: image }
-                })}
-                onMobileImageRemove={() => onUpdateConfig({
-                  endingWin: { ...config.endingWin, backgroundImageMobile: undefined }
-                })}
+                className="text-xs h-8"
+                placeholder="Use {{prize}} for the won prize"
               />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Utilisez {'{{'} prize{'}}'} pour afficher le lot gagné
+              </p>
+            </div>
+
+            {!hideSpacingAndBackground && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.endingWin.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.endingWin.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      endingWin: { ...config.endingWin, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.endingWin.backgroundImage}
+                    mobileImage={config.endingWin.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      endingWin: { ...config.endingWin, backgroundImageMobile: undefined }
+                    })}
+                  />
+                )}
+              </>
             )}
           </div>
         );
@@ -374,45 +432,75 @@ export const ScratchSettingsPanel = ({
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.endingLose.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.endingLose.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, blockSpacing: value }
+              <Label className="text-xs text-muted-foreground mb-2 block">Title</Label>
+              <Input 
+                type="text" 
+                value={config.endingLose.title}
+                onChange={(e) => onUpdateConfig({ 
+                  endingLose: { ...config.endingLose, title: e.target.value } 
                 })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
+                className="text-xs h-8"
               />
             </div>
 
-            <Separator />
-
-            {/* Background Image */}
-            {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
-                Background appliqué depuis Welcome Screen
-              </div>
-            ) : (
-              <BackgroundUploader
-                desktopImage={config.endingLose.backgroundImage}
-                mobileImage={config.endingLose.backgroundImageMobile}
-                onDesktopImageChange={(image) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImage: image }
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
+              <Input 
+                type="text" 
+                value={config.endingLose.subtitle}
+                onChange={(e) => onUpdateConfig({ 
+                  endingLose: { ...config.endingLose, subtitle: e.target.value } 
                 })}
-                onDesktopImageRemove={() => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImage: undefined }
-                })}
-                onMobileImageChange={(image) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImageMobile: image }
-                })}
-                onMobileImageRemove={() => onUpdateConfig({
-                  endingLose: { ...config.endingLose, backgroundImageMobile: undefined }
-                })}
+                className="text-xs h-8"
               />
+            </div>
+
+            {!hideSpacingAndBackground && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.endingLose.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.endingLose.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      endingLose: { ...config.endingLose, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.endingLose.backgroundImage}
+                    mobileImage={config.endingLose.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      endingLose: { ...config.endingLose, backgroundImageMobile: undefined }
+                    })}
+                  />
+                )}
+              </>
             )}
           </div>
         );

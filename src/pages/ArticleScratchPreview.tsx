@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
-import { WheelConfig } from "@/components/WheelBuilder";
+import { ScratchConfig } from "@/components/ScratchBuilder";
 import { ArticleConfig } from "@/components/ArticleWheelBuilder";
 import { ThemeSettings, GOOGLE_FONTS } from "@/contexts/ThemeContext";
-import SmartWheel from "@/components/SmartWheel/SmartWheel";
+import SmartScratch from "@/components/SmartScratch/SmartScratch";
 
-const ArticleWheelPreview = () => {
-  const [config, setConfig] = useState<WheelConfig | null>(null);
+const ArticleScratchPreview = () => {
+  const [config, setConfig] = useState<ScratchConfig | null>(null);
   const [articleConfig, setArticleConfig] = useState<ArticleConfig | null>(null);
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
-  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
+  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   useEffect(() => {
     // Load configs from localStorage
-    const savedConfig = localStorage.getItem('article-wheel-config');
-    const savedArticleConfig = localStorage.getItem('article-wheel-article-config');
-    const savedTheme = localStorage.getItem('article-wheel-theme');
+    const savedConfig = localStorage.getItem('article-scratch-config');
+    const savedArticleConfig = localStorage.getItem('article-scratch-article-config');
+    const savedTheme = localStorage.getItem('article-scratch-theme');
     
     if (savedConfig) {
       setConfig(JSON.parse(savedConfig));
@@ -53,14 +53,14 @@ const ArticleWheelPreview = () => {
       if (config.contactForm?.enabled) {
         setActiveView('contact');
       } else {
-        setActiveView('wheel');
+        setActiveView('scratch');
       }
     } else if (activeView === 'contact') {
-      setActiveView('wheel');
+      setActiveView('scratch');
     }
   };
 
-  const handleSpinComplete = (isWin: boolean) => {
+  const handleScratchComplete = (isWin: boolean) => {
     setActiveView(isWin ? 'ending-win' : 'ending-lose');
   };
 
@@ -111,7 +111,7 @@ const ArticleWheelPreview = () => {
                   fontFamily: themeStyles.fontFamily,
                 }}
               >
-                {config.welcomeScreen.buttonText || 'Tourner la roue'}
+                {config.welcomeScreen.buttonText || 'Commencer à gratter'}
               </button>
             </div>
           </div>
@@ -169,34 +169,22 @@ const ArticleWheelPreview = () => {
           </div>
         );
 
-      case 'wheel':
-        // Adapt segments for SmartWheel
-        const adaptedSegments = config.segments.map(seg => ({
-          ...seg,
-          value: seg.label
-        }));
-        
+      case 'scratch':
         return (
           <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
-            <div 
-              style={{ 
-                transform: viewMode === 'mobile' ? 'scale(0.6)' : 'scale(0.8)',
-                transformOrigin: 'center center',
+            <SmartScratch
+              width={config.scratchScreen.cardWidth}
+              height={config.scratchScreen.cardHeight}
+              scratchColor={config.scratchScreen.scratchColor}
+              revealText="🎉 Félicitations !"
+              threshold={config.scratchScreen.threshold}
+              brushSize={config.scratchScreen.brushSize}
+              onComplete={(percentage) => {
+                // Simulate win/lose based on random
+                const isWin = Math.random() > 0.3;
+                setTimeout(() => handleScratchComplete(isWin), 500);
               }}
-            >
-              <SmartWheel
-                segments={adaptedSegments as any}
-                onComplete={(segment: any) => {
-                  const isWin = segment && segment.label !== 'Perdu';
-                  setTimeout(() => handleSpinComplete(isWin), 1000);
-                }}
-                brandColors={theme ? { primary: theme.systemColor, secondary: theme.accentColor } : undefined}
-                size={350}
-                borderStyle={theme?.wheelBorderStyle === 'gold' ? 'goldRing' : theme?.wheelBorderStyle === 'silver' ? 'silverRing' : theme?.wheelBorderStyle || 'classic'}
-                customBorderColor={theme?.wheelBorderStyle === 'classic' ? theme?.wheelBorderCustomColor : undefined}
-                showBulbs={true}
-              />
-            </div>
+            />
           </div>
         );
 
@@ -313,4 +301,4 @@ const ArticleWheelPreview = () => {
   );
 };
 
-export default ArticleWheelPreview;
+export default ArticleScratchPreview;

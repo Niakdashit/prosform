@@ -1,40 +1,29 @@
 import { useEffect, useState } from "react";
-import { WheelConfig } from "@/components/WheelBuilder";
-import { ArticleConfig } from "@/components/ArticleWheelBuilder";
+import { JackpotConfig } from "@/components/JackpotBuilder";
+import { ArticleConfig } from "@/components/ArticleJackpotBuilder";
 import { ThemeSettings, GOOGLE_FONTS } from "@/contexts/ThemeContext";
-import SmartWheel from "@/components/SmartWheel/SmartWheel";
+import SmartJackpot from "@/components/SmartJackpot/SmartJackpot";
 
-const ArticleWheelPreview = () => {
-  const [config, setConfig] = useState<WheelConfig | null>(null);
+const ArticleJackpotPreview = () => {
+  const [config, setConfig] = useState<JackpotConfig | null>(null);
   const [articleConfig, setArticleConfig] = useState<ArticleConfig | null>(null);
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
-  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
+  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   useEffect(() => {
-    // Load configs from localStorage
-    const savedConfig = localStorage.getItem('article-wheel-config');
-    const savedArticleConfig = localStorage.getItem('article-wheel-article-config');
-    const savedTheme = localStorage.getItem('article-wheel-theme');
+    const savedConfig = localStorage.getItem('article-jackpot-config');
+    const savedArticleConfig = localStorage.getItem('article-jackpot-article-config');
+    const savedTheme = localStorage.getItem('article-jackpot-theme');
     
-    if (savedConfig) {
-      setConfig(JSON.parse(savedConfig));
-    }
-    if (savedArticleConfig) {
-      setArticleConfig(JSON.parse(savedArticleConfig));
-    }
-    if (savedTheme) {
-      setTheme(JSON.parse(savedTheme));
-    }
+    if (savedConfig) setConfig(JSON.parse(savedConfig));
+    if (savedArticleConfig) setArticleConfig(JSON.parse(savedArticleConfig));
+    if (savedTheme) setTheme(JSON.parse(savedTheme));
 
-    // Detect mobile device
     const isMobileDevice = window.innerWidth < 768;
-    if (isMobileDevice) {
-      setViewMode('mobile');
-    }
+    if (isMobileDevice) setViewMode('mobile');
   }, []);
 
-  // Get font family CSS value
   const getFontFamily = (fontValue: string) => {
     const font = GOOGLE_FONTS.find(f => f.value === fontValue);
     return font ? `'${font.label}', ${font.category}` : 'Inter, sans-serif';
@@ -53,10 +42,10 @@ const ArticleWheelPreview = () => {
       if (config.contactForm?.enabled) {
         setActiveView('contact');
       } else {
-        setActiveView('wheel');
+        setActiveView('jackpot');
       }
     } else if (activeView === 'contact') {
-      setActiveView('wheel');
+      setActiveView('jackpot');
     }
   };
 
@@ -66,7 +55,6 @@ const ArticleWheelPreview = () => {
 
   const canvasWidth = viewMode === 'mobile' ? 375 : articleConfig.frameWidth;
 
-  // Theme-based styles
   const themeStyles = theme ? {
     fontFamily: getFontFamily(theme.fontFamily),
     headingFontFamily: getFontFamily(theme.headingFontFamily),
@@ -91,13 +79,9 @@ const ArticleWheelPreview = () => {
         return (
           <div className="p-6" style={{ fontFamily: themeStyles.fontFamily }}>
             <div 
-              style={{ 
-                fontSize: '16px', 
-                lineHeight: '1.6',
-                color: themeStyles.textColor,
-              }}
+              style={{ fontSize: '16px', lineHeight: '1.6', color: themeStyles.textColor }}
               dangerouslySetInnerHTML={{
-                __html: config.welcomeScreen.subtitleHtml || '<p>Décrivez votre contenu ici...</p>'
+                __html: config.welcomeScreen.subtitleHtml || config.welcomeScreen.subtitle || '<p>Décrivez votre jeu ici...</p>'
               }}
             />
             <div className="flex justify-center mt-6">
@@ -108,10 +92,9 @@ const ArticleWheelPreview = () => {
                   backgroundColor: theme?.buttonColor || articleConfig.ctaBackgroundColor,
                   color: articleConfig.ctaTextColor,
                   borderRadius: `${theme?.borderRadius || articleConfig.ctaBorderRadius}px`,
-                  fontFamily: themeStyles.fontFamily,
                 }}
               >
-                {config.welcomeScreen.buttonText || 'Tourner la roue'}
+                {config.welcomeScreen.buttonText || 'Jouer au jackpot'}
               </button>
             </div>
           </div>
@@ -121,13 +104,7 @@ const ArticleWheelPreview = () => {
         return (
           <div className="p-6" style={{ fontFamily: themeStyles.fontFamily }}>
             {config.contactForm.title && (
-              <h2 
-                className={`text-xl font-semibold text-center ${config.contactForm.subtitle ? 'mb-2' : 'mb-6'}`}
-                style={{ 
-                  fontFamily: themeStyles.headingFontFamily,
-                  color: themeStyles.textColor,
-                }}
-              >
+              <h2 className="text-xl font-semibold text-center mb-2" style={{ fontFamily: themeStyles.headingFontFamily, color: themeStyles.textColor }}>
                 {config.contactForm.title}
               </h2>
             )}
@@ -139,16 +116,10 @@ const ArticleWheelPreview = () => {
             <div className="max-w-md mx-auto space-y-4">
               {config.contactForm.fields.map((field, i) => (
                 <div key={i}>
-                  <label 
-                    className="block text-sm font-medium mb-1"
-                    style={{ color: themeStyles.textColor }}
-                  >
+                  <label className="block text-sm font-medium mb-1" style={{ color: themeStyles.textColor }}>
                     {field.label} {field.required && <span className="text-red-500">*</span>}
                   </label>
-                  <input
-                    type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-                    className="w-full h-10 px-3 border border-gray-300 rounded-md"
-                  />
+                  <input type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'} className="w-full h-10 px-3 border border-gray-300 rounded-md" />
                 </div>
               ))}
               <div className="flex justify-center pt-4">
@@ -159,7 +130,6 @@ const ArticleWheelPreview = () => {
                     backgroundColor: theme?.buttonColor || articleConfig.ctaBackgroundColor,
                     color: articleConfig.ctaTextColor,
                     borderRadius: `${theme?.borderRadius || articleConfig.ctaBorderRadius}px`,
-                    fontFamily: themeStyles.fontFamily,
                   }}
                 >
                   Valider
@@ -169,32 +139,13 @@ const ArticleWheelPreview = () => {
           </div>
         );
 
-      case 'wheel':
-        // Adapt segments for SmartWheel
-        const adaptedSegments = config.segments.map(seg => ({
-          ...seg,
-          value: seg.label
-        }));
-        
+      case 'jackpot':
         return (
           <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
-            <div 
-              style={{ 
-                transform: viewMode === 'mobile' ? 'scale(0.6)' : 'scale(0.8)',
-                transformOrigin: 'center center',
-              }}
-            >
-              <SmartWheel
-                segments={adaptedSegments as any}
-                onComplete={(segment: any) => {
-                  const isWin = segment && segment.label !== 'Perdu';
-                  setTimeout(() => handleSpinComplete(isWin), 1000);
-                }}
-                brandColors={theme ? { primary: theme.systemColor, secondary: theme.accentColor } : undefined}
-                size={350}
-                borderStyle={theme?.wheelBorderStyle === 'gold' ? 'goldRing' : theme?.wheelBorderStyle === 'silver' ? 'silverRing' : theme?.wheelBorderStyle || 'classic'}
-                customBorderColor={theme?.wheelBorderStyle === 'classic' ? theme?.wheelBorderCustomColor : undefined}
-                showBulbs={true}
+            <div style={{ transform: viewMode === 'mobile' ? 'scale(0.6)' : 'scale(0.8)', transformOrigin: 'center center' }}>
+              <SmartJackpot
+                symbols={config.symbols.map(s => s.emoji)}
+                spinDuration={config.jackpotScreen.spinDuration}
               />
             </div>
           </div>
@@ -205,19 +156,12 @@ const ArticleWheelPreview = () => {
           <div className="p-6 text-center" style={{ fontFamily: themeStyles.fontFamily }}>
             <div 
               className="text-2xl font-bold mb-4"
-              style={{ 
-                fontFamily: themeStyles.headingFontFamily,
-                color: theme?.primaryColor || '#16a34a',
-              }}
-              dangerouslySetInnerHTML={{
-                __html: config.endingWin.titleHtml || config.endingWin.title,
-              }}
+              style={{ fontFamily: themeStyles.headingFontFamily, color: theme?.primaryColor || '#16a34a' }}
+              dangerouslySetInnerHTML={{ __html: config.endingWin.titleHtml || config.endingWin.title }}
             />
             <div 
               style={{ color: theme?.textSecondaryColor || '#6b7280' }}
-              dangerouslySetInnerHTML={{
-                __html: config.endingWin.subtitleHtml || config.endingWin.subtitle,
-              }}
+              dangerouslySetInnerHTML={{ __html: config.endingWin.subtitleHtml || config.endingWin.subtitle }}
             />
           </div>
         );
@@ -227,19 +171,12 @@ const ArticleWheelPreview = () => {
           <div className="p-6 text-center" style={{ fontFamily: themeStyles.fontFamily }}>
             <div 
               className="text-2xl font-bold mb-4"
-              style={{ 
-                fontFamily: themeStyles.headingFontFamily,
-                color: themeStyles.textColor,
-              }}
-              dangerouslySetInnerHTML={{
-                __html: config.endingLose.titleHtml || config.endingLose.title,
-              }}
+              style={{ fontFamily: themeStyles.headingFontFamily, color: themeStyles.textColor }}
+              dangerouslySetInnerHTML={{ __html: config.endingLose.titleHtml || config.endingLose.title }}
             />
             <div 
               style={{ color: theme?.textSecondaryColor || '#6b7280' }}
-              dangerouslySetInnerHTML={{
-                __html: config.endingLose.subtitleHtml || config.endingLose.subtitle,
-              }}
+              dangerouslySetInnerHTML={{ __html: config.endingLose.subtitleHtml || config.endingLose.subtitle }}
             />
           </div>
         );
@@ -250,10 +187,7 @@ const ArticleWheelPreview = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: articleConfig.pageBackgroundColor || '#3d3731' }}
-    >
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: articleConfig.pageBackgroundColor || '#3d3731' }}>
       <div
         style={{
           width: `${canvasWidth}px`,
@@ -266,51 +200,22 @@ const ArticleWheelPreview = () => {
           overflow: 'hidden',
         }}
       >
-        {/* Header */}
         {articleConfig.headerImage && (
-          <img
-            src={articleConfig.headerImage}
-            alt="Header"
-            className="w-full"
-            style={{ 
-              objectFit: articleConfig.headerFitMode === 'fit' ? 'contain' : 'cover',
-              maxHeight: '150px',
-              borderTopLeftRadius: `${articleConfig.frameBorderRadius}px`,
-              borderTopRightRadius: `${articleConfig.frameBorderRadius}px`,
-            }}
-          />
+          <img src={articleConfig.headerImage} alt="Header" className="w-full" style={{ objectFit: articleConfig.headerFitMode === 'fit' ? 'contain' : 'cover', maxHeight: '150px' }} />
         )}
 
-        {/* Banner */}
         {articleConfig.banner?.imageUrl && (
-          <img
-            src={articleConfig.banner.imageUrl}
-            alt="Banner"
-            className="w-full"
-            style={{ height: 'auto', display: 'block' }}
-          />
+          <img src={articleConfig.banner.imageUrl} alt="Banner" className="w-full" style={{ height: 'auto', display: 'block' }} />
         )}
 
-        {/* Content */}
         {renderContent()}
 
-        {/* Footer */}
         {articleConfig.footerImage && (
-          <img
-            src={articleConfig.footerImage}
-            alt="Footer"
-            className="w-full"
-            style={{ 
-              objectFit: articleConfig.footerFitMode === 'fit' ? 'contain' : 'cover',
-              maxHeight: '150px',
-              borderBottomLeftRadius: `${articleConfig.frameBorderRadius}px`,
-              borderBottomRightRadius: `${articleConfig.frameBorderRadius}px`,
-            }}
-          />
+          <img src={articleConfig.footerImage} alt="Footer" className="w-full" style={{ objectFit: articleConfig.footerFitMode === 'fit' ? 'contain' : 'cover', maxHeight: '150px' }} />
         )}
       </div>
     </div>
   );
 };
 
-export default ArticleWheelPreview;
+export default ArticleJackpotPreview;

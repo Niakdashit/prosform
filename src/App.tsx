@@ -22,6 +22,11 @@ import JackpotPreview from "./pages/JackpotPreview";
 import Scratch from "./pages/Scratch";
 import ScratchPreview from "./pages/ScratchPreview";
 import ArticleScratch from "./pages/ArticleScratch";
+import ArticleScratchPreview from "./pages/ArticleScratchPreview";
+import ArticleQuiz from "./pages/ArticleQuiz";
+import ArticleQuizPreview from "./pages/ArticleQuizPreview";
+import ArticleJackpot from "./pages/ArticleJackpot";
+import ArticleJackpotPreview from "./pages/ArticleJackpotPreview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +58,11 @@ const App = () => (
             <Route path="/scratch" element={<Scratch />} />
             <Route path="/scratch-preview" element={<ScratchPreview />} />
             <Route path="/article-scratch" element={<ArticleScratch />} />
+            <Route path="/article-scratch-preview" element={<ArticleScratchPreview />} />
+            <Route path="/article-quiz" element={<ArticleQuiz />} />
+            <Route path="/article-quiz-preview" element={<ArticleQuizPreview />} />
+            <Route path="/article-jackpot" element={<ArticleJackpot />} />
+            <Route path="/article-jackpot-preview" element={<ArticleJackpotPreview />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

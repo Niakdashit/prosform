@@ -16,10 +16,6 @@ interface ArticleScratchPreviewProps {
   prizes: ScratchPrize[];
 }
 
-/**
- * ArticleScratchPreview - Canvas rectangulaire pour le mode Article Scratch
- * Affiche le contenu dans un cadre avec bordures
- */
 export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
   config,
   articleConfig,
@@ -33,16 +29,13 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
   const editorRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   
-  // Get unified button styles from theme (same as WheelPreview)
   const unifiedButtonStyles = getButtonStyles(theme, viewMode);
 
-  // Get font family CSS value
   const getFontFamily = (fontValue: string) => {
     const font = GOOGLE_FONTS.find(f => f.value === fontValue);
     return font ? `'${font.label}', ${font.category}` : 'Inter, sans-serif';
   };
 
-  // Theme-based styles
   const themeStyles = {
     fontFamily: getFontFamily(theme.fontFamily),
     headingFontFamily: getFontFamily(theme.headingFontFamily),
@@ -53,70 +46,79 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
     borderRadius: theme.borderRadius,
   };
 
-  // Get banner image from config
   const bannerImage = articleConfig.banner?.imageUrl;
 
-  // Execute formatting command
   const exec = useCallback((cmd: string, val?: string) => {
     document.execCommand(cmd, false, val);
   }, []);
 
-  // Render content based on active view
   const renderContent = () => {
     switch (activeView) {
       case 'welcome':
         return (
           <div className="p-6">
             {/* Rich text toolbar */}
-            <div 
-              className="flex items-center gap-1 p-2 mb-4 rounded-lg bg-white border border-gray-200 flex-wrap"
-            >
-              <select className="h-8 px-2 text-sm border border-gray-200 rounded bg-white">
-                <option>Taille ▾</option>
+            <div className="flex items-center gap-1 p-2 mb-4 rounded-lg bg-white border border-gray-200 flex-wrap">
+              <select 
+                className="h-8 px-2 text-sm border border-gray-200 rounded bg-white"
+                onChange={(e) => exec('fontSize', e.target.value)}
+              >
+                <option value="3">Taille ▾</option>
+                <option value="1">Petit</option>
+                <option value="3">Normal</option>
+                <option value="5">Grand</option>
+                <option value="7">Très grand</option>
               </select>
               
               <div className="w-px h-6 bg-gray-200 mx-1" />
               
-              <button onClick={() => exec('bold')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('bold')} className="p-2 hover:bg-gray-100 rounded" title="Gras">
                 <Bold className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('italic')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('italic')} className="p-2 hover:bg-gray-100 rounded" title="Italique">
                 <Italic className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('underline')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('underline')} className="p-2 hover:bg-gray-100 rounded" title="Souligné">
                 <Underline className="w-4 h-4" />
               </button>
               
               <div className="w-px h-6 bg-gray-200 mx-1" />
               
-              <button onClick={() => exec('insertUnorderedList')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('insertUnorderedList')} className="p-2 hover:bg-gray-100 rounded" title="Liste">
                 <List className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('insertOrderedList')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('insertOrderedList')} className="p-2 hover:bg-gray-100 rounded" title="Liste numérotée">
                 <ListOrdered className="w-4 h-4" />
               </button>
               
               <div className="w-px h-6 bg-gray-200 mx-1" />
               
-              <button onClick={() => exec('justifyLeft')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('justifyLeft')} className="p-2 hover:bg-gray-100 rounded" title="Gauche">
                 <AlignLeft className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('justifyCenter')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('justifyCenter')} className="p-2 hover:bg-gray-100 rounded" title="Centre">
                 <AlignCenter className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('justifyRight')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('justifyRight')} className="p-2 hover:bg-gray-100 rounded" title="Droite">
                 <AlignRight className="w-4 h-4" />
               </button>
               
               <div className="w-px h-6 bg-gray-200 mx-1" />
               
-              <button onClick={() => exec('createLink', prompt('URL:') || '')} className="p-2 hover:bg-gray-100 rounded">
+              <button 
+                onClick={() => {
+                  const url = prompt('URL du lien:');
+                  if (url) exec('createLink', url);
+                }} 
+                className="p-2 hover:bg-gray-100 rounded" 
+                title="Lien"
+              >
                 <Link className="w-4 h-4" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded">
+              <button className="p-2 hover:bg-gray-100 rounded" title="Image">
                 <Image className="w-4 h-4" />
               </button>
-              <button className="p-2 hover:bg-gray-100 rounded">
+              <button className="p-2 hover:bg-gray-100 rounded" title="Tableau">
                 <Table className="w-4 h-4" />
               </button>
               
@@ -168,7 +170,6 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
       case 'contact':
         return (
           <div className="p-6" style={{ fontFamily: themeStyles.fontFamily }}>
-            {/* Form Title */}
             {config.contactForm.title && (
               <h2 
                 className={`text-xl font-semibold text-center ${config.contactForm.subtitle ? 'mb-2' : 'mb-6'}`}
@@ -181,14 +182,12 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
               </h2>
             )}
             
-            {/* Form Subtitle */}
             {config.contactForm.subtitle && (
               <p className="text-center mb-6" style={{ color: theme.textSecondaryColor }}>
                 {config.contactForm.subtitle}
               </p>
             )}
             
-            {/* Form Fields */}
             {config.contactForm.enabled && (
               <div className="max-w-md mx-auto space-y-4">
                 {config.contactForm.fields.map((field, i) => (
@@ -221,7 +220,6 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
               </div>
             )}
             
-            {/* Form disabled message */}
             {!config.contactForm.enabled && (
               <p className="text-center text-gray-500 italic">
                 Formulaire de contact désactivé
@@ -233,37 +231,43 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
       case 'scratch':
         return (
           <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
-            <h2 
-              className="text-xl font-bold text-center mb-4"
-              style={{ 
-                fontFamily: themeStyles.headingFontFamily,
-                color: theme.primaryColor,
-              }}
-            >
-              {config.scratchScreen.title}
-            </h2>
-            <p className="text-center mb-6" style={{ color: theme.textSecondaryColor }}>
-              {config.scratchScreen.subtitle}
-            </p>
+            {/* Title */}
+            {config.scratchScreen.title && (
+              <h2 
+                className="text-2xl font-bold mb-6 text-center"
+                style={{ 
+                  fontFamily: themeStyles.headingFontFamily,
+                  color: theme.primaryColor,
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: config.scratchScreen.titleHtml || config.scratchScreen.title,
+                }}
+              />
+            )}
             
+            {/* Display all cards */}
             <div 
-              className="relative"
+              className="flex flex-wrap justify-center gap-4"
               style={{ 
-                transform: viewMode === 'mobile' ? 'scale(0.8)' : 'scale(1)',
+                transform: viewMode === 'mobile' ? 'scale(0.6)' : 'scale(0.85)',
                 transformOrigin: 'center center',
               }}
             >
-              <SmartScratch
-                width={config.scratchScreen.cardWidth}
-                height={config.scratchScreen.cardHeight}
-                scratchColor={config.scratchScreen.scratchColor}
-                revealText="🎉 Félicitations !"
-                threshold={config.scratchScreen.threshold}
-                brushSize={config.scratchScreen.brushSize}
-                onComplete={(percentage) => {
-                  console.log('Scratch completed:', percentage);
-                }}
-              />
+              {config.cards.map((card) => (
+                <SmartScratch
+                  key={card.id}
+                  width={config.scratchScreen.cardWidth}
+                  height={config.scratchScreen.cardHeight}
+                  scratchColor={config.scratchScreen.scratchColor}
+                  revealText={card.revealText}
+                  revealImage={card.revealImage}
+                  threshold={config.scratchScreen.threshold}
+                  brushSize={config.scratchScreen.brushSize}
+                  onComplete={(percentage) => {
+                    console.log('Scratch completed:', percentage, 'Card:', card.revealText);
+                  }}
+                />
+              ))}
             </div>
           </div>
         );
@@ -272,38 +276,44 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
       case 'ending-lose':
         const isWin = activeView === 'ending-win';
         const endingConfig = isWin ? config.endingWin : config.endingLose;
+        const endingKey = isWin ? 'endingWin' : 'endingLose';
         
         return (
           <div className="p-6" style={{ fontFamily: themeStyles.fontFamily }}>
             {/* Rich text toolbar */}
-            <div 
-              className="flex items-center gap-1 p-2 mb-4 rounded-lg bg-white border border-gray-200 flex-wrap"
-            >
-              <select className="h-8 px-2 text-sm border border-gray-200 rounded bg-white">
-                <option>Taille ▾</option>
+            <div className="flex items-center gap-1 p-2 mb-4 rounded-lg bg-white border border-gray-200 flex-wrap">
+              <select 
+                className="h-8 px-2 text-sm border border-gray-200 rounded bg-white"
+                onChange={(e) => exec('fontSize', e.target.value)}
+              >
+                <option value="3">Taille ▾</option>
+                <option value="1">Petit</option>
+                <option value="3">Normal</option>
+                <option value="5">Grand</option>
+                <option value="7">Très grand</option>
               </select>
               
               <div className="w-px h-6 bg-gray-200 mx-1" />
               
-              <button onClick={() => exec('bold')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('bold')} className="p-2 hover:bg-gray-100 rounded" title="Gras">
                 <Bold className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('italic')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('italic')} className="p-2 hover:bg-gray-100 rounded" title="Italique">
                 <Italic className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('underline')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('underline')} className="p-2 hover:bg-gray-100 rounded" title="Souligné">
                 <Underline className="w-4 h-4" />
               </button>
               
               <div className="w-px h-6 bg-gray-200 mx-1" />
               
-              <button onClick={() => exec('justifyLeft')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('justifyLeft')} className="p-2 hover:bg-gray-100 rounded" title="Gauche">
                 <AlignLeft className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('justifyCenter')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('justifyCenter')} className="p-2 hover:bg-gray-100 rounded" title="Centre">
                 <AlignCenter className="w-4 h-4" />
               </button>
-              <button onClick={() => exec('justifyRight')} className="p-2 hover:bg-gray-100 rounded">
+              <button onClick={() => exec('justifyRight')} className="p-2 hover:bg-gray-100 rounded" title="Droite">
                 <AlignRight className="w-4 h-4" />
               </button>
               
@@ -314,21 +324,51 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
               </button>
             </div>
 
-            {/* Title with theme color */}
-            <h2 
-              className="text-2xl font-bold mb-4"
+            {/* Editable Title */}
+            <div
+              contentEditable
+              suppressContentEditableWarning
+              className="text-2xl font-bold mb-4 outline-none"
               style={{ 
                 fontFamily: themeStyles.headingFontFamily,
                 color: theme.primaryColor,
               }}
-            >
-              {endingConfig.title}
-            </h2>
+              dangerouslySetInnerHTML={{
+                __html: endingConfig.titleHtml || endingConfig.title,
+              }}
+              onBlur={(e) => {
+                onUpdateConfig({
+                  [endingKey]: {
+                    ...endingConfig,
+                    title: e.currentTarget.textContent || '',
+                    titleHtml: e.currentTarget.innerHTML,
+                  },
+                });
+              }}
+            />
             
-            {/* Subtitle with theme color */}
-            <p style={{ color: theme.textSecondaryColor }}>
-              {endingConfig.subtitle}
-            </p>
+            {/* Editable Subtitle */}
+            <div
+              contentEditable
+              suppressContentEditableWarning
+              className="outline-none"
+              style={{ 
+                color: theme.textSecondaryColor,
+                fontFamily: themeStyles.fontFamily,
+              }}
+              dangerouslySetInnerHTML={{
+                __html: endingConfig.subtitleHtml || endingConfig.subtitle,
+              }}
+              onBlur={(e) => {
+                onUpdateConfig({
+                  [endingKey]: {
+                    ...endingConfig,
+                    subtitle: e.currentTarget.textContent || '',
+                    subtitleHtml: e.currentTarget.innerHTML,
+                  },
+                });
+              }}
+            />
           </div>
         );
 
@@ -337,54 +377,53 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
     }
   };
 
-  // Calculate canvas width based on viewMode
   const canvasWidth = viewMode === 'mobile' ? 375 : articleConfig.frameWidth;
 
   return (
-    <div 
-      className="min-h-full flex items-start justify-center p-8"
-      style={{ 
-        backgroundColor: articleConfig.pageBackgroundColor || '#f3f4f6',
-        backgroundImage: articleConfig.pageBackgroundImage ? `url(${articleConfig.pageBackgroundImage})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
+    <div className="relative flex items-center justify-center p-4">
       {/* Article Canvas */}
       <div
-        className="relative"
+        className="article-canvas"
         style={{
           width: `${canvasWidth}px`,
           backgroundColor: articleConfig.frameColor,
-          borderRadius: `${articleConfig.frameBorderRadius}px`,
+          borderStyle: 'solid',
           borderWidth: `${articleConfig.frameBorderWidth}px`,
           borderColor: articleConfig.frameBorderColor,
-          borderStyle: 'solid',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+          borderRadius: `${articleConfig.frameBorderRadius}px`,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
           overflow: 'hidden',
         }}
       >
         {/* Header */}
         {articleConfig.headerImage && (
-          <img
-            src={articleConfig.headerImage}
-            alt="Header"
-            className="w-full"
-            style={{ 
-              objectFit: articleConfig.headerFitMode === 'fit' ? 'contain' : 'cover',
-              maxHeight: '150px',
-            }}
-          />
+          <div className="relative">
+            <img
+              src={articleConfig.headerImage}
+              alt="Header"
+              className="w-full"
+              style={{ 
+                objectFit: articleConfig.headerFitMode === 'fit' ? 'contain' : 'cover',
+                maxHeight: '150px'
+              }}
+            />
+          </div>
         )}
 
         {/* Banner */}
         {bannerImage && (
-          <img
-            src={bannerImage}
-            alt="Banner"
-            className="w-full"
-            style={{ height: 'auto', display: 'block' }}
-          />
+          <div className="relative w-full">
+            <img
+              src={bannerImage}
+              alt="Banner"
+              className="w-full"
+              style={{ 
+                width: '100%',
+                height: 'auto',
+                display: 'block'
+              }}
+            />
+          </div>
         )}
 
         {/* Content */}
@@ -392,15 +431,17 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
 
         {/* Footer */}
         {articleConfig.footerImage && (
-          <img
-            src={articleConfig.footerImage}
-            alt="Footer"
-            className="w-full"
-            style={{ 
-              objectFit: articleConfig.footerFitMode === 'fit' ? 'contain' : 'cover',
-              maxHeight: '150px',
-            }}
-          />
+          <div className="relative">
+            <img
+              src={articleConfig.footerImage}
+              alt="Footer"
+              className="w-full"
+              style={{ 
+                objectFit: articleConfig.footerFitMode === 'fit' ? 'contain' : 'cover',
+                maxHeight: '150px'
+              }}
+            />
+          </div>
         )}
       </div>
     </div>

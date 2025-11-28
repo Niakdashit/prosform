@@ -1,32 +1,31 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
-import { ScratchSidebar } from "./ScratchSidebar";
-import { ArticleScratchPreview } from "./ArticleScratchPreview";
-import { ScratchSettingsPanel } from "./ScratchSettingsPanel";
-import { ArticleScratchSettingsPanel } from "./ArticleScratchSettingsPanel";
-import { ScratchTopToolbar } from "./ScratchTopToolbar";
-import { CampaignSettings } from "./CampaignSettings";
+import { JackpotSidebar } from "./JackpotSidebar";
+import { ArticleJackpotPreview } from "./ArticleJackpotPreview";
+import { JackpotSettingsPanel } from "./JackpotSettingsPanel";
+import { ArticleJackpotSettingsPanel } from "./ArticleJackpotSettingsPanel";
+import { JackpotTopToolbar } from "./JackpotTopToolbar";
 import { FloatingToolbar } from "./FloatingToolbar";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
-import { ScratchConfig, ScratchCard, ScratchPrize } from "./ScratchBuilder";
+import { JackpotConfig, JackpotSymbol, JackpotPrize } from "./JackpotBuilder";
 
-const defaultScratchConfig: ScratchConfig = {
+const defaultJackpotConfig: JackpotConfig = {
   welcomeScreen: {
-    title: "Grattez et gagnez !",
-    subtitle: "Découvrez votre lot en grattant la carte",
-    buttonText: "Commencer à gratter",
+    title: "Tentez votre chance !",
+    subtitle: "Faites tourner le jackpot et gagnez des prix incroyables",
+    buttonText: "Jouer au jackpot",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-left-right"
   },
   contactForm: {
     enabled: true,
-    title: "Merci de compléter ce formulaire afin de valider votre participation :",
-    subtitle: "",
+    title: "Vos coordonnées",
+    subtitle: "Pour vous envoyer votre gain",
     blockSpacing: 1,
     fields: [
       { type: 'name', required: true, label: 'Nom complet' },
@@ -36,21 +35,22 @@ const defaultScratchConfig: ScratchConfig = {
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
   },
-  scratchScreen: {
-    title: "Grattez pour gagner !",
-    subtitle: "Découvrez votre lot en grattant la carte",
+  jackpotScreen: {
+    title: "Tournez le jackpot !",
+    subtitle: "Alignez 3 symboles identiques pour gagner",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered",
-    scratchColor: "#C0C0C0",
-    cardWidth: 300,
-    cardHeight: 200,
-    threshold: 50,
-    brushSize: 40
+    template: "jackpot-11",
+    spinDuration: 2000
   },
-  cards: [
-    { id: '1', revealText: 'Gagné !', isWinning: true, probability: 50 },
-    { id: '2', revealText: 'Perdu...', isWinning: false, probability: 50 }
+  symbols: [
+    { id: '1', emoji: '🍒', label: 'Cerise' },
+    { id: '2', emoji: '🍋', label: 'Citron' },
+    { id: '3', emoji: '🍊', label: 'Orange' },
+    { id: '4', emoji: '🍇', label: 'Raisin' },
+    { id: '5', emoji: '⭐', label: 'Étoile' },
+    { id: '6', emoji: '💎', label: 'Diamant' }
   ],
   endingWin: {
     title: "Félicitations !",
@@ -100,36 +100,34 @@ const defaultArticleConfig: ArticleConfig = {
   pageBackgroundColor: '#f3f4f6',
 };
 
-export const ArticleScratchBuilder = () => {
+export const ArticleJackpotBuilder = () => {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
-  const [config, setConfig] = useState<ScratchConfig>(defaultScratchConfig);
+  const [config, setConfig] = useState<JackpotConfig>(defaultJackpotConfig);
   const [articleConfig, setArticleConfig] = useState<ArticleConfig>(defaultArticleConfig);
-  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
+  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
-  const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
-  const [prizes, setPrizes] = useState<ScratchPrize[]>([]);
+  const [prizes, setPrizes] = useState<JackpotPrize[]>([]);
 
   useEffect(() => {
     if (isMobile) setViewMode('mobile');
   }, [isMobile]);
 
   useEffect(() => {
-    localStorage.setItem('article-scratch-config', JSON.stringify(config));
+    localStorage.setItem('article-jackpot-config', JSON.stringify(config));
   }, [config]);
 
   useEffect(() => {
-    localStorage.setItem('article-scratch-article-config', JSON.stringify(articleConfig));
+    localStorage.setItem('article-jackpot-article-config', JSON.stringify(articleConfig));
   }, [articleConfig]);
 
   useEffect(() => {
-    localStorage.setItem('article-scratch-theme', JSON.stringify(theme));
+    localStorage.setItem('article-jackpot-theme', JSON.stringify(theme));
   }, [theme]);
 
-  const updateConfig = (updates: Partial<ScratchConfig>) => {
+  const updateConfig = (updates: Partial<JackpotConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
   };
 
@@ -137,99 +135,69 @@ export const ArticleScratchBuilder = () => {
     setArticleConfig(prev => ({ ...prev, ...updates }));
   };
 
-  const updateCard = (id: string, updates: Partial<ScratchCard>) => {
+  const updateSymbol = (id: string, updates: Partial<JackpotSymbol>) => {
     setConfig(prev => ({
       ...prev,
-      cards: prev.cards.map(card => card.id === id ? { ...card, ...updates } : card)
+      symbols: prev.symbols.map(s => s.id === id ? { ...s, ...updates } : s)
     }));
   };
 
-  const addCard = () => {
-    const newCard: ScratchCard = {
+  const addSymbol = () => {
+    const newSymbol: JackpotSymbol = {
       id: String(Date.now()),
-      revealText: 'Nouveau lot',
-      isWinning: false,
-      probability: 10
+      emoji: '🎁',
+      label: 'Nouveau symbole'
     };
-    setConfig(prev => ({ ...prev, cards: [...prev.cards, newCard] }));
-    toast.success("Carte ajoutée");
+    setConfig(prev => ({ ...prev, symbols: [...prev.symbols, newSymbol] }));
+    toast.success("Symbole ajouté");
   };
 
-  const deleteCard = (id: string) => {
-    if (config.cards.length <= 1) {
-      toast.error("Il doit y avoir au moins 1 carte");
+  const deleteSymbol = (id: string) => {
+    if (config.symbols.length <= 3) {
+      toast.error("Le jackpot doit avoir au moins 3 symboles");
       return;
     }
-    setConfig(prev => ({ ...prev, cards: prev.cards.filter(c => c.id !== id) }));
-    toast.success("Carte supprimée");
-  };
-
-  const handleSavePrize = (prize: ScratchPrize) => {
-    const existingPrize = prizes.find(p => p.id === prize.id);
-    if (existingPrize) {
-      const used = Math.max(0, existingPrize.quantity - existingPrize.remaining);
-      const newRemaining = Math.max(0, (prize.quantity ?? existingPrize.quantity) - used);
-      setPrizes(prizes.map(p => p.id === prize.id ? { ...p, ...prize, remaining: newRemaining, status: newRemaining === 0 ? 'depleted' : p.status } : p));
-    } else {
-      setPrizes([...prizes, { ...prize, remaining: prize.quantity, status: 'active' as const }]);
-    }
-    toast.success("Lot enregistré");
-  };
-
-  const handleDeletePrize = (id: string) => {
-    setPrizes(prizes.filter(p => p.id !== id));
-    toast.success("Lot supprimé");
+    setConfig(prev => ({ ...prev, symbols: prev.symbols.filter(s => s.id !== id) }));
+    toast.success("Symbole supprimé");
   };
 
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
-      <ScratchTopToolbar 
+      <JackpotTopToolbar 
         onPreview={() => {
-          const targetViewMode = isMobile ? 'mobile' : 'desktop';
           try {
-            localStorage.setItem('article-scratch-config', JSON.stringify(config));
-            localStorage.setItem('article-scratch-article-config', JSON.stringify(articleConfig));
-            localStorage.setItem('article-scratch-viewMode', targetViewMode);
-            localStorage.setItem('article-scratch-theme', JSON.stringify(theme));
-            window.open('/article-scratch-preview', '_blank');
+            localStorage.setItem('article-jackpot-config', JSON.stringify(config));
+            localStorage.setItem('article-jackpot-article-config', JSON.stringify(articleConfig));
+            localStorage.setItem('article-jackpot-theme', JSON.stringify(theme));
+            window.open('/article-jackpot-preview', '_blank');
           } catch (e) {
             toast.error('Unable to open preview - data too large');
           }
         }}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        activeTab="design"
+        onTabChange={() => {}}
       />
         
-      {activeTab === 'campaign' ? (
-        <CampaignSettings 
-          defaultTab={campaignDefaultTab}
-          prizes={prizes as any}
-          onSavePrize={handleSavePrize as any}
-          onDeletePrize={handleDeletePrize}
-          gameType="scratch"
-          segments={config.cards.map(c => ({ id: c.id, label: c.revealText }))}
-        />
-      ) : (
-        <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
               <DrawerContent className="h-[85vh]">
-                <ScratchSidebar
+                <JackpotSidebar
                   config={config}
                   activeView={activeView}
                   onViewSelect={(view) => { setActiveView(view); setLeftDrawerOpen(false); }}
-                  onUpdateCard={updateCard}
-                  onAddCard={addCard}
-                  onDeleteCard={deleteCard}
-                  onGoToDotation={() => { setActiveTab('campaign'); setCampaignDefaultTab('dotation'); setLeftDrawerOpen(false); }}
+                  onUpdateSymbol={updateSymbol}
+                  onAddSymbol={addSymbol}
+                  onDeleteSymbol={deleteSymbol}
+                  onGoToDotation={() => {}}
                 />
               </DrawerContent>
             </Drawer>
 
             <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
               <DrawerContent className="h-[85vh]">
-                <ArticleScratchSettingsPanel 
+                <ArticleJackpotSettingsPanel 
                   articleConfig={articleConfig}
                   onUpdateArticleConfig={updateArticleConfig}
                 />
@@ -244,7 +212,7 @@ export const ArticleScratchBuilder = () => {
               <ChevronLeft className="h-5 w-5" />
             </Button>
 
-            <ArticleScratchPreview
+            <ArticleJackpotPreview
               config={config}
               articleConfig={articleConfig}
               activeView={activeView}
@@ -257,19 +225,17 @@ export const ArticleScratchBuilder = () => {
           </>
         ) : (
           <>
-            <ScratchSidebar
+            <JackpotSidebar
               config={config}
               activeView={activeView}
               onViewSelect={setActiveView}
-              onUpdateCard={updateCard}
-              onAddCard={addCard}
-              onDeleteCard={deleteCard}
-              onGoToDotation={() => { setActiveTab('campaign'); setCampaignDefaultTab('dotation'); }}
+              onUpdateSymbol={updateSymbol}
+              onAddSymbol={addSymbol}
+              onDeleteSymbol={deleteSymbol}
+              onGoToDotation={() => {}}
             />
             
-            {/* Preview area */}
             <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
-              {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
                   onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
@@ -284,9 +250,8 @@ export const ArticleScratchBuilder = () => {
                 </button>
               </div>
               
-              {/* ArticleScratchPreview */}
               <div className="flex-1 overflow-auto">
-                <ArticleScratchPreview
+                <ArticleJackpotPreview
                   config={config}
                   articleConfig={articleConfig}
                   activeView={activeView}
@@ -299,22 +264,17 @@ export const ArticleScratchBuilder = () => {
               </div>
             </div>
             
-            {/* Right sidebar - View content settings + Article settings */}
             <div className="w-72 bg-white border-l border-gray-200 flex flex-col h-full overflow-hidden">
               <div className="flex-1 overflow-y-auto">
-                {/* View-specific settings */}
-                <ScratchSettingsPanel 
+                <JackpotSettingsPanel 
                   config={config}
                   activeView={activeView}
                   onUpdateConfig={updateConfig}
-                  hideSpacingAndBackground={true}
-                  hideLayoutAndAlignment={true}
                 />
                 
-                {/* Article-specific settings - Only on Welcome */}
                 {activeView === 'welcome' && (
                   <div className="px-4 pb-4">
-                    <ArticleScratchSettingsPanel 
+                    <ArticleJackpotSettingsPanel 
                       articleConfig={articleConfig}
                       onUpdateArticleConfig={updateArticleConfig}
                     />
@@ -325,11 +285,10 @@ export const ArticleScratchBuilder = () => {
           </>
         )}
       </div>
-      )}
 
       <FloatingToolbar />
     </div>
   );
 };
 
-export default ArticleScratchBuilder;
+export default ArticleJackpotBuilder;

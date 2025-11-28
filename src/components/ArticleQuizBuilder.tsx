@@ -1,32 +1,32 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
-import { ScratchSidebar } from "./ScratchSidebar";
-import { ArticleScratchPreview } from "./ArticleScratchPreview";
-import { ScratchSettingsPanel } from "./ScratchSettingsPanel";
-import { ArticleScratchSettingsPanel } from "./ArticleScratchSettingsPanel";
-import { ScratchTopToolbar } from "./ScratchTopToolbar";
-import { CampaignSettings } from "./CampaignSettings";
+import { QuizSidebar } from "./QuizSidebar";
+import { ArticleQuizPreview } from "./ArticleQuizPreview";
+import { QuizSettingsPanel } from "./QuizSettingsPanel";
+import { ArticleQuizSettingsPanel } from "./ArticleQuizSettingsPanel";
+import { QuizTopToolbar } from "./QuizTopToolbar";
 import { FloatingToolbar } from "./FloatingToolbar";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
-import { ScratchConfig, ScratchCard, ScratchPrize } from "./ScratchBuilder";
+import { QuizConfig, QuizQuestion } from "./QuizBuilder";
 
-const defaultScratchConfig: ScratchConfig = {
+const defaultQuizConfig: QuizConfig = {
   welcomeScreen: {
-    title: "Grattez et gagnez !",
-    subtitle: "Découvrez votre lot en grattant la carte",
-    buttonText: "Commencer à gratter",
+    title: "Testez vos connaissances !",
+    subtitle: "Répondez aux questions et découvrez votre score",
+    buttonText: "Commencer le quiz",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-left-right"
   },
-  contactForm: {
+  contactScreen: {
     enabled: true,
-    title: "Merci de compléter ce formulaire afin de valider votre participation :",
-    subtitle: "",
+    title: "Vos coordonnées",
+    subtitle: "Laissez vos informations pour recevoir vos résultats.",
+    buttonText: "Commencer le quiz",
     blockSpacing: 1,
     fields: [
       { type: 'name', required: true, label: 'Nom complet' },
@@ -34,37 +34,36 @@ const defaultScratchConfig: ScratchConfig = {
       { type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-centered",
   },
-  scratchScreen: {
-    title: "Grattez pour gagner !",
-    subtitle: "Découvrez votre lot en grattant la carte",
+  questions: [
+    {
+      id: 'q1',
+      question: 'Quelle est la capitale de la France ?',
+      answers: [
+        { id: 'a1', text: 'Paris', isCorrect: true },
+        { id: 'a2', text: 'Londres', isCorrect: false },
+        { id: 'a3', text: 'Berlin', isCorrect: false },
+        { id: 'a4', text: 'Madrid', isCorrect: false }
+      ],
+      points: 10
+    }
+  ],
+  resultScreen: {
+    title: "Résultats",
+    subtitle: "Voici votre score !",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered",
-    scratchColor: "#C0C0C0",
-    cardWidth: 300,
-    cardHeight: 200,
-    threshold: 50,
-    brushSize: 40
+    showScore: true,
+    showCorrectAnswers: true
   },
-  cards: [
-    { id: '1', revealText: 'Gagné !', isWinning: true, probability: 50 },
-    { id: '2', revealText: 'Perdu...', isWinning: false, probability: 50 }
-  ],
-  endingWin: {
-    title: "Félicitations !",
-    subtitle: "Vous avez gagné {{prize}}",
-    blockSpacing: 1,
-    mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
-  },
-  endingLose: {
-    title: "Dommage !",
-    subtitle: "Vous n'avez pas gagné cette fois-ci",
-    blockSpacing: 1,
-    mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+  settings: {
+    shuffleQuestions: false,
+    shuffleAnswers: false,
+    showProgressBar: true,
+    allowReview: false,
+    passingScore: 50
   }
 };
 
@@ -100,36 +99,34 @@ const defaultArticleConfig: ArticleConfig = {
   pageBackgroundColor: '#f3f4f6',
 };
 
-export const ArticleScratchBuilder = () => {
+export const ArticleQuizBuilder = () => {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
-  const [config, setConfig] = useState<ScratchConfig>(defaultScratchConfig);
+  const [config, setConfig] = useState<QuizConfig>(defaultQuizConfig);
   const [articleConfig, setArticleConfig] = useState<ArticleConfig>(defaultArticleConfig);
-  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
+  const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'question' | 'result'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
-  const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
-  const [prizes, setPrizes] = useState<ScratchPrize[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   useEffect(() => {
     if (isMobile) setViewMode('mobile');
   }, [isMobile]);
 
   useEffect(() => {
-    localStorage.setItem('article-scratch-config', JSON.stringify(config));
+    localStorage.setItem('article-quiz-config', JSON.stringify(config));
   }, [config]);
 
   useEffect(() => {
-    localStorage.setItem('article-scratch-article-config', JSON.stringify(articleConfig));
+    localStorage.setItem('article-quiz-article-config', JSON.stringify(articleConfig));
   }, [articleConfig]);
 
   useEffect(() => {
-    localStorage.setItem('article-scratch-theme', JSON.stringify(theme));
+    localStorage.setItem('article-quiz-theme', JSON.stringify(theme));
   }, [theme]);
 
-  const updateConfig = (updates: Partial<ScratchConfig>) => {
+  const updateConfig = (updates: Partial<QuizConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
   };
 
@@ -137,99 +134,90 @@ export const ArticleScratchBuilder = () => {
     setArticleConfig(prev => ({ ...prev, ...updates }));
   };
 
-  const updateCard = (id: string, updates: Partial<ScratchCard>) => {
-    setConfig(prev => ({
-      ...prev,
-      cards: prev.cards.map(card => card.id === id ? { ...card, ...updates } : card)
-    }));
-  };
-
-  const addCard = () => {
-    const newCard: ScratchCard = {
+  const addQuestion = () => {
+    const newQuestion: QuizQuestion = {
       id: String(Date.now()),
-      revealText: 'Nouveau lot',
-      isWinning: false,
-      probability: 10
+      question: 'Nouvelle question',
+      answers: [
+        { id: `${Date.now()}-a1`, text: 'Réponse 1', isCorrect: true },
+        { id: `${Date.now()}-a2`, text: 'Réponse 2', isCorrect: false },
+      ],
+      points: 10
     };
-    setConfig(prev => ({ ...prev, cards: [...prev.cards, newCard] }));
-    toast.success("Carte ajoutée");
+    setConfig(prev => ({ ...prev, questions: [...prev.questions, newQuestion] }));
+    toast.success("Question ajoutée");
   };
 
-  const deleteCard = (id: string) => {
-    if (config.cards.length <= 1) {
-      toast.error("Il doit y avoir au moins 1 carte");
+  const deleteQuestion = (index: number) => {
+    if (config.questions.length <= 1) {
+      toast.error("Il doit y avoir au moins 1 question");
       return;
     }
-    setConfig(prev => ({ ...prev, cards: prev.cards.filter(c => c.id !== id) }));
-    toast.success("Carte supprimée");
+    setConfig(prev => ({ ...prev, questions: prev.questions.filter((_, i) => i !== index) }));
+    toast.success("Question supprimée");
   };
 
-  const handleSavePrize = (prize: ScratchPrize) => {
-    const existingPrize = prizes.find(p => p.id === prize.id);
-    if (existingPrize) {
-      const used = Math.max(0, existingPrize.quantity - existingPrize.remaining);
-      const newRemaining = Math.max(0, (prize.quantity ?? existingPrize.quantity) - used);
-      setPrizes(prizes.map(p => p.id === prize.id ? { ...p, ...prize, remaining: newRemaining, status: newRemaining === 0 ? 'depleted' : p.status } : p));
-    } else {
-      setPrizes([...prizes, { ...prize, remaining: prize.quantity, status: 'active' as const }]);
+  const duplicateQuestion = (index: number) => {
+    const q = config.questions[index];
+    if (q) {
+      const newQ: QuizQuestion = {
+        ...q,
+        id: String(Date.now()),
+        answers: q.answers.map(a => ({ ...a, id: `${Date.now()}-${a.id}` }))
+      };
+      const newQuestions = [...config.questions];
+      newQuestions.splice(index + 1, 0, newQ);
+      setConfig(prev => ({ ...prev, questions: newQuestions }));
+      toast.success("Question dupliquée");
     }
-    toast.success("Lot enregistré");
   };
 
-  const handleDeletePrize = (id: string) => {
-    setPrizes(prizes.filter(p => p.id !== id));
-    toast.success("Lot supprimé");
+  const reorderQuestions = (startIndex: number, endIndex: number) => {
+    const newQuestions = [...config.questions];
+    const [removed] = newQuestions.splice(startIndex, 1);
+    newQuestions.splice(endIndex, 0, removed);
+    setConfig(prev => ({ ...prev, questions: newQuestions }));
   };
 
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
-      <ScratchTopToolbar 
+      <QuizTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
           try {
-            localStorage.setItem('article-scratch-config', JSON.stringify(config));
-            localStorage.setItem('article-scratch-article-config', JSON.stringify(articleConfig));
-            localStorage.setItem('article-scratch-viewMode', targetViewMode);
-            localStorage.setItem('article-scratch-theme', JSON.stringify(theme));
-            window.open('/article-scratch-preview', '_blank');
+            localStorage.setItem('article-quiz-config', JSON.stringify(config));
+            localStorage.setItem('article-quiz-article-config', JSON.stringify(articleConfig));
+            localStorage.setItem('article-quiz-viewMode', targetViewMode);
+            localStorage.setItem('article-quiz-theme', JSON.stringify(theme));
+            window.open('/article-quiz-preview', '_blank');
           } catch (e) {
             toast.error('Unable to open preview - data too large');
           }
         }}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
       />
         
-      {activeTab === 'campaign' ? (
-        <CampaignSettings 
-          defaultTab={campaignDefaultTab}
-          prizes={prizes as any}
-          onSavePrize={handleSavePrize as any}
-          onDeletePrize={handleDeletePrize}
-          gameType="scratch"
-          segments={config.cards.map(c => ({ id: c.id, label: c.revealText }))}
-        />
-      ) : (
-        <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
               <DrawerContent className="h-[85vh]">
-                <ScratchSidebar
+                <QuizSidebar
                   config={config}
                   activeView={activeView}
+                  activeQuestionIndex={currentQuestionIndex}
                   onViewSelect={(view) => { setActiveView(view); setLeftDrawerOpen(false); }}
-                  onUpdateCard={updateCard}
-                  onAddCard={addCard}
-                  onDeleteCard={deleteCard}
-                  onGoToDotation={() => { setActiveTab('campaign'); setCampaignDefaultTab('dotation'); setLeftDrawerOpen(false); }}
+                  onQuestionSelect={(index) => { setCurrentQuestionIndex(index); setActiveView('question'); }}
+                  onAddQuestion={addQuestion}
+                  onDuplicateQuestion={duplicateQuestion}
+                  onReorderQuestions={reorderQuestions}
+                  onDeleteQuestion={deleteQuestion}
                 />
               </DrawerContent>
             </Drawer>
 
             <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
               <DrawerContent className="h-[85vh]">
-                <ArticleScratchSettingsPanel 
+                <ArticleQuizSettingsPanel 
                   articleConfig={articleConfig}
                   onUpdateArticleConfig={updateArticleConfig}
                 />
@@ -244,7 +232,7 @@ export const ArticleScratchBuilder = () => {
               <ChevronLeft className="h-5 w-5" />
             </Button>
 
-            <ArticleScratchPreview
+            <ArticleQuizPreview
               config={config}
               articleConfig={articleConfig}
               activeView={activeView}
@@ -252,19 +240,22 @@ export const ArticleScratchBuilder = () => {
               onUpdateArticleConfig={updateArticleConfig}
               viewMode="mobile"
               onViewChange={setActiveView}
-              prizes={prizes}
+              currentQuestionIndex={currentQuestionIndex}
+              onQuestionIndexChange={setCurrentQuestionIndex}
             />
           </>
         ) : (
           <>
-            <ScratchSidebar
+            <QuizSidebar
               config={config}
               activeView={activeView}
+              activeQuestionIndex={currentQuestionIndex}
               onViewSelect={setActiveView}
-              onUpdateCard={updateCard}
-              onAddCard={addCard}
-              onDeleteCard={deleteCard}
-              onGoToDotation={() => { setActiveTab('campaign'); setCampaignDefaultTab('dotation'); }}
+              onQuestionSelect={(index) => { setCurrentQuestionIndex(index); setActiveView('question'); }}
+              onAddQuestion={addQuestion}
+              onDuplicateQuestion={duplicateQuestion}
+              onReorderQuestions={reorderQuestions}
+              onDeleteQuestion={deleteQuestion}
             />
             
             {/* Preview area */}
@@ -284,9 +275,9 @@ export const ArticleScratchBuilder = () => {
                 </button>
               </div>
               
-              {/* ArticleScratchPreview */}
+              {/* ArticleQuizPreview */}
               <div className="flex-1 overflow-auto">
-                <ArticleScratchPreview
+                <ArticleQuizPreview
                   config={config}
                   articleConfig={articleConfig}
                   activeView={activeView}
@@ -294,7 +285,8 @@ export const ArticleScratchBuilder = () => {
                   onUpdateArticleConfig={updateArticleConfig}
                   viewMode={viewMode}
                   onViewChange={setActiveView}
-                  prizes={prizes}
+                  currentQuestionIndex={currentQuestionIndex}
+                  onQuestionIndexChange={setCurrentQuestionIndex}
                 />
               </div>
             </div>
@@ -303,18 +295,23 @@ export const ArticleScratchBuilder = () => {
             <div className="w-72 bg-white border-l border-gray-200 flex flex-col h-full overflow-hidden">
               <div className="flex-1 overflow-y-auto">
                 {/* View-specific settings */}
-                <ScratchSettingsPanel 
+                <QuizSettingsPanel 
                   config={config}
                   activeView={activeView}
+                  activeQuestionIndex={currentQuestionIndex}
                   onUpdateConfig={updateConfig}
-                  hideSpacingAndBackground={true}
-                  hideLayoutAndAlignment={true}
+                  onUpdateQuestion={(index, updates) => {
+                    setConfig(prev => ({
+                      ...prev,
+                      questions: prev.questions.map((q, i) => i === index ? { ...q, ...updates } : q)
+                    }));
+                  }}
                 />
                 
                 {/* Article-specific settings - Only on Welcome */}
                 {activeView === 'welcome' && (
                   <div className="px-4 pb-4">
-                    <ArticleScratchSettingsPanel 
+                    <ArticleQuizSettingsPanel 
                       articleConfig={articleConfig}
                       onUpdateArticleConfig={updateArticleConfig}
                     />
@@ -325,11 +322,10 @@ export const ArticleScratchBuilder = () => {
           </>
         )}
       </div>
-      )}
 
       <FloatingToolbar />
     </div>
   );
 };
 
-export default ArticleScratchBuilder;
+export default ArticleQuizBuilder;
