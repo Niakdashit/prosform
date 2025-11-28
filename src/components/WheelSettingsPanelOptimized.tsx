@@ -341,9 +341,9 @@ export const WheelSettingsPanelOptimized = ({
               <SettingsField label="Title">
                 <Input 
                   type="text" 
-                  value={config.endingScreen.title}
+                  value={config.endingWin.title}
                   onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { ...config.endingScreen, title: e.target.value } 
+                    endingWin: { ...config.endingWin, title: e.target.value } 
                   })}
                   className="h-9"
                   placeholder="e.g., Congratulations!"
@@ -356,9 +356,9 @@ export const WheelSettingsPanelOptimized = ({
               >
                 <Input 
                   type="text" 
-                  value={config.endingScreen.subtitle}
+                  value={config.endingWin.subtitle}
                   onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { ...config.endingScreen, subtitle: e.target.value } 
+                    endingWin: { ...config.endingWin, subtitle: e.target.value } 
                   })}
                   className="h-9"
                   placeholder="You won {{prize}}"
