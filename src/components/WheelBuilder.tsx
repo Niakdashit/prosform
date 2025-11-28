@@ -380,8 +380,9 @@ export const WheelBuilder = () => {
       <WheelTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          const fullConfig = { ...config, prizes };
           try {
-            localStorage.setItem('wheel-config', JSON.stringify(config));
+            localStorage.setItem('wheel-config', JSON.stringify(fullConfig));
             localStorage.setItem('wheel-viewMode', targetViewMode);
             localStorage.setItem('wheel-theme', JSON.stringify(theme));
             window.open('/wheel-preview', '_blank');
@@ -389,6 +390,7 @@ export const WheelBuilder = () => {
             console.warn('localStorage full, trying without images:', e);
             const configWithoutImages = {
               ...config,
+              prizes,
               welcomeScreen: { ...config.welcomeScreen, image: undefined, imageSettings: undefined }
             };
             try {
