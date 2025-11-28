@@ -77,8 +77,12 @@ export interface JackpotConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
+    applyBackgroundToAll?: boolean;
     showImage?: boolean;
     splitAlignment?: 'left' | 'center' | 'right';
+    alignment?: 'left' | 'center' | 'right';
     image?: string;
     imageSettings?: {
       borderRadius: number;
@@ -103,6 +107,8 @@ export interface JackpotConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   jackpotScreen: {
     title: string;
@@ -118,6 +124,8 @@ export interface JackpotConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
     template: string;
     spinDuration: number;
   };
@@ -136,6 +144,8 @@ export interface JackpotConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   endingLose: {
     title: string;
@@ -151,6 +161,8 @@ export interface JackpotConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
 }
 
@@ -315,6 +327,10 @@ export const JackpotBuilder = () => {
       <JackpotTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          // Clear old data first to make room
+          localStorage.removeItem('jackpot-config');
+          localStorage.removeItem('jackpot-viewMode');
+          localStorage.removeItem('jackpot-theme');
           try {
             localStorage.setItem('jackpot-config', JSON.stringify(config));
             localStorage.setItem('jackpot-viewMode', targetViewMode);
@@ -324,14 +340,41 @@ export const JackpotBuilder = () => {
             console.warn('localStorage full, trying without images:', e);
             const configWithoutImages = {
               ...config,
-              welcomeScreen: { ...config.welcomeScreen, image: undefined, imageSettings: undefined }
+              welcomeScreen: { 
+                ...config.welcomeScreen, 
+                image: undefined, 
+                imageSettings: undefined,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined,
+                wallpaperImage: undefined
+              },
+              contactForm: {
+                ...config.contactForm,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined
+              },
+              jackpotScreen: {
+                ...config.jackpotScreen,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined
+              },
+              endingWin: {
+                ...config.endingWin,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined
+              },
+              endingLose: {
+                ...config.endingLose,
+                backgroundImage: undefined,
+                backgroundImageMobile: undefined
+              }
             };
             try {
               localStorage.setItem('jackpot-config', JSON.stringify(configWithoutImages));
               localStorage.setItem('jackpot-viewMode', targetViewMode);
               localStorage.setItem('jackpot-theme', JSON.stringify(theme));
               window.open('/jackpot-preview', '_blank');
-              toast.warning('Preview opened without images (images too large)');
+              toast.warning('Preview opened without background images (images too large)');
             } catch (e2) {
               toast.error('Unable to open preview - data too large');
             }

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { QuizConfig } from "./QuizBuilder";
-import { Plus, Palette, LayoutList, Home, Award, GripVertical, MoreVertical, Copy, Trash2, HelpCircle, Settings, User } from "lucide-react";
+import { Plus, Palette, LayoutList, Home, Award, GripVertical, MoreVertical, Copy, Trash2, HelpCircle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -27,7 +27,6 @@ interface QuizSidebarProps {
   onDuplicateQuestion: (index: number) => void;
   onReorderQuestions: (startIndex: number, endIndex: number) => void;
   onDeleteQuestion: (index: number) => void;
-  onGoToCampaign: () => void;
 }
 
 export const QuizSidebar = ({
@@ -40,7 +39,6 @@ export const QuizSidebar = ({
   onDuplicateQuestion,
   onReorderQuestions,
   onDeleteQuestion,
-  onGoToCampaign,
 }: QuizSidebarProps) => {
   const { theme, updateTheme } = useTheme();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -130,22 +128,13 @@ export const QuizSidebar = ({
 
               <div className="flex items-center justify-between mb-3 px-2">
                 <span className="text-sm font-semibold text-foreground">Questions</span>
-                <div className="flex items-center gap-1">
-                  <button 
-                    onClick={onGoToCampaign}
-                    className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
-                    title="Paramètres du quiz"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={onAddQuestion}
-                    className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
-                    title="Ajouter une question"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
+                <button 
+                  onClick={onAddQuestion}
+                  className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
+                  title="Ajouter une question"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
               
               {config.questions.map((question, index) => {
@@ -174,7 +163,7 @@ export const QuizSidebar = ({
                       <HelpCircle className="w-4 h-4" />
                     </div>
                     <div className="flex-1 text-left min-w-0">
-                      <p className="text-xs text-foreground truncate">
+                      <p className="text-xs text-foreground break-words">
                         Q{index + 1}: {question.question}
                       </p>
                       <p className="text-[10px] text-muted-foreground">
@@ -220,7 +209,7 @@ export const QuizSidebar = ({
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
-          <ThemeStylePanel />
+          <ThemeStylePanel hideJackpotSections />
         </TabsContent>
       </Tabs>
     </div>

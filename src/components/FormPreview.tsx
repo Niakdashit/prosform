@@ -480,8 +480,8 @@ export const FormPreview = ({
         newWidth = startWidth - deltaPercent;
       }
       
-      // Clamp between 20% and 100%
-      newWidth = Math.max(20, Math.min(100, newWidth));
+      // Clamp between 20% and 200%
+      newWidth = Math.max(20, Math.min(200, newWidth));
       onUpdateQuestion(question.id, { titleWidth: Math.round(newWidth) });
     };
     
@@ -521,8 +521,8 @@ export const FormPreview = ({
         newWidth = startWidth - deltaPercent;
       }
       
-      // Clamp between 20% and 100%
-      newWidth = Math.max(20, Math.min(100, newWidth));
+      // Clamp between 20% and 200%
+      newWidth = Math.max(20, Math.min(200, newWidth));
       onUpdateQuestion(question.id, { subtitleWidth: Math.round(newWidth) });
     };
     
@@ -1593,11 +1593,6 @@ export const FormPreview = ({
                   <div className="mb-6">
                     <EditableTitle className={`${viewMode === 'desktop' ? 'text-3xl' : 'text-xl'} font-medium`} textColor="#111827" />
                   </div>
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-100 text-gray-600 text-sm">
-                      <span>{getTypeIcon()}</span> {getTypeLabel()}
-                    </span>
-                  </motion.div>
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
                     {isLongText ? (
                       <textarea placeholder={question.placeholder || "Type your answer here..."} className="w-full border-b-2 border-gray-200 focus:border-gray-900 bg-transparent pb-2 text-xl text-gray-900 placeholder-gray-400 outline-none transition-colors resize-none" rows={1} value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
@@ -1610,7 +1605,6 @@ export const FormPreview = ({
                       <Button onClick={handleTemplateNext} className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 font-medium flex items-center gap-2" style={{ borderRadius: '4px' }}>
                         OK <Check className="w-4 h-4" />
                       </Button>
-                      <span className="text-gray-400 text-sm">press <strong>Enter ↵</strong></span>
                     </motion.div>
                   )}
                 </div>
@@ -1634,11 +1628,6 @@ export const FormPreview = ({
                 <div className="mb-6">
                   <EditableTitle className={`${viewMode === 'desktop' ? 'text-3xl' : 'text-xl'} ${layoutStyle === 'bold' ? 'font-black' : 'font-medium'}`} />
                 </div>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/10 text-white/80 text-sm">
-                    <span>{getTypeIcon()}</span> {getTypeLabel()}
-                  </span>
-                </motion.div>
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
                   {isLongText ? (
                     <textarea placeholder={question.placeholder || "Type your answer here..."} className="w-full border-b-2 border-white/30 focus:border-white bg-transparent pb-2 text-xl text-white placeholder-white/50 outline-none transition-colors resize-none" rows={1} value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
@@ -1651,7 +1640,6 @@ export const FormPreview = ({
                     <Button onClick={handleTemplateNext} className="bg-white hover:bg-white/90 px-6 py-2.5 font-semibold flex items-center gap-2 rounded" style={{ color: themeColor }}>
                       OK <Check className="w-4 h-4" />
                     </Button>
-                    <span className="text-white/50 text-sm">press <strong>Enter ↵</strong></span>
                   </motion.div>
                 )}
               </div>
@@ -1922,6 +1910,52 @@ export const FormPreview = ({
           ...getContainerDimensions() 
         }}
       >
+        {/* Background image from question settings */}
+        {(() => {
+          // Check if we should use the welcome screen's background for all screens
+          const welcomeQuestion = allQuestions.find(q => q.type === 'welcome');
+          const applyToAll = welcomeQuestion?.applyBackgroundToAll;
+          
+          let bgImage: string | undefined;
+          let overlayOpacity: number | undefined;
+          
+          if (applyToAll && welcomeQuestion) {
+            // Use welcome screen's background for all questions
+            bgImage = viewMode === 'mobile' && welcomeQuestion.backgroundImageMobile 
+              ? welcomeQuestion.backgroundImageMobile 
+              : welcomeQuestion.backgroundImage;
+            overlayOpacity = welcomeQuestion.overlayOpacity;
+          } else {
+            // Use the current question's background
+            bgImage = viewMode === 'mobile' && question.backgroundImageMobile 
+              ? question.backgroundImageMobile 
+              : question.backgroundImage;
+            overlayOpacity = question.overlayOpacity;
+          }
+          
+          if (!bgImage) return null;
+          
+          return (
+            <div 
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: `url(${bgImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
+              {/* Optional overlay for better text readability */}
+              <div 
+                className="absolute inset-0" 
+                style={{ 
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  opacity: overlayOpacity !== undefined ? overlayOpacity / 100 : 0.3
+                }} 
+              />
+            </div>
+          );
+        })()}
         <AnimatePresence mode="wait">
           <motion.div
             key={question.id}
@@ -1929,7 +1963,7 @@ export const FormPreview = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full"
+            className="w-full h-full relative z-10"
           >
             {question.type === "welcome" ? (
               <div
@@ -2012,12 +2046,15 @@ export const FormPreview = ({
                   );
 
                   // Text content component  
+                  const alignment = question.welcomeDisplayStyle || 'left';
+                  const alignmentTextClass = alignment === 'center' || alignment === 'centered' ? 'text-center items-center' : alignment === 'right' ? 'text-right items-end' : 'text-left items-start';
+                  
                   const TextContent = ({ centered = false }: { centered?: boolean }) => {
                     const titleWidth = question.titleWidth || 100;
                     const subtitleWidth = question.subtitleWidth || 100;
                     
                     return (
-                    <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
+                    <div className={`flex flex-col ${alignmentTextClass} overflow-visible`}>
                       {/* Title with resize handles */}
                       <div 
                         className="relative group"
@@ -2130,13 +2167,13 @@ export const FormPreview = ({
                           data-text-editable="title"
                           className={`${!isReadOnly ? 'cursor-text' : ''} transition-opacity`}
                           style={{ 
-                            color: question.titleStyle?.textColor || theme.accentColor,
+                            color: question.titleStyle?.textColor || theme.buttonColor,
                             fontFamily: question.titleStyle?.fontFamily || 'inherit',
                             fontSize: question.titleStyle?.fontSize ? `${question.titleStyle.fontSize}px` : '2.25rem',
                             fontWeight: question.titleStyle?.isBold ? 'bold' : 'normal',
                             fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                             textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
-                            textAlign: question.titleStyle?.textAlign || 'left',
+                            textAlign: question.titleStyle?.textAlign || (alignment === 'center' || alignment === 'centered' ? 'center' : alignment === 'right' ? 'right' : 'left'),
                             outline: !isReadOnly && editingField === 'welcome-title' ? '2px solid rgba(245, 202, 60, 0.5)' : 'none',
                             padding: '4px',
                             margin: '-4px',
@@ -2286,7 +2323,7 @@ export const FormPreview = ({
                             fontWeight: question.subtitleStyle?.isBold ? 'bold' : 'normal',
                             fontStyle: question.subtitleStyle?.isItalic ? 'italic' : 'normal',
                             textDecoration: question.subtitleStyle?.isUnderline ? 'underline' : 'none',
-                            textAlign: question.subtitleStyle?.textAlign || 'left',
+                            textAlign: question.subtitleStyle?.textAlign || (alignment === 'center' || alignment === 'centered' ? 'center' : alignment === 'right' ? 'right' : 'left'),
                             opacity: 0.9,
                             outline: !isReadOnly && editingField === 'welcome-subtitle' ? '2px solid rgba(184, 168, 146, 0.5)' : 'none',
                             padding: '4px',
@@ -2332,6 +2369,10 @@ export const FormPreview = ({
 
                   // Desktop layouts
                   if (viewMode === 'desktop') {
+                    // Horizontal alignment for the whole content block
+                    const horizontalAlign = alignment === 'center' || alignment === 'centered' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
+                    const justifyContent = alignment === 'center' || alignment === 'centered' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
+                    
                     if (desktopLayout === 'desktop-left-right') {
                       const align = question.splitAlignment || 'left';
                       const alignmentClass =
@@ -2348,9 +2389,9 @@ export const FormPreview = ({
                           : 'max-w-[700px]';
 
                       return (
-                        <div className={`w-full h-full flex flex-col ${alignmentClass} justify-start gap-10 overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
-                          <ImageBlock />
-                          <div className={textContainerClass}>
+                        <div className={`w-full h-full flex ${justifyContent} justify-start overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
+                          <div className={`flex flex-col ${horizontalAlign} gap-10 max-w-[700px] overflow-visible`}>
+                            <ImageBlock />
                             <TextContent />
                           </div>
                         </div>
@@ -2358,9 +2399,9 @@ export const FormPreview = ({
                     } else if (desktopLayout === 'desktop-right-left') {
                       // Stack: Texte à gauche, Image petite à droite (sur la même ligne)
                       return (
-                        <div className="w-full h-full flex items-center justify-center px-24">
-                          <div className="w-full max-w-[900px] flex items-center gap-16">
-                            <div className="flex-1">
+                        <div className={`w-full h-full flex ${justifyContent} items-center px-24`}>
+                          <div className="max-w-[900px] flex items-center gap-16">
+                            <div className="max-w-[500px]">
                               <TextContent />
                             </div>
                             <ImageBlock />
@@ -2370,10 +2411,10 @@ export const FormPreview = ({
                     } else if (desktopLayout === 'desktop-centered') {
                       // Centered: Image à gauche, Texte à droite (comme split)
                       return (
-                        <div className="w-full h-full flex items-center justify-center px-24">
-                          <div className="w-full max-w-[900px] flex items-center gap-16">
+                        <div className={`w-full h-full flex ${justifyContent} items-center px-24`}>
+                          <div className="max-w-[900px] flex items-center gap-16">
                             <ImageBlock />
-                            <div className="flex-1">
+                            <div className="max-w-[500px]">
                               <TextContent />
                             </div>
                           </div>
@@ -2557,9 +2598,12 @@ export const FormPreview = ({
 
                   // Mobile layouts
                   if (mobileLayout === 'mobile-vertical') {
+                    const imageAlignment = alignment === 'center' || alignment === 'centered' ? 'center' : alignment === 'right' ? 'flex-end' : 'flex-start';
                     return (
                       <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
-                        <ImageBlock />
+                        <div className="flex w-full" style={{ justifyContent: imageAlignment }}>
+                          <ImageBlock />
+                        </div>
                         <TextContent />
                       </div>
                     );
@@ -2801,7 +2845,7 @@ export const FormPreview = ({
                         data-text-editable="title"
                         className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
-                          color: question.titleStyle?.textColor || '#FFFFFF', 
+                          color: question.titleStyle?.textColor || theme.buttonColor, 
                           fontFamily: question.titleStyle?.fontFamily || 'inherit',
                           fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                           fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
@@ -2829,17 +2873,6 @@ export const FormPreview = ({
                       />
                       </div>
                     </ResizableTextWrapper>
-                    {(question.variant || question.type !== "text") && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        {question.type === 'email' && <><Mail className="w-4 h-4" /><span>Email</span></>}
-                        {question.type === 'phone' && <><Phone className="w-4 h-4" /><span>Phone</span></>}
-                        {question.type === 'number' && <><Hash className="w-4 h-4" /><span>Number</span></>}
-                        {question.type === 'date' && <><Calendar className="w-4 h-4" /><span>Date</span></>}
-                        {question.type === 'text' && question.variant === 'video' && <><Video className="w-4 h-4" /><span>Video/Audio</span></>}
-                        {question.type === 'text' && question.variant === 'long' && <><FileText className="w-4 h-4" /><span>Long Text</span></>}
-                        {question.type === 'text' && question.variant === 'short' && <><Type className="w-4 h-4" /><span>Short Text</span></>}
-                      </div>
-                    )}
                   </div>
                   <form onSubmit={handleSubmit}>
                     {question.variant === 'long' ? (
@@ -2855,11 +2888,6 @@ export const FormPreview = ({
                           }}
                           autoFocus
                         />
-                        <div className="mt-2 text-sm" style={{ color: '#8B7E6E' }}>
-                          <kbd className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#A89A8A' }}>Shift</kbd>
-                          {' '}+ <kbd className="px-2 py-1 rounded text-xs font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#A89A8A' }}>Enter</kbd>
-                          {' '}to make a line break
-                        </div>
                       </>
                     ) : question.type === 'phone' ? (
                       <div className="flex items-center gap-3">
@@ -2955,17 +2983,11 @@ export const FormPreview = ({
                     <div className="mt-8 flex items-center gap-4">
                       <Button
                         type="submit"
-                        className="font-semibold px-6 py-3 h-[48px] rounded-lg text-base hover:opacity-90 transition-opacity"
-                        style={{ 
-                          backgroundColor: '#F5B800', 
-                          color: '#3D3731' 
-                        }}
+                        className="font-semibold hover:opacity-90 transition-opacity"
+                        style={unifiedButtonStyles}
                       >
                         OK <span className="ml-1">✓</span>
                       </Button>
-                      <span className="text-sm" style={{ color: '#A89A8A' }}>
-                        press <kbd className="px-2.5 py-1.5 rounded text-sm font-medium" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#C4B5A0' }}>Enter</kbd>
-                      </span>
                     </div>
                   </form>
                 </div>
@@ -3028,7 +3050,7 @@ export const FormPreview = ({
                         data-text-editable="title"
                         className="text-4xl font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
-                          color: question.titleStyle?.textColor || '#FFFFFF', 
+                          color: question.titleStyle?.textColor || theme.buttonColor, 
                           fontFamily: question.titleStyle?.fontFamily || 'inherit',
                           fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                           fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
@@ -3056,13 +3078,6 @@ export const FormPreview = ({
                         dangerouslySetInnerHTML={{ __html: question.titleHtml || question.title }}
                       />
                     </ResizableTextWrapper>
-                    {question.variant && (
-                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                        {question.variant === 'stars' && <><Star className="w-4 h-4" /><span>Rating</span></>}
-                        {question.variant === 'scale' && <><BarChart3 className="w-4 h-4" /><span>Opinion Scale</span></>}
-                        {question.variant === 'ranking' && <><Hash className="w-4 h-4" /><span>Ranking</span></>}
-                      </div>
-                    )}
                   </div>
                   <div className="flex gap-4">
                     {Array.from({ length: question.ratingCount || 5 }, (_, i) => i + 1).map((rating) => {
@@ -3216,7 +3231,7 @@ export const FormPreview = ({
                         data-text-editable="title"
                         className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
-                        color: question.titleStyle?.textColor || '#FFFFFF', 
+                        color: question.titleStyle?.textColor || theme.buttonColor, 
                         fontFamily: question.titleStyle?.fontFamily || 'inherit',
                         fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                         fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
@@ -3245,14 +3260,6 @@ export const FormPreview = ({
                       dangerouslySetInnerHTML={{ __html: question.titleHtml || question.title }}
                     />
                     </ResizableTextWrapper>
-                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                      {question.type === 'dropdown' && <><List className="w-4 h-4" /><span>Dropdown</span></>}
-                      {question.type === 'yesno' && <><CheckCircle className="w-4 h-4" /><span>Yes/No</span></>}
-                      {question.type === 'picture-choice' && <><ImageIcon className="w-4 h-4" /><span>Picture Choice</span></>}
-                      {question.type === 'choice' && question.variant === 'multiple' && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
-                      {question.type === 'choice' && question.variant === 'checkbox' && <><CheckSquare className="w-4 h-4" /><span>Checkbox</span></>}
-                      {question.type === 'choice' && !question.variant && <><CheckSquare className="w-4 h-4" /><span>Multiple Choice</span></>}
-                    </div>
                   </div>
                   {/* Render choices based on choiceDisplayStyle */}
                   {(() => {
@@ -3493,7 +3500,7 @@ export const FormPreview = ({
                         data-text-editable="title"
                         className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
-                        color: question.titleStyle?.textColor || '#FFFFFF', 
+                        color: question.titleStyle?.textColor || theme.buttonColor, 
                         fontFamily: question.titleStyle?.fontFamily || 'inherit',
                         fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                         fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
@@ -3522,10 +3529,6 @@ export const FormPreview = ({
                         dangerouslySetInnerHTML={{ __html: question.titleHtml || question.title }}
                       />
                     </ResizableTextWrapper>
-                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: 'rgba(245, 184, 0, 0.15)', color: '#F5B800' }}>
-                      <Paperclip className="w-4 h-4" />
-                      <span>File Upload</span>
-                    </div>
                   </div>
                   <div 
                     className="border-2 border-dashed rounded-xl p-12 text-center transition-all"
@@ -3593,12 +3596,12 @@ export const FormPreview = ({
                       </PopoverContent>
                     </Popover>
                   )}
-                  <ResizableTextWrapper type="title" marginBottom="32px">
+                  <ResizableTextWrapper type="title" marginBottom="16px">
                     <h2
                       data-text-editable="title"
                       className="font-bold cursor-text hover:opacity-80 transition-opacity"
                       style={{ 
-                      color: question.titleStyle?.textColor || '#FFFFFF', 
+                      color: question.titleStyle?.textColor || theme.buttonColor, 
                       fontFamily: question.titleStyle?.fontFamily || 'inherit',
                       fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                       fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
@@ -3663,18 +3666,15 @@ export const FormPreview = ({
                   )}
                   <button
                     onClick={onNext}
-                    className="font-semibold px-8 py-4 rounded-lg text-lg hover:opacity-90 transition-opacity"
-                    style={{ 
-                      backgroundColor: '#F5B800', 
-                      color: '#3D3731' 
-                    }}
+                    className="font-semibold hover:opacity-90 transition-opacity"
+                    style={unifiedButtonStyles}
                   >
                     {question.buttonText || "Continue"}
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '24px' }}>
                 <div className="w-full max-w-[700px] text-center relative">
                   {(editingField === 'ending-title' || editingField === 'ending-subtitle') && (
                     <>
@@ -3751,17 +3751,17 @@ export const FormPreview = ({
                     </>
                   )}
 
-                  <ResizableTextWrapper type="title" marginBottom="32px">
+                  <ResizableTextWrapper type="title" marginBottom={viewMode === 'desktop' ? '16px' : '8px'}>
                     <h2 
                       data-text-editable="title"
-                      className="text-4xl md:text-5xl font-bold cursor-text hover:opacity-80 transition-opacity" 
+                      className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                       color: question.titleStyle?.textColor || '#F5B800', 
                       fontFamily: question.titleStyle?.fontFamily || 'inherit',
                       fontWeight: question.titleStyle?.isBold ? 'bold' : 700,
                       fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                       textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
-                      fontSize: question.titleStyle?.fontSize ? `${question.titleStyle.fontSize}px` : undefined,
+                      fontSize: question.titleStyle?.fontSize ? `${question.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
                       textAlign: question.titleStyle?.textAlign || 'center',
                         outline: editingField === 'ending-title' ? '2px solid rgba(245, 184, 0, 0.5)' : 'none',
                         padding: '4px',
@@ -3784,17 +3784,17 @@ export const FormPreview = ({
                     />
                   </ResizableTextWrapper>
                   {question.subtitle && (
-                    <ResizableTextWrapper type="subtitle" marginBottom="48px">
+                    <ResizableTextWrapper type="subtitle" marginBottom={viewMode === 'desktop' ? '48px' : '32px'}>
                       <p 
                         data-text-editable="subtitle"
-                        className="text-lg md:text-xl cursor-text hover:opacity-80 transition-opacity" 
+                        className="cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                           color: question.subtitleStyle?.textColor || '#C4B5A0',
                           fontFamily: question.subtitleStyle?.fontFamily || 'inherit',
                           fontWeight: question.subtitleStyle?.isBold ? 'bold' : 'normal',
                           fontStyle: question.subtitleStyle?.isItalic ? 'italic' : 'normal',
                           textDecoration: question.subtitleStyle?.isUnderline ? 'underline' : 'none',
-                          fontSize: question.subtitleStyle?.fontSize ? `${question.subtitleStyle.fontSize}px` : undefined,
+                          fontSize: question.subtitleStyle?.fontSize ? `${question.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
                           textAlign: question.subtitleStyle?.textAlign || 'center',
                           opacity: 0.8,
                           outline: editingField === 'ending-subtitle' ? '2px solid rgba(196, 181, 160, 0.5)' : 'none',
@@ -3820,11 +3820,8 @@ export const FormPreview = ({
                   )}
                   <Button
                     onClick={() => window.location.reload()}
-                    className="font-semibold px-8 py-3 h-[52px] rounded-lg text-base hover:opacity-90 transition-opacity"
-                    style={{ 
-                      backgroundColor: '#F5B800', 
-                      color: '#3D3731' 
-                    }}
+                    className="font-semibold hover:opacity-90 transition-opacity"
+                    style={unifiedButtonStyles}
                   >
                     {question.buttonText || "Start over"}
                   </Button>

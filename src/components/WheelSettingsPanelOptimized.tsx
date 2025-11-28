@@ -333,26 +333,6 @@ export const WheelSettingsPanelOptimized = ({
       case 'ending':
         return (
           <div className="space-y-6">
-            {/* Layout Section */}
-            <SettingsSection 
-              title="Layout" 
-              icon={<Layout className="w-4 h-4" />}
-              defaultCollapsed={true}
-            >
-              <LayoutSelector
-                desktopLayout={config.endingScreen.desktopLayout}
-                mobileLayout={config.endingScreen.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  endingScreen: { ...config.endingScreen, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  endingScreen: { ...config.endingScreen, mobileLayout: layout }
-                })}
-              />
-            </SettingsSection>
-
-            <Separator />
-
             {/* Content Section */}
             <SettingsSection 
               title="Content" 

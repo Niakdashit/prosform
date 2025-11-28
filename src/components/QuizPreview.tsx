@@ -252,19 +252,14 @@ export const QuizPreview = ({
           );
         };
 
+        // Alignment for the whole content block
+        const alignment = config.welcomeScreen.alignment || 'left';
+        const alignmentClass = alignment === 'center' ? 'text-center items-center' : alignment === 'right' ? 'text-right items-end' : 'text-left items-start';
+        
         // Text content component
         const TextContent = ({ centered = false }: { centered?: boolean }) => {
-          const align = config.welcomeScreen.splitAlignment || 'left';
-          const textAlignClass = centered
-            ? 'text-center'
-            : align === 'center'
-            ? 'text-center'
-            : align === 'right'
-            ? 'text-right'
-            : '';
-
           return (
-            <div className={textAlignClass}>
+            <div className={`flex flex-col ${alignmentClass}`}>
               {config.welcomeScreen.title && (
                 <div className="relative">
                   <EditableTextBlock
@@ -272,15 +267,16 @@ export const QuizPreview = ({
                     onChange={(value, html) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, title: value, titleHtml: html } })}
                     onClear={() => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, title: '', titleHtml: '' } })}
                     onSparklesClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                    className="text-4xl md:text-5xl font-bold"
+                    className="font-bold"
                     style={{ 
                       color: config.welcomeScreen.titleStyle?.textColor || theme.textColor,
                       fontFamily: config.welcomeScreen.titleStyle?.fontFamily || 'inherit',
                       fontWeight: config.welcomeScreen.titleStyle?.isBold ? 'bold' : undefined,
                       fontStyle: config.welcomeScreen.titleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.welcomeScreen.titleStyle?.isUnderline ? 'underline' : undefined,
-                      textAlign: config.welcomeScreen.titleStyle?.textAlign || 'center',
-                      fontSize: config.welcomeScreen.titleStyle?.fontSize ? `${config.welcomeScreen.titleStyle.fontSize}px` : undefined,
+                      textAlign: config.welcomeScreen.titleStyle?.textAlign || alignment,
+                      fontSize: config.welcomeScreen.titleStyle?.fontSize ? `${config.welcomeScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
+                      lineHeight: '1.2',
                     }}
                     isEditing={!isReadOnly && editingField === 'welcome-title'}
                     isReadOnly={isReadOnly}
@@ -357,15 +353,16 @@ export const QuizPreview = ({
                     onChange={(value, html) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitle: value, subtitleHtml: html } })}
                     onClear={() => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitle: '', subtitleHtml: '' } })}
                     onSparklesClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                    className="text-lg md:text-xl"
+                    className=""
                     style={{ 
                       color: config.welcomeScreen.subtitleStyle?.textColor || theme.textSecondaryColor, 
                       fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || 'inherit',
                       fontWeight: config.welcomeScreen.subtitleStyle?.isBold ? 'bold' : undefined,
                       fontStyle: config.welcomeScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.welcomeScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
-                      textAlign: config.welcomeScreen.subtitleStyle?.textAlign || 'center',
-                      fontSize: config.welcomeScreen.subtitleStyle?.fontSize ? `${config.welcomeScreen.subtitleStyle.fontSize}px` : undefined,
+                      textAlign: config.welcomeScreen.subtitleStyle?.textAlign || 'left',
+                      fontSize: config.welcomeScreen.subtitleStyle?.fontSize ? `${config.welcomeScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
+                      lineHeight: '1.4',
                       opacity: 0.9 
                     }}
                     isEditing={!isReadOnly && editingField === 'welcome-subtitle'}
@@ -436,21 +433,22 @@ export const QuizPreview = ({
                 </div>
               )}
             
-            <div className="mt-10" style={{ marginTop: `${(config.welcomeScreen.blockSpacing || 1) * 32}px` }}>
-              <button 
-                onClick={onNext}
-                className="flex items-center justify-center font-medium transition-all hover:opacity-90"
-                style={unifiedButtonStyles}
-              >
-                <span>{config.welcomeScreen.buttonText || "Commencer"}</span>
-              </button>
-            </div>
+            <button 
+              onClick={onNext}
+              className="flex items-center justify-center font-medium transition-all hover:opacity-90"
+              style={unifiedButtonStyles}
+            >
+              <span>{config.welcomeScreen.buttonText || "Commencer"}</span>
+            </button>
           </div>
           );
         };
 
         // Desktop layouts
         if (viewMode === 'desktop') {
+          // Horizontal alignment for the whole content block
+          const horizontalAlign = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
+          
           if (desktopLayout === 'desktop-left-right') {
             const align = config.welcomeScreen.splitAlignment || 'left';
             const alignmentClass =
@@ -470,7 +468,7 @@ export const QuizPreview = ({
 
             return (
               <div
-                className={`w-full h-full flex flex-col ${alignmentClass} ${justifyClass} gap-10 px-24 py-12 overflow-y-auto scrollbar-hide`}
+                className={`w-full h-full flex flex-col ${horizontalAlign} ${justifyClass} gap-10 px-24 py-12 overflow-y-auto scrollbar-hide`}
                 style={{ padding: '35px 75px' }}
               >
                 {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
@@ -480,24 +478,27 @@ export const QuizPreview = ({
               </div>
             );
           } else if (desktopLayout === 'desktop-right-left') {
+            const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
             return (
-              <div className="w-full h-full flex items-center gap-16 px-24">
-                <div className="flex-1">
+              <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
+                <div className="max-w-[500px]">
                   <TextContent />
                 </div>
                 <ImageBlock />
               </div>
             );
           } else if (desktopLayout === 'desktop-centered') {
+            const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
             return (
-              <div className="w-full h-full flex items-center gap-16 px-24">
+              <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
                 <ImageBlock />
-                <div className="flex-1">
+                <div className="max-w-[500px]">
                   <TextContent />
                 </div>
               </div>
             );
           } else if (desktopLayout === 'desktop-split') {
+            const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
             return (
               <div className="absolute inset-0">
                 {config.welcomeScreen.wallpaperImage && (
@@ -513,17 +514,18 @@ export const QuizPreview = ({
                     backgroundColor: `rgba(61, 55, 49, ${config.welcomeScreen.overlayOpacity ?? 0.6})`
                   }}
                 />
-                <div className="relative w-full h-full flex items-center justify-center px-24">
+                <div className={`relative w-full h-full flex ${justifyContent} items-center px-24`}>
                   <div className="max-w-[700px]">
-                    <TextContent centered />
+                    <TextContent />
                   </div>
                 </div>
               </div>
             );
           } else if (desktopLayout === 'desktop-card') {
+            const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
             return (
               <div className="relative w-full h-full flex">
-                <div className="w-1/2 flex items-center justify-center px-24 z-10">
+                <div className={`w-1/2 flex ${justifyContent} items-center px-24 z-10`}>
                   <div className="max-w-[500px]">
                     <TextContent />
                   </div>
@@ -557,10 +559,13 @@ export const QuizPreview = ({
           }
         } else {
           // Mobile layouts
+          const imageAlignment = alignment === 'center' ? 'center' : alignment === 'right' ? 'flex-end' : 'flex-start';
           if (mobileLayout === 'mobile-vertical') {
             return (
               <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
-                <ImageBlock />
+                <div className="flex w-full" style={{ justifyContent: imageAlignment }}>
+                  <ImageBlock />
+                </div>
                 <TextContent />
               </div>
             );
@@ -631,36 +636,22 @@ export const QuizPreview = ({
         const currentLayout = config.contactScreen[layoutKey];
 
         return (
-          <div
-            className="flex w-full h-full"
-            style={{
-              alignItems: viewMode === 'desktop' ? 'center' : 'flex-start',
-              justifyContent: viewMode === 'desktop' ? 'center' : 'flex-start',
-              padding:
-                viewMode === 'desktop'
-                  ? '0 64px'
-                  : '24px 20px',
-              paddingLeft: '7%',
-              paddingRight: '7%',
-            }}
-          >
-            <ContactLayouts
-              layout={currentLayout}
-              viewMode={viewMode}
-              title={config.contactScreen.title}
-              subtitle={config.contactScreen.subtitle}
-              fields={config.contactScreen.fields}
-              contactData={contactData}
-              onFieldChange={(type, value) =>
-                setContactData(prev => ({ ...prev, [type]: value }))
-              }
-              onSubmit={onNext}
-              backgroundColor={theme.backgroundColor}
-              textColor={theme.textColor}
-              buttonColor={theme.buttonColor}
-              isReadOnly={isReadOnly}
-            />
-          </div>
+          <ContactLayouts
+            layout={currentLayout}
+            viewMode={viewMode}
+            title={config.contactScreen.title}
+            subtitle={config.contactScreen.subtitle}
+            fields={config.contactScreen.fields}
+            contactData={contactData}
+            onFieldChange={(type, value) =>
+              setContactData(prev => ({ ...prev, [type]: value }))
+            }
+            onSubmit={onNext}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+            isReadOnly={isReadOnly}
+          />
         );
       }
 
@@ -876,7 +867,7 @@ export const QuizPreview = ({
           .replace('{{total}}', totalPoints.toString());
 
         return (
-          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '0 96px' : '0 20px', paddingLeft: '7%', paddingRight: '7%' }}>
+          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '24px' }}>
             <div className="w-full max-w-[700px] text-center relative">
               {resultTitle && (
                 <div className="relative">
@@ -885,15 +876,16 @@ export const QuizPreview = ({
                     onChange={(value, html) => onUpdateConfig({ resultScreen: { ...config.resultScreen, title: value, titleHtml: html } })}
                     onClear={() => onUpdateConfig({ resultScreen: { ...config.resultScreen, title: '', titleHtml: '' } })}
                     onSparklesClick={() => { setVariableTarget('title'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                    className="text-4xl md:text-5xl font-bold"
+                    className="font-bold"
                     style={{ 
                       color: config.resultScreen.titleStyle?.textColor || theme.textColor,
                       fontFamily: config.resultScreen.titleStyle?.fontFamily || 'inherit',
-                      fontWeight: config.resultScreen.titleStyle?.isBold ? 'bold' : undefined,
+                      fontWeight: config.resultScreen.titleStyle?.isBold ? 'bold' : 700,
                       fontStyle: config.resultScreen.titleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.resultScreen.titleStyle?.isUnderline ? 'underline' : undefined,
                       textAlign: config.resultScreen.titleStyle?.textAlign || 'center',
-                      fontSize: config.resultScreen.titleStyle?.fontSize ? `${config.resultScreen.titleStyle.fontSize}px` : undefined,
+                      fontSize: config.resultScreen.titleStyle?.fontSize ? `${config.resultScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
+                      lineHeight: 1.2,
                     }}
                     isEditing={!isReadOnly && editingField === 'result-title'}
                     isReadOnly={isReadOnly}
@@ -904,7 +896,7 @@ export const QuizPreview = ({
                     fieldType="title"
                     width={config.resultScreen.titleWidth || 100}
                     onWidthChange={(width) => onUpdateConfig({ resultScreen: { ...config.resultScreen, titleWidth: width } })}
-                    marginBottom="32px"
+                    marginBottom={viewMode === 'desktop' ? '16px' : '8px'}
                   />
                   {showVariableMenu && variableTarget === 'title' && editingField === 'result-title' && (
                     <div
@@ -970,15 +962,16 @@ export const QuizPreview = ({
                     onChange={(value, html) => onUpdateConfig({ resultScreen: { ...config.resultScreen, subtitle: value, subtitleHtml: html } })}
                     onClear={() => onUpdateConfig({ resultScreen: { ...config.resultScreen, subtitle: '', subtitleHtml: '' } })}
                     onSparklesClick={() => { setVariableTarget('subtitle'); setShowVariableMenu((open) => !open); setMenuView('main'); }}
-                    className="text-lg md:text-xl"
+                    className=""
                     style={{ 
                       color: config.resultScreen.subtitleStyle?.textColor || theme.textSecondaryColor, 
                       fontFamily: config.resultScreen.subtitleStyle?.fontFamily || 'inherit',
-                      fontWeight: config.resultScreen.subtitleStyle?.isBold ? 'bold' : undefined,
+                      fontWeight: config.resultScreen.subtitleStyle?.isBold ? 'bold' : 400,
                       fontStyle: config.resultScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.resultScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
                       textAlign: config.resultScreen.subtitleStyle?.textAlign || 'center',
-                      fontSize: config.resultScreen.subtitleStyle?.fontSize ? `${config.resultScreen.subtitleStyle.fontSize}px` : undefined,
+                      fontSize: config.resultScreen.subtitleStyle?.fontSize ? `${config.resultScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
+                      lineHeight: 1.5,
                       opacity: 0.8 
                     }}
                     isEditing={!isReadOnly && editingField === 'result-subtitle'}
@@ -990,7 +983,7 @@ export const QuizPreview = ({
                     fieldType="subtitle"
                     width={config.resultScreen.subtitleWidth || 100}
                     onWidthChange={(width) => onUpdateConfig({ resultScreen: { ...config.resultScreen, subtitleWidth: width } })}
-                    marginBottom="48px"
+                    marginBottom={viewMode === 'desktop' ? '48px' : '32px'}
                   />
                   {showVariableMenu && variableTarget === 'subtitle' && editingField === 'result-subtitle' && (
                     <div
@@ -1048,13 +1041,15 @@ export const QuizPreview = ({
                   )}
                 </div>
               )}
-              <button
-                onClick={() => window.location.reload()}
-                className="flex items-center justify-center font-medium transition-all hover:opacity-90"
-                style={unifiedButtonStyles}
-              >
-                Recommencer
-              </button>
+              <div className="flex justify-center">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="flex items-center justify-center font-medium transition-all hover:opacity-90"
+                  style={unifiedButtonStyles}
+                >
+                  Recommencer
+                </button>
+              </div>
             </div>
           </div>
         );
@@ -1065,31 +1060,7 @@ export const QuizPreview = ({
   };
 
   return (
-    <div className={isMobileResponsive ? "w-full h-full relative overflow-hidden" : "flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100"}>
-      {!isMobileResponsive && (
-        <button
-          onClick={onToggleViewMode}
-          className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
-          style={{
-            backgroundColor: '#4A4138',
-            border: '1px solid rgba(245, 184, 0, 0.3)',
-            color: '#F5CA3C'
-          }}
-        >
-          {viewMode === 'desktop' ? (
-            <>
-              <Monitor className="w-4 h-4" />
-              <span className="text-xs font-medium">Desktop</span>
-            </>
-          ) : (
-            <>
-              <Smartphone className="w-4 h-4" />
-              <span className="text-xs font-medium">Mobile</span>
-            </>
-          )}
-        </button>
-      )}
-
+    <div className={isMobileResponsive ? "w-full h-full relative overflow-hidden" : "flex items-center justify-center relative overflow-hidden"}>
       <input
         ref={fileInputRef}
         type="file"
@@ -1099,13 +1070,77 @@ export const QuizPreview = ({
       />
 
       <div 
+        key={`preview-container-${viewMode}`}
         className="relative overflow-hidden transition-all duration-300" 
         style={{ 
           backgroundColor: theme.backgroundColor, 
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
-          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px') 
+          minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
+          maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
+          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px'),
+          minHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
+          maxHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
         }}
       >
+        {/* Background image from config settings */}
+        {(() => {
+          const getScreenBackground = () => {
+            const applyToAll = config.welcomeScreen.applyBackgroundToAll;
+            const welcomeDesktop = config.welcomeScreen.backgroundImage;
+            const welcomeMobile = config.welcomeScreen.backgroundImageMobile;
+            
+            if (applyToAll && (welcomeDesktop || welcomeMobile)) {
+              return viewMode === 'mobile' && welcomeMobile ? welcomeMobile : welcomeDesktop;
+            }
+            
+            switch (activeView) {
+              case 'welcome':
+                return viewMode === 'mobile' && welcomeMobile ? welcomeMobile : welcomeDesktop;
+              case 'contact':
+                return viewMode === 'mobile' && config.contactScreen.backgroundImageMobile 
+                  ? config.contactScreen.backgroundImageMobile 
+                  : config.contactScreen.backgroundImage;
+              case 'result':
+                return viewMode === 'mobile' && config.resultScreen.backgroundImageMobile 
+                  ? config.resultScreen.backgroundImageMobile 
+                  : config.resultScreen.backgroundImage;
+              default:
+                return undefined;
+            }
+          };
+          
+          const bgImage = getScreenBackground();
+          const getOverlayOpacity = () => {
+            switch (activeView) {
+              case 'welcome': return config.welcomeScreen.overlayOpacity;
+              case 'contact': return (config.contactScreen as any).overlayOpacity;
+              case 'result': return config.resultScreen.overlayOpacity;
+              default: return undefined;
+            }
+          };
+          
+          if (!bgImage) return null;
+          
+          return (
+            <div 
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: `url(${bgImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
+              <div 
+                className="absolute inset-0" 
+                style={{ 
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  opacity: getOverlayOpacity() !== undefined ? getOverlayOpacity()! / 100 : 0.4
+                }} 
+              />
+            </div>
+          );
+        })()}
         <AnimatePresence mode="wait">
           <motion.div
             key={`${activeView}-${activeQuestionIndex}`}
@@ -1113,7 +1148,7 @@ export const QuizPreview = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full"
+            className="w-full h-full relative z-10"
             onClick={(e) => {
               // Ne pas blur si on clique sur un input, textarea ou button
               const target = e.target as HTMLElement;

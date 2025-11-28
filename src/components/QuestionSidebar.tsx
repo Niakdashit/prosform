@@ -294,7 +294,7 @@ export const QuestionSidebar = ({
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
           <ScrollArea className="h-[calc(100vh-140px)]">
-            <ThemeStylePanel />
+            <ThemeStylePanel hideJackpotSections />
           </ScrollArea>
         </TabsContent>
       </Tabs>

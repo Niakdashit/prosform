@@ -107,14 +107,18 @@ export const ContactLayouts = ({
   });
 
   const renderForm = () => (
-    <div className="w-full max-w-md text-center">
+    <div className="w-full max-w-md text-center px-4">
       <EditableTextBlock
         value={title}
         onChange={(value, html) => onChangeTitle?.(value, html)}
         onClear={() => onClearTitle?.()}
         onSparklesClick={() => onToggleVariableMenu?.('title')}
-        className="text-4xl md:text-5xl font-bold mb-4"
-        style={getTitleStyles()}
+        className="font-bold"
+        style={{
+          ...getTitleStyles(),
+          fontSize: viewMode === 'mobile' ? '28px' : '42px',
+          lineHeight: '1.2',
+        }}
         isEditing={!isReadOnly && editingField === 'contact-title'}
         isReadOnly={isReadOnly}
         onFocus={onFocusTitle}
@@ -122,6 +126,7 @@ export const ContactLayouts = ({
         showSparkles={!isReadOnly}
         showClear={!isReadOnly}
         fieldType="title"
+        marginBottom="16px"
       />
       
       <EditableTextBlock
@@ -129,8 +134,12 @@ export const ContactLayouts = ({
         onChange={(value, html) => onChangeSubtitle?.(value, html)}
         onClear={() => onClearSubtitle?.()}
         onSparklesClick={() => onToggleVariableMenu?.('subtitle')}
-        className="text-lg md:text-xl mb-8"
-        style={getSubtitleStyles()}
+        className=""
+        style={{
+          ...getSubtitleStyles(),
+          fontSize: viewMode === 'mobile' ? '14px' : '18px',
+          lineHeight: '1.4',
+        }}
         isEditing={!isReadOnly && editingField === 'contact-subtitle'}
         isReadOnly={isReadOnly}
         onFocus={onFocusSubtitle}
@@ -138,6 +147,7 @@ export const ContactLayouts = ({
         showSparkles={!isReadOnly}
         showClear={!isReadOnly}
         fieldType="subtitle"
+        marginBottom="32px"
       />
       
       <div className="space-y-4">
@@ -149,11 +159,14 @@ export const ContactLayouts = ({
               value={contactData[field.type as keyof typeof contactData]}
               onChange={(e) => onFieldChange(field.type, e.target.value)}
               required={field.required}
-              className="h-12 text-base"
+              className="h-14 text-base"
               style={{
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderColor: 'rgba(255,255,255,0.3)',
-                color: textColor
+                backgroundColor: backgroundColor,
+                borderColor: textColor,
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                color: textColor,
+                borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
               }}
             />
           </div>

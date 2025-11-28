@@ -28,9 +28,9 @@ export const TopToolbar = ({
     <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
       <div className="flex items-center gap-1.5">
         <Button 
-          variant="default"
+          variant={activeTab === 'content' ? 'default' : 'ghost'}
           size="sm" 
-          className="gap-1.5 h-8 text-xs px-2.5 bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="gap-1.5 h-8 text-xs px-2.5"
           onClick={() => {
             onTabChange?.('content');
             onAddContent();

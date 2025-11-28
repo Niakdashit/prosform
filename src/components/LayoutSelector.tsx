@@ -45,25 +45,23 @@ export const LayoutSelector = ({
   onMobileLayoutChange
 }: LayoutSelectorProps) => {
   return (
-    <div className="space-y-3">
-      <div className="space-y-1.5">
-        <Label className="text-xs text-muted-foreground">Mobile</Label>
+    <div className="flex gap-2">
+      {/* Mobile */}
+      <div className="flex-1 space-y-1">
+        <Label className="text-[10px] text-muted-foreground">Mobile</Label>
         <Select value={mobileLayout} onValueChange={onMobileLayoutChange}>
           <SelectTrigger className="h-9">
             <div className="flex items-center gap-2 w-full">
-              <div className="w-6 h-6 flex-shrink-0">
+              <div className="w-5 h-5 flex-shrink-0">
                 <LayoutIcon type={mobileLayout} />
               </div>
-              <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
             </div>
           </SelectTrigger>
           <SelectContent>
             {MOBILE_LAYOUTS.map((layout) => (
               <SelectItem key={layout.id} value={layout.id} className="text-xs">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-6 h-6">
+                  <div className="w-5 h-5">
                     <LayoutIcon type={layout.id} />
                   </div>
                   <span>{layout.name}</span>
@@ -74,24 +72,22 @@ export const LayoutSelector = ({
         </Select>
       </div>
 
-      <div className="space-y-1.5">
-        <Label className="text-xs text-muted-foreground">Desktop</Label>
+      {/* Desktop */}
+      <div className="flex-1 space-y-1">
+        <Label className="text-[10px] text-muted-foreground">Desktop</Label>
         <Select value={desktopLayout} onValueChange={onDesktopLayoutChange}>
           <SelectTrigger className="h-9">
             <div className="flex items-center gap-2 w-full">
-              <div className="w-6 h-6 flex-shrink-0">
+              <div className="w-5 h-5 flex-shrink-0">
                 <LayoutIcon type={desktopLayout} />
               </div>
-              <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
             </div>
           </SelectTrigger>
           <SelectContent>
             {DESKTOP_LAYOUTS.map((layout) => (
               <SelectItem key={layout.id} value={layout.id} className="text-xs">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-6 h-6">
+                  <div className="w-5 h-5">
                     <LayoutIcon type={layout.id} />
                   </div>
                   <span>{layout.name}</span>

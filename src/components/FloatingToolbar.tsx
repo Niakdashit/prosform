@@ -284,6 +284,30 @@ export const FloatingToolbar = ({ containerRef }: FloatingToolbarProps) => {
         left: editableRect.left + window.scrollX,
       });
       
+      // Lire les styles actuels de l'élément pour les afficher dans la toolbar
+      const computedStyle = window.getComputedStyle(editableElement);
+      
+      // Extraire la police
+      let fontFamily = computedStyle.fontFamily.split(',')[0].replace(/['"]/g, '').trim();
+      if (fontFamily === '-apple-system' || fontFamily === 'BlinkMacSystemFont' || fontFamily === 'system-ui' || fontFamily === 'inherit') {
+        fontFamily = 'Inter';
+      }
+      setSelectedFont(fontFamily);
+      
+      // Extraire la taille de police
+      const fontSize = Math.round(parseFloat(computedStyle.fontSize));
+      setCurrentFontSize(fontSize);
+      
+      // Extraire l'alignement
+      const textAlign = computedStyle.textAlign;
+      if (textAlign === 'left' || textAlign === 'start') {
+        setCurrentAlign('left');
+      } else if (textAlign === 'center') {
+        setCurrentAlign('center');
+      } else if (textAlign === 'right' || textAlign === 'end') {
+        setCurrentAlign('right');
+      }
+      
       setIsVisible(true);
     };
 

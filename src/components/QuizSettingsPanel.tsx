@@ -9,10 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutSelector } from "./LayoutSelector";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Plus, Trash2, Check } from "lucide-react";
+import { Upload, X, Plus, Trash2, Check, AlignCenter, Image, Split } from "lucide-react";
 import { WallpaperUploadModal } from "./WallpaperUploadModal";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
 
 interface QuizSettingsPanelProps {
   config: QuizConfig;
@@ -112,6 +113,28 @@ export const QuizSettingsPanel = ({
             </div>
             
             <Separator />
+
+            {/* Alignment */}
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
+              <Select
+                value={config.welcomeScreen.alignment || 'left'}
+                onValueChange={(value) => onUpdateConfig({
+                  welcomeScreen: { ...config.welcomeScreen, alignment: value as 'left' | 'center' | 'right' }
+                })}
+              >
+                <SelectTrigger className="h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="left">Left</SelectItem>
+                  <SelectItem value="center">Center</SelectItem>
+                  <SelectItem value="right">Right</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Separator />
             
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -139,35 +162,6 @@ export const QuizSettingsPanel = ({
                 className="text-xs h-8"
               />
               <p className="text-[10px] text-muted-foreground mt-1.5">{(config.welcomeScreen.buttonText || "").length}/24</p>
-            </div>
-
-            <Separator />
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Image or video</Label>
-              <div className="space-y-2">
-                <Button variant="outline" size="sm" className="w-full text-[10px] h-7 justify-start">
-                  <Upload className="w-3 h-3 mr-1.5" />
-                  Upload
-                </Button>
-                <Button variant="outline" size="sm" className="w-full text-[10px] h-7 justify-start">
-                  <Upload className="w-3 h-3 mr-1.5" />
-                  Add from URL
-                </Button>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Brightness</Label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                defaultValue="50"
-                className="w-full h-1.5 accent-primary cursor-pointer"
-              />
             </div>
 
             <Separator />
@@ -212,75 +206,30 @@ export const QuizSettingsPanel = ({
               />
             </div>
 
-            {(config.welcomeScreen.desktopLayout === 'desktop-split' || config.welcomeScreen.mobileLayout === 'mobile-minimal') && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  {config.welcomeScreen.wallpaperImage ? (
-                    <div className="space-y-2">
-                      <div className="relative rounded-lg overflow-hidden border">
-                        <img 
-                          src={config.welcomeScreen.wallpaperImage} 
-                          alt="Wallpaper preview" 
-                          className="w-full h-24 object-cover"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-6 w-6"
-                          onClick={() => handleRemoveWallpaper('welcome')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full text-xs h-8"
-                        onClick={() => {
-                          setActiveWallpaperSection('welcome');
-                          setWallpaperModalOpen(true);
-                        }}
-                      >
-                        Changer l'image
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full text-xs h-8 justify-start"
-                      onClick={() => {
-                        setActiveWallpaperSection('welcome');
-                        setWallpaperModalOpen(true);
-                      }}
-                    >
-                      <Upload className="w-3 h-3 mr-2" />
-                      Ajouter une image
-                    </Button>
-                  )}
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Overlay opacity: {((config.welcomeScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
-                  </Label>
-                  <Slider
-                    value={[(config.welcomeScreen.overlayOpacity ?? 0.6) * 100]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      welcomeScreen: { ...config.welcomeScreen, overlayOpacity: value / 100 }
-                    })}
-                    min={0}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-              </>
-            )}
+            <Separator />
+
+            {/* Background Image */}
+            <BackgroundUploader
+              desktopImage={config.welcomeScreen.backgroundImage}
+              mobileImage={config.welcomeScreen.backgroundImageMobile}
+              onDesktopImageChange={(image) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImage: image }
+              })}
+              onDesktopImageRemove={() => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImage: undefined }
+              })}
+              onMobileImageChange={(image) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: image }
+              })}
+              onMobileImageRemove={() => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: undefined }
+              })}
+              showApplyToAll={true}
+              applyToAll={config.welcomeScreen.applyBackgroundToAll}
+              onApplyToAllChange={(value) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
+              })}
+            />
           </div>
         );
 
@@ -341,6 +290,32 @@ export const QuizSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.contactScreen.backgroundImage}
+                mobileImage={config.contactScreen.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
+                })}
+              />
+            )}
           </div>
         );
 
@@ -473,22 +448,6 @@ export const QuizSettingsPanel = ({
       case 'result':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.resultScreen.desktopLayout}
-                mobileLayout={config.resultScreen.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  resultScreen: { ...config.resultScreen, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  resultScreen: { ...config.resultScreen, mobileLayout: layout }
-                })}
-              />
-            </div>
-
-            <Separator />
-
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="text-xs text-muted-foreground">Afficher le score</Label>
@@ -529,74 +488,30 @@ export const QuizSettingsPanel = ({
               />
             </div>
 
-            {(config.resultScreen.desktopLayout === 'desktop-split' || config.resultScreen.mobileLayout === 'mobile-minimal') && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  {config.resultScreen.wallpaperImage ? (
-                    <div className="space-y-2">
-                      <div className="relative rounded-lg overflow-hidden border">
-                        <img 
-                          src={config.resultScreen.wallpaperImage} 
-                          alt="Wallpaper preview" 
-                          className="w-full h-24 object-cover"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-6 w-6"
-                          onClick={() => handleRemoveWallpaper('result')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full text-xs h-8"
-                        onClick={() => {
-                          setActiveWallpaperSection('result');
-                          setWallpaperModalOpen(true);
-                        }}
-                      >
-                        Changer l'image
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full text-xs h-8 justify-start"
-                      onClick={() => {
-                        setActiveWallpaperSection('result');
-                        setWallpaperModalOpen(true);
-                      }}
-                    >
-                      <Upload className="w-3 h-3 mr-2" />
-                      Ajouter une image
-                    </Button>
-                  )}
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Overlay opacity: {((config.resultScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
-                  </Label>
-                  <Slider
-                    value={[(config.resultScreen.overlayOpacity ?? 0.6) * 100]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      resultScreen: { ...config.resultScreen, overlayOpacity: value / 100 }
-                    })}
-                    min={0}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-              </>
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.resultScreen.backgroundImage}
+                mobileImage={config.resultScreen.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  resultScreen: { ...config.resultScreen, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  resultScreen: { ...config.resultScreen, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  resultScreen: { ...config.resultScreen, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  resultScreen: { ...config.resultScreen, backgroundImageMobile: undefined }
+                })}
+              />
             )}
           </div>
         );

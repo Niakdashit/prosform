@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
 
 interface ScratchSettingsPanelProps {
   config: ScratchConfig;
@@ -39,6 +41,28 @@ export const ScratchSettingsPanel = ({
             </div>
             
             <Separator />
+
+            {/* Alignment */}
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
+              <Select
+                value={config.welcomeScreen.alignment || 'left'}
+                onValueChange={(value) => onUpdateConfig({
+                  welcomeScreen: { ...config.welcomeScreen, alignment: value as 'left' | 'center' | 'right' }
+                })}
+              >
+                <SelectTrigger className="h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="left">Left</SelectItem>
+                  <SelectItem value="center">Center</SelectItem>
+                  <SelectItem value="right">Right</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Separator />
             
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
@@ -69,6 +93,31 @@ export const ScratchSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            <BackgroundUploader
+              desktopImage={config.welcomeScreen.backgroundImage}
+              mobileImage={config.welcomeScreen.backgroundImageMobile}
+              onDesktopImageChange={(image) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImage: image }
+              })}
+              onDesktopImageRemove={() => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImage: undefined }
+              })}
+              onMobileImageChange={(image) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: image }
+              })}
+              onMobileImageRemove={() => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: undefined }
+              })}
+              showApplyToAll={true}
+              applyToAll={config.welcomeScreen.applyBackgroundToAll}
+              onApplyToAllChange={(value) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
+              })}
+            />
           </div>
         );
 
@@ -106,28 +155,38 @@ export const ScratchSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.contactForm.backgroundImage}
+                mobileImage={config.contactForm.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
+                })}
+              />
+            )}
           </div>
         );
 
       case 'scratch':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.scratchScreen.desktopLayout}
-                mobileLayout={config.scratchScreen.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
-
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Couleur de grattage</Label>
               <div className="flex gap-2">
@@ -235,28 +294,38 @@ export const ScratchSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.scratchScreen.backgroundImage}
+                mobileImage={config.scratchScreen.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  scratchScreen: { ...config.scratchScreen, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  scratchScreen: { ...config.scratchScreen, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  scratchScreen: { ...config.scratchScreen, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  scratchScreen: { ...config.scratchScreen, backgroundImageMobile: undefined }
+                })}
+              />
+            )}
           </div>
         );
 
       case 'ending-win':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.endingWin.desktopLayout}
-                mobileLayout={config.endingWin.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
-            
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">
                 Block spacing: {config.endingWin.blockSpacing}x
@@ -272,28 +341,38 @@ export const ScratchSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.endingWin.backgroundImage}
+                mobileImage={config.endingWin.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImageMobile: undefined }
+                })}
+              />
+            )}
           </div>
         );
 
       case 'ending-lose':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.endingLose.desktopLayout}
-                mobileLayout={config.endingLose.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
-            
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">
                 Block spacing: {config.endingLose.blockSpacing}x
@@ -309,6 +388,32 @@ export const ScratchSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.endingLose.backgroundImage}
+                mobileImage={config.endingLose.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImageMobile: undefined }
+                })}
+              />
+            )}
           </div>
         );
     }

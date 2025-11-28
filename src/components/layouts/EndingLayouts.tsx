@@ -105,43 +105,49 @@ export const EndingLayouts = ({
   });
 
   const renderContent = () => (
-    <div className="text-center w-full max-w-2xl px-8">
-      <div className="mb-6">
-        <EditableTextBlock
-          value={title}
-          onChange={(value, html) => onChangeTitle?.(value, html)}
-          onClear={() => onClearTitle?.()}
-          onSparklesClick={() => onToggleVariableMenu?.('title')}
-          className="text-3xl md:text-4xl font-bold"
-          style={getTitleStyles()}
-          isEditing={editingField === 'ending-title'}
-          onFocus={onFocusTitle}
-          onBlur={() => onBlurTitle?.(title)}
-          showSparkles={true}
-          showClear={true}
-          fieldType="title"
-        />
-      </div>
+    <div className="text-center w-full max-w-2xl px-6">
+      <EditableTextBlock
+        value={title}
+        onChange={(value, html) => onChangeTitle?.(value, html)}
+        onClear={() => onClearTitle?.()}
+        onSparklesClick={() => onToggleVariableMenu?.('title')}
+        className="font-bold"
+        style={{
+          ...getTitleStyles(),
+          fontSize: viewMode === 'mobile' ? '28px' : '42px',
+          lineHeight: '1.2',
+        }}
+        isEditing={editingField === 'ending-title'}
+        onFocus={onFocusTitle}
+        onBlur={() => onBlurTitle?.(title)}
+        showSparkles={true}
+        showClear={true}
+        fieldType="title"
+        marginBottom="16px"
+      />
       
-      <div className="mb-8">
-        <EditableTextBlock
-          value={subtitle.replace('{{prize}}', wonPrize || '')}
-          onChange={(value, html) => onChangeSubtitle?.(value, html)}
-          onClear={() => onClearSubtitle?.()}
-          onSparklesClick={() => onToggleVariableMenu?.('subtitle')}
-          className="text-xl md:text-2xl"
-          style={getSubtitleStyles()}
-          isEditing={editingField === 'ending-subtitle'}
-          onFocus={onFocusSubtitle}
-          onBlur={() => onBlurSubtitle?.(subtitle)}
-          showSparkles={true}
-          showClear={true}
-          fieldType="subtitle"
-        />
-      </div>
+      <EditableTextBlock
+        value={subtitle.replace('{{prize}}', wonPrize || '')}
+        onChange={(value, html) => onChangeSubtitle?.(value, html)}
+        onClear={() => onClearSubtitle?.()}
+        onSparklesClick={() => onToggleVariableMenu?.('subtitle')}
+        className=""
+        style={{
+          ...getSubtitleStyles(),
+          fontSize: viewMode === 'mobile' ? '14px' : '18px',
+          lineHeight: '1.4',
+        }}
+        isEditing={editingField === 'ending-subtitle'}
+        onFocus={onFocusSubtitle}
+        onBlur={() => onBlurSubtitle?.(subtitle)}
+        showSparkles={true}
+        showClear={true}
+        fieldType="subtitle"
+        marginBottom="32px"
+      />
       
       {onRestart && (
-        <div className="mt-4 mb-8 flex justify-center">
+        <div className="flex justify-center">
           <button 
             onClick={onRestart}
             className="inline-flex items-center justify-center font-medium transition-all hover:opacity-90"

@@ -4,7 +4,6 @@ import { QuizSidebar } from "./QuizSidebar";
 import { QuizPreview } from "./QuizPreview";
 import { QuizSettingsPanel } from "./QuizSettingsPanel";
 import { QuizTopToolbar } from "./QuizTopToolbar";
-import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
@@ -56,7 +55,11 @@ export interface QuizConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
+    applyBackgroundToAll?: boolean;
     splitAlignment?: 'left' | 'center' | 'right';
+    alignment?: 'left' | 'center' | 'right';
     showImage?: boolean;
   };
   contactScreen: {
@@ -74,6 +77,8 @@ export interface QuizConfig {
     fields: ContactField[];
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   questions: QuizQuestion[];
   resultScreen: {
@@ -90,6 +95,8 @@ export interface QuizConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
     showScore: boolean;
     showCorrectAnswers: boolean;
     socialLinks?: {
@@ -201,8 +208,6 @@ export const QuizBuilder = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
-  const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
 
   useEffect(() => {
     if (isMobile) {
@@ -301,19 +306,9 @@ export const QuizBuilder = () => {
           localStorage.setItem('quiz-theme', JSON.stringify(theme));
           window.open('/quiz-preview', '_blank');
         }}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
       />
         
-      {activeTab === 'campaign' ? (
-        <CampaignSettings 
-          defaultTab={campaignDefaultTab}
-          prizes={[]}
-          onSavePrize={() => {}}
-          onDeletePrize={() => {}}
-        />
-      ) : (
-        <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
@@ -338,11 +333,6 @@ export const QuizBuilder = () => {
                   onDuplicateQuestion={duplicateQuestion}
                   onReorderQuestions={reorderQuestions}
                   onDeleteQuestion={deleteQuestion}
-                  onGoToCampaign={() => {
-                    setActiveTab('campaign');
-                    setCampaignDefaultTab('canaux');
-                    setLeftDrawerOpen(false);
-                  }}
                 />
               </DrawerContent>
             </Drawer>
@@ -420,10 +410,6 @@ export const QuizBuilder = () => {
               onDuplicateQuestion={duplicateQuestion}
               onReorderQuestions={reorderQuestions}
               onDeleteQuestion={deleteQuestion}
-              onGoToCampaign={() => {
-                setActiveTab('campaign');
-                setCampaignDefaultTab('canaux');
-              }}
             />
             
             {/* Preview area */}
@@ -487,7 +473,6 @@ export const QuizBuilder = () => {
           </>
         )}
       </div>
-      )}
       <FloatingToolbar />
     </div>
   );

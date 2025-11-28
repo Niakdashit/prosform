@@ -85,8 +85,12 @@ export interface WheelConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
+    applyBackgroundToAll?: boolean;
     showImage?: boolean;
     splitAlignment?: 'left' | 'center' | 'right';
+    alignment?: 'left' | 'center' | 'right';
     image?: string;
     imageSettings?: {
       borderRadius: number;
@@ -111,6 +115,8 @@ export interface WheelConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   wheelScreen: {
     title: string;
@@ -122,10 +128,13 @@ export interface WheelConfig {
     subtitleStyle?: TextStyle;
     subtitleWidth?: number;
     blockSpacing: number;
+    wheelSize?: number;
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   segments: WheelSegment[];
   endingWin: {
@@ -142,6 +151,8 @@ export interface WheelConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   endingLose: {
     title: string;
@@ -157,6 +168,8 @@ export interface WheelConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
 }
 
@@ -186,6 +199,7 @@ const defaultWheelConfig: WheelConfig = {
     title: "Tournez la roue !",
     subtitle: "Tentez votre chance et découvrez votre lot",
     blockSpacing: 1,
+    wheelSize: 100,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
   },

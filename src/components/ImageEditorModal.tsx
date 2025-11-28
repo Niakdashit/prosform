@@ -24,7 +24,7 @@ interface ImageEditorModalProps {
 
 const defaultSettings: ImageSettings = {
   size: 100,
-  borderRadius: 36,
+  borderRadius: 5,
   borderWidth: 0,
   borderColor: '#F5B800',
   rotation: 0,

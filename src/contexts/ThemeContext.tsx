@@ -194,7 +194,7 @@ const defaultTheme: ThemeSettings = {
   // Game-specific
   wheelBorderStyle: 'classic',
   wheelBorderCustomColor: '#d4d4d8',
-  jackpotTemplate: 'jackpot-4',
+  jackpotTemplate: 'jackpot-3',
   customJackpotFrame: undefined,
   modernJackpotFrameColor: '#F59E0B',
   modernJackpotInnerColor: '#312E38',
@@ -219,7 +219,7 @@ export const getButtonStyles = (theme: ThemeSettings, viewMode: 'desktop' | 'mob
   const sizes = viewMode === 'mobile' ? mobileSizes : desktopSizes;
   
   const radiusMap = {
-    square: '4px',
+    square: '0px',
     rounded: `${theme.borderRadius}px`,
     pill: '9999px',
   };

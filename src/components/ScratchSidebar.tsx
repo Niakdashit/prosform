@@ -123,9 +123,6 @@ export const ScratchSidebar = ({
                     <p className="text-xs text-foreground truncate">
                       {card.revealText}
                     </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {card.probability}%
-                    </p>
                   </div>
                   <button 
                     onClick={() => onDeleteCard(card.id)}
@@ -140,7 +137,7 @@ export const ScratchSidebar = ({
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
-          <ThemeStylePanel />
+          <ThemeStylePanel hideJackpotSections />
         </TabsContent>
       </Tabs>
     </div>

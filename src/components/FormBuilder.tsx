@@ -61,7 +61,7 @@ export interface Question {
   yesnoDisplayStyle?: 'buttons' | 'toggle' | 'cards' | 'icons';
   dateDisplayStyle?: 'calendar' | 'dropdowns' | 'input';
   fileDisplayStyle?: 'dropzone' | 'button' | 'minimal';
-  welcomeDisplayStyle?: 'centered' | 'left' | 'split' | 'fullscreen';
+  welcomeDisplayStyle?: 'centered' | 'left' | 'split' | 'fullscreen' | 'center' | 'right';
   endingDisplayStyle?: 'centered' | 'confetti' | 'minimal' | 'redirect';
   dropdownDisplayStyle?: 'select' | 'searchable' | 'buttons';
   websiteDisplayStyle?: 'default' | 'card' | 'minimal';
@@ -86,6 +86,10 @@ export interface Question {
   };
   // Overlay opacity for wallpaper layouts
   overlayOpacity?: number;
+  // Background images
+  backgroundImage?: string;
+  backgroundImageMobile?: string;
+  applyBackgroundToAll?: boolean;
   // Text styling for title, subtitle, description
   titleStyle?: {
     fontFamily?: string;
@@ -144,100 +148,6 @@ const defaultQuestions: Question[] = [
     icon: "mail",
     number: 2,
     placeholder: "nom@exemple.com"
-  },
-  {
-    id: "q3",
-    type: "phone",
-    title: "Ajouter votre question ici",
-    icon: "phone",
-    number: 3,
-    placeholder: "+33 6 00 00 00 00",
-    phoneCountry: "FR"
-  },
-  {
-    id: "q4",
-    type: "number",
-    title: "Ajouter votre question ici",
-    icon: "hash",
-    number: 4,
-    placeholder: "Entrez un nombre",
-    minValue: 0,
-    maxValue: 100
-  },
-  {
-    id: "q5",
-    type: "date",
-    title: "Ajouter votre question ici",
-    icon: "calendar",
-    number: 5,
-    dateFormat: "ddmmyyyy"
-  },
-  {
-    id: "q6",
-    type: "rating",
-    title: "Ajouter votre question ici",
-    icon: "star",
-    number: 6,
-    variant: "stars",
-    ratingCount: 5,
-    ratingType: "stars"
-  },
-  {
-    id: "q7",
-    type: "choice",
-    title: "Ajouter votre question ici",
-    icon: "building",
-    number: 7,
-    choices: ["Option 1", "Option 2", "Option 3", "Option 4"]
-  },
-  {
-    id: "q8",
-    type: "dropdown",
-    title: "Ajouter votre question ici",
-    icon: "map",
-    number: 8,
-    choices: ["Option 1", "Option 2", "Option 3", "Option 4"]
-  },
-  {
-    id: "q9",
-    type: "yesno",
-    title: "Ajouter votre question ici",
-    icon: "check",
-    number: 9
-  },
-  {
-    id: "q10",
-    type: "picture-choice",
-    title: "Ajouter votre question ici",
-    icon: "image",
-    number: 10,
-    choices: ["Option 1", "Option 2", "Option 3"]
-  },
-  {
-    id: "q11",
-    type: "file",
-    title: "Ajouter votre question ici",
-    icon: "upload",
-    number: 11,
-    maxFileSize: 10,
-    fileTypes: ["PDF", "DOC", "JPG"]
-  },
-  {
-    id: "q12",
-    type: "statement",
-    title: "Ajouter un message ici",
-    subtitle: "Ajouter une description optionnelle",
-    icon: "info",
-    number: 12
-  },
-  {
-    id: "q13",
-    type: "text",
-    title: "Ajouter votre question ici",
-    icon: "message",
-    number: 13,
-    variant: "long",
-    maxLength: 500
   },
   {
     id: "ending",

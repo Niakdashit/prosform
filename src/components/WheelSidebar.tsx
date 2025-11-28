@@ -321,7 +321,7 @@ export const WheelSidebar = ({
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
-          <ThemeStylePanel />
+          <ThemeStylePanel hideJackpotSections />
         </TabsContent>
       </Tabs>
     </div>

@@ -444,8 +444,11 @@ export const ScratchPreview = ({
               );
 
               // Text content component  
+              const alignment = config.welcomeScreen.alignment || 'left';
+              const alignmentClass = alignment === 'center' ? 'text-center items-center' : alignment === 'right' ? 'text-right items-end' : 'text-left items-start';
+              
               const TextContent = ({ centered = false }: { centered?: boolean }) => (
-                <div className={centered && viewMode === 'desktop' ? 'text-center' : ''}>
+                <div className={`flex flex-col ${alignmentClass}`}>
                   {config.welcomeScreen.title && (
                     <EditableTextBlock
                       value={config.welcomeScreen.titleHtml || config.welcomeScreen.title}
@@ -458,9 +461,9 @@ export const ScratchPreview = ({
                         fontWeight: config.welcomeScreen.titleStyle?.isBold ? 'bold' : undefined,
                         fontStyle: config.welcomeScreen.titleStyle?.isItalic ? 'italic' : undefined,
                         textDecoration: config.welcomeScreen.titleStyle?.isUnderline ? 'underline' : undefined,
-                        textAlign: config.welcomeScreen.titleStyle?.textAlign || (centered ? 'center' : 'left'),
-                        fontSize: config.welcomeScreen.titleStyle?.fontSize ? `${config.welcomeScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '48px' : '28px'),
-                        lineHeight: 1.1
+                        textAlign: config.welcomeScreen.titleStyle?.textAlign || alignment,
+                        fontSize: config.welcomeScreen.titleStyle?.fontSize ? `${config.welcomeScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
+                        lineHeight: '1.2'
                       }}
                       isEditing={!isReadOnly && editingField === 'welcome-title'}
                       isReadOnly={isReadOnly}
@@ -487,10 +490,10 @@ export const ScratchPreview = ({
                         fontWeight: config.welcomeScreen.subtitleStyle?.isBold ? 'bold' : undefined,
                         fontStyle: config.welcomeScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
                         textDecoration: config.welcomeScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
-                        textAlign: config.welcomeScreen.subtitleStyle?.textAlign || (centered ? 'center' : 'left'),
+                        textAlign: config.welcomeScreen.subtitleStyle?.textAlign || alignment,
                         opacity: 0.9, 
-                        fontSize: config.welcomeScreen.subtitleStyle?.fontSize ? `${config.welcomeScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '20px' : '16px'),
-                        lineHeight: 1.5
+                        fontSize: config.welcomeScreen.subtitleStyle?.fontSize ? `${config.welcomeScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
+                        lineHeight: '1.4'
                       }}
                       isEditing={!isReadOnly && editingField === 'welcome-subtitle'}
                       isReadOnly={isReadOnly}
@@ -505,21 +508,22 @@ export const ScratchPreview = ({
                     />
                   )}
 
-                  <div className="mt-10" style={{ marginTop: `${(config.welcomeScreen.blockSpacing || 1) * 32}px` }}>
-                    <button
-                      onClick={onNext}
-                      className="flex items-center justify-center font-medium transition-all hover:opacity-90"
-                      style={unifiedButtonStyles}
-                    >
-                      <span>{config.welcomeScreen.buttonText || "Commencer"}</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={onNext}
+                    className="font-medium transition-all hover:opacity-90"
+                    style={unifiedButtonStyles}
+                  >
+                    <span>{config.welcomeScreen.buttonText || "Commencer"}</span>
+                  </button>
 
                   </div>
                 );
 
               // Desktop layouts
               if (viewMode === 'desktop') {
+                // Horizontal alignment for the whole content block
+                const horizontalAlign = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
+                
                 if (desktopLayout === 'desktop-left-right') {
                   const align = config.welcomeScreen.splitAlignment || 'left';
                   const alignmentClass =
@@ -537,7 +541,7 @@ export const ScratchPreview = ({
                       : 'max-w-[700px]';
 
                   return (
-                    <div className={`w-full h-full flex flex-col ${alignmentClass} ${justifyClass} gap-10 overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
+                    <div className={`w-full h-full flex flex-col ${horizontalAlign} ${justifyClass} gap-10 overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
                       {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                       <div className={textContainerClass}>
                         <TextContent />
@@ -545,24 +549,27 @@ export const ScratchPreview = ({
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-right-left') {
+                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
-                    <div className="w-full h-full flex items-center gap-16 px-24">
-                      <div className="flex-1">
+                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
+                      <div className="max-w-[500px]">
                         <TextContent />
                       </div>
                       <ImageBlock />
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-centered') {
+                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
-                    <div className="w-full h-full flex items-center gap-16 px-24">
+                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
                       <ImageBlock />
-                      <div className="flex-1">
+                      <div className="max-w-[500px]">
                         <TextContent />
                       </div>
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-split') {
+                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
                     <div className="absolute inset-0">
                       {config.welcomeScreen.wallpaperImage ? (
@@ -578,17 +585,18 @@ export const ScratchPreview = ({
                         className="absolute inset-0 bg-black" 
                         style={{ opacity: config.welcomeScreen.overlayOpacity ?? 0.6 }}
                       />
-                      <div className="relative z-10 flex items-center justify-center h-full px-16">
-                        <div className="max-w-[700px] text-center">
-                          <TextContent centered />
+                      <div className={`relative z-10 flex ${justifyContent} items-center h-full px-16`}>
+                        <div className="max-w-[700px]">
+                          <TextContent />
                         </div>
                       </div>
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-card') {
+                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
                     <div className="relative w-full h-full flex">
-                      <div className="w-1/2 flex items-center justify-center px-24 z-10">
+                      <div className={`w-1/2 flex ${justifyContent} items-center px-24 z-10`}>
                         <div className="max-w-[500px]">
                           <TextContent />
                         </div>
@@ -800,55 +808,31 @@ export const ScratchPreview = ({
           return null;
         }
         return (
-          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '35px' }}>
-            <div className="w-full max-w-[500px] text-center">
-              <h2 
-                className="text-3xl md:text-4xl font-bold mb-4"
-                style={{ color: theme.textColor }}
-              >
-                {config.contactForm.title}
-              </h2>
-              <p 
-                className="text-base md:text-lg mb-8"
-                style={{ color: theme.textSecondaryColor, opacity: 0.8 }}
-              >
-                {config.contactForm.subtitle}
-              </p>
-              
-              <div className="space-y-4">
-                {config.contactForm.fields.map((field, index) => (
-                  <Input
-                    key={index}
-                    type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-                    placeholder={field.label}
-                    value={contactData[field.type] || ''}
-                    onChange={(e) => setContactData(prev => ({ ...prev, [field.type]: e.target.value }))}
-                    className="h-12 text-base"
-                    style={{ 
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                      borderColor: 'rgba(255,255,255,0.2)',
-                      color: theme.textColor
-                    }}
-                  />
-                ))}
-              </div>
-              
-              <button
-                onClick={onNext}
-                className="mt-8 w-full font-semibold transition-opacity hover:opacity-90"
-                style={{ 
-                  backgroundColor: '#F5CA3C', 
-                  color: '#3D3731',
-                  height: '56px',
-                  borderRadius: '28px',
-                  fontSize: '17px',
-                  border: 'none'
-                }}
-              >
-                Continuer
-              </button>
-            </div>
-          </div>
+          <ContactLayouts
+            layout={currentLayout}
+            viewMode={viewMode}
+            title={config.contactForm.titleHtml || config.contactForm.title}
+            subtitle={config.contactForm.subtitleHtml || config.contactForm.subtitle}
+            fields={config.contactForm.fields}
+            contactData={contactData}
+            onFieldChange={(type, value) => setContactData(prev => ({ ...prev, [type]: value }))}
+            onSubmit={onNext}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+            editingField={editingField}
+            isReadOnly={isReadOnly}
+            onFocusTitle={() => !isReadOnly && setEditingField('contact-title')}
+            onFocusSubtitle={() => !isReadOnly && setEditingField('contact-subtitle')}
+            onBlurTitle={() => setEditingField(null)}
+            onBlurSubtitle={() => setEditingField(null)}
+            onChangeTitle={(value, html) => onUpdateConfig({ contactForm: { ...config.contactForm, title: value, titleHtml: html } })}
+            onChangeSubtitle={(value, html) => onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: value, subtitleHtml: html } })}
+            onClearTitle={() => onUpdateConfig({ contactForm: { ...config.contactForm, title: '', titleHtml: '' } })}
+            onClearSubtitle={() => onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: '', subtitleHtml: '' } })}
+            titleStyle={config.contactForm.titleStyle}
+            subtitleStyle={config.contactForm.subtitleStyle}
+          />
         );
 
       case 'scratch':
@@ -1039,21 +1023,22 @@ export const ScratchPreview = ({
         const winSubtitle = config.endingWin.subtitle.replace('{{prize}}', wonPrize || 'votre lot');
         
         return (
-          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '35px' }}>
+          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '24px' }}>
             <div className="w-full max-w-[700px] text-center">
               <EditableTextBlock
                 value={config.endingWin.titleHtml || winTitle}
                 onChange={(value, html) => onUpdateConfig({ endingWin: { ...config.endingWin, title: value, titleHtml: html } })}
                 onClear={() => onUpdateConfig({ endingWin: { ...config.endingWin, title: '', titleHtml: '' } })}
-                className="text-4xl md:text-5xl font-bold"
+                className="font-bold"
                 style={{ 
                   color: config.endingWin.titleStyle?.textColor || theme.textColor,
                   fontFamily: config.endingWin.titleStyle?.fontFamily || 'inherit',
-                  fontWeight: config.endingWin.titleStyle?.isBold ? 'bold' : undefined,
+                  fontWeight: config.endingWin.titleStyle?.isBold ? 'bold' : 700,
                   fontStyle: config.endingWin.titleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingWin.titleStyle?.isUnderline ? 'underline' : undefined,
                   textAlign: config.endingWin.titleStyle?.textAlign || 'center',
-                  fontSize: config.endingWin.titleStyle?.fontSize ? `${config.endingWin.titleStyle.fontSize}px` : undefined,
+                  fontSize: config.endingWin.titleStyle?.fontSize ? `${config.endingWin.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
+                  lineHeight: 1.2,
                 }}
                 isEditing={!isReadOnly && editingField === 'ending-win-title'}
                 isReadOnly={isReadOnly}
@@ -1064,21 +1049,22 @@ export const ScratchPreview = ({
                 fieldType="title"
                 width={config.endingWin.titleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingWin: { ...config.endingWin, titleWidth: width } })}
-                marginBottom="32px"
+                marginBottom={viewMode === 'desktop' ? '16px' : '8px'}
               />
               <EditableTextBlock
                 value={config.endingWin.subtitleHtml || winSubtitle}
                 onChange={(value, html) => onUpdateConfig({ endingWin: { ...config.endingWin, subtitle: value, subtitleHtml: html } })}
                 onClear={() => onUpdateConfig({ endingWin: { ...config.endingWin, subtitle: '', subtitleHtml: '' } })}
-                className="text-lg md:text-xl"
+                className=""
                 style={{ 
                   color: config.endingWin.subtitleStyle?.textColor || theme.textSecondaryColor, 
                   fontFamily: config.endingWin.subtitleStyle?.fontFamily || 'inherit',
-                  fontWeight: config.endingWin.subtitleStyle?.isBold ? 'bold' : undefined,
+                  fontWeight: config.endingWin.subtitleStyle?.isBold ? 'bold' : 400,
                   fontStyle: config.endingWin.subtitleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingWin.subtitleStyle?.isUnderline ? 'underline' : undefined,
                   textAlign: config.endingWin.subtitleStyle?.textAlign || 'center',
-                  fontSize: config.endingWin.subtitleStyle?.fontSize ? `${config.endingWin.subtitleStyle.fontSize}px` : undefined,
+                  fontSize: config.endingWin.subtitleStyle?.fontSize ? `${config.endingWin.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
+                  lineHeight: 1.5,
                   opacity: 0.8 
                 }}
                 isEditing={!isReadOnly && editingField === 'ending-win-subtitle'}
@@ -1090,7 +1076,7 @@ export const ScratchPreview = ({
                 fieldType="subtitle"
                 width={config.endingWin.subtitleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingWin: { ...config.endingWin, subtitleWidth: width } })}
-                marginBottom="48px"
+                marginBottom={viewMode === 'desktop' ? '48px' : '32px'}
               />
               
               <button
@@ -1098,15 +1084,8 @@ export const ScratchPreview = ({
                   setWonPrize(null);
                   setContactData({ name: '', email: '', phone: '' });
                 }}
-                className="font-semibold px-8 transition-opacity hover:opacity-90"
-                style={{ 
-                  backgroundColor: '#F5CA3C', 
-                  color: '#3D3731',
-                  height: '56px',
-                  borderRadius: '28px',
-                  fontSize: '17px',
-                  border: 'none'
-                }}
+                className="font-semibold transition-opacity hover:opacity-90"
+                style={unifiedButtonStyles}
               >
                 Rejouer
               </button>
@@ -1119,21 +1098,22 @@ export const ScratchPreview = ({
         const loseSubtitle = config.endingLose.subtitle;
         
         return (
-          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '35px' }}>
+          <div className="w-full h-full flex items-center justify-center" style={{ padding: viewMode === 'desktop' ? '35px 75px' : '24px' }}>
             <div className="w-full max-w-[700px] text-center">
               <EditableTextBlock
                 value={config.endingLose.titleHtml || loseTitle}
                 onChange={(value, html) => onUpdateConfig({ endingLose: { ...config.endingLose, title: value, titleHtml: html } })}
                 onClear={() => onUpdateConfig({ endingLose: { ...config.endingLose, title: '', titleHtml: '' } })}
-                className="text-4xl md:text-5xl font-bold"
+                className="font-bold"
                 style={{ 
                   color: config.endingLose.titleStyle?.textColor || theme.textColor,
                   fontFamily: config.endingLose.titleStyle?.fontFamily || 'inherit',
-                  fontWeight: config.endingLose.titleStyle?.isBold ? 'bold' : undefined,
+                  fontWeight: config.endingLose.titleStyle?.isBold ? 'bold' : 700,
                   fontStyle: config.endingLose.titleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingLose.titleStyle?.isUnderline ? 'underline' : undefined,
                   textAlign: config.endingLose.titleStyle?.textAlign || 'center',
-                  fontSize: config.endingLose.titleStyle?.fontSize ? `${config.endingLose.titleStyle.fontSize}px` : undefined,
+                  fontSize: config.endingLose.titleStyle?.fontSize ? `${config.endingLose.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
+                  lineHeight: 1.2,
                 }}
                 isEditing={!isReadOnly && editingField === 'ending-lose-title'}
                 isReadOnly={isReadOnly}
@@ -1144,21 +1124,22 @@ export const ScratchPreview = ({
                 fieldType="title"
                 width={config.endingLose.titleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingLose: { ...config.endingLose, titleWidth: width } })}
-                marginBottom="32px"
+                marginBottom={viewMode === 'desktop' ? '16px' : '8px'}
               />
               <EditableTextBlock
                 value={config.endingLose.subtitleHtml || loseSubtitle}
                 onChange={(value, html) => onUpdateConfig({ endingLose: { ...config.endingLose, subtitle: value, subtitleHtml: html } })}
                 onClear={() => onUpdateConfig({ endingLose: { ...config.endingLose, subtitle: '', subtitleHtml: '' } })}
-                className="text-lg md:text-xl"
+                className=""
                 style={{ 
                   color: config.endingLose.subtitleStyle?.textColor || theme.textSecondaryColor, 
                   fontFamily: config.endingLose.subtitleStyle?.fontFamily || 'inherit',
-                  fontWeight: config.endingLose.subtitleStyle?.isBold ? 'bold' : undefined,
+                  fontWeight: config.endingLose.subtitleStyle?.isBold ? 'bold' : 400,
                   fontStyle: config.endingLose.subtitleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingLose.subtitleStyle?.isUnderline ? 'underline' : undefined,
                   textAlign: config.endingLose.subtitleStyle?.textAlign || 'center',
-                  fontSize: config.endingLose.subtitleStyle?.fontSize ? `${config.endingLose.subtitleStyle.fontSize}px` : undefined,
+                  fontSize: config.endingLose.subtitleStyle?.fontSize ? `${config.endingLose.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
+                  lineHeight: 1.5,
                   opacity: 0.8 
                 }}
                 isEditing={!isReadOnly && editingField === 'ending-lose-subtitle'}
@@ -1170,7 +1151,7 @@ export const ScratchPreview = ({
                 fieldType="subtitle"
                 width={config.endingLose.subtitleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingLose: { ...config.endingLose, subtitleWidth: width } })}
-                marginBottom="48px"
+                marginBottom={viewMode === 'desktop' ? '48px' : '32px'}
               />
               
               <button
@@ -1178,15 +1159,8 @@ export const ScratchPreview = ({
                   setWonPrize(null);
                   setContactData({ name: '', email: '', phone: '' });
                 }}
-                className="font-semibold px-8 transition-opacity hover:opacity-90"
-                style={{ 
-                  backgroundColor: '#F5CA3C', 
-                  color: '#3D3731',
-                  height: '56px',
-                  borderRadius: '28px',
-                  fontSize: '17px',
-                  border: 'none'
-                }}
+                className="font-semibold transition-opacity hover:opacity-90"
+                style={unifiedButtonStyles}
               >
                 Rejouer
               </button>
@@ -1197,7 +1171,7 @@ export const ScratchPreview = ({
   };
 
   return (
-    <div className={isMobileResponsive ? "w-full h-full relative overflow-hidden" : "flex-1 flex items-center justify-center relative overflow-hidden bg-gray-100"}>
+    <div className={isMobileResponsive ? "w-full h-full relative overflow-hidden" : "flex items-center justify-center relative overflow-hidden"}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -1223,38 +1197,88 @@ export const ScratchPreview = ({
         onSave={handleImageEdit}
       />
 
-      {!isMobileResponsive && (
-        <button
-          onClick={onToggleViewMode}
-          className="absolute top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
-          style={{
-            backgroundColor: '#4A4138',
-            border: '1px solid rgba(245, 184, 0, 0.3)',
-            color: '#F5CA3C'
-          }}
-        >
-          {viewMode === 'desktop' ? (
-            <>
-              <Monitor className="w-4 h-4" />
-              <span className="text-xs font-medium">Desktop</span>
-            </>
-          ) : (
-            <>
-              <Smartphone className="w-4 h-4" />
-              <span className="text-xs font-medium">Mobile</span>
-            </>
-          )}
-        </button>
-      )}
-
       <div 
-        className="relative overflow-y-auto overflow-x-hidden transition-all duration-300" 
+        key={`preview-container-${viewMode}`}
+        className="relative overflow-y-auto overflow-x-hidden transition-all duration-300 flex-shrink-0" 
         style={{ 
           backgroundColor: theme.backgroundColor, 
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
-          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px') 
+          minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
+          maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
+          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px'),
+          minHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
+          maxHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
         }}
       >
+        {/* Background image from config settings */}
+        {(() => {
+          const getScreenBackground = () => {
+            const applyToAll = config.welcomeScreen.applyBackgroundToAll;
+            const welcomeDesktop = config.welcomeScreen.backgroundImage;
+            const welcomeMobile = config.welcomeScreen.backgroundImageMobile;
+            
+            if (applyToAll && (welcomeDesktop || welcomeMobile)) {
+              return viewMode === 'mobile' && welcomeMobile ? welcomeMobile : welcomeDesktop;
+            }
+            
+            switch (activeView) {
+              case 'welcome':
+                return viewMode === 'mobile' && welcomeMobile ? welcomeMobile : welcomeDesktop;
+              case 'contact':
+                return viewMode === 'mobile' && config.contactForm.backgroundImageMobile 
+                  ? config.contactForm.backgroundImageMobile 
+                  : config.contactForm.backgroundImage;
+              case 'scratch':
+                return viewMode === 'mobile' && config.scratchScreen.backgroundImageMobile 
+                  ? config.scratchScreen.backgroundImageMobile 
+                  : config.scratchScreen.backgroundImage;
+              case 'ending-win':
+                return viewMode === 'mobile' && config.endingWin.backgroundImageMobile 
+                  ? config.endingWin.backgroundImageMobile 
+                  : config.endingWin.backgroundImage;
+              case 'ending-lose':
+                return viewMode === 'mobile' && config.endingLose.backgroundImageMobile 
+                  ? config.endingLose.backgroundImageMobile 
+                  : config.endingLose.backgroundImage;
+              default:
+                return undefined;
+            }
+          };
+          
+          const bgImage = getScreenBackground();
+          const getOverlayOpacity = () => {
+            switch (activeView) {
+              case 'welcome': return config.welcomeScreen.overlayOpacity;
+              case 'contact': return config.contactForm.overlayOpacity;
+              case 'scratch': return config.scratchScreen.overlayOpacity;
+              case 'ending-win': return config.endingWin.overlayOpacity;
+              case 'ending-lose': return config.endingLose.overlayOpacity;
+              default: return undefined;
+            }
+          };
+          
+          if (!bgImage) return null;
+          
+          return (
+            <div 
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: `url(${bgImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
+            >
+              <div 
+                className="absolute inset-0" 
+                style={{ 
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  opacity: getOverlayOpacity() !== undefined ? getOverlayOpacity()! / 100 : 0.4
+                }} 
+              />
+            </div>
+          );
+        })()}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView}
@@ -1262,7 +1286,7 @@ export const ScratchPreview = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full"
+            className="w-full h-full relative z-10"
             onClick={(e) => {
               // Ne pas blur si on clique sur un input, textarea ou button
               const target = e.target as HTMLElement;

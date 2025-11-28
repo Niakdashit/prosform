@@ -102,20 +102,25 @@ export const WelcomeLayouts = ({
   });
 
   const renderContent = () => (
-    <div className="text-center w-full max-w-[700px]">
+    <div className="text-center w-full max-w-[700px] px-4">
       <EditableTextBlock
         value={title}
         onChange={(value, html) => onChangeTitle?.(value, html)}
         onClear={() => onClearTitle?.()}
         onSparklesClick={() => onToggleVariableMenu?.('title')}
-        className="text-4xl md:text-5xl font-bold mb-4"
-        style={getTitleStyles()}
+        className="font-bold"
+        style={{
+          ...getTitleStyles(),
+          fontSize: viewMode === 'mobile' ? '28px' : '42px',
+          lineHeight: '1.2',
+        }}
         isEditing={editingField === 'welcome-title'}
         onFocus={onFocusTitle}
         onBlur={() => onBlurTitle?.(title)}
         showSparkles={true}
         showClear={true}
         fieldType="title"
+        marginBottom="16px"
       />
       
       <EditableTextBlock
@@ -123,14 +128,19 @@ export const WelcomeLayouts = ({
         onChange={(value, html) => onChangeSubtitle?.(value, html)}
         onClear={() => onClearSubtitle?.()}
         onSparklesClick={() => onToggleVariableMenu?.('subtitle')}
-        className="text-lg md:text-xl mb-8"
-        style={getSubtitleStyles()}
+        className=""
+        style={{
+          ...getSubtitleStyles(),
+          fontSize: viewMode === 'mobile' ? '14px' : '18px',
+          lineHeight: '1.4',
+        }}
         isEditing={editingField === 'welcome-subtitle'}
         onFocus={onFocusSubtitle}
         onBlur={() => onBlurSubtitle?.(subtitle)}
         showSparkles={true}
         showClear={true}
         fieldType="subtitle"
+        marginBottom="32px"
       />
       
       <button 

@@ -37,7 +37,6 @@ const BORDER_STYLES = [
 
 // Templates Jackpot (frames SVG)
 const JACKPOT_TEMPLATES = [
-  { id: 'jackpot-2', name: 'Classic Gold', file: 'Jackpot 2.svg' },
   { id: 'jackpot-3', name: 'Neon Glow', file: 'Jackpot 3.svg' },
   { id: 'jackpot-5', name: 'Retro', file: 'Jackpot 5.svg' },
   { id: 'jackpot-6', name: 'Modern', file: 'Jackpot 6.svg' },
@@ -51,7 +50,7 @@ const ColorPicker = ({
   label, 
   value, 
   onChange,
-  presets = ['#374151', '#2563EB', '#059669', '#DC2626', '#7C3AED', '#EA580C', '#ffffff', '#000000']
+  presets = ['#000000', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#ffffff']
 }: { 
   label: string; 
   value: string; 
@@ -85,9 +84,10 @@ const ColorPicker = ({
 
 interface ThemeStylePanelProps {
   hideBorders?: boolean;
+  hideJackpotSections?: boolean;
 }
 
-export const ThemeStylePanel = ({ hideBorders }: ThemeStylePanelProps) => {
+export const ThemeStylePanel = ({ hideBorders, hideJackpotSections }: ThemeStylePanelProps) => {
   const { theme, updateTheme } = useTheme();
   const [openSections, setOpenSections] = useState<string | undefined>(undefined);
 
@@ -258,16 +258,16 @@ export const ThemeStylePanel = ({ hideBorders }: ThemeStylePanelProps) => {
                     <button
                       key={style}
                       onClick={() => updateTheme({ buttonStyle: style })}
-                      className={`p-3 border-2 transition-all ${
-                        theme.buttonStyle === style ? 'border-primary bg-primary/5' : 'border-muted'
+                      className={`p-3 transition-all ${
+                        theme.buttonStyle === style ? 'bg-primary/10' : ''
                       }`}
-                      style={{ borderRadius: style === 'square' ? '4px' : style === 'rounded' ? '8px' : '9999px' }}
+                      style={{ borderRadius: '8px' }}
                     >
                       <div 
-                        className="h-6 bg-muted-foreground/20"
-                        style={{ borderRadius: style === 'square' ? '2px' : style === 'rounded' ? '4px' : '9999px' }}
+                        className={`h-6 ${theme.buttonStyle === style ? 'bg-primary/40' : 'bg-muted-foreground/20'}`}
+                        style={{ borderRadius: style === 'square' ? '0px' : style === 'rounded' ? '4px' : '9999px' }}
                       />
-                      <span className="text-[10px] text-muted-foreground capitalize mt-1 block">{style}</span>
+                      <span className={`text-[10px] capitalize mt-1 block ${theme.buttonStyle === style ? 'text-primary' : 'text-muted-foreground'}`}>{style}</span>
                     </button>
                   ))}
                 </div>
@@ -301,6 +301,24 @@ export const ThemeStylePanel = ({ hideBorders }: ThemeStylePanelProps) => {
                 onChange={(c) => updateTheme({ buttonTextColor: c })} 
                 presets={['#ffffff', '#000000', '#374151', '#f3f4f6']}
               />
+
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Bordure: {theme.buttonBorderWidth}px</Label>
+                <Slider
+                  value={[theme.buttonBorderWidth]}
+                  onValueChange={([v]) => updateTheme({ buttonBorderWidth: v })}
+                  min={0} max={4} step={1}
+                />
+              </div>
+
+              {theme.buttonBorderWidth > 0 && (
+                <ColorPicker 
+                  label="Couleur de bordure" 
+                  value={theme.borderColor} 
+                  onChange={(c) => updateTheme({ borderColor: c })} 
+                  presets={['#ffffff', '#000000', '#374151', '#e5e7eb']}
+                />
+              )}
 
               <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">Ombre</Label>
@@ -472,6 +490,7 @@ export const ThemeStylePanel = ({ hideBorders }: ThemeStylePanelProps) => {
           {/* ═══════════════════════════════════════════════════════════ */}
           {/* TEMPLATES JACKPOT */}
           {/* ═══════════════════════════════════════════════════════════ */}
+          {!hideJackpotSections && (
           <AccordionItem value="jackpot-templates" className="border rounded-lg px-3">
             <AccordionTrigger className="py-3 hover:no-underline">
               <div className="flex items-center gap-2">
@@ -572,9 +591,8 @@ export const ThemeStylePanel = ({ hideBorders }: ThemeStylePanelProps) => {
               </div>
             </AccordionContent>
           </AccordionItem>
+          )}
 
-          {!hideBorders && (
-            <>
           {/* ═══════════════════════════════════════════════════════════ */}
           {/* STYLES DE BORDURES */}
           {/* ═══════════════════════════════════════════════════════════ */}
@@ -645,8 +663,6 @@ export const ThemeStylePanel = ({ hideBorders }: ThemeStylePanelProps) => {
               />
             </AccordionContent>
           </AccordionItem>
-            </>
-          )}
 
         </Accordion>
       </div>

@@ -6,12 +6,14 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
-import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { Button } from "@/components/ui/button";
 import { Upload, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WallpaperUploadModal } from "./WallpaperUploadModal";
 import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
+import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
 
 interface WheelSettingsPanelProps {
   config: WheelConfig;
@@ -105,6 +107,28 @@ export const WheelSettingsPanel = ({
             </div>
             
             <Separator />
+
+            {/* Alignment */}
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
+              <Select
+                value={config.welcomeScreen.alignment || 'left'}
+                onValueChange={(value) => onUpdateConfig({
+                  welcomeScreen: { ...config.welcomeScreen, alignment: value as 'left' | 'center' | 'right' }
+                })}
+              >
+                <SelectTrigger className="h-9 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="left">Left</SelectItem>
+                  <SelectItem value="center">Center</SelectItem>
+                  <SelectItem value="right">Right</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Separator />
             
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
@@ -136,75 +160,30 @@ export const WheelSettingsPanel = ({
               />
             </div>
 
-            {(config.welcomeScreen.desktopLayout === 'desktop-split' || config.welcomeScreen.mobileLayout === 'mobile-minimal') && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  {config.welcomeScreen.wallpaperImage ? (
-                    <div className="space-y-2">
-                      <div className="relative rounded-lg overflow-hidden border">
-                        <img 
-                          src={config.welcomeScreen.wallpaperImage} 
-                          alt="Wallpaper preview" 
-                          className="w-full h-24 object-cover"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-6 w-6"
-                          onClick={() => handleRemoveWallpaper('welcome')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full text-xs h-8"
-                        onClick={() => {
-                          setActiveWallpaperSection('welcome');
-                          setWallpaperModalOpen(true);
-                        }}
-                      >
-                        Changer l'image
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full text-xs h-8 justify-start"
-                      onClick={() => {
-                        setActiveWallpaperSection('welcome');
-                        setWallpaperModalOpen(true);
-                      }}
-                    >
-                      <Upload className="w-3 h-3 mr-2" />
-                      Ajouter une image
-                    </Button>
-                  )}
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Overlay opacity: {((config.welcomeScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
-                  </Label>
-                  <Slider
-                    value={[(config.welcomeScreen.overlayOpacity ?? 0.6) * 100]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      welcomeScreen: { ...config.welcomeScreen, overlayOpacity: value / 100 }
-                    })}
-                    min={0}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-              </>
-            )}
+            <Separator />
+
+            {/* Background Image */}
+            <BackgroundUploader
+              desktopImage={config.welcomeScreen.backgroundImage}
+              mobileImage={config.welcomeScreen.backgroundImageMobile}
+              onDesktopImageChange={(image) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImage: image }
+              })}
+              onDesktopImageRemove={() => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImage: undefined }
+              })}
+              onMobileImageChange={(image) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: image }
+              })}
+              onMobileImageRemove={() => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, backgroundImageMobile: undefined }
+              })}
+              showApplyToAll={true}
+              applyToAll={config.welcomeScreen.applyBackgroundToAll}
+              onApplyToAllChange={(value) => onUpdateConfig({
+                welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
+              })}
+            />
           </div>
         );
 
@@ -283,74 +262,30 @@ export const WheelSettingsPanel = ({
                   />
                 </div>
 
-                {(config.contactForm.desktopLayout === 'desktop-split' || config.contactForm.mobileLayout === 'mobile-minimal') && (
-                  <>
-                    <Separator />
-                    <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                      {config.contactForm.wallpaperImage ? (
-                        <div className="space-y-2">
-                          <div className="relative rounded-lg overflow-hidden border">
-                            <img 
-                              src={config.contactForm.wallpaperImage} 
-                              alt="Wallpaper preview" 
-                              className="w-full h-24 object-cover"
-                            />
-                            <Button
-                              variant="destructive"
-                              size="icon"
-                              className="absolute top-1 right-1 h-6 w-6"
-                              onClick={() => handleRemoveWallpaper('contact')}
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="w-full text-xs h-8"
-                            onClick={() => {
-                              setActiveWallpaperSection('contact');
-                              setWallpaperModalOpen(true);
-                            }}
-                          >
-                            Changer l'image
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="w-full text-xs h-8 justify-start"
-                          onClick={() => {
-                            setActiveWallpaperSection('contact');
-                            setWallpaperModalOpen(true);
-                          }}
-                        >
-                          <Upload className="w-3 h-3 mr-2" />
-                          Ajouter une image
-                        </Button>
-                      )}
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-2 block">
-                        Overlay opacity: {((config.contactForm.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
-                      </Label>
-                      <Slider
-                        value={[(config.contactForm.overlayOpacity ?? 0.6) * 100]}
-                        onValueChange={([value]) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, overlayOpacity: value / 100 }
-                        })}
-                        min={0}
-                        max={100}
-                        step={5}
-                        className="w-full"
-                      />
-                    </div>
-                  </>
+                <Separator />
+
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.contactForm.backgroundImage}
+                    mobileImage={config.contactForm.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
+                    })}
+                  />
                 )}
 
                 <Separator />
@@ -382,106 +317,46 @@ export const WheelSettingsPanel = ({
       case 'wheel':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.wheelScreen.desktopLayout}
-                mobileLayout={config.wheelScreen.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  wheelScreen: { ...config.wheelScreen, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  wheelScreen: { ...config.wheelScreen, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
-            
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.wheelScreen.blockSpacing}x
+                Taille de la roue: {config.wheelScreen.wheelSize || 100}%
               </Label>
               <Slider
-                value={[config.wheelScreen.blockSpacing]}
+                value={[config.wheelScreen.wheelSize || 100]}
                 onValueChange={([value]) => onUpdateConfig({
-                  wheelScreen: { ...config.wheelScreen, blockSpacing: value }
+                  wheelScreen: { ...config.wheelScreen, wheelSize: value }
                 })}
-                min={0.5}
-                max={3}
-                step={0.25}
+                min={50}
+                max={150}
+                step={5}
                 className="w-full"
               />
             </div>
 
-            {(config.wheelScreen.desktopLayout === 'desktop-split' || config.wheelScreen.mobileLayout === 'mobile-minimal') && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Wallpaper image</Label>
-                  {config.wheelScreen.wallpaperImage ? (
-                    <div className="space-y-2">
-                      <div className="relative rounded-lg overflow-hidden border">
-                        <img 
-                          src={config.wheelScreen.wallpaperImage} 
-                          alt="Wallpaper preview" 
-                          className="w-full h-24 object-cover"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-1 right-1 h-6 w-6"
-                          onClick={() => handleRemoveWallpaper('wheel')}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full text-xs h-8"
-                        onClick={() => {
-                          setActiveWallpaperSection('wheel');
-                          setWallpaperModalOpen(true);
-                        }}
-                      >
-                        Changer l'image
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full text-xs h-8 justify-start"
-                      onClick={() => {
-                        setActiveWallpaperSection('wheel');
-                        setWallpaperModalOpen(true);
-                      }}
-                    >
-                      <Upload className="w-3 h-3 mr-2" />
-                      Ajouter une image
-                    </Button>
-                  )}
-                </div>
-                
-                <Separator />
-                
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Overlay opacity: {((config.wheelScreen.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
-                  </Label>
-                  <Slider
-                    value={[(config.wheelScreen.overlayOpacity ?? 0.6) * 100]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      wheelScreen: { ...config.wheelScreen, overlayOpacity: value / 100 }
-                    })}
-                    min={0}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-              </>
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.wheelScreen.backgroundImage}
+                mobileImage={config.wheelScreen.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  wheelScreen: { ...config.wheelScreen, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  wheelScreen: { ...config.wheelScreen, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  wheelScreen: { ...config.wheelScreen, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  wheelScreen: { ...config.wheelScreen, backgroundImageMobile: undefined }
+                })}
+              />
             )}
           </div>
         );
@@ -489,22 +364,6 @@ export const WheelSettingsPanel = ({
       case 'ending-win':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.endingWin.desktopLayout}
-                mobileLayout={config.endingWin.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  endingWin: { ...config.endingWin, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
-            
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Title</Label>
               <Input 
@@ -550,28 +409,38 @@ export const WheelSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.endingWin.backgroundImage}
+                mobileImage={config.endingWin.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  endingWin: { ...config.endingWin, backgroundImageMobile: undefined }
+                })}
+              />
+            )}
           </div>
         );
 
       case 'ending-lose':
         return (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-              <LayoutSelector
-                desktopLayout={config.endingLose.desktopLayout}
-                mobileLayout={config.endingLose.mobileLayout}
-                onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, desktopLayout: layout }
-                })}
-                onMobileLayoutChange={(layout) => onUpdateConfig({
-                  endingLose: { ...config.endingLose, mobileLayout: layout }
-                })}
-              />
-            </div>
-            
-            <Separator />
-            
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">Title</Label>
               <Input 
@@ -613,6 +482,32 @@ export const WheelSettingsPanel = ({
                 className="w-full"
               />
             </div>
+
+            <Separator />
+
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.endingLose.backgroundImage}
+                mobileImage={config.endingLose.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  endingLose: { ...config.endingLose, backgroundImageMobile: undefined }
+                })}
+              />
+            )}
           </div>
         );
     }

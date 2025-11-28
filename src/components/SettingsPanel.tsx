@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Image, Smartphone, Plus, Trash2, Info, Upload, Link as LinkIcon, Star, Smile, Heart, ThumbsUp, Tag, Monitor, LayoutGrid, List, CircleDot, Square, Type, Underline, BoxSelect, Minus, Hash, Sliders, ToggleLeft, Calendar, ChevronDown, FileUp, Maximize, AlignCenter, AlignLeft, Split, Sparkles, PartyPopper, ExternalLink, Globe, Play, Video, CheckSquare, Palette, RectangleHorizontal, Circle, SquareIcon, Paintbrush } from "lucide-react";
+import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getQuestionIcon, questionIconMap } from "@/lib/questionIcons";
@@ -443,18 +444,23 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
     <>
       <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
-      {/* Welcome Display Style */}
-      <DisplayStyleSelector
-        label="Display style"
-        options={[
-          { value: 'centered', icon: AlignCenter, label: 'Centered' },
-          { value: 'left', icon: AlignLeft, label: 'Left' },
-          { value: 'split', icon: Split, label: 'Split' },
-          { value: 'fullscreen', icon: Maximize, label: 'Full' },
-        ]}
-        value={question.welcomeDisplayStyle || 'centered'}
-        onChange={(value) => onUpdateQuestion?.(question.id, { welcomeDisplayStyle: value })}
-      />
+      {/* Alignment */}
+      <div>
+        <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
+        <Select
+          value={question.welcomeDisplayStyle || 'left'}
+          onValueChange={(value) => onUpdateQuestion?.(question.id, { welcomeDisplayStyle: value })}
+        >
+          <SelectTrigger className="h-9 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="left">Left</SelectItem>
+            <SelectItem value="center">Center</SelectItem>
+            <SelectItem value="right">Right</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <Separator className="my-4" />
       
@@ -486,35 +492,6 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <div>
-        <Label className="text-xs text-muted-foreground mb-2 block">Image or video</Label>
-        <div className="space-y-2">
-          <Button variant="outline" size="sm" className="w-full text-[10px] h-7 justify-start">
-            <Upload className="w-3 h-3 mr-1.5" />
-            Upload
-          </Button>
-          <Button variant="outline" size="sm" className="w-full text-[10px] h-7 justify-start">
-            <LinkIcon className="w-3 h-3 mr-1.5" />
-            Add from URL
-          </Button>
-        </div>
-      </div>
-
-      <Separator className="my-4" />
-
-      <div>
-        <Label className="text-xs text-muted-foreground mb-2 block">Brightness</Label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          defaultValue="50"
-          className="w-full h-1.5 accent-primary cursor-pointer"
-        />
-      </div>
-
-      <Separator className="my-4" />
-
       {question.desktopLayout === 'desktop-left-right' && (
         <>
           <div>
@@ -538,6 +515,21 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
       )}
 
       <BlockSpacingControl />
+
+      <Separator className="my-4" />
+
+      {/* Background Image */}
+      <BackgroundUploader
+        desktopImage={question.backgroundImage}
+        mobileImage={question.backgroundImageMobile}
+        onDesktopImageChange={(image) => onUpdateQuestion?.(question.id, { backgroundImage: image })}
+        onDesktopImageRemove={() => onUpdateQuestion?.(question.id, { backgroundImage: undefined })}
+        onMobileImageChange={(image) => onUpdateQuestion?.(question.id, { backgroundImageMobile: image })}
+        onMobileImageRemove={() => onUpdateQuestion?.(question.id, { backgroundImageMobile: undefined })}
+        showApplyToAll={true}
+        applyToAll={question.applyBackgroundToAll}
+        onApplyToAllChange={(value) => onUpdateQuestion?.(question.id, { applyBackgroundToAll: value })}
+      />
     </>
   );
 
@@ -1558,13 +1550,15 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
       <Separator className="my-4" />
 
-      <div>
-        <Label className="text-xs text-muted-foreground mb-2 block">Image or video</Label>
-        <Button variant="outline" size="sm" className="w-full text-[10px] h-8">
-          <Plus className="w-3 h-3 mr-1" />
-          Add media
-        </Button>
-      </div>
+      {/* Background Image */}
+      <BackgroundUploader
+        desktopImage={question.backgroundImage}
+        mobileImage={question.backgroundImageMobile}
+        onDesktopImageChange={(image) => onUpdateQuestion?.(question.id, { backgroundImage: image })}
+        onDesktopImageRemove={() => onUpdateQuestion?.(question.id, { backgroundImage: undefined })}
+        onMobileImageChange={(image) => onUpdateQuestion?.(question.id, { backgroundImageMobile: image })}
+        onMobileImageRemove={() => onUpdateQuestion?.(question.id, { backgroundImageMobile: undefined })}
+      />
     </>
   );
 

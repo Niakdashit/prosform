@@ -76,8 +76,12 @@ export interface ScratchConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
+    applyBackgroundToAll?: boolean;
     showImage?: boolean;
     splitAlignment?: 'left' | 'center' | 'right';
+    alignment?: 'left' | 'center' | 'right';
     image?: string;
     imageSettings?: {
       borderRadius: number;
@@ -102,6 +106,8 @@ export interface ScratchConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   scratchScreen: {
     title: string;
@@ -117,6 +123,8 @@ export interface ScratchConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
     scratchColor: string;
     cardWidth: number;
     cardHeight: number;
@@ -138,6 +146,8 @@ export interface ScratchConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
   endingLose: {
     title: string;
@@ -153,6 +163,8 @@ export interface ScratchConfig {
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
     overlayOpacity?: number;
+    backgroundImage?: string;
+    backgroundImageMobile?: string;
   };
 }
 
