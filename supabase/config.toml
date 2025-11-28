@@ -1,1 +1,10 @@
 project_id = "nnzmjphdodqkzclhbdyl"
+
+[functions.validate-participation]
+verify_jwt = false
+
+[functions.export-user-data]
+verify_jwt = true
+
+[functions.delete-user-data]
+verify_jwt = true

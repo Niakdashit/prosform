@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocked_participations: {
+        Row: {
+          block_reason: string
+          blocked_at: string
+          campaign_id: string
+          device_fingerprint: string | null
+          email: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          block_reason: string
+          blocked_at?: string
+          campaign_id: string
+          device_fingerprint?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          block_reason?: string
+          blocked_at?: string
+          campaign_id?: string
+          device_fingerprint?: string | null
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_participations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_analytics: {
         Row: {
           avg_time_spent: number | null
@@ -147,6 +188,36 @@ export type Database = {
         }
         Relationships: []
       }
+      gdpr_exports: {
+        Row: {
+          completed_at: string | null
+          export_type: string
+          file_url: string | null
+          id: string
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          export_type: string
+          file_url?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          export_type?: string
+          file_url?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -174,6 +245,42 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_consents: {
+        Row: {
+          analytics_cookies: boolean | null
+          consent_given_at: string
+          functional_cookies: boolean | null
+          id: string
+          ip_address: string | null
+          marketing_cookies: boolean | null
+          participant_email: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          analytics_cookies?: boolean | null
+          consent_given_at?: string
+          functional_cookies?: boolean | null
+          id?: string
+          ip_address?: string | null
+          marketing_cookies?: boolean | null
+          participant_email?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          analytics_cookies?: boolean | null
+          consent_given_at?: string
+          functional_cookies?: boolean | null
+          id?: string
+          ip_address?: string | null
+          marketing_cookies?: boolean | null
+          participant_email?: string | null
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
