@@ -343,17 +343,15 @@ export const ScratchBuilder = () => {
       <ScratchTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          const fullConfig = { ...config, prizes };
           try {
-            localStorage.setItem('scratch-config', JSON.stringify(config));
+            localStorage.setItem('scratch-config', JSON.stringify(fullConfig));
             localStorage.setItem('scratch-viewMode', targetViewMode);
             localStorage.setItem('scratch-theme', JSON.stringify(theme));
             window.open('/scratch-preview', '_blank');
           } catch (e) {
             console.warn('localStorage full, trying without images:', e);
-            const configWithoutImages = {
-              ...config,
-              welcomeScreen: { ...config.welcomeScreen, image: undefined, imageSettings: undefined }
-            };
+            const configWithoutImages = { ...config, prizes };
             try {
               localStorage.setItem('scratch-config', JSON.stringify(configWithoutImages));
               localStorage.setItem('scratch-viewMode', targetViewMode);

@@ -65,7 +65,7 @@ const JackpotPreviewContent = () => {
         isReadOnly={true}
         onNext={handleNext}
         onGoToEnding={handleGoToEnding}
-        prizes={[]}
+        prizes={(config as any).prizes || []}
       />
     </div>
   );

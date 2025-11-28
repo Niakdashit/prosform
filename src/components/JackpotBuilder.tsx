@@ -347,12 +347,13 @@ export const JackpotBuilder = () => {
       <JackpotTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          const fullConfig = { ...config, prizes };
           // Clear old data first to make room
           localStorage.removeItem('jackpot-config');
           localStorage.removeItem('jackpot-viewMode');
           localStorage.removeItem('jackpot-theme');
           try {
-            localStorage.setItem('jackpot-config', JSON.stringify(config));
+            localStorage.setItem('jackpot-config', JSON.stringify(fullConfig));
             localStorage.setItem('jackpot-viewMode', targetViewMode);
             localStorage.setItem('jackpot-theme', JSON.stringify(theme));
             window.open('/jackpot-preview', '_blank');
@@ -360,6 +361,7 @@ export const JackpotBuilder = () => {
             console.warn('localStorage full, trying without images:', e);
             const configWithoutImages = {
               ...config,
+              prizes,
               welcomeScreen: { 
                 ...config.welcomeScreen, 
                 image: undefined, 
