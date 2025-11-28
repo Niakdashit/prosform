@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { WheelConfig } from "./WheelBuilder";
+import { WheelConfig, Prize } from "./WheelBuilder";
 import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, GripVertical, MoreVertical, Copy, Trash2, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,16 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface Prize {
-  id: string;
-  name: string;
-  attributionMethod: 'probability' | 'calendar';
-  winProbability?: number;
-  assignedSegments?: string[];
-  status: 'active' | 'depleted' | 'scheduled';
-  remaining: number;
-}
 
 interface WheelSidebarProps {
   config: WheelConfig;

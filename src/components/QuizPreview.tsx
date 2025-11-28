@@ -569,15 +569,6 @@ export const QuizPreview = ({
                 <TextContent />
               </div>
             );
-          } else if (mobileLayout === 'mobile-horizontal') {
-            return (
-              <div className="flex gap-4 w-full max-w-[700px]" style={{ padding: '35px' }}>
-                <div className="flex-1">
-                  <TextContent />
-                </div>
-                <ImageBlock />
-              </div>
-            );
           } else if (mobileLayout === 'mobile-centered') {
             return (
               <div className="flex flex-col w-full h-full">
@@ -595,7 +586,8 @@ export const QuizPreview = ({
                 </div>
               </div>
             );
-          } else if (mobileLayout === 'mobile-minimal') {
+          } else {
+            // mobile-minimal layout
             return (
               <div className="absolute inset-0">
                 {config.welcomeScreen.wallpaperImage && (
