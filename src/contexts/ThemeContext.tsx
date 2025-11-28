@@ -265,7 +265,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children, initialTheme }: { children: ReactNode; initialTheme?: ThemeSettings | null }) => {
+export function ThemeProvider({ children, initialTheme }: { children: ReactNode; initialTheme?: ThemeSettings | null }) {
   const [theme, setTheme] = useState<ThemeSettings>(initialTheme || defaultTheme);
 
   const updateTheme = (updates: Partial<ThemeSettings>) => {
@@ -277,7 +277,7 @@ export const ThemeProvider = ({ children, initialTheme }: { children: ReactNode;
       {children}
     </ThemeContext.Provider>
   );
-};
+}
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
