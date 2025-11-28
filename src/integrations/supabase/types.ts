@@ -150,9 +150,16 @@ export type Database = {
         Row: {
           config: Json
           created_at: string
+          ends_at: string | null
           id: string
+          is_published: boolean | null
           last_edited_at: string
+          participation_count: number | null
+          participation_limit: number | null
+          public_url_slug: string | null
+          published_at: string | null
           published_url: string | null
+          starts_at: string | null
           status: string | null
           thumbnail_url: string | null
           title: string
@@ -163,9 +170,16 @@ export type Database = {
         Insert: {
           config?: Json
           created_at?: string
+          ends_at?: string | null
           id?: string
+          is_published?: boolean | null
           last_edited_at?: string
+          participation_count?: number | null
+          participation_limit?: number | null
+          public_url_slug?: string | null
+          published_at?: string | null
           published_url?: string | null
+          starts_at?: string | null
           status?: string | null
           thumbnail_url?: string | null
           title: string
@@ -176,9 +190,16 @@ export type Database = {
         Update: {
           config?: Json
           created_at?: string
+          ends_at?: string | null
           id?: string
+          is_published?: boolean | null
           last_edited_at?: string
+          participation_count?: number | null
+          participation_limit?: number | null
+          public_url_slug?: string | null
+          published_at?: string | null
           published_url?: string | null
+          starts_at?: string | null
           status?: string | null
           thumbnail_url?: string | null
           title?: string
@@ -310,6 +331,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_campaign_slug: {
+        Args: { campaign_id: string; campaign_title: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

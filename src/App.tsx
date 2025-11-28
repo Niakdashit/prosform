@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
+import Participate from "./pages/Participate";
 import NotFound from "./pages/NotFound";
 import { GDPRBanner } from "./components/GDPRBanner";
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/p/:slug" element={<Participate />} />
             <Route path="/form" element={<Index />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/wheel" element={<Wheel />} />
