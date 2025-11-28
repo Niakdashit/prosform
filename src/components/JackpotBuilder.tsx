@@ -245,6 +245,7 @@ export const JackpotBuilder = () => {
     title: config.welcomeScreen.title || 'Jackpot sans titre',
     config: { ...config, prizes },
     enabled: true,
+    debounceMs: 800,
     onConfigLoaded: (loadedConfig) => {
       if (loadedConfig) {
         setConfig(loadedConfig);

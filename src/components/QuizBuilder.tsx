@@ -219,6 +219,7 @@ export const QuizBuilder = () => {
     title: config.welcomeScreen.title || 'Quiz sans titre',
     config,
     enabled: true,
+    debounceMs: 800,
     onConfigLoaded: (loadedConfig) => {
       if (loadedConfig) {
         setConfig(loadedConfig);

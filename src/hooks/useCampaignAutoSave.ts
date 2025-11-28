@@ -82,7 +82,7 @@ export const useCampaignAutoSave = ({
 
   // Auto-save logic
   useEffect(() => {
-    if (!enabled || !userId) return;
+    if (!enabled || !userId || !hasLoadedRef.current) return;
 
     // Clear previous timeout
     if (saveTimeoutRef.current) {
@@ -91,6 +91,7 @@ export const useCampaignAutoSave = ({
 
     // Set new timeout for auto-save
     saveTimeoutRef.current = setTimeout(() => {
+      console.log('🔄 Auto-saving campaign...', { config, title });
       saveCampaign();
     }, debounceMs);
 
@@ -123,6 +124,7 @@ export const useCampaignAutoSave = ({
           .eq("user_id", userId);
 
         if (error) throw error;
+        console.log('✅ Campaign saved successfully', { campaignId, configKeys: Object.keys(config) });
       } else {
         // Create new campaign
         const { data, error } = await supabase
@@ -141,11 +143,12 @@ export const useCampaignAutoSave = ({
         // Update URL with campaign ID
         setCampaignId(data.id);
         setSearchParams({ id: data.id });
+        console.log('✅ New campaign created', { campaignId: data.id });
       }
 
       setLastSaved(new Date());
     } catch (error) {
-      console.error("Error saving campaign:", error);
+      console.error("❌ Error saving campaign:", error);
       toast.error("Erreur lors de la sauvegarde");
     } finally {
       setIsSaving(false);
