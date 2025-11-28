@@ -265,11 +265,19 @@ export const FormBuilder = () => {
     mobileLayout?: string;
   } | null>(null);
 
-  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
     campaignType: 'form',
     title: questions.find(q => q.type === 'welcome')?.title || 'Form sans titre',
     config: { questions, templateMeta },
-    enabled: true
+    enabled: true,
+    onConfigLoaded: (loadedConfig) => {
+      if (loadedConfig?.questions) {
+        setQuestions(loadedConfig.questions);
+      }
+      if (loadedConfig?.templateMeta) {
+        setTemplateMeta(loadedConfig.templateMeta);
+      }
+    }
   });
 
   // Force mobile view mode on mobile devices

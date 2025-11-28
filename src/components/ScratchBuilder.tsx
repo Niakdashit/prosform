@@ -239,11 +239,19 @@ export const ScratchBuilder = () => {
   const [prizes, setPrizes] = useState<ScratchPrize[]>([]);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
-  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+  const { campaignId, isSaving, lastSaved, isLoading, saveCampaign } = useCampaignAutoSave({
     campaignType: 'scratch',
     title: config.welcomeScreen.title || 'Scratch sans titre',
     config: { ...config, prizes },
-    enabled: true
+    enabled: true,
+    onConfigLoaded: (loadedConfig) => {
+      if (loadedConfig) {
+        setConfig(loadedConfig);
+        if (loadedConfig.prizes) {
+          setPrizes(loadedConfig.prizes);
+        }
+      }
+    }
   });
 
   useEffect(() => {
