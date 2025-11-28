@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { QuizSidebar } from "./QuizSidebar";
 import { QuizPreview } from "./QuizPreview";
 import { QuizSettingsPanel } from "./QuizSettingsPanel";
 import { QuizTopToolbar } from "./QuizTopToolbar";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { PublishModal } from "./PublishModal";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaignAutoSave } from "@/hooks/useCampaignAutoSave";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import type { ContactField } from "./WheelBuilder";
 
@@ -201,6 +204,7 @@ const defaultQuizConfig: QuizConfig = {
 
 export const QuizBuilder = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [config, setConfig] = useState<QuizConfig>(defaultQuizConfig);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'question' | 'result'>('welcome');
@@ -208,6 +212,14 @@ export const QuizBuilder = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+
+  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+    campaignType: 'quiz',
+    title: config.welcomeScreen.title || 'Quiz sans titre',
+    config,
+    enabled: true
+  });
 
   useEffect(() => {
     if (isMobile) {
@@ -306,6 +318,11 @@ export const QuizBuilder = () => {
           localStorage.setItem('quiz-theme', JSON.stringify(theme));
           window.open('/quiz-preview', '_blank');
         }}
+        onBackToDashboard={() => navigate('/dashboard')}
+        onSave={saveCampaign}
+        onPublish={() => setPublishModalOpen(true)}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
       />
         
       <div className="flex flex-1 overflow-hidden relative">
@@ -474,6 +491,14 @@ export const QuizBuilder = () => {
         )}
       </div>
       <FloatingToolbar />
+      {campaignId && (
+        <PublishModal
+          isOpen={publishModalOpen}
+          onClose={() => setPublishModalOpen(false)}
+          campaignId={campaignId}
+          campaignTitle={config.welcomeScreen.title || 'Quiz sans titre'}
+        />
+      )}
     </div>
   );
 };

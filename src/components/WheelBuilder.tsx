@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { WheelSidebar } from "./WheelSidebar";
 import { WheelPreview } from "./WheelPreview";
@@ -7,11 +8,13 @@ import { WheelTopToolbar } from "./WheelTopToolbar";
 import { SegmentsModal } from "./SegmentsModal";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { PublishModal } from "./PublishModal";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaignAutoSave } from "@/hooks/useCampaignAutoSave";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 
 export interface Prize {
@@ -229,6 +232,7 @@ const defaultWheelConfig: WheelConfig = {
 
 export const WheelBuilder = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [config, setConfig] = useState<WheelConfig>(defaultWheelConfig);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
@@ -239,6 +243,14 @@ export const WheelBuilder = () => {
   const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
   const [prizes, setPrizes] = useState<Prize[]>([]);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+
+  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+    campaignType: 'wheel',
+    title: config.welcomeScreen.title || 'Roue sans titre',
+    config: { ...config, prizes },
+    enabled: true
+  });
 
   useEffect(() => {
     if (isMobile) {
@@ -384,6 +396,11 @@ export const WheelBuilder = () => {
         }}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        onBackToDashboard={() => navigate('/dashboard')}
+        onSave={saveCampaign}
+        onPublish={() => setPublishModalOpen(true)}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
       />
         
       {activeTab === 'campaign' ? (
@@ -550,6 +567,14 @@ export const WheelBuilder = () => {
         prizes={prizes}
       />
       <FloatingToolbar />
+      {campaignId && (
+        <PublishModal
+          isOpen={publishModalOpen}
+          onClose={() => setPublishModalOpen(false)}
+          campaignId={campaignId}
+          campaignTitle={config.welcomeScreen.title || 'Roue sans titre'}
+        />
+      )}
     </div>
   );
 };

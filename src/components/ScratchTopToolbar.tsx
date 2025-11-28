@@ -1,15 +1,53 @@
 import { Button } from "@/components/ui/button";
-import { Eye, Share2, Settings, Palette, Smartphone, RotateCcw, Gift } from "lucide-react";
+import { Eye, Share2, Settings, Palette, Smartphone, RotateCcw, Gift, Home, Save, Globe } from "lucide-react";
+import { SaveIndicator } from "./ui/SaveIndicator";
 
 interface ScratchTopToolbarProps {
   onPreview: () => void;
   activeTab: 'design' | 'campaign' | 'templates';
   onTabChange: (tab: 'design' | 'campaign' | 'templates') => void;
+  onBackToDashboard?: () => void;
+  onSave?: () => void;
+  onPublish?: () => void;
+  isSaving?: boolean;
+  lastSaved?: Date | null;
 }
 
-export const ScratchTopToolbar = ({ onPreview, activeTab, onTabChange }: ScratchTopToolbarProps) => {
+export const ScratchTopToolbar = ({ 
+  onPreview, 
+  activeTab, 
+  onTabChange,
+  onBackToDashboard,
+  onSave,
+  onPublish,
+  isSaving,
+  lastSaved
+}: ScratchTopToolbarProps) => {
+  const getSaveStatus = () => {
+    if (isSaving) return 'saving';
+    if (lastSaved) return 'saved';
+    return 'idle';
+  };
+
   return (
-    <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
+    <div className="h-12 bg-card border-b border-border flex items-center justify-between px-3">
+      {/* Left: Back button */}
+      <div className="flex items-center gap-2">
+        {onBackToDashboard && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 gap-1.5 text-xs px-2.5"
+            onClick={onBackToDashboard}
+          >
+            <Home className="w-3.5 h-3.5" />
+            Dashboard
+          </Button>
+        )}
+        {(isSaving !== undefined || lastSaved !== undefined) && (
+          <SaveIndicator status={getSaveStatus()} />
+        )}
+      </div>
       <div className="flex items-center gap-1.5">
         <Button 
           variant="ghost" 
@@ -40,22 +78,23 @@ export const ScratchTopToolbar = ({ onPreview, activeTab, onTabChange }: Scratch
         </Button>
       </div>
 
-      <div className="flex items-center gap-1 absolute right-3">
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Smartphone className="w-3.5 h-3.5" />
-        </Button>
+      {/* Right: Action buttons */}
+      <div className="flex items-center gap-1">
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onPreview}>
           <Eye className="w-3.5 h-3.5" />
         </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <RotateCcw className="w-3.5 h-3.5" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Share2 className="w-3.5 h-3.5" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Settings className="w-3.5 h-3.5" />
-        </Button>
+        {onSave && (
+          <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs px-2.5" onClick={onSave}>
+            <Save className="w-3.5 h-3.5" />
+            Sauvegarder
+          </Button>
+        )}
+        {onPublish && (
+          <Button variant="default" size="sm" className="h-8 gap-1.5 text-xs px-2.5" onClick={onPublish}>
+            <Globe className="w-3.5 h-3.5" />
+            Publier
+          </Button>
+        )}
       </div>
     </div>
   );

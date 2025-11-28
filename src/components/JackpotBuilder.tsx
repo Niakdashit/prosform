@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { JackpotSidebar } from "./JackpotSidebar";
 import { JackpotPreview } from "./JackpotPreview";
@@ -6,11 +7,13 @@ import { JackpotSettingsPanel } from "./JackpotSettingsPanel";
 import { JackpotTopToolbar } from "./JackpotTopToolbar";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { PublishModal } from "./PublishModal";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaignAutoSave } from "@/hooks/useCampaignAutoSave";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { JackpotSymbolPickerModal } from "./JackpotSymbolPickerModal";
 
@@ -225,6 +228,7 @@ const defaultJackpotConfig: JackpotConfig = {
 
 export const JackpotBuilder = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const [config, setConfig] = useState<JackpotConfig>(defaultJackpotConfig);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
@@ -234,6 +238,14 @@ export const JackpotBuilder = () => {
   const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
   const [prizes, setPrizes] = useState<JackpotPrize[]>([]);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+
+  const { campaignId, isSaving, lastSaved, saveCampaign } = useCampaignAutoSave({
+    campaignType: 'jackpot',
+    title: config.welcomeScreen.title || 'Jackpot sans titre',
+    config: { ...config, prizes },
+    enabled: true
+  });
 
   useEffect(() => {
     if (isMobile) {
@@ -382,6 +394,11 @@ export const JackpotBuilder = () => {
         }}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        onBackToDashboard={() => navigate('/dashboard')}
+        onSave={saveCampaign}
+        onPublish={() => setPublishModalOpen(true)}
+        isSaving={isSaving}
+        lastSaved={lastSaved}
       />
         
       {activeTab === 'campaign' ? (
@@ -547,6 +564,14 @@ export const JackpotBuilder = () => {
       </div>
       )}
       <FloatingToolbar />
+      {campaignId && (
+        <PublishModal
+          isOpen={publishModalOpen}
+          onClose={() => setPublishModalOpen(false)}
+          campaignId={campaignId}
+          campaignTitle={config.welcomeScreen.title || 'Jackpot sans titre'}
+        />
+      )}
     </div>
   );
 };
