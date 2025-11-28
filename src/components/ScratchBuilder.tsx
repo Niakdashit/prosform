@@ -244,6 +244,7 @@ export const ScratchBuilder = () => {
     title: config.welcomeScreen.title || 'Scratch sans titre',
     config: { ...config, prizes },
     enabled: true,
+    debounceMs: 800,
     onConfigLoaded: (loadedConfig) => {
       if (loadedConfig) {
         setConfig(loadedConfig);

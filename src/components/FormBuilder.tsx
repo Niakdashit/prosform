@@ -270,6 +270,7 @@ export const FormBuilder = () => {
     title: questions.find(q => q.type === 'welcome')?.title || 'Form sans titre',
     config: { questions, templateMeta },
     enabled: true,
+    debounceMs: 800,
     onConfigLoaded: (loadedConfig) => {
       if (loadedConfig?.questions) {
         setQuestions(loadedConfig.questions);

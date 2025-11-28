@@ -250,6 +250,7 @@ export const WheelBuilder = () => {
     title: config.welcomeScreen.title || 'Roue sans titre',
     config: { ...config, prizes },
     enabled: true,
+    debounceMs: 800,
     onConfigLoaded: (loadedConfig) => {
       if (loadedConfig) {
         setConfig(loadedConfig);

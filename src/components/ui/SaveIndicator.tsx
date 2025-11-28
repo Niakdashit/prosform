@@ -13,20 +13,20 @@ export const SaveIndicator = ({ status, className }: SaveIndicatorProps) => {
     <div className={cn("flex items-center gap-2 text-xs", className)}>
       {status === 'saving' && (
         <>
-          <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
-          <span className="text-muted-foreground">Saving...</span>
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
+          <span className="text-blue-600 font-medium">Sauvegarde...</span>
         </>
       )}
       {status === 'saved' && (
         <>
-          <Check className="w-3 h-3 text-green-600" />
-          <span className="text-green-600">Saved</span>
+          <Check className="w-3.5 h-3.5 text-green-600" />
+          <span className="text-green-600 font-medium">Sauvegardé</span>
         </>
       )}
       {status === 'error' && (
         <>
-          <AlertCircle className="w-3 h-3 text-destructive" />
-          <span className="text-destructive">Error</span>
+          <AlertCircle className="w-3.5 h-3.5 text-destructive" />
+          <span className="text-destructive font-medium">Erreur</span>
         </>
       )}
     </div>
