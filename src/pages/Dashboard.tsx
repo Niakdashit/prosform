@@ -22,9 +22,11 @@ import {
   Pencil,
   BarChart3,
   Settings as SettingsIcon,
+  Globe,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { PublishModal } from "@/components/PublishModal";
 
 interface Campaign {
   id: string;
@@ -59,6 +61,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<any>(null);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [selectedCampaignForPublish, setSelectedCampaignForPublish] = useState<Campaign | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -152,6 +156,11 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
+  };
+
+  const handlePublishClick = (campaign: Campaign) => {
+    setSelectedCampaignForPublish(campaign);
+    setPublishModalOpen(true);
   };
 
   const filteredCampaigns = campaigns.filter((campaign) =>
@@ -311,6 +320,15 @@ export default function Dashboard() {
                         <DropdownMenuItem
                           onClick={(e) => {
                             e.stopPropagation();
+                            handlePublishClick(campaign);
+                          }}
+                        >
+                          <Globe className="w-4 h-4 mr-2" />
+                          Publier
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation();
                             navigate(`/analytics?id=${campaign.id}`);
                           }}
                         >
@@ -356,6 +374,20 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Publish Modal */}
+      {selectedCampaignForPublish && (
+        <PublishModal
+          isOpen={publishModalOpen}
+          onClose={() => {
+            setPublishModalOpen(false);
+            setSelectedCampaignForPublish(null);
+            loadCampaigns(); // Reload to get updated publish status
+          }}
+          campaignId={selectedCampaignForPublish.id}
+          campaignTitle={selectedCampaignForPublish.title}
+        />
+      )}
     </div>
   );
 }
