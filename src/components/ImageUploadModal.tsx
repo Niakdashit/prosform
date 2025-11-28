@@ -1,7 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload } from "lucide-react";
-import { useRef } from "react";
+import { Upload, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { uploadImageToStorage } from "@/utils/imageUpload";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ImageUploadModalProps {
   open: boolean;
@@ -11,16 +14,29 @@ interface ImageUploadModalProps {
 
 export const ImageUploadModal = ({ open, onOpenChange, onImageSelect }: ImageUploadModalProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onImageSelect(reader.result as string);
-        onOpenChange(false);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Vous devez être connecté pour uploader des images");
+        return;
+      }
+
+      const publicUrl = await uploadImageToStorage(file, user.id, 'content');
+      onImageSelect(publicUrl);
+      toast.success("Image uploadée avec succès");
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(error instanceof Error ? error.message : "Erreur lors de l'upload");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -42,24 +58,38 @@ export const ImageUploadModal = ({ open, onOpenChange, onImageSelect }: ImageUpl
           
           <TabsContent value="upload" className="mt-6">
             <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed rounded-lg p-16 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => !uploading && fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-lg p-16 flex flex-col items-center justify-center ${
+                uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-muted/50'
+              } transition-colors`}
               style={{ borderColor: '#E5E5E5' }}
             >
               <div className="text-center">
-                <p className="text-base font-medium mb-2" style={{ color: '#3D3731' }}>
-                  <span className="underline">Upload</span> or drop an image here
-                </p>
-                <p className="text-sm" style={{ color: '#A89A8A' }}>
-                  JPG, PNG, or GIF. Up to 4MB.
-                </p>
+                {uploading ? (
+                  <>
+                    <Loader2 className="w-10 h-10 mb-3 mx-auto animate-spin" style={{ color: '#A89A8A' }} />
+                    <p className="text-base font-medium mb-2" style={{ color: '#3D3731' }}>
+                      Uploading...
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-base font-medium mb-2" style={{ color: '#3D3731' }}>
+                      <span className="underline">Upload</span> or drop an image here
+                    </p>
+                    <p className="text-sm" style={{ color: '#A89A8A' }}>
+                      JPG, PNG, WEBP or GIF. Up to 5MB.
+                    </p>
+                  </>
+                )}
               </div>
             </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={handleImageUpload}
+              disabled={uploading}
               className="hidden"
             />
           </TabsContent>

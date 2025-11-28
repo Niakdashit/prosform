@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Link as LinkIcon } from "lucide-react";
+import { Upload, Link as LinkIcon, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
+import { uploadImageToStorage } from "@/utils/imageUpload";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface WallpaperUploadModalProps {
   open: boolean;
@@ -21,16 +24,29 @@ export const WallpaperUploadModal = ({
 }: WallpaperUploadModalProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [urlInput, setUrlInput] = useState(currentImage || "");
+  const [uploading, setUploading] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onImageSelect(reader.result as string);
-        onOpenChange(false);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Vous devez être connecté pour uploader des images");
+        return;
+      }
+
+      const publicUrl = await uploadImageToStorage(file, user.id, 'wallpapers');
+      onImageSelect(publicUrl);
+      toast.success("Image uploadée avec succès");
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error(error instanceof Error ? error.message : "Erreur lors de l'upload");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -56,22 +72,34 @@ export const WallpaperUploadModal = ({
           
           <TabsContent value="upload" className="mt-6">
             <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed rounded-lg p-12 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => !uploading && fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-lg p-12 flex flex-col items-center justify-center ${
+                uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-muted/50'
+              } transition-colors`}
             >
-              <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
-              <p className="text-sm font-medium mb-1">
-                <span className="underline">Upload</span> ou glissez une image ici
-              </p>
-              <p className="text-xs text-muted-foreground">
-                JPG, PNG, ou GIF. Max 4MB.
-              </p>
+              {uploading ? (
+                <>
+                  <Loader2 className="w-10 h-10 mb-3 text-muted-foreground animate-spin" />
+                  <p className="text-sm font-medium mb-1">Upload en cours...</p>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
+                  <p className="text-sm font-medium mb-1">
+                    <span className="underline">Upload</span> ou glissez une image ici
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG, WEBP ou GIF. Max 5MB.
+                  </p>
+                </>
+              )}
             </div>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={handleImageUpload}
+              disabled={uploading}
               className="hidden"
             />
           </TabsContent>

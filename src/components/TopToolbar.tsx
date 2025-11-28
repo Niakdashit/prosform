@@ -10,6 +10,7 @@ import {
   Globe
 } from "lucide-react";
 import { SaveIndicator } from "./ui/SaveIndicator";
+import { PublicationBadge } from "./ui/PublicationBadge";
 
 interface TopToolbarProps {
   onAddContent: () => void;
@@ -21,6 +22,7 @@ interface TopToolbarProps {
   onPublish?: () => void;
   isSaving?: boolean;
   lastSaved?: Date | null;
+  isPublished?: boolean;
 }
 
 export const TopToolbar = ({ 
@@ -32,7 +34,8 @@ export const TopToolbar = ({
   onSave,
   onPublish,
   isSaving,
-  lastSaved
+  lastSaved,
+  isPublished = false
 }: TopToolbarProps) => {
   const getSaveStatus = () => {
     if (isSaving) return 'saving';
@@ -58,6 +61,7 @@ export const TopToolbar = ({
         {(isSaving !== undefined || lastSaved !== undefined) && (
           <SaveIndicator status={getSaveStatus()} />
         )}
+        <PublicationBadge isPublished={isPublished} />
       </div>
 
       {/* Center: Tab buttons */}
