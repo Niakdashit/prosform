@@ -14,6 +14,9 @@ import Jackpot from "./pages/Jackpot";
 import JackpotPreview from "./pages/JackpotPreview";
 import Scratch from "./pages/Scratch";
 import ScratchPreview from "./pages/ScratchPreview";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,7 +29,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/form" replace />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/form" element={<Index />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/wheel" element={<Wheel />} />
