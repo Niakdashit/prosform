@@ -54,7 +54,7 @@ const WheelPreviewContent = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+    <div className="fixed inset-0 w-screen h-screen overflow-hidden" style={{ minHeight: '100vh' }}>
       <WheelPreview
         config={config}
         activeView={activeView}
