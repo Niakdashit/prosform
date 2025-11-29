@@ -566,21 +566,23 @@ export const WheelPreview = ({
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-right-left') {
-                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
+                  // Le bloc texte+image est toujours centré horizontalement
+                  // L'alignement du texte est géré par TextContent via alignmentClass
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
-                      <div className="max-w-[500px]">
+                    <div className="w-full h-full flex justify-center items-center gap-16 px-24">
+                      <div className="max-w-[600px] flex-shrink-0">
                         <TextContent />
                       </div>
                       <ImageBlock />
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-centered') {
-                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
+                  // Le bloc image+texte est toujours centré horizontalement
+                  // L'alignement du texte est géré par TextContent via alignmentClass
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
+                    <div className="w-full h-full flex justify-center items-center gap-16 px-24">
                       <ImageBlock />
-                      <div className="max-w-[500px]">
+                      <div className="max-w-[600px] flex-shrink-0">
                         <TextContent />
                       </div>
                     </div>

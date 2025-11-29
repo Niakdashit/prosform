@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
+import { ChevronLeft, ChevronRight, Monitor, Smartphone, Loader2 } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { JackpotSidebar } from "./JackpotSidebar";
 import { JackpotPreview } from "./JackpotPreview";
 import { JackpotSettingsPanel } from "./JackpotSettingsPanel";
@@ -13,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { JackpotSymbolPickerModal } from "./JackpotSymbolPickerModal";
+import { useCampaign } from "@/hooks/useCampaign";
 
 export interface JackpotPrize {
   id: string;
@@ -225,21 +227,67 @@ const defaultJackpotConfig: JackpotConfig = {
 
 export const JackpotBuilder = () => {
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
-  const [config, setConfig] = useState<JackpotConfig>(defaultJackpotConfig);
+  const themeContext = useTheme();
+  const { theme } = themeContext;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    campaign,
+    config,
+    prizes,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    isLoading,
+    isSaving,
+    setConfig,
+    setPrizes,
+    save,
+    publish,
+    setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
+  } = useCampaign(
+    { campaignId, type: 'jackpot', defaultName: 'Nouvelle campagne jackpot' },
+    defaultJackpotConfig,
+    themeContext
+  );
+
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
-  const [prizes, setPrizes] = useState<JackpotPrize[]>([]);
 
   useEffect(() => {
     if (isMobile) {
       setViewMode('mobile');
     }
   }, [isMobile]);
+
+  // Sauvegarder et mettre à jour l'URL avec l'ID
+  const handleSave = async () => {
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/jackpot?id=${saved.id}`, { replace: true });
+    }
+  };
+
+  // Publier et mettre à jour l'URL
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/jackpot?id=${published.id}`, { replace: true });
+    }
+  };
 
   const updateConfig = (updates: Partial<JackpotConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -322,6 +370,27 @@ export const JackpotBuilder = () => {
     toast.success("Symbole ajouté");
   };
 
+  // Afficher un spinner plein page pendant le chargement d'une campagne existante
+  if (isLoading && campaignId) {
+    return (
+      <div 
+        className="flex flex-col items-center justify-center h-screen"
+        style={{ 
+          fontFamily: "'DM Sans', sans-serif",
+          backgroundColor: '#f3f4f6',
+        }}
+      >
+        <Loader2 
+          className="w-10 h-10 animate-spin mb-4" 
+          style={{ color: '#f5ca3c' }} 
+        />
+        <p className="text-sm" style={{ color: '#6b7280' }}>
+          Chargement de la campagne...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <JackpotTopToolbar 
@@ -380,6 +449,9 @@ export const JackpotBuilder = () => {
             }
           }
         }}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        isSaving={isSaving}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
@@ -393,6 +465,16 @@ export const JackpotBuilder = () => {
           gameType="jackpot"
           segments={config.symbols.map(s => ({ id: s.id, label: s.emoji }))}
           symbols={config.symbols}
+          campaignName={campaignName}
+          onCampaignNameChange={setName}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          startTime={startTime}
+          onStartTimeChange={setStartTime}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          endTime={endTime}
+          onEndTimeChange={setEndTime}
           onAddSymbol={(emoji: string) => {
             const newSymbol: JackpotSymbol = {
               id: `symbol-${Date.now()}`,

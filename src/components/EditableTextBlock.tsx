@@ -132,13 +132,13 @@ export const EditableTextBlock = ({
   };
 
   // En mode readOnly, afficher simplement le texte sans édition
+  // Ne pas appliquer la contrainte de largeur en mode readOnly pour éviter les retours à la ligne inattendus
   if (isReadOnly) {
     return (
       <div
         className={`transition-opacity ${className}`}
         style={{
           ...style,
-          width: onWidthChange ? `${width}%` : undefined,
           padding: '4px',
           marginTop: '-4px',
           marginLeft: '-4px',

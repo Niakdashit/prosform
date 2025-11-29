@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
+import { ChevronLeft, ChevronRight, Monitor, Smartphone, Loader2 } from "lucide-react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { WheelSidebar } from "./WheelSidebar";
 import { WheelPreview } from "./WheelPreview";
@@ -402,6 +402,27 @@ export const WheelBuilder = () => {
     setPrizes(prizes.filter(p => p.id !== id));
     toast.success("Lot supprimé");
   };
+
+  // Afficher un spinner plein page pendant le chargement d'une campagne existante
+  if (isLoading && campaignId) {
+    return (
+      <div 
+        className="flex flex-col items-center justify-center h-screen"
+        style={{ 
+          fontFamily: "'DM Sans', sans-serif",
+          backgroundColor: '#f3f4f6',
+        }}
+      >
+        <Loader2 
+          className="w-10 h-10 animate-spin mb-4" 
+          style={{ color: '#f5ca3c' }} 
+        />
+        <p className="text-sm" style={{ color: '#6b7280' }}>
+          Chargement de la campagne...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">

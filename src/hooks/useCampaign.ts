@@ -3,6 +3,30 @@ import { CampaignService } from '@/services/CampaignService';
 import type { Campaign, CampaignType } from '@/types/campaign';
 import { toast } from 'sonner';
 
+// Deep merge utility function
+function deepMerge<T extends Record<string, any>>(target: T, source: Record<string, any>): T {
+  const result = { ...target };
+  
+  for (const key in source) {
+    if (source[key] !== undefined) {
+      if (
+        source[key] !== null &&
+        typeof source[key] === 'object' &&
+        !Array.isArray(source[key]) &&
+        target[key] !== null &&
+        typeof target[key] === 'object' &&
+        !Array.isArray(target[key])
+      ) {
+        result[key as keyof T] = deepMerge(target[key], source[key]);
+      } else {
+        result[key as keyof T] = source[key];
+      }
+    }
+  }
+  
+  return result;
+}
+
 interface UseCampaignOptions {
   campaignId?: string | null;
   type: CampaignType;
@@ -27,7 +51,8 @@ export function useCampaign(
   const [startTime, setStartTime] = useState('');
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // Initialiser isLoading à true si on a un campaignId pour éviter le flash du contenu par défaut
+  const [isLoading, setIsLoading] = useState(!!campaignId);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -46,7 +71,11 @@ export function useCampaign(
         const data = await CampaignService.getById(campaignId);
         if (data) {
           setCampaign(data);
-          setConfigState(data.config);
+          // Merge deep: defaultConfig + data.config pour garder les valeurs par défaut
+          const mergedConfig = deepMerge(defaultConfig, data.config || {});
+          setConfigState(mergedConfig);
+          console.log('✅ Config loaded:', mergedConfig);
+          console.log('✅ Background image:', mergedConfig.welcomeScreen?.backgroundImage ? 'Present' : 'Missing');
           setPrizesState(data.prizes || []);
           setName(data.name);
           

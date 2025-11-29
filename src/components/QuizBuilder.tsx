@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
+import { ChevronLeft, ChevronRight, Monitor, Smartphone, Loader2 } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { QuizSidebar } from "./QuizSidebar";
 import { QuizPreview } from "./QuizPreview";
 import { QuizSettingsPanel } from "./QuizSettingsPanel";
@@ -12,6 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import type { ContactField } from "./WheelBuilder";
+import { useCampaign } from "@/hooks/useCampaign";
 
 export interface QuizAnswer {
   id: string;
@@ -201,8 +203,37 @@ const defaultQuizConfig: QuizConfig = {
 
 export const QuizBuilder = () => {
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
-  const [config, setConfig] = useState<QuizConfig>(defaultQuizConfig);
+  const themeContext = useTheme();
+  const { theme } = themeContext;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    campaign,
+    config,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    isLoading,
+    isSaving,
+    setConfig,
+    save,
+    publish,
+    setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
+  } = useCampaign(
+    { campaignId, type: 'quiz', defaultName: 'Nouveau quiz' },
+    defaultQuizConfig,
+    themeContext
+  );
+
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'question' | 'result'>('welcome');
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
@@ -214,6 +245,22 @@ export const QuizBuilder = () => {
       setViewMode('mobile');
     }
   }, [isMobile]);
+
+  // Sauvegarder et mettre à jour l'URL avec l'ID
+  const handleSave = async () => {
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/quiz?id=${saved.id}`, { replace: true });
+    }
+  };
+
+  // Publier et mettre à jour l'URL
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/quiz?id=${published.id}`, { replace: true });
+    }
+  };
 
   const updateConfig = (updates: Partial<QuizConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -296,6 +343,27 @@ export const QuizBuilder = () => {
     toast.success("Question supprimée");
   };
 
+  // Afficher un spinner plein page pendant le chargement d'une campagne existante
+  if (isLoading && campaignId) {
+    return (
+      <div 
+        className="flex flex-col items-center justify-center h-screen"
+        style={{ 
+          fontFamily: "'DM Sans', sans-serif",
+          backgroundColor: '#f3f4f6',
+        }}
+      >
+        <Loader2 
+          className="w-10 h-10 animate-spin mb-4" 
+          style={{ color: '#f5ca3c' }} 
+        />
+        <p className="text-sm" style={{ color: '#6b7280' }}>
+          Chargement de la campagne...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <QuizTopToolbar 
@@ -306,6 +374,9 @@ export const QuizBuilder = () => {
           localStorage.setItem('quiz-theme', JSON.stringify(theme));
           window.open('/quiz-preview', '_blank');
         }}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        isSaving={isSaving}
       />
         
       <div className="flex flex-1 overflow-hidden relative">

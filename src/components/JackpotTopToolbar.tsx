@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Eye, Save, Globe, Palette, Gift } from "lucide-react";
+import { Eye, Save, Globe, Palette, Gift, Loader2 } from "lucide-react";
 
 interface JackpotTopToolbarProps {
   onPreview: () => void;
+  onSave?: () => void;
+  onPublish?: () => void;
+  isSaving?: boolean;
   activeTab: 'design' | 'campaign' | 'templates';
   onTabChange: (tab: 'design' | 'campaign' | 'templates') => void;
 }
 
-export const JackpotTopToolbar = ({ onPreview, activeTab, onTabChange }: JackpotTopToolbarProps) => {
+export const JackpotTopToolbar = ({ onPreview, onSave, onPublish, isSaving, activeTab, onTabChange }: JackpotTopToolbarProps) => {
   return (
     <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
       <div className="flex items-center gap-1.5">
@@ -53,9 +56,11 @@ export const JackpotTopToolbar = ({ onPreview, activeTab, onTabChange }: Jackpot
           variant="ghost" 
           size="sm" 
           className="gap-2 h-8 px-3 text-xs font-medium"
+          onClick={onSave}
+          disabled={isSaving}
         >
-          <Save className="w-4 h-4" />
-          Sauvegarder
+          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
         </Button>
         <Button 
           size="sm" 
@@ -65,6 +70,8 @@ export const JackpotTopToolbar = ({ onPreview, activeTab, onTabChange }: Jackpot
             color: '#3d3731',
             border: 'none',
           }}
+          onClick={onPublish}
+          disabled={isSaving}
         >
           <Globe className="w-4 h-4" />
           Publier

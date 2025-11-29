@@ -198,9 +198,49 @@ const Campaigns = () => {
     navigate(`${routes[campaign.type]}?id=${campaign.id}`);
   };
 
+  // Afficher un spinner plein page pendant le chargement initial
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div 
+          className="flex items-center justify-center"
+          style={{ 
+            fontFamily: "'DM Sans', sans-serif",
+            minHeight: 'calc(100vh - 120px)',
+          }}
+        >
+          {/* Grand cadre glass de loading - même fond que le container principal */}
+          <div
+            className="flex flex-col items-center justify-center w-full max-w-6xl mx-auto px-8 py-16"
+            style={{
+              borderRadius: '32px',
+              background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
+              boxShadow: '0 18px 55px rgba(15,23,42,0.12)',
+            }}
+          >
+            <Loader2 
+              className="w-10 h-10 animate-spin mb-4" 
+              style={{ color: colors.gold }} 
+            />
+            <p className="text-sm" style={{ color: colors.muted }}>
+              Chargement des campagnes...
+            </p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
-      <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      <div
+        style={{
+          fontFamily: "'DM Sans', sans-serif",
+          background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
+          borderRadius: '32px',
+          padding: '24px',
+        }}
+      >
         {/* Page title */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold" style={{ color: colors.dark }}>
@@ -211,8 +251,22 @@ const Campaigns = () => {
           </p>
         </div>
 
-        {/* Stats cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        {/* Stats cards - Liquid Glass Effect */}
+        <div 
+          className="grid grid-cols-4 gap-4 mb-6 p-5 relative overflow-hidden"
+          style={{
+            borderRadius: '24px',
+            // Dégradé quasi blanc avec une pointe de doré très légère
+            background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
+          }}
+        >
+          {/* Animated gradient overlay for depth */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.65) 0%, transparent 55%), radial-gradient(circle at 85% 100%, rgba(245,202,60,0.08) 0%, transparent 55%)',
+            }}
+          />
           {[
             { label: 'Total campagnes', value: campaigns.length, icon: LayoutGrid },
             { label: 'En ligne', value: campaigns.filter(c => c.status === 'online').length, icon: CircleDot },
@@ -221,35 +275,91 @@ const Campaigns = () => {
           ].map((stat, i) => (
             <div 
               key={i}
-              className="p-4"
+              className="p-4 relative overflow-hidden group"
               style={{ 
-                backgroundColor: colors.white, 
-                borderRadius: '8px',
-                border: `1px solid ${colors.border}`,
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                borderRadius: '18px',
+                border: '1px solid rgba(255, 255, 255, 0.6)',
+                boxShadow: `
+                  0 4px 24px rgba(0, 0, 0, 0.06),
+                  0 1px 2px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                  inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                `,
               }}
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium" style={{ color: colors.muted }}>
-                  {stat.label}
-                </span>
-                <stat.icon className="w-4 h-4" style={{ color: colors.gold }} />
+              {/* Top highlight line - liquid glass signature */}
+              <div 
+                className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                }}
+              />
+              {/* Inner glow */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(ellipse at 50% -20%, rgba(255, 255, 255, 0.5) 0%, transparent 70%)',
+                  borderRadius: '18px',
+                }}
+              />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium" style={{ color: 'rgba(60, 60, 67, 0.7)' }}>
+                    {stat.label}
+                  </span>
+                  <stat.icon className="w-4 h-4" style={{ color: colors.gold }} />
+                </div>
+                <p className="text-2xl font-semibold" style={{ color: 'rgba(0, 0, 0, 0.85)' }}>
+                  {stat.value}
+                </p>
               </div>
-              <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
-                {stat.value}
-              </p>
             </div>
           ))}
         </div>
 
-        {/* Filters bar */}
+        {/* Main content container - Liquid Glass Effect (même fond que les cartes de stats) */}
         <div 
-          className="flex items-center justify-between p-4 mb-4"
-          style={{ 
-            backgroundColor: colors.white, 
-            borderRadius: '8px',
-            border: `1px solid ${colors.border}`,
+          className="relative overflow-hidden p-5"
+          style={{
+            borderRadius: '28px',
+            background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
           }}
         >
+          {/* Gradient overlay for depth */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.65) 0%, transparent 55%), radial-gradient(circle at 85% 100%, rgba(245,202,60,0.08) 0%, transparent 55%)',
+            }}
+          />
+
+        {/* Filters bar */}
+        <div 
+          className="flex items-center justify-between p-4 mb-4 relative overflow-hidden"
+          style={{ 
+            background: 'rgba(255, 255, 255, 0.25)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: '18px',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+            boxShadow: `
+              0 4px 24px rgba(0, 0, 0, 0.06),
+              0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 1px 1px rgba(255, 255, 255, 0.8),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+            `,
+          }}
+        >
+          {/* Top highlight line */}
+          <div 
+            className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+            }}
+          />
           <div className="flex items-center gap-3">
             {/* Search */}
             <div 
@@ -318,21 +428,36 @@ const Campaigns = () => {
         {/* Campaigns - List or Grid view */}
         {viewMode === 'list' ? (
           <div 
+            className="relative overflow-hidden"
             style={{ 
-              backgroundColor: colors.white, 
-              borderRadius: '8px',
-              border: `1px solid ${colors.border}`,
-              overflow: 'hidden',
+              background: 'rgba(255, 255, 255, 0.25)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderRadius: '18px',
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: `
+                0 4px 24px rgba(0, 0, 0, 0.06),
+                0 1px 2px rgba(0, 0, 0, 0.04),
+                inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+              `,
             }}
           >
+            {/* Top highlight line */}
+            <div 
+              className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none z-10"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+              }}
+            />
             {/* Table header */}
             <div 
               className="grid items-center px-4 h-11 text-xs font-medium"
               style={{ 
                 gridTemplateColumns: '40px 1fr 120px 200px 120px 140px 60px',
-                backgroundColor: colors.background,
-                color: colors.muted,
-                borderBottom: `1px solid ${colors.border}`,
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                color: 'rgba(60, 60, 67, 0.7)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.4)',
               }}
             >
               <div className="flex items-center justify-center">
@@ -359,10 +484,10 @@ const Campaigns = () => {
                 className="grid items-center px-4 h-14 text-sm transition-colors cursor-pointer"
                 style={{ 
                   gridTemplateColumns: '40px 1fr 120px 200px 120px 140px 60px',
-                  borderBottom: `1px solid ${colors.border}`,
-                  color: colors.dark,
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.3)',
+                  color: 'rgba(0, 0, 0, 0.85)',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.background}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 onClick={() => handleEditCampaign(campaign)}
               >
@@ -459,13 +584,13 @@ const Campaigns = () => {
           /* Grid view */
           <div className="grid grid-cols-4 gap-4">
             {filteredCampaigns.map((campaign) => {
-              // Gradient colors based on campaign type - using DA colors
+              // Dégradés doux par type, basés sur la palette de l'app (gris + or)
               const gradients: Record<CampaignType, string> = {
-                quiz: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
-                form: 'linear-gradient(135deg, #4a4540 0%, #6a6358 50%, #8a8070 100%)',
-                wheel: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
-                jackpot: 'linear-gradient(135deg, #4a4540 0%, #6a6358 50%, #8a8070 100%)',
-                scratch: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
+                quiz: 'linear-gradient(135deg, rgba(245,202,60,0.20) 0%, rgba(249,250,251,0.96) 40%, rgba(212,214,220,0.90) 100%)',
+                form: 'linear-gradient(135deg, rgba(245,202,60,0.16) 0%, rgba(249,250,251,0.96) 40%, rgba(209,213,219,0.88) 100%)',
+                wheel: 'linear-gradient(135deg, rgba(245,202,60,0.22) 0%, rgba(249,250,251,0.96) 40%, rgba(212,214,220,0.90) 100%)',
+                jackpot: 'linear-gradient(135deg, rgba(245,202,60,0.18) 0%, rgba(249,250,251,0.96) 40%, rgba(209,213,219,0.88) 100%)',
+                scratch: 'linear-gradient(135deg, rgba(245,202,60,0.20) 0%, rgba(249,250,251,0.96) 40%, rgba(212,214,220,0.90) 100%)',
               };
 
               return (
@@ -474,8 +599,9 @@ const Campaigns = () => {
                   className="relative overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
                   style={{ 
                     background: gradients[campaign.type],
-                    borderRadius: '16px',
+                    borderRadius: '18px',
                     minHeight: '180px',
+                    boxShadow: '0 18px 55px rgba(15,23,42,0.18)',
                   }}
                   onClick={() => handleEditCampaign(campaign)}
                 >
@@ -564,13 +690,6 @@ const Campaigns = () => {
           </div>
         )}
 
-        {/* Loading state */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin" style={{ color: colors.gold }} />
-          </div>
-        )}
-
         {/* Error state */}
         {error && (
           <div className="flex flex-col items-center justify-center py-16">
@@ -584,6 +703,7 @@ const Campaigns = () => {
             </button>
           </div>
         )}
+        </div>
       </div>
 
       {/* Delete confirmation dialog */}
