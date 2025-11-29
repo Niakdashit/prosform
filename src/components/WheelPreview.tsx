@@ -100,6 +100,22 @@ export const WheelPreview = ({
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme, viewMode);
 
+  // Sync image from config when it changes (e.g., after loading from Supabase)
+  useEffect(() => {
+    if (config.welcomeScreen.image) {
+      setUploadedImage(config.welcomeScreen.image);
+    }
+    if (config.welcomeScreen.imageSettings) {
+      setImageRotation(config.welcomeScreen.imageSettings.rotation || 0);
+      setImageSettings(prev => ({
+        ...prev,
+        borderRadius: config.welcomeScreen.imageSettings?.borderRadius ?? prev.borderRadius,
+        borderWidth: config.welcomeScreen.imageSettings?.borderWidth ?? prev.borderWidth,
+        borderColor: config.welcomeScreen.imageSettings?.borderColor ?? prev.borderColor,
+      }));
+    }
+  }, [config.welcomeScreen.image, config.welcomeScreen.imageSettings]);
+
   // Listen for FloatingToolbar style updates
   useEffect(() => {
     const handleStyleUpdate = (e: CustomEvent) => {
