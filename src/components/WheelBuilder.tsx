@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { WheelSidebar } from "./WheelSidebar";
 import { WheelPreview } from "./WheelPreview";
 import { WheelSettingsPanel } from "./WheelSettingsPanel";
@@ -13,6 +14,7 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
+import { useCampaign } from "@/hooks/useCampaign";
 
 export interface Prize {
   id: string;
@@ -230,7 +232,27 @@ const defaultWheelConfig: WheelConfig = {
 export const WheelBuilder = () => {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
-  const [config, setConfig] = useState<WheelConfig>(defaultWheelConfig);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    campaign,
+    config,
+    prizes,
+    isLoading,
+    isSaving,
+    setConfig,
+    setPrizes,
+    save,
+    publish,
+    setName,
+  } = useCampaign(
+    { campaignId, type: 'wheel', defaultName: 'Nouvelle campagne roue' },
+    defaultWheelConfig
+  );
+
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
@@ -238,13 +260,28 @@ export const WheelBuilder = () => {
   const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
-  const [prizes, setPrizes] = useState<Prize[]>([]);
 
   useEffect(() => {
     if (isMobile) {
       setViewMode('mobile');
     }
   }, [isMobile]);
+
+  // Sauvegarder et mettre à jour l'URL avec l'ID
+  const handleSave = async () => {
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/wheel?id=${saved.id}`, { replace: true });
+    }
+  };
+
+  // Publier et mettre à jour l'URL
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/wheel?id=${published.id}`, { replace: true });
+    }
+  };
 
   const updateConfig = (updates: Partial<WheelConfig>) => {
     setConfig(prev => ({ ...prev, ...updates }));
@@ -409,6 +446,9 @@ export const WheelBuilder = () => {
             }
           }
         }}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        isSaving={isSaving}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />

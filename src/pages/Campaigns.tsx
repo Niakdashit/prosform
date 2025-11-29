@@ -9,65 +9,33 @@ import {
   Gift,
   HelpCircle,
   Dices,
-  CircleDot
+  CircleDot,
+  Loader2,
+  Trash2,
+  Copy
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
+import { useCampaigns } from "@/hooks/useCampaigns";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-type CampaignType = 'form' | 'wheel' | 'quiz' | 'jackpot' | 'scratch';
-type CampaignStatus = 'draft' | 'online' | 'ended';
-type CampaignMode = 'fullscreen' | 'embed' | 'popup';
-
-interface Campaign {
-  id: string;
-  name: string;
-  type: CampaignType;
-  mode: CampaignMode;
-  status: CampaignStatus;
-  daysRemaining: number | null;
-  participants: number;
-  createdAt: string;
-}
-
-// Mock data for campaigns
-const mockCampaigns: Campaign[] = [
-  {
-    id: '1',
-    name: 'Roue de la Fortune - Été 2024',
-    type: 'wheel',
-    mode: 'fullscreen',
-    status: 'online',
-    daysRemaining: 15,
-    participants: 1234,
-    createdAt: '2024-01-15',
-  },
-  {
-    id: '2',
-    name: 'Quiz Produits',
-    type: 'quiz',
-    mode: 'embed',
-    status: 'draft',
-    daysRemaining: null,
-    participants: 0,
-    createdAt: '2024-01-20',
-  },
-  {
-    id: '3',
-    name: 'Jackpot Noël',
-    type: 'jackpot',
-    mode: 'popup',
-    status: 'ended',
-    daysRemaining: 0,
-    participants: 5678,
-    createdAt: '2023-12-01',
-  },
-];
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import type { CampaignType, CampaignStatus, CampaignMode } from "@/types/campaign";
 
 // Couleurs DA - harmonisées avec /form
 const colors = {
@@ -101,12 +69,15 @@ const typeLabels: Record<CampaignType, string> = {
 
 const modeLabels: Record<CampaignMode, string> = {
   fullscreen: 'Plein écran',
+  article: 'Article',
   embed: 'Intégré',
   popup: 'Popup',
 };
 
-const StatusBadge = ({ status }: { status: CampaignStatus }) => {
-  const styles: Record<CampaignStatus, { bg: string; text: string; label: string }> = {
+type DisplayStatus = 'online' | 'draft' | 'ended';
+
+const StatusBadge = ({ status }: { status: DisplayStatus }) => {
+  const styles: Record<DisplayStatus, { bg: string; text: string; label: string }> = {
     online: { bg: 'rgba(34, 197, 94, 0.15)', text: colors.success, label: 'En ligne' },
     draft: { bg: 'rgba(156, 163, 175, 0.15)', text: colors.muted, label: 'Brouillon' },
     ended: { bg: 'rgba(245, 158, 11, 0.15)', text: colors.warning, label: 'Terminé' },
@@ -131,12 +102,32 @@ const StatusBadge = ({ status }: { status: CampaignStatus }) => {
 
 const Campaigns = () => {
   const navigate = useNavigate();
+  const { campaigns: rawCampaigns, isLoading, error, deleteCampaign, duplicateCampaign, refetch } = useCampaigns();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | CampaignStatus>('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [campaignToDelete, setCampaignToDelete] = useState<string | null>(null);
 
-  const campaigns = mockCampaigns;
+  // Transform campaigns for display
+  const campaigns = rawCampaigns.map(c => {
+    // Map paused to draft for display
+    let displayStatus: DisplayStatus = 'draft';
+    if (c.status === 'online') displayStatus = 'online';
+    else if (c.status === 'ended') displayStatus = 'ended';
+    
+    return {
+      id: c.id,
+      name: c.name,
+      type: c.type,
+      mode: c.mode,
+      status: displayStatus,
+      daysRemaining: c.end_date ? Math.max(0, Math.ceil((new Date(c.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null,
+      participants: 0,
+      createdAt: c.created_at,
+    };
+  });
 
   const filteredCampaigns = campaigns.filter(campaign => {
     const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -169,7 +160,34 @@ const Campaigns = () => {
     navigate(routes[type]);
   };
 
-  const handleEditCampaign = (campaign: Campaign) => {
+  const handleDeleteClick = (id: string) => {
+    setCampaignToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (campaignToDelete) {
+      const success = await deleteCampaign(campaignToDelete);
+      if (success) {
+        toast.success('Campagne supprimée');
+      } else {
+        toast.error('Erreur lors de la suppression');
+      }
+    }
+    setDeleteDialogOpen(false);
+    setCampaignToDelete(null);
+  };
+
+  const handleDuplicate = async (id: string) => {
+    const duplicated = await duplicateCampaign(id);
+    if (duplicated) {
+      toast.success('Campagne dupliquée');
+    } else {
+      toast.error('Erreur lors de la duplication');
+    }
+  };
+
+  const handleEditCampaign = (campaign: { id: string; type: CampaignType }) => {
     const routes: Record<CampaignType, string> = {
       form: '/form',
       wheel: '/wheel',
@@ -177,7 +195,7 @@ const Campaigns = () => {
       jackpot: '/jackpot',
       scratch: '/scratch',
     };
-    navigate(routes[campaign.type]);
+    navigate(`${routes[campaign.type]}?id=${campaign.id}`);
   };
 
   return (
@@ -404,6 +422,18 @@ const Campaigns = () => {
                       <DropdownMenuItem onClick={() => handleEditCampaign(campaign)}>
                         Modifier
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleDuplicate(campaign.id)}>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Dupliquer
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => handleDeleteClick(campaign.id)}
+                        className="text-red-500 focus:text-red-500"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Supprimer
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -534,7 +564,48 @@ const Campaigns = () => {
           </div>
         )}
 
+        {/* Loading state */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin" style={{ color: colors.gold }} />
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="flex flex-col items-center justify-center py-16">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button 
+              onClick={() => refetch()}
+              className="px-4 py-2 rounded-lg"
+              style={{ backgroundColor: colors.gold, color: colors.dark }}
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer la campagne ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. La campagne et toutes ses données seront définitivement supprimées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AppLayout>
   );
 };
