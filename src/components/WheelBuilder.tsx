@@ -397,8 +397,17 @@ export const WheelBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <WheelTopToolbar 
-        onPreview={() => {
+        onPreview={async () => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
+          
+          // Si on a un ID de campagne, sauvegarder d'abord puis ouvrir avec l'ID
+          if (campaign?.id) {
+            await save(); // Sauvegarder les dernières modifications
+            window.open(`/wheel-preview?id=${campaign.id}&mode=${targetViewMode}`, '_blank');
+            return;
+          }
+          
+          // Sinon, utiliser localStorage (pour les nouvelles campagnes non sauvegardées)
           // Clear old preview data first to free up space
           try {
             localStorage.removeItem('wheel-config');
