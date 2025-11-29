@@ -23,6 +23,10 @@ export function useCampaign(
   const [config, setConfigState] = useState<any>(defaultConfig);
   const [prizes, setPrizesState] = useState<any[]>([]);
   const [name, setName] = useState(defaultName);
+  const [startDate, setStartDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +54,18 @@ export function useCampaign(
           if (data.theme && Object.keys(data.theme).length > 0 && themeContext) {
             themeContext.updateTheme(data.theme);
             console.log('✅ Theme restored:', Object.keys(data.theme).length, 'properties');
+          }
+          
+          // Restore dates
+          if (data.start_date) {
+            const startDateTime = new Date(data.start_date);
+            setStartDate(startDateTime.toISOString().split('T')[0]);
+            setStartTime(startDateTime.toTimeString().slice(0, 5));
+          }
+          if (data.end_date) {
+            const endDateTime = new Date(data.end_date);
+            setEndDate(endDateTime.toISOString().split('T')[0]);
+            setEndTime(endDateTime.toTimeString().slice(0, 5));
           }
           
           console.log('✅ Campaign loaded:', data.id);
@@ -109,6 +125,21 @@ export function useCampaign(
     setIsSaving(true);
     setError(null);
 
+    // Build start_date and end_date from date + time
+    let start_date: string | undefined;
+    let end_date: string | undefined;
+    
+    if (startDate) {
+      start_date = startTime 
+        ? new Date(`${startDate}T${startTime}`).toISOString()
+        : new Date(`${startDate}T00:00`).toISOString();
+    }
+    if (endDate) {
+      end_date = endTime 
+        ? new Date(`${endDate}T${endTime}`).toISOString()
+        : new Date(`${endDate}T23:59`).toISOString();
+    }
+
     try {
       const savedCampaign = await CampaignService.save({
         id: campaign?.id,
@@ -119,6 +150,8 @@ export function useCampaign(
         config,
         prizes,
         theme: themeContext?.theme || campaign?.theme || {},
+        start_date,
+        end_date,
       });
 
       setCampaign(savedCampaign);
@@ -161,6 +194,11 @@ export function useCampaign(
     campaign,
     config,
     prizes,
+    name,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
     isLoading,
     isSaving,
     error,
@@ -169,6 +207,10 @@ export function useCampaign(
     save,
     publish,
     setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

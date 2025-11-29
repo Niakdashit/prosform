@@ -1,25 +1,31 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { WheelConfig } from "@/components/WheelBuilder";
 import { ThemeProvider, ThemeSettings } from "@/contexts/ThemeContext";
 import { WheelPreview } from "@/components/WheelPreview";
-import { CampaignService } from "@/services/CampaignService";
 
-interface PreviewData {
-  config: WheelConfig;
-  theme: ThemeSettings | null;
-  viewMode: 'desktop' | 'mobile';
-}
-
-const WheelPreviewContent = ({ config, viewMode: initialViewMode }: { config: WheelConfig; viewMode: 'desktop' | 'mobile' }) => {
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>(initialViewMode);
+const WheelPreviewContent = () => {
+  const [config, setConfig] = useState<WheelConfig | null>(null);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
 
   useEffect(() => {
+    const savedConfig = localStorage.getItem('wheel-config');
+    
     // Détecter si on est sur mobile (largeur < 768px)
     const isMobileDevice = window.innerWidth < 768;
+    
+    if (savedConfig) {
+      setConfig(JSON.parse(savedConfig));
+    }
+    
+    // Forcer le mode mobile si on est sur un appareil mobile
     if (isMobileDevice) {
       setViewMode('mobile');
+    } else {
+      const savedViewMode = localStorage.getItem('wheel-viewMode');
+      if (savedViewMode) {
+        setViewMode(savedViewMode as 'desktop' | 'mobile');
+      }
     }
   }, []);
 
@@ -66,55 +72,16 @@ const WheelPreviewContent = ({ config, viewMode: initialViewMode }: { config: Wh
 };
 
 const WheelPreviewPage = () => {
-  const [searchParams] = useSearchParams();
-  const [previewData, setPreviewData] = useState<PreviewData | null>(null);
+  const [theme, setTheme] = useState<ThemeSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadPreviewData = async () => {
-      const campaignId = searchParams.get('id');
-      const modeParam = searchParams.get('mode') as 'desktop' | 'mobile' | null;
-      
-      // Si on a un ID, charger depuis Supabase
-      if (campaignId) {
-        try {
-          const campaign = await CampaignService.getById(campaignId);
-          if (campaign) {
-            setPreviewData({
-              config: campaign.config as unknown as WheelConfig,
-              theme: campaign.theme as unknown as ThemeSettings | null,
-              viewMode: modeParam || 'desktop',
-            });
-          } else {
-            setError('Campagne non trouvée');
-          }
-        } catch (err) {
-          console.error('Error loading campaign:', err);
-          setError('Erreur de chargement');
-        }
-      } else {
-        // Sinon, charger depuis localStorage
-        const savedConfig = localStorage.getItem('wheel-config');
-        const savedTheme = localStorage.getItem('wheel-theme');
-        const savedViewMode = localStorage.getItem('wheel-viewMode');
-        
-        if (savedConfig) {
-          setPreviewData({
-            config: JSON.parse(savedConfig),
-            theme: savedTheme ? JSON.parse(savedTheme) : null,
-            viewMode: (savedViewMode as 'desktop' | 'mobile') || 'desktop',
-          });
-        } else {
-          setError('Aucune configuration trouvée');
-        }
-      }
-      
-      setIsLoading(false);
-    };
-    
-    loadPreviewData();
-  }, [searchParams]);
+    const savedTheme = localStorage.getItem('wheel-theme');
+    if (savedTheme) {
+      setTheme(JSON.parse(savedTheme));
+    }
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -124,17 +91,9 @@ const WheelPreviewPage = () => {
     );
   }
 
-  if (error || !previewData) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
-        <p className="text-white">{error || 'Erreur de chargement'}</p>
-      </div>
-    );
-  }
-
   return (
-    <ThemeProvider initialTheme={previewData.theme}>
-      <WheelPreviewContent config={previewData.config} viewMode={previewData.viewMode} />
+    <ThemeProvider initialTheme={theme}>
+      <WheelPreviewContent />
     </ThemeProvider>
   );
 };

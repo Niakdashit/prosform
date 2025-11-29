@@ -242,6 +242,11 @@ export const WheelBuilder = () => {
     campaign,
     config,
     prizes,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
     isLoading,
     isSaving,
     setConfig,
@@ -249,6 +254,10 @@ export const WheelBuilder = () => {
     save,
     publish,
     setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
   } = useCampaign(
     { campaignId, type: 'wheel', defaultName: 'Nouvelle campagne roue' },
     defaultWheelConfig,
@@ -397,17 +406,8 @@ export const WheelBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <WheelTopToolbar 
-        onPreview={async () => {
+        onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
-          
-          // Si on a un ID de campagne, sauvegarder d'abord puis ouvrir avec l'ID
-          if (campaign?.id) {
-            await save(); // Sauvegarder les dernières modifications
-            window.open(`/wheel-preview?id=${campaign.id}&mode=${targetViewMode}`, '_blank');
-            return;
-          }
-          
-          // Sinon, utiliser localStorage (pour les nouvelles campagnes non sauvegardées)
           // Clear old preview data first to free up space
           try {
             localStorage.removeItem('wheel-config');
@@ -472,6 +472,17 @@ export const WheelBuilder = () => {
           onDeletePrize={handleDeletePrize}
           gameType="wheel"
           segments={config.segments.map(s => ({ id: s.id, label: s.label }))}
+          campaignName={campaignName}
+          onCampaignNameChange={setName}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          startTime={startTime}
+          onStartTimeChange={setStartTime}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          endTime={endTime}
+          onEndTimeChange={setEndTime}
+          campaignUrl={campaign?.id ? `${window.location.origin}/wheel-preview?id=${campaign.id}` : ''}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

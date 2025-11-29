@@ -29,6 +29,18 @@ interface CampaignSettingsProps {
   segments: Array<{ id: string; label: string }>;
   symbols?: JackpotSymbol[]; // Pour Jackpot uniquement
   onAddSymbol?: (emoji: string) => void; // Pour ajouter un symbole depuis le modal
+  // Campaign metadata
+  campaignName?: string;
+  onCampaignNameChange?: (name: string) => void;
+  startDate?: string;
+  onStartDateChange?: (date: string) => void;
+  startTime?: string;
+  onStartTimeChange?: (time: string) => void;
+  endDate?: string;
+  onEndDateChange?: (date: string) => void;
+  endTime?: string;
+  onEndTimeChange?: (time: string) => void;
+  campaignUrl?: string;
 }
 
 export const CampaignSettings = ({ 
@@ -40,6 +52,17 @@ export const CampaignSettings = ({
   segments,
   symbols = [],
   onAddSymbol,
+  campaignName = '',
+  onCampaignNameChange,
+  startDate = '',
+  onStartDateChange,
+  startTime = '',
+  onStartTimeChange,
+  endDate = '',
+  onEndDateChange,
+  endTime = '',
+  onEndTimeChange,
+  campaignUrl = '',
 }: CampaignSettingsProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [prizeModalOpen, setPrizeModalOpen] = useState(false);
@@ -122,6 +145,8 @@ export const CampaignSettings = ({
                       <Input 
                         placeholder="Ma Campagne" 
                         className="mt-1.5"
+                        value={campaignName}
+                        onChange={(e) => onCampaignNameChange?.(e.target.value)}
                       />
                     </div>
                   </div>
@@ -135,6 +160,8 @@ export const CampaignSettings = ({
                         <Input 
                           type="date" 
                           className="mt-1.5"
+                          value={startDate}
+                          onChange={(e) => onStartDateChange?.(e.target.value)}
                         />
                       </div>
                       <div>
@@ -142,6 +169,8 @@ export const CampaignSettings = ({
                         <Input 
                           type="time" 
                           className="mt-1.5"
+                          value={startTime}
+                          onChange={(e) => onStartTimeChange?.(e.target.value)}
                         />
                       </div>
                     </div>
@@ -152,6 +181,8 @@ export const CampaignSettings = ({
                         <Input 
                           type="date" 
                           className="mt-1.5"
+                          value={endDate}
+                          onChange={(e) => onEndDateChange?.(e.target.value)}
                         />
                       </div>
                       <div>
@@ -159,6 +190,8 @@ export const CampaignSettings = ({
                         <Input 
                           type="time" 
                           className="mt-1.5"
+                          value={endTime}
+                          onChange={(e) => onEndTimeChange?.(e.target.value)}
                         />
                       </div>
                     </div>
@@ -169,14 +202,16 @@ export const CampaignSettings = ({
                     
                     <div>
                       <Input 
-                        value="https://id-preview--9ba3ba3f-a694-4465-ae2d-56a6f172ada6.lovable.app/campaign/wheel-design-" 
+                        value={campaignUrl || 'URL générée après publication'}
                         readOnly
                         className="bg-muted"
                       />
-                      <Button variant="outline" size="sm" className="mt-2">
-                        <Eye className="w-4 h-4 mr-2" />
-                        Ouvrir
-                      </Button>
+                      {campaignUrl && (
+                        <Button variant="outline" size="sm" className="mt-2" onClick={() => window.open(campaignUrl, '_blank')}>
+                          <Eye className="w-4 h-4 mr-2" />
+                          Ouvrir
+                        </Button>
+                      )}
                     </div>
                   </div>
 
