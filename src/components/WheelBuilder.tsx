@@ -231,12 +231,13 @@ const defaultWheelConfig: WheelConfig = {
 
 export const WheelBuilder = () => {
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
+  const themeContext = useTheme();
+  const { theme } = themeContext;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const campaignId = searchParams.get('id');
 
-  // Hook de persistance Supabase
+  // Hook de persistance Supabase (avec theme)
   const {
     campaign,
     config,
@@ -250,7 +251,8 @@ export const WheelBuilder = () => {
     setName,
   } = useCampaign(
     { campaignId, type: 'wheel', defaultName: 'Nouvelle campagne roue' },
-    defaultWheelConfig
+    defaultWheelConfig,
+    themeContext // Pass theme context for save/restore
   );
 
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');

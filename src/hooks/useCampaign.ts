@@ -14,7 +14,8 @@ interface UseCampaignOptions {
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function useCampaign(
   options: UseCampaignOptions,
-  defaultConfig: any
+  defaultConfig: any,
+  themeContext?: { theme: any; updateTheme: (updates: any) => void }
 ) {
   const { campaignId, type, defaultName = 'Nouvelle campagne', autoSave = false, autoSaveDelay = 3000 } = options;
   
@@ -44,6 +45,13 @@ export function useCampaign(
           setConfigState(data.config);
           setPrizesState(data.prizes || []);
           setName(data.name);
+          
+          // Restore theme if saved and themeContext provided
+          if (data.theme && Object.keys(data.theme).length > 0 && themeContext) {
+            themeContext.updateTheme(data.theme);
+            console.log('✅ Theme restored:', Object.keys(data.theme).length, 'properties');
+          }
+          
           console.log('✅ Campaign loaded:', data.id);
         }
       } catch (err) {
@@ -110,7 +118,7 @@ export function useCampaign(
         status: campaign?.status || 'draft',
         config,
         prizes,
-        theme: campaign?.theme || {},
+        theme: themeContext?.theme || campaign?.theme || {},
       });
 
       setCampaign(savedCampaign);
