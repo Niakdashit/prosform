@@ -568,23 +568,19 @@ export const WheelPreview = ({
                 } else if (desktopLayout === 'desktop-right-left') {
                   const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center`} style={{ gap: '4%', padding: '0 5%' }}>
-                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }}>
+                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
+                      <div className="max-w-[500px]">
                         <TextContent />
                       </div>
-                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }} className="flex justify-center">
-                        <ImageBlock />
-                      </div>
+                      <ImageBlock />
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-centered') {
                   const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center`} style={{ gap: '4%', padding: '0 5%' }}>
-                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }} className="flex justify-center">
-                        <ImageBlock />
-                      </div>
-                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }}>
+                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
+                      <ImageBlock />
+                      <div className="max-w-[500px]">
                         <TextContent />
                       </div>
                     </div>

@@ -594,39 +594,26 @@ export const WheelBuilder = () => {
                 </button>
               </div>
               
-              {/* WheelPreview - Scaled screenshot */}
-              <div className="flex-1 flex items-center justify-center overflow-hidden p-4">
-                <div 
-                  className="relative"
-                  style={{
-                    width: viewMode === 'desktop' ? 'min(100%, calc((100vh - 180px) * 16 / 9))' : 'min(100%, calc((100vh - 180px) * 9 / 16))',
-                    height: viewMode === 'desktop' ? 'min(100%, calc((100vw - 400px) * 9 / 16))' : 'min(100%, calc((100vw - 400px) * 16 / 9))',
-                    maxWidth: viewMode === 'desktop' ? '100%' : '375px',
-                    maxHeight: 'calc(100vh - 180px)',
-                    aspectRatio: viewMode === 'desktop' ? '16/9' : '9/16',
+              {/* WheelPreview */}
+              <div className="flex-1 flex items-center justify-center overflow-hidden">
+                <WheelPreview
+                  config={config}
+                  activeView={activeView}
+                  onUpdateConfig={updateConfig}
+                  viewMode={viewMode}
+                  onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+                  isMobileResponsive={false}
+                  onNext={() => {
+                    const views: Array<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'> = ['welcome', 'contact', 'wheel', 'ending-win', 'ending-lose'];
+                    const currentIndex = views.indexOf(activeView);
+                    if (currentIndex < views.length - 1) {
+                      setActiveView(views[currentIndex + 1]);
+                    }
                   }}
-                >
-                  <div className="absolute inset-0 rounded-lg overflow-hidden shadow-2xl">
-                    <WheelPreview
-                      config={config}
-                      activeView={activeView}
-                      onUpdateConfig={updateConfig}
-                      viewMode={viewMode}
-                      onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-                      isMobileResponsive={false}
-                      onNext={() => {
-                        const views: Array<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'> = ['welcome', 'contact', 'wheel', 'ending-win', 'ending-lose'];
-                        const currentIndex = views.indexOf(activeView);
-                        if (currentIndex < views.length - 1) {
-                          setActiveView(views[currentIndex + 1]);
-                        }
-                      }}
-                      onGoToEnding={(isWin) => setActiveView(isWin ? 'ending-win' : 'ending-lose')}
-                      prizes={prizes}
-                      onUpdatePrize={(updatedPrize) => setPrizes(prev => prev.map(p => p.id === updatedPrize.id ? updatedPrize : p))}
-                    />
-                  </div>
-                </div>
+                  onGoToEnding={(isWin) => setActiveView(isWin ? 'ending-win' : 'ending-lose')}
+                  prizes={prizes}
+                  onUpdatePrize={(updatedPrize) => setPrizes(prev => prev.map(p => p.id === updatedPrize.id ? updatedPrize : p))}
+                />
               </div>
             </div>
             
