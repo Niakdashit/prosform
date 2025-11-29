@@ -1084,7 +1084,7 @@ export const WheelPreview = ({
   };
 
   return (
-    <div className={isMobileResponsive ? "w-full h-full min-h-screen relative overflow-hidden" : "flex items-center justify-center relative overflow-hidden"}>
+    <div className={isMobileResponsive ? "w-full h-full relative overflow-hidden" : "flex items-center justify-center relative overflow-hidden"}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -1118,8 +1118,8 @@ export const WheelPreview = ({
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
-          height: isMobileResponsive ? '100vh' : (viewMode === 'desktop' ? '620px' : '667px'),
-          minHeight: isMobileResponsive ? '100vh' : (viewMode === 'desktop' ? '620px' : '667px'),
+          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px'),
+          minHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
           maxHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
         }}
       >
