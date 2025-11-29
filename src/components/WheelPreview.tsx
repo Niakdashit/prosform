@@ -568,11 +568,11 @@ export const WheelPreview = ({
                 } else if (desktopLayout === 'desktop-right-left') {
                   const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center gap-8 px-8 md:gap-16 md:px-24`}>
-                      <div className="flex-1 min-w-0 max-w-[50%]">
+                    <div className={`w-full h-full flex ${justifyContent} items-center`} style={{ gap: '4%', padding: '0 5%' }}>
+                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }}>
                         <TextContent />
                       </div>
-                      <div className="flex-1 min-w-0 max-w-[50%] flex justify-center">
+                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }} className="flex justify-center">
                         <ImageBlock />
                       </div>
                     </div>
@@ -580,11 +580,11 @@ export const WheelPreview = ({
                 } else if (desktopLayout === 'desktop-centered') {
                   const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center gap-8 px-8 md:gap-16 md:px-24`}>
-                      <div className="flex-1 min-w-0 max-w-[50%] flex justify-center">
+                    <div className={`w-full h-full flex ${justifyContent} items-center`} style={{ gap: '4%', padding: '0 5%' }}>
+                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }} className="flex justify-center">
                         <ImageBlock />
                       </div>
-                      <div className="flex-1 min-w-0 max-w-[50%]">
+                      <div style={{ flex: '1 1 45%', maxWidth: '45%' }}>
                         <TextContent />
                       </div>
                     </div>
