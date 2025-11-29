@@ -54,29 +54,19 @@ const WheelPreviewContent = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen overflow-hidden flex items-center justify-center">
-      <div 
-        className="relative"
-        style={{
-          width: viewMode === 'desktop' ? '100%' : '375px',
-          maxWidth: viewMode === 'desktop' ? '1400px' : '375px',
-          height: '100%',
-          maxHeight: viewMode === 'desktop' ? '800px' : '100%',
-        }}
-      >
-        <WheelPreview
-          config={config}
-          activeView={activeView}
-          onUpdateConfig={() => {}}
-          viewMode={viewMode}
-          onToggleViewMode={() => {}}
-          isMobileResponsive={true}
-          isReadOnly={true}
-          onNext={handleNext}
-          onGoToEnding={handleGoToEnding}
-          prizes={[]}
-        />
-      </div>
+    <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+      <WheelPreview
+        config={config}
+        activeView={activeView}
+        onUpdateConfig={() => {}}
+        viewMode={viewMode}
+        onToggleViewMode={() => {}}
+        isMobileResponsive={true}
+        isReadOnly={true}
+        onNext={handleNext}
+        onGoToEnding={handleGoToEnding}
+        prizes={[]}
+      />
     </div>
   );
 };
