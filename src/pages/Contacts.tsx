@@ -213,6 +213,9 @@ const Contacts = () => {
                   <SelectValue placeholder="Choisissez une campagne..." />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="default">
+                    🌐 Paramètres par défaut (toutes les campagnes)
+                  </SelectItem>
                   {campaignsLoading ? (
                     <SelectItem value="loading" disabled>
                       Chargement...
