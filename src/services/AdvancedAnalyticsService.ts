@@ -85,16 +85,92 @@ export const AdvancedAnalyticsService = {
 
   // Statistiques par device
   async getDeviceStats(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<DeviceStats[]> {
-    // Pour l'instant retourne des données vides car les colonnes n'existent pas encore
-    console.warn('Device stats not available - columns not yet created');
-    return [];
+    try {
+      let query = supabase
+        .from('campaign_participants')
+        .select('device_type');
+
+      if (campaignId) query = query.eq('campaign_id', campaignId);
+      if (dateRange && dateRange.from && dateRange.to) {
+        query = query
+          .gte('created_at', dateRange.from.toISOString())
+          .lte('created_at', dateRange.to.toISOString());
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const deviceMap = new Map<string, number>();
+      let total = 0;
+
+      data?.forEach(p => {
+        const type = (p as any).device_type || 'Inconnu';
+        deviceMap.set(type, (deviceMap.get(type) || 0) + 1);
+        total++;
+      });
+
+      return Array.from(deviceMap.entries()).map(([device_type, count]) => ({
+        device_type,
+        count,
+        percentage: total > 0 ? (count / total) * 100 : 0,
+      }));
+    } catch (error) {
+      console.error('Error fetching device stats:', error);
+      return [];
+    }
   },
 
   // Sources de trafic
   async getTrafficSources(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<TrafficSource[]> {
-    // Pour l'instant retourne des données vides car les colonnes n'existent pas encore
-    console.warn('Traffic sources not available - columns not yet created');
-    return [];
+    try {
+      let query = supabase
+        .from('campaign_participants')
+        .select('utm_source, referrer');
+
+      if (campaignId) query = query.eq('campaign_id', campaignId);
+      if (dateRange && dateRange.from && dateRange.to) {
+        query = query
+          .gte('created_at', dateRange.from.toISOString())
+          .lte('created_at', dateRange.to.toISOString());
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      const sourceMap = new Map<string, number>();
+      let total = 0;
+
+      data?.forEach(p => {
+        const row = p as any;
+        let source = 'Direct';
+
+        if (row.utm_source) {
+          source = `UTM: ${row.utm_source}`;
+        } else if (row.referrer) {
+          try {
+            const url = new URL(row.referrer);
+            source = `Referral: ${url.hostname}`;
+          } catch {
+            source = 'Referral';
+          }
+        }
+
+        sourceMap.set(source, (sourceMap.get(source) || 0) + 1);
+        total++;
+      });
+
+      return Array.from(sourceMap.entries())
+        .map(([source, count]) => ({
+          source,
+          count,
+          percentage: total > 0 ? (count / total) * 100 : 0,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+    } catch (error) {
+      console.error('Error fetching traffic sources:', error);
+      return [];
+    }
   },
 
   // Heures de pic
@@ -160,12 +236,12 @@ export const AdvancedAnalyticsService = {
     }
   },
 
-  // Participations uniques par IP
+  // Participations uniques par IP (avec fallback email / device)
   async getUniqueParticipationsByIP(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<number> {
     try {
       let query = supabase
         .from('campaign_participants')
-        .select('ip_address');
+        .select('ip_address, device_fingerprint, email');
 
       if (campaignId) query = query.eq('campaign_id', campaignId);
       if (dateRange && dateRange.from && dateRange.to) {
@@ -177,9 +253,22 @@ export const AdvancedAnalyticsService = {
       const { data, error } = await query;
       if (error) throw error;
 
-      // Compter les IPs uniques (en excluant les nulls)
-      const uniqueIPs = new Set(data?.filter(p => p.ip_address).map(p => p.ip_address));
-      return uniqueIPs.size;
+      const uniqueKeys = new Set<string>();
+
+      data?.forEach(p => {
+        const row = p as any;
+        const ip = row.ip_address as string | null;
+        const fingerprint = row.device_fingerprint as string | null;
+        const email = row.email as string | null;
+
+        // Construire une clé de fallback: IP > fingerprint > email
+        const key = ip || fingerprint || email;
+        if (key) {
+          uniqueKeys.add(key);
+        }
+      });
+
+      return uniqueKeys.size;
     } catch (error) {
       console.error('Error fetching unique participations by IP:', error);
       return 0;
