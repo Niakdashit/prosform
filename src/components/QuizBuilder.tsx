@@ -396,7 +396,6 @@ export const QuizBuilder = () => {
         onPublish={handlePublish}
         isSaving={isSaving}
         hasUnsavedChanges={hasUnsavedChanges}
-        campaignId={campaign?.id}
       />
         
       <div className="flex flex-1 overflow-hidden relative">

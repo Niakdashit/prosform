@@ -130,7 +130,7 @@ const Campaigns = () => {
   });
 
   const filteredCampaigns = campaigns.filter(campaign => {
-    const matchesSearch = (campaign.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter;
     return matchesSearch && matchesStatus;
   });

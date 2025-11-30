@@ -148,12 +148,11 @@ export type Database = {
       }
       campaigns: {
         Row: {
-          app_title: string
           config: Json
           created_at: string
           ends_at: string | null
           id: string
-          is_published: boolean
+          is_published: boolean | null
           last_edited_at: string
           participation_count: number | null
           participation_limit: number | null
@@ -161,20 +160,19 @@ export type Database = {
           published_at: string | null
           published_url: string | null
           starts_at: string | null
-          status: string
+          status: string | null
           thumbnail_url: string | null
-          title: string | null
+          title: string
           type: Database["public"]["Enums"]["campaign_type"]
           updated_at: string
           user_id: string
         }
         Insert: {
-          app_title: string
           config?: Json
           created_at?: string
           ends_at?: string | null
           id?: string
-          is_published?: boolean
+          is_published?: boolean | null
           last_edited_at?: string
           participation_count?: number | null
           participation_limit?: number | null
@@ -182,20 +180,19 @@ export type Database = {
           published_at?: string | null
           published_url?: string | null
           starts_at?: string | null
-          status?: string
+          status?: string | null
           thumbnail_url?: string | null
-          title?: string | null
+          title: string
           type: Database["public"]["Enums"]["campaign_type"]
           updated_at?: string
           user_id: string
         }
         Update: {
-          app_title?: string
           config?: Json
           created_at?: string
           ends_at?: string | null
           id?: string
-          is_published?: boolean
+          is_published?: boolean | null
           last_edited_at?: string
           participation_count?: number | null
           participation_limit?: number | null
@@ -203,9 +200,9 @@ export type Database = {
           published_at?: string | null
           published_url?: string | null
           starts_at?: string | null
-          status?: string
+          status?: string | null
           thumbnail_url?: string | null
-          title?: string | null
+          title?: string
           type?: Database["public"]["Enums"]["campaign_type"]
           updated_at?: string
           user_id?: string

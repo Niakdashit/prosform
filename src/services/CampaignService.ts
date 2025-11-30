@@ -1,88 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Campaign, CampaignCreate, CampaignUpdate } from '@/types/campaign';
-// NOTE: We purposely avoid using the generated Database types here because
-// the runtime database schema for campaigns may differ (external backend).
-// Using `any` keeps the service compatible while we align schemas.
-type DbCampaign = any;
-type DbCampaignInsert = any;
-type DbCampaignUpdate = any;
-
-function dbToAppCampaign(dbCampaign: DbCampaign): Campaign {
-  const cfg = (dbCampaign && (dbCampaign as any).config) || {};
-  const configData = (cfg || {}) as any;
-
-  return {
-    id: (dbCampaign as any).id,
-    // Support both legacy `title` and newer `app_title` columns
-    name:
-      (dbCampaign as any).app_title ??
-      (dbCampaign as any).title ??
-      '',
-    type: (dbCampaign as any).type as Campaign['type'],
-    mode: (configData.mode as Campaign['mode']) || 'fullscreen',
-    status: ((dbCampaign as any).status as Campaign['status']) || 'draft',
-    config: (configData.config || configData || {}) as Record<string, unknown>,
-    prizes: (configData.prizes || []) as Record<string, unknown>[],
-    theme: (configData.theme || {}) as Record<string, unknown>,
-    slug: (dbCampaign as any).public_url_slug || undefined,
-    thumbnail_url: (dbCampaign as any).thumbnail_url || undefined,
-    start_date: (dbCampaign as any).starts_at || undefined,
-    end_date: (dbCampaign as any).ends_at || undefined,
-    created_at: (dbCampaign as any).created_at,
-    updated_at: (dbCampaign as any).updated_at,
-    published_at: (dbCampaign as any).published_at || undefined,
-  };
-}
-
-function appToDbCampaign(
-  campaign: Partial<Campaign> & { name: string; type: Campaign['type'] },
-  user_id: string,
-): DbCampaignInsert {
-  return {
-    // Backend actuel : on utilise uniquement les colonnes sûres
-    // (title, user_id, type, status, public_url_slug, thumbnail_url, config).
-    title: campaign.name,
-    user_id,
-    type: campaign.type,
-    config: {
-      mode: campaign.mode,
-      prizes: campaign.prizes,
-      theme: campaign.theme,
-      config: campaign.config,
-    } as any,
-    status: campaign.status || 'draft',
-    public_url_slug: campaign.slug || null,
-    thumbnail_url: campaign.thumbnail_url || null,
-  } as DbCampaignInsert;
-}
-
-function appToDbUpdate(updates: Partial<Campaign>): DbCampaignUpdate {
-  const dbUpdate: DbCampaignUpdate = {} as DbCampaignUpdate;
-
-  if (updates.name !== undefined) (dbUpdate as any).title = updates.name;
-  if (updates.status !== undefined) (dbUpdate as any).status = updates.status;
-  if (updates.slug !== undefined)
-    (dbUpdate as any).public_url_slug = updates.slug;
-  if (updates.thumbnail_url !== undefined)
-    (dbUpdate as any).thumbnail_url = updates.thumbnail_url;
-
-  // Emballer mode, prizes, theme, config dans le JSON config
-  if (
-    updates.mode !== undefined ||
-    updates.prizes !== undefined ||
-    updates.theme !== undefined ||
-    updates.config !== undefined
-  ) {
-    (dbUpdate as any).config = {
-      mode: updates.mode,
-      prizes: updates.prizes,
-      theme: updates.theme,
-      config: updates.config,
-    } as any;
-  }
-
-  return dbUpdate;
-}
 
 /**
  * Service centralisé pour la gestion des campagnes
@@ -102,7 +19,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return (data || []).map(dbToAppCampaign);
+    return data || [];
   },
 
   /**
@@ -121,24 +38,16 @@ export const CampaignService = {
       throw error;
     }
 
-    return data ? dbToAppCampaign(data) : null;
+    return data;
   },
 
   /**
    * Créer une nouvelle campagne
    */
   async create(campaign: CampaignCreate): Promise<Campaign> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const dbCampaign = appToDbCampaign(
-      { ...campaign, name: campaign.name, type: campaign.type },
-      user.id
-    );
-
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([dbCampaign])
+      .insert([campaign])
       .select()
       .single();
 
@@ -148,18 +57,16 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign created:', data.id);
-    return dbToAppCampaign(data);
+    return data;
   },
 
   /**
    * Mettre à jour une campagne
    */
   async update(id: string, updates: CampaignUpdate): Promise<Campaign> {
-    const dbUpdate = appToDbUpdate(updates);
-
     const { data, error } = await supabase
       .from('campaigns')
-      .update(dbUpdate)
+      .update(updates)
       .eq('id', id)
       .select()
       .single();
@@ -170,7 +77,7 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign updated:', id);
-    return dbToAppCampaign(data);
+    return data;
   },
 
   /**
@@ -186,7 +93,10 @@ export const CampaignService = {
         ...createData,
         mode: createData.mode || 'fullscreen',
         status: createData.status || 'draft',
-      } as CampaignCreate);
+        config: createData.config || {},
+        prizes: createData.prizes || [],
+        theme: createData.theme || {},
+      });
     }
   },
 
