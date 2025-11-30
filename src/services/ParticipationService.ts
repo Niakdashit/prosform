@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { emailSchema, phoneSchema, nameSchema } from '@/schemas/participation.schema';
+import { ExternalBackendAnalyticsService } from './ExternalBackendAnalyticsService';
 import { z } from 'zod';
 
 export interface ParticipationData {
@@ -131,8 +132,10 @@ export const ParticipationService = {
         }
       }
 
-      // Récupérer l'IP réelle via edge function
+      // Récupérer l'IP réelle via edge function et le device fingerprint
       let realIpAddress = null;
+      const deviceFingerprint = generateDeviceFingerprint();
+      
       try {
         const ipResponse = await supabase.functions.invoke('get-participant-ip');
         if (ipResponse.data?.ip_address && ipResponse.data.ip_address !== 'unknown') {
@@ -141,6 +144,75 @@ export const ParticipationService = {
       } catch (ipError) {
         console.log('Could not fetch IP address:', ipError);
       }
+
+      // ===== VÉRIFICATIONS ANTI-SPAM =====
+      
+      // 1. Vérifier si le participant est bloqué
+      const isBlocked = await ExternalBackendAnalyticsService.isParticipantBlocked(
+        data.campaignId,
+        realIpAddress || undefined,
+        contactData.email || data.email,
+        deviceFingerprint
+      );
+
+      if (isBlocked) {
+        throw new Error('Vous avez été temporairement bloqué en raison de tentatives suspectes. Veuillez réessayer plus tard.');
+      }
+
+      // 2. Vérifier le rate limit par IP
+      if (realIpAddress) {
+        const ipRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
+          realIpAddress,
+          'ip',
+          data.campaignId,
+          5, // Max 5 tentatives
+          60 // Par heure
+        );
+
+        if (!ipRateLimit.allowed) {
+          const blockedUntil = ipRateLimit.blocked_until 
+            ? new Date(ipRateLimit.blocked_until).toLocaleTimeString()
+            : 'quelques minutes';
+          throw new Error(`Trop de tentatives depuis votre connexion. Veuillez réessayer après ${blockedUntil}.`);
+        }
+      }
+
+      // 3. Vérifier le rate limit par email
+      if (contactData.email || data.email) {
+        const emailToCheck = contactData.email || data.email;
+        const emailRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
+          emailToCheck!,
+          'email',
+          data.campaignId,
+          3, // Max 3 tentatives par email
+          60 // Par heure
+        );
+
+        if (!emailRateLimit.allowed) {
+          const blockedUntil = emailRateLimit.blocked_until 
+            ? new Date(emailRateLimit.blocked_until).toLocaleTimeString()
+            : 'quelques minutes';
+          throw new Error(`Cet email a déjà participé trop de fois. Veuillez réessayer après ${blockedUntil}.`);
+        }
+      }
+
+      // 4. Vérifier le rate limit par device fingerprint
+      const deviceRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
+        deviceFingerprint,
+        'device',
+        data.campaignId,
+        5, // Max 5 tentatives par appareil
+        60 // Par heure
+      );
+
+      if (!deviceRateLimit.allowed) {
+        const blockedUntil = deviceRateLimit.blocked_until 
+          ? new Date(deviceRateLimit.blocked_until).toLocaleTimeString()
+          : 'quelques minutes';
+        throw new Error(`Trop de tentatives depuis cet appareil. Veuillez réessayer après ${blockedUntil}.`);
+      }
+
+      // ===== FIN VÉRIFICATIONS ANTI-SPAM =====
 
       // Données de base (toujours présentes)
       const baseData: any = {
@@ -162,7 +234,6 @@ export const ParticipationService = {
         const country = language.includes('-') ? language.split('-')[1]?.toUpperCase() : null;
         const utmParams = extractUTMParams();
         const referrer = document.referrer || undefined;
-        const deviceFingerprint = generateDeviceFingerprint();
         
         // Enrichir participation_data avec les données de tracking
         baseData.participation_data = {
