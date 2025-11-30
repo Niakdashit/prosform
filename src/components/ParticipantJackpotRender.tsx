@@ -3,12 +3,14 @@ import { JackpotConfig } from "./JackpotBuilder";
 import { useState } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import SmartJackpot from "./SmartJackpot/SmartJackpot";
+import { ParticipationService } from "@/services/ParticipationService";
 
 interface ParticipantJackpotRenderProps {
   config: JackpotConfig;
+  campaignId: string;
 }
 
-export const ParticipantJackpotRender = ({ config }: ParticipantJackpotRenderProps) => {
+export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJackpotRenderProps) => {
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
   const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
   const [wonPrize, setWonPrize] = useState<string | null>(null);
@@ -28,8 +30,19 @@ export const ParticipantJackpotRender = ({ config }: ParticipantJackpotRenderPro
     }
   };
 
-  const handleSpinComplete = (isWin: boolean, prize?: string) => {
+  const handleSpinComplete = async (isWin: boolean, prize?: string) => {
     setWonPrize(prize || null);
+    
+    // Enregistrer la participation
+    await ParticipationService.recordParticipation({
+      campaignId,
+      contactData,
+      result: {
+        type: isWin ? 'win' : 'lose',
+        prize: isWin ? prize : undefined,
+      },
+    });
+    
     setTimeout(() => {
       setActiveView(isWin ? 'ending-win' : 'ending-lose');
     }, 1500);

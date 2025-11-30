@@ -3,12 +3,14 @@ import { ScratchConfig, ScratchCard } from "./ScratchBuilder";
 import { useState, useMemo } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { SmartScratch } from "./SmartScratch/SmartScratch";
+import { ParticipationService } from "@/services/ParticipationService";
 
 interface ParticipantScratchRenderProps {
   config: ScratchConfig;
+  campaignId: string;
 }
 
-export const ParticipantScratchRender = ({ config }: ParticipantScratchRenderProps) => {
+export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScratchRenderProps) => {
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
   const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
   const [wonPrize, setWonPrize] = useState<string | null>(null);
@@ -42,9 +44,20 @@ export const ParticipantScratchRender = ({ config }: ParticipantScratchRenderPro
     }
   };
 
-  const handleScratchComplete = (isWin: boolean, prize?: string) => {
+  const handleScratchComplete = async (isWin: boolean, prize?: string) => {
     setHasScratched(true);
     setWonPrize(prize || null);
+    
+    // Enregistrer la participation
+    await ParticipationService.recordParticipation({
+      campaignId,
+      contactData,
+      result: {
+        type: isWin ? 'win' : 'lose',
+        prize: isWin ? prize : undefined,
+      },
+    });
+    
     setTimeout(() => {
       setActiveView(isWin ? 'ending-win' : 'ending-lose');
     }, 1500);
