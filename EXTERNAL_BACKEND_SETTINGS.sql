@@ -5,9 +5,10 @@
 -- ============================================================================
 
 -- Table pour stocker les paramètres de configuration par campagne
+-- campaign_id NULL = paramètres par défaut globaux
 CREATE TABLE IF NOT EXISTS public.campaign_settings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  campaign_id uuid NOT NULL UNIQUE REFERENCES campaigns(id) ON DELETE CASCADE,
+  campaign_id uuid UNIQUE REFERENCES campaigns(id) ON DELETE CASCADE,
   
   -- Rate limiting settings
   ip_max_attempts integer DEFAULT 5 NOT NULL,
@@ -58,8 +59,40 @@ SECURITY DEFINER
 AS $$
 DECLARE
   v_settings jsonb;
+  v_default_settings jsonb;
 BEGIN
-  -- Récupérer les settings ou retourner les valeurs par défaut
+  -- Si p_campaign_id est NULL, récupérer les paramètres globaux
+  IF p_campaign_id IS NULL THEN
+    SELECT jsonb_build_object(
+      'ip_max_attempts', COALESCE(ip_max_attempts, 5),
+      'ip_window_minutes', COALESCE(ip_window_minutes, 60),
+      'email_max_attempts', COALESCE(email_max_attempts, 3),
+      'email_window_minutes', COALESCE(email_window_minutes, 60),
+      'device_max_attempts', COALESCE(device_max_attempts, 5),
+      'device_window_minutes', COALESCE(device_window_minutes, 60),
+      'auto_block_enabled', COALESCE(auto_block_enabled, true),
+      'block_duration_hours', COALESCE(block_duration_hours, 24)
+    ) INTO v_settings
+    FROM campaign_settings
+    WHERE campaign_id IS NULL;
+    
+    IF v_settings IS NULL THEN
+      RETURN jsonb_build_object(
+        'ip_max_attempts', 5,
+        'ip_window_minutes', 60,
+        'email_max_attempts', 3,
+        'email_window_minutes', 60,
+        'device_max_attempts', 5,
+        'device_window_minutes', 60,
+        'auto_block_enabled', true,
+        'block_duration_hours', 24
+      );
+    END IF;
+    
+    RETURN v_settings;
+  END IF;
+
+  -- Récupérer les settings spécifiques à la campagne
   SELECT jsonb_build_object(
     'ip_max_attempts', COALESCE(ip_max_attempts, 5),
     'ip_window_minutes', COALESCE(ip_window_minutes, 60),
@@ -73,8 +106,27 @@ BEGIN
   FROM campaign_settings
   WHERE campaign_id = p_campaign_id;
 
-  -- Si pas de settings, retourner les valeurs par défaut
+  -- Si pas de settings spécifiques, chercher les paramètres par défaut (campaign_id = NULL)
   IF v_settings IS NULL THEN
+    SELECT jsonb_build_object(
+      'ip_max_attempts', COALESCE(ip_max_attempts, 5),
+      'ip_window_minutes', COALESCE(ip_window_minutes, 60),
+      'email_max_attempts', COALESCE(email_max_attempts, 3),
+      'email_window_minutes', COALESCE(email_window_minutes, 60),
+      'device_max_attempts', COALESCE(device_max_attempts, 5),
+      'device_window_minutes', COALESCE(device_window_minutes, 60),
+      'auto_block_enabled', COALESCE(auto_block_enabled, true),
+      'block_duration_hours', COALESCE(block_duration_hours, 24)
+    ) INTO v_default_settings
+    FROM campaign_settings
+    WHERE campaign_id IS NULL;
+    
+    -- Si paramètres par défaut existent, les utiliser
+    IF v_default_settings IS NOT NULL THEN
+      RETURN v_default_settings;
+    END IF;
+    
+    -- Sinon, retourner les valeurs hardcodées
     RETURN jsonb_build_object(
       'ip_max_attempts', 5,
       'ip_window_minutes', 60,

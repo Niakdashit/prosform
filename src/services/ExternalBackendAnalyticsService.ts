@@ -49,7 +49,7 @@ export interface BlockedParticipant {
 
 export interface CampaignSettings {
   id?: string;
-  campaign_id: string;
+  campaign_id: string | null;
   ip_max_attempts: number;
   ip_window_minutes: number;
   email_max_attempts: number;
@@ -253,8 +253,9 @@ export const ExternalBackendAnalyticsService = {
 
   /**
    * Récupère les settings de rate limiting pour une campagne
+   * Si campaignId est null, récupère les paramètres par défaut globaux
    */
-  async getCampaignSettings(campaignId: string): Promise<CampaignSettings | null> {
+  async getCampaignSettings(campaignId: string | null): Promise<CampaignSettings | null> {
     try {
       const { data, error } = await externalSupabase
         .rpc('get_campaign_settings', { p_campaign_id: campaignId });
@@ -274,9 +275,10 @@ export const ExternalBackendAnalyticsService = {
 
   /**
    * Mettre à jour les settings de rate limiting pour une campagne
+   * Si campaignId est null, met à jour les paramètres par défaut globaux
    */
   async updateCampaignSettings(
-    campaignId: string,
+    campaignId: string | null,
     settings: Partial<Omit<CampaignSettings, 'id' | 'campaign_id' | 'created_at' | 'updated_at'>>
   ): Promise<CampaignSettings | null> {
     try {

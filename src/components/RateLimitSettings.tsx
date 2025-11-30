@@ -27,6 +27,7 @@ export function RateLimitSettings({ campaignId }: RateLimitSettingsProps) {
   const [settings, setSettings] = useState(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const isDefaultSettings = campaignId === 'default';
 
   useEffect(() => {
     loadSettings();
@@ -35,7 +36,9 @@ export function RateLimitSettings({ campaignId }: RateLimitSettingsProps) {
   const loadSettings = async () => {
     setIsLoading(true);
     try {
-      const data = await ExternalBackendAnalyticsService.getCampaignSettings(campaignId);
+      // Si 'default', passer null pour obtenir les paramètres globaux
+      const effectiveCampaignId = isDefaultSettings ? null : campaignId;
+      const data = await ExternalBackendAnalyticsService.getCampaignSettings(effectiveCampaignId as string);
       if (data) {
         setSettings({
           ip_max_attempts: data.ip_max_attempts,
@@ -59,8 +62,10 @@ export function RateLimitSettings({ campaignId }: RateLimitSettingsProps) {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // Si 'default', passer null pour sauvegarder les paramètres globaux
+      const effectiveCampaignId = isDefaultSettings ? null : campaignId;
       const result = await ExternalBackendAnalyticsService.updateCampaignSettings(
-        campaignId,
+        effectiveCampaignId as string,
         settings
       );
 
@@ -96,9 +101,13 @@ export function RateLimitSettings({ campaignId }: RateLimitSettingsProps) {
         <div className="flex items-center gap-3">
           <Shield className="w-6 h-6 text-primary" />
           <div>
-            <h2 className="text-2xl font-semibold text-foreground">Configuration Rate Limiting</h2>
+            <h2 className="text-2xl font-semibold text-foreground">
+              {isDefaultSettings ? 'Paramètres par défaut' : 'Configuration Rate Limiting'}
+            </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Personnalisez les limites anti-fraude pour cette campagne
+              {isDefaultSettings 
+                ? 'Ces limites s\'appliqueront à toutes les campagnes sans configuration spécifique'
+                : 'Personnalisez les limites anti-fraude pour cette campagne'}
             </p>
           </div>
         </div>
