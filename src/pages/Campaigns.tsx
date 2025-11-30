@@ -15,7 +15,15 @@ import {
   Copy,
   BarChart2,
   TrendingUp,
-  Activity
+  Activity,
+  Megaphone,
+  UserPlus,
+  Eye,
+  Filter,
+  Mail,
+  Scale,
+  Handshake,
+  FileDown
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
@@ -46,7 +54,9 @@ import {
 } from "@/components/ui/dialog";
 import type { CampaignType, CampaignStatus, CampaignMode } from "@/types/campaign";
 import { AnalyticsService } from "@/services/AnalyticsService";
+import { AdvancedAnalyticsService } from "@/services/AdvancedAnalyticsService";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Button } from "@/components/ui/button";
 
 // Couleurs DA - harmonisées avec /form
 const colors = {
@@ -219,9 +229,21 @@ const Campaigns = () => {
     setLoadingStats(true);
     
     try {
-      const stats = await AnalyticsService.getCampaignAnalyticsById(campaignId);
-      const timeSeries = await AnalyticsService.getTimeSeriesDataByCampaign(campaignId, 7);
-      setCampaignStats({ ...stats, timeSeries });
+      const [stats, timeSeries, uniqueParticipants, newParticipants, emailStats] = await Promise.all([
+        AnalyticsService.getCampaignAnalyticsById(campaignId),
+        AnalyticsService.getTimeSeriesDataByCampaign(campaignId, 7),
+        AdvancedAnalyticsService.getUniqueParticipationsByIP(campaignId),
+        AdvancedAnalyticsService.getNewParticipantsCount(campaignId),
+        AdvancedAnalyticsService.getEmailCollectionStats(campaignId),
+      ]);
+      
+      setCampaignStats({ 
+        ...stats, 
+        timeSeries,
+        uniqueParticipants,
+        newParticipants,
+        emailStats
+      });
     } catch (error) {
       console.error('Error loading stats:', error);
       toast.error('Erreur lors du chargement des statistiques');
@@ -762,12 +784,39 @@ const Campaigns = () => {
 
       {/* Campaign Statistics Modal */}
       <Dialog open={statsModalOpen} onOpenChange={setStatsModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <BarChart2 className="w-5 h-5" />
-              Statistiques de la campagne
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="flex items-center gap-2">
+                <BarChart2 className="w-5 h-5" />
+                Statistiques de la campagne
+              </DialogTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={async () => {
+                  if (selectedCampaignForStats) {
+                    try {
+                      const csvData = await AdvancedAnalyticsService.exportToCSV(selectedCampaignForStats);
+                      const blob = new Blob([csvData], { type: 'text/csv' });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `campaign-stats-${selectedCampaignForStats}.csv`;
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      toast.success('Données exportées');
+                    } catch (error) {
+                      toast.error('Erreur lors de l\'export');
+                    }
+                  }
+                }}
+              >
+                <FileDown className="w-4 h-4" />
+                Export to PDF
+              </Button>
+            </div>
           </DialogHeader>
 
           {loadingStats ? (
@@ -776,43 +825,162 @@ const Campaigns = () => {
             </div>
           ) : campaignStats ? (
             <div className="space-y-6 py-4">
-              {/* Stats cards */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium" style={{ color: colors.muted }}>Vues</span>
-                    <Activity className="w-4 h-4" style={{ color: colors.gold }} />
+              {/* Main Stats Grid - 4 columns */}
+              <div className="grid grid-cols-4 gap-4">
+                {/* Participations */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.gold}15` }}
+                    >
+                      <Megaphone className="w-8 h-8" style={{ color: colors.gold }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {(campaignStats.total_participations || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
+                      PARTICIPATIONS
+                    </p>
                   </div>
-                  <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
-                    {campaignStats.total_views || 0}
-                  </p>
                 </div>
-                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium" style={{ color: colors.muted }}>Participations</span>
-                    <Users className="w-4 h-4" style={{ color: colors.gold }} />
+
+                {/* Unique Participants */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.gold}15` }}
+                    >
+                      <Users className="w-8 h-8" style={{ color: colors.gold }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {(campaignStats.uniqueParticipants || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
+                      UNIQUE PARTICIPANTS
+                    </p>
                   </div>
-                  <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
-                    {campaignStats.total_participations || 0}
-                  </p>
                 </div>
-                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium" style={{ color: colors.muted }}>Taux de conversion</span>
-                    <TrendingUp className="w-4 h-4" style={{ color: colors.gold }} />
+
+                {/* New Participants */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.gold}15` }}
+                    >
+                      <UserPlus className="w-8 h-8" style={{ color: colors.gold }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {(campaignStats.newParticipants || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
+                      NEW PARTICIPANTS
+                    </p>
                   </div>
-                  <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
-                    {campaignStats.total_views > 0 
-                      ? `${((campaignStats.total_participations / campaignStats.total_views) * 100).toFixed(1)}%`
-                      : '0%'
-                    }
-                  </p>
+                </div>
+
+                {/* Total Page Views */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.gold}15` }}
+                    >
+                      <Eye className="w-8 h-8" style={{ color: colors.gold }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {(campaignStats.total_views || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
+                      TOTAL PAGE VIEWS
+                    </p>
+                  </div>
+                </div>
+
+                {/* Completion Rate */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.success}15` }}
+                    >
+                      <Filter className="w-8 h-8" style={{ color: colors.success }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {campaignStats.total_views > 0 
+                        ? `${((campaignStats.total_completions || 0) / campaignStats.total_views * 100).toFixed(2)}%`
+                        : '0%'
+                      }
+                    </p>
+                    <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                      {(campaignStats.total_completions || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
+                      COMPLETION RATE
+                    </p>
+                  </div>
+                </div>
+
+                {/* Newsletter & Marketing Opt-ins */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.gold}15` }}
+                    >
+                      <Mail className="w-8 h-8" style={{ color: colors.gold }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {(campaignStats.emailStats?.marketing_opt_ins || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide text-center" style={{ color: colors.muted }}>
+                      NEWSLETTER & MARKETING OPT-INS
+                    </p>
+                  </div>
+                </div>
+
+                {/* Legal & Rules Opt-ins */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.gold}15` }}
+                    >
+                      <Scale className="w-8 h-8" style={{ color: colors.gold }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {(campaignStats.emailStats?.legal_opt_ins || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide text-center" style={{ color: colors.muted }}>
+                      LEGAL & RULES OPT-INS
+                    </p>
+                  </div>
+                </div>
+
+                {/* Partner Opt-ins */}
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${colors.gold}15` }}
+                    >
+                      <Handshake className="w-8 h-8" style={{ color: colors.gold }} />
+                    </div>
+                    <p className="text-4xl font-bold mb-2" style={{ color: colors.dark }}>
+                      {(campaignStats.emailStats?.partner_opt_ins || 0).toLocaleString()}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
+                      PARTNER OPT-INS
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Time series chart */}
               {campaignStats.timeSeries && campaignStats.timeSeries.length > 0 && (
-                <div>
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
                   <h3 className="text-sm font-medium mb-4" style={{ color: colors.dark }}>
                     Évolution sur 7 jours
                   </h3>
@@ -854,26 +1022,30 @@ const Campaigns = () => {
                 </div>
               )}
 
-              {/* Additional stats */}
+              {/* Bottom stats */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
-                  <span className="text-xs font-medium" style={{ color: colors.muted }}>
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
                     Temps moyen passé
                   </span>
-                  <p className="text-lg font-semibold mt-1" style={{ color: colors.dark }}>
+                  <p className="text-2xl font-semibold mt-2" style={{ color: colors.dark }}>
                     {campaignStats.avg_time_spent 
                       ? `${Math.round(campaignStats.avg_time_spent)}s`
                       : 'N/A'
                     }
                   </p>
                 </div>
-                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
-                  <span className="text-xs font-medium" style={{ color: colors.muted }}>
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
                     Dernière participation
                   </span>
-                  <p className="text-lg font-semibold mt-1" style={{ color: colors.dark }}>
+                  <p className="text-2xl font-semibold mt-2" style={{ color: colors.dark }}>
                     {campaignStats.last_participation_at 
-                      ? new Date(campaignStats.last_participation_at).toLocaleDateString('fr-FR')
+                      ? new Date(campaignStats.last_participation_at).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric'
+                        })
                       : 'Aucune'
                     }
                   </p>
