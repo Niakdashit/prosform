@@ -40,115 +40,202 @@ export interface GlobalStats {
  */
 export const AnalyticsService = {
   
-  /**
-   * Récupère les statistiques globales
-   */
   async getGlobalStats(): Promise<GlobalStats> {
-    // Récupérer toutes les analytics
-    const { data: analytics, error: analyticsError } = await supabase
-      .from('campaign_analytics')
-      .select('total_views, total_participations, total_completions, avg_time_spent');
-    
-    if (analyticsError) throw analyticsError;
-    
+    // Utiliser les participations comme source de vérité
+    const { data: participants, error: participantsError } = await supabase
+      .from('campaign_participants')
+      .select('completed_at, participation_data');
+
+    if (participantsError) throw participantsError;
+
     // Compter les campagnes
     const { count: campaignCount, error: campaignError } = await supabase
       .from('campaigns')
       .select('*', { count: 'exact', head: true });
-    
+
     if (campaignError) throw campaignError;
-    
-    // Calculer les totaux
-    const totals = (analytics || []).reduce((acc, item) => ({
-      total_views: acc.total_views + (item.total_views || 0),
-      total_participations: acc.total_participations + (item.total_participations || 0),
-      total_completions: acc.total_completions + (item.total_completions || 0),
-      avg_time_spent: acc.avg_time_spent + (item.avg_time_spent || 0),
-    }), {
-      total_views: 0,
-      total_participations: 0,
-      total_completions: 0,
-      avg_time_spent: 0,
-    });
-    
+
+    const totals = (participants || []).reduce(
+      (acc, participant: any) => {
+        acc.total_views += 1; // 1 vue par participation (simplifié)
+        acc.total_participations += 1;
+
+        const isWin =
+          !!participant.completed_at ||
+          participant.participation_data?.result?.type === 'win';
+
+        if (isWin) {
+          acc.total_completions += 1;
+        }
+
+        return acc;
+      },
+      {
+        total_views: 0,
+        total_participations: 0,
+        total_completions: 0,
+        avg_time_spent: 0,
+      }
+    );
+
     const conversion_rate = totals.total_participations > 0
       ? (totals.total_completions / totals.total_participations) * 100
       : 0;
-    
-    const avg_time_spent = analytics?.length 
-      ? totals.avg_time_spent / analytics.length
-      : 0;
-    
+
+    // Pour l'instant nous ne traquons pas le temps passé précisément
+    const avg_time_spent = 0;
+
     return {
       ...totals,
       total_campaigns: campaignCount || 0,
       total_winners: totals.total_completions,
       conversion_rate: Math.round(conversion_rate),
-      avg_time_spent: Math.round(avg_time_spent),
+      avg_time_spent,
     };
   },
   
-  /**
-   * Récupère les analytics par campagne
-   */
   async getCampaignAnalytics(): Promise<CampaignAnalytics[]> {
-    const { data, error } = await supabase
-      .from('campaign_analytics')
-      .select(`
-        *,
-        campaigns!inner(app_title, type)
-      `)
-      .order('total_participations', { ascending: false });
-    
-    if (error) throw error;
-    
-    return (data || []).map(item => ({
-      campaign_id: item.campaign_id,
-      campaign_name: (item.campaigns as any)?.app_title || 'Sans nom',
-      campaign_type: (item.campaigns as any)?.type || 'unknown',
-      total_views: item.total_views || 0,
-      total_participations: item.total_participations || 0,
-      total_completions: item.total_completions || 0,
-      conversion_rate: item.total_participations > 0
-        ? Math.round((item.total_completions / item.total_participations) * 100)
-        : 0,
-      avg_time_spent: Math.round(item.avg_time_spent || 0),
-      last_participation_at: item.last_participation_at,
-    }));
+    // Récupérer toutes les campagnes
+    const { data: campaigns, error: campaignsError } = await supabase
+      .from('campaigns')
+      .select('id, app_title, type');
+
+    if (campaignsError) throw campaignsError;
+
+    // Récupérer toutes les participations
+    const { data: participants, error: participantsError } = await supabase
+      .from('campaign_participants')
+      .select('campaign_id, completed_at, participation_data');
+
+    if (participantsError) throw participantsError;
+
+    const statsByCampaign = new Map<string, {
+      total_views: number;
+      total_participations: number;
+      total_completions: number;
+      last_participation_at: string | null;
+    }>();
+
+    (participants || []).forEach((participant: any) => {
+      const id = participant.campaign_id as string;
+      const current = statsByCampaign.get(id) || {
+        total_views: 0,
+        total_participations: 0,
+        total_completions: 0,
+        last_participation_at: null,
+      };
+
+      current.total_views += 1;
+      current.total_participations += 1;
+
+      const isWin =
+        !!participant.completed_at ||
+        participant.participation_data?.result?.type === 'win';
+
+      if (isWin) {
+        current.total_completions += 1;
+      }
+
+      const createdAt = (participant as any).created_at as string | undefined;
+      if (createdAt && (!current.last_participation_at || createdAt > current.last_participation_at)) {
+        current.last_participation_at = createdAt;
+      }
+
+      statsByCampaign.set(id, current);
+    });
+
+    return (campaigns || []).map(campaign => {
+      const stats = statsByCampaign.get(campaign.id) || {
+        total_views: 0,
+        total_participations: 0,
+        total_completions: 0,
+        last_participation_at: null,
+      };
+
+      const conversion_rate = stats.total_participations > 0
+        ? Math.round((stats.total_completions / stats.total_participations) * 100)
+        : 0;
+
+      return {
+        campaign_id: campaign.id,
+        campaign_name: (campaign as any).app_title || 'Sans nom',
+        campaign_type: (campaign as any).type || 'unknown',
+        total_views: stats.total_views,
+        total_participations: stats.total_participations,
+        total_completions: stats.total_completions,
+        conversion_rate,
+        avg_time_spent: 0,
+        last_participation_at: stats.last_participation_at,
+      };
+    });
   },
 
-  /**
-   * Récupère les analytics d'une campagne spécifique
-   */
   async getCampaignAnalyticsById(campaignId: string): Promise<CampaignAnalytics | null> {
-    const { data, error } = await supabase
-      .from('campaign_analytics')
-      .select(`
-        *,
-        campaigns!inner(app_title, type)
-      `)
-      .eq('campaign_id', campaignId)
+    // Récupérer la campagne
+    const { data: campaign, error: campaignError } = await supabase
+      .from('campaigns')
+      .select('id, app_title, type')
+      .eq('id', campaignId)
       .single();
-    
-    if (error) {
-      console.error('Error fetching campaign analytics:', error);
+
+    if (campaignError || !campaign) {
+      console.error('Error fetching campaign:', campaignError);
       return null;
     }
-    
-    if (!data) return null;
-    
+
+    // Récupérer les participations de cette campagne
+    const { data: participants, error: participantsError } = await supabase
+      .from('campaign_participants')
+      .select('created_at, completed_at, participation_data')
+      .eq('campaign_id', campaignId);
+
+    if (participantsError) {
+      console.error('Error fetching campaign participants:', participantsError);
+      return null;
+    }
+
+    const totals = (participants || []).reduce(
+      (acc, participant: any) => {
+        acc.total_views += 1;
+        acc.total_participations += 1;
+
+        const isWin =
+          !!participant.completed_at ||
+          participant.participation_data?.result?.type === 'win';
+
+        if (isWin) {
+          acc.total_completions += 1;
+        }
+
+        const createdAt = participant.created_at as string | undefined;
+        if (createdAt && (!acc.last_participation_at || createdAt > acc.last_participation_at)) {
+          acc.last_participation_at = createdAt;
+        }
+
+        return acc;
+      },
+      {
+        total_views: 0,
+        total_participations: 0,
+        total_completions: 0,
+        last_participation_at: null as string | null,
+      }
+    );
+
+    const conversion_rate = totals.total_participations > 0
+      ? Math.round((totals.total_completions / totals.total_participations) * 100)
+      : 0;
+
     return {
-      campaign_id: data.campaign_id,
-      campaign_name: (data.campaigns as any)?.app_title || 'Sans nom',
-      campaign_type: (data.campaigns as any)?.type || 'unknown',
-      total_views: data.total_views || 0,
-      total_participations: data.total_participations || 0,
-      total_completions: data.total_completions || 0,
-      conversion_rate: data.total_participations > 0
-        ? Math.round((data.total_completions / data.total_participations) * 100)
-        : 0,
-      avg_time_spent: Math.round(data.avg_time_spent || 0),
-      last_participation_at: data.last_participation_at,
+      campaign_id: campaign.id,
+      campaign_name: (campaign as any).app_title || 'Sans nom',
+      campaign_type: (campaign as any).type || 'unknown',
+      total_views: totals.total_views,
+      total_participations: totals.total_participations,
+      total_completions: totals.total_completions,
+      conversion_rate,
+      avg_time_spent: 0,
+      last_participation_at: totals.last_participation_at,
     };
   },
   
