@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { emailSchema, phoneSchema, nameSchema } from '@/schemas/participation.schema';
-import { ExternalBackendAnalyticsService } from './ExternalBackendAnalyticsService';
+import { ExternalBackendAnalyticsService, CampaignSettings } from './ExternalBackendAnalyticsService';
 import { z } from 'zod';
 
 export interface ParticipationData {
@@ -145,7 +145,23 @@ export const ParticipationService = {
         console.log('Could not fetch IP address:', ipError);
       }
 
-      // ===== VÉRIFICATIONS ANTI-SPAM =====
+      // ===== VÉRIFICATIONS ANTI-SPAM AVEC CONFIGURATION PAR CAMPAGNE =====
+      
+      // Récupérer les settings de la campagne ou utiliser les valeurs par défaut
+      const settings = await ExternalBackendAnalyticsService.getCampaignSettings(data.campaignId);
+      const rateLimitConfig: CampaignSettings = settings || {
+        campaign_id: data.campaignId,
+        ip_max_attempts: 5,
+        ip_window_minutes: 60,
+        email_max_attempts: 3,
+        email_window_minutes: 60,
+        device_max_attempts: 5,
+        device_window_minutes: 60,
+        auto_block_enabled: true,
+        block_duration_hours: 24,
+      };
+
+      console.log('⚙️ Using rate limit config for campaign:', rateLimitConfig);
       
       // 1. Vérifier si le participant est bloqué
       const isBlocked = await ExternalBackendAnalyticsService.isParticipantBlocked(
@@ -159,14 +175,14 @@ export const ParticipationService = {
         throw new Error('Vous avez été temporairement bloqué en raison de tentatives suspectes. Veuillez réessayer plus tard.');
       }
 
-      // 2. Vérifier le rate limit par IP
+      // 2. Vérifier le rate limit par IP avec config personnalisée
       if (realIpAddress) {
         const ipRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
           realIpAddress,
           'ip',
           data.campaignId,
-          5, // Max 5 tentatives
-          60 // Par heure
+          rateLimitConfig.ip_max_attempts,
+          rateLimitConfig.ip_window_minutes
         );
 
         if (!ipRateLimit.allowed) {
@@ -177,15 +193,15 @@ export const ParticipationService = {
         }
       }
 
-      // 3. Vérifier le rate limit par email
+      // 3. Vérifier le rate limit par email avec config personnalisée
       if (contactData.email || data.email) {
         const emailToCheck = contactData.email || data.email;
         const emailRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
           emailToCheck!,
           'email',
           data.campaignId,
-          3, // Max 3 tentatives par email
-          60 // Par heure
+          rateLimitConfig.email_max_attempts,
+          rateLimitConfig.email_window_minutes
         );
 
         if (!emailRateLimit.allowed) {
@@ -196,13 +212,13 @@ export const ParticipationService = {
         }
       }
 
-      // 4. Vérifier le rate limit par device fingerprint
+      // 4. Vérifier le rate limit par device fingerprint avec config personnalisée
       const deviceRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
         deviceFingerprint,
         'device',
         data.campaignId,
-        5, // Max 5 tentatives par appareil
-        60 // Par heure
+        rateLimitConfig.device_max_attempts,
+        rateLimitConfig.device_window_minutes
       );
 
       if (!deviceRateLimit.allowed) {

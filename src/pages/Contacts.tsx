@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { Search, MoreVertical, Mail, Download, Filter } from "lucide-react";
+import { Search, MoreVertical, Mail, Download, Filter, Settings } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RateLimitSettings } from "@/components/RateLimitSettings";
+import { useCampaigns } from "@/hooks/useCampaigns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const colors = {
   dark: '#3d3731',
@@ -31,6 +36,8 @@ const mockContacts: Contact[] = [
 
 const Contacts = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string>('');
+  const { campaigns, isLoading: campaignsLoading } = useCampaigns();
 
   const filteredContacts = mockContacts.filter(contact => 
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -50,17 +57,33 @@ const Contacts = () => {
               {mockContacts.length} contacts collectés
             </p>
           </div>
-          <button
-            className="h-8 px-3 flex items-center gap-2 font-medium text-xs transition-colors rounded-md"
-            style={{ 
-              backgroundColor: colors.gold, 
-              color: colors.dark,
-            }}
-          >
-            <Download className="w-3.5 h-3.5" />
-            Exporter CSV
-          </button>
         </div>
+
+        <Tabs defaultValue="contacts" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="contacts" className="flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Contacts
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Configuration Rate Limiting
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="contacts">
+            <div className="flex items-center justify-end mb-4">
+              <button
+                className="h-8 px-3 flex items-center gap-2 font-medium text-xs transition-colors rounded-md"
+                style={{ 
+                  backgroundColor: colors.gold, 
+                  color: colors.dark,
+                }}
+              >
+                <Download className="w-3.5 h-3.5" />
+                Exporter CSV
+              </button>
+            </div>
 
         {/* Filters bar */}
         <div 
@@ -97,89 +120,133 @@ const Contacts = () => {
           </button>
         </div>
 
-        {/* Contacts table */}
-        <div 
-          style={{ 
-            backgroundColor: colors.white, 
-            borderRadius: '8px',
-            border: `1px solid ${colors.border}`,
-            overflow: 'hidden',
-          }}
-        >
-          {/* Table header */}
-          <div 
-            className="grid items-center px-4 h-11 text-xs font-medium"
-            style={{ 
-              gridTemplateColumns: '1fr 1.5fr 140px 1fr 100px 60px',
-              backgroundColor: colors.background,
-              color: colors.muted,
-              borderBottom: `1px solid ${colors.border}`,
-            }}
-          >
-            <div>NOM</div>
-            <div>EMAIL</div>
-            <div>TÉLÉPHONE</div>
-            <div>CAMPAGNE</div>
-            <div>DATE</div>
-            <div></div>
-          </div>
-
-          {/* Table body */}
-          {filteredContacts.map((contact) => (
-            <div
-              key={contact.id}
-              className="grid items-center px-4 h-14 text-sm transition-colors"
+            {/* Contacts table */}
+            <div 
               style={{ 
-                gridTemplateColumns: '1fr 1.5fr 140px 1fr 100px 60px',
-                borderBottom: `1px solid ${colors.border}`,
-                color: colors.dark,
+                backgroundColor: colors.white, 
+                borderRadius: '8px',
+                border: `1px solid ${colors.border}`,
+                overflow: 'hidden',
               }}
             >
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium"
-                  style={{ backgroundColor: `${colors.gold}20`, color: colors.dark }}
+              {/* Table header */}
+              <div 
+                className="grid items-center px-4 h-11 text-xs font-medium"
+                style={{ 
+                  gridTemplateColumns: '1fr 1.5fr 140px 1fr 100px 60px',
+                  backgroundColor: colors.background,
+                  color: colors.muted,
+                  borderBottom: `1px solid ${colors.border}`,
+                }}
+              >
+                <div>NOM</div>
+                <div>EMAIL</div>
+                <div>TÉLÉPHONE</div>
+                <div>CAMPAGNE</div>
+                <div>DATE</div>
+                <div></div>
+              </div>
+
+              {/* Table body */}
+              {filteredContacts.map((contact) => (
+                <div
+                  key={contact.id}
+                  className="grid items-center px-4 h-14 text-sm transition-colors"
+                  style={{ 
+                    gridTemplateColumns: '1fr 1.5fr 140px 1fr 100px 60px',
+                    borderBottom: `1px solid ${colors.border}`,
+                    color: colors.dark,
+                  }}
                 >
-                  {contact.name.split(' ').map(n => n[0]).join('')}
-                </div>
-                <div>
-                  <span className="font-medium">{contact.name}</span>
-                  {contact.status === 'winner' && (
-                    <span 
-                      className="ml-2 text-xs px-1.5 py-0.5 rounded"
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium"
                       style={{ backgroundColor: `${colors.gold}20`, color: colors.dark }}
                     >
-                      Gagnant
-                    </span>
-                  )}
+                      {contact.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <span className="font-medium">{contact.name}</span>
+                      {contact.status === 'winner' && (
+                        <span 
+                          className="ml-2 text-xs px-1.5 py-0.5 rounded"
+                          style={{ backgroundColor: `${colors.gold}20`, color: colors.dark }}
+                        >
+                          Gagnant
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-xs" style={{ color: colors.muted }}>
+                    <Mail className="w-3.5 h-3.5" />
+                    {contact.email}
+                  </div>
+                  
+                  <div className="text-xs" style={{ color: colors.muted }}>
+                    {contact.phone}
+                  </div>
+                  
+                  <div className="text-xs truncate" style={{ color: colors.muted }}>
+                    {contact.campaign}
+                  </div>
+                  
+                  <div className="text-xs" style={{ color: colors.muted }}>
+                    {new Date(contact.date).toLocaleDateString('fr-FR')}
+                  </div>
+                  
+                  <div className="flex items-center justify-end">
+                    <button className="p-1.5 rounded transition-colors hover:bg-gray-100">
+                      <MoreVertical className="w-4 h-4" style={{ color: colors.muted }} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-2 text-xs" style={{ color: colors.muted }}>
-                <Mail className="w-3.5 h-3.5" />
-                {contact.email}
-              </div>
-              
-              <div className="text-xs" style={{ color: colors.muted }}>
-                {contact.phone}
-              </div>
-              
-              <div className="text-xs truncate" style={{ color: colors.muted }}>
-                {contact.campaign}
-              </div>
-              
-              <div className="text-xs" style={{ color: colors.muted }}>
-                {new Date(contact.date).toLocaleDateString('fr-FR')}
-              </div>
-              
-              <div className="flex items-center justify-end">
-                <button className="p-1.5 rounded transition-colors hover:bg-gray-100">
-                  <MoreVertical className="w-4 h-4" style={{ color: colors.muted }} />
-                </button>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <div className="mb-6">
+              <Label className="text-sm font-medium mb-2 block">Sélectionner une campagne</Label>
+              <Select value={selectedCampaignId} onValueChange={setSelectedCampaignId}>
+                <SelectTrigger className="w-full max-w-md">
+                  <SelectValue placeholder="Choisissez une campagne..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {campaignsLoading ? (
+                    <SelectItem value="loading" disabled>
+                      Chargement...
+                    </SelectItem>
+                  ) : campaigns.length === 0 ? (
+                    <SelectItem value="empty" disabled>
+                      Aucune campagne disponible
+                    </SelectItem>
+                  ) : (
+                    campaigns.map((campaign) => (
+                      <SelectItem key={campaign.id} value={campaign.id}>
+                        {campaign.name}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedCampaignId ? (
+              <RateLimitSettings campaignId={selectedCampaignId} />
+            ) : (
+              <div 
+                className="flex flex-col items-center justify-center p-12 rounded-lg"
+                style={{ backgroundColor: colors.background, border: `1px solid ${colors.border}` }}
+              >
+                <Settings className="w-12 h-12 mb-4" style={{ color: colors.muted }} />
+                <p className="text-sm" style={{ color: colors.muted }}>
+                  Sélectionnez une campagne pour configurer les limites de rate limiting
+                </p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </AppLayout>
   );
