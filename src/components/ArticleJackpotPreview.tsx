@@ -183,7 +183,8 @@ export const ArticleJackpotPreview: React.FC<ArticleJackpotPreviewProps> = ({
             <div style={{ transform: viewMode === 'mobile' ? 'scale(0.7)' : 'scale(0.85)', transformOrigin: 'center center' }}>
               <SmartJackpot
                 symbols={config.symbols.map(s => s.emoji)}
-                onComplete={(result) => console.log('Jackpot result:', result)}
+                onWin={(result) => console.log('Jackpot win:', result)}
+                onLose={() => console.log('Jackpot lose')}
                 spinDuration={config.jackpotScreen.spinDuration}
               />
             </div>

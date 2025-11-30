@@ -449,7 +449,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
         <Label className="text-xs text-muted-foreground mb-2 block">Alignment</Label>
         <Select
           value={question.welcomeDisplayStyle || 'left'}
-          onValueChange={(value) => onUpdateQuestion?.(question.id, { welcomeDisplayStyle: value })}
+          onValueChange={(value) => onUpdateQuestion?.(question.id, { welcomeDisplayStyle: value as 'left' | 'center' | 'right' | 'split' | 'centered' | 'fullscreen' })}
         >
           <SelectTrigger className="h-9 text-xs">
             <SelectValue />

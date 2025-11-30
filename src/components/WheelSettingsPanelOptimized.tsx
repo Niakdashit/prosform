@@ -341,10 +341,14 @@ export const WheelSettingsPanelOptimized = ({
               <SettingsField label="Title">
                 <Input 
                   type="text" 
-                  value={config.endingScreen.title}
-                  onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { ...config.endingScreen, title: e.target.value } 
-                  })}
+                  value={config.endingWin?.title || config.endingLose?.title || ''}
+                  onChange={(e) => {
+                    if (activeView === 'ending') {
+                      onUpdateConfig({ 
+                        endingWin: { ...config.endingWin, title: e.target.value } 
+                      });
+                    }
+                  }}
                   className="h-9"
                   placeholder="e.g., Congratulations!"
                 />
@@ -356,10 +360,14 @@ export const WheelSettingsPanelOptimized = ({
               >
                 <Input 
                   type="text" 
-                  value={config.endingScreen.subtitle}
-                  onChange={(e) => onUpdateConfig({ 
-                    endingScreen: { ...config.endingScreen, subtitle: e.target.value } 
-                  })}
+                  value={config.endingWin?.subtitle || config.endingLose?.subtitle || ''}
+                  onChange={(e) => {
+                    if (activeView === 'ending') {
+                      onUpdateConfig({ 
+                        endingWin: { ...config.endingWin, subtitle: e.target.value } 
+                      });
+                    }
+                  }}
                   className="h-9"
                   placeholder="You won {{prize}}"
                 />

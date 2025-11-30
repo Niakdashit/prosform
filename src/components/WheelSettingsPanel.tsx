@@ -1,4 +1,4 @@
-import { WheelConfig, WheelSegment } from "./WheelBuilder";
+import { WheelConfig, WheelSegment, ContactField } from "./WheelBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -399,8 +399,8 @@ export const WheelSettingsPanel = ({
                   <div className="flex gap-2 pt-2">
                     <Button
                       onClick={() => {
-                        const newField = {
-                          type: 'text' as const,
+                        const newField: ContactField = {
+                          type: 'name',
                           label: 'Nouveau champ',
                           required: false
                         };

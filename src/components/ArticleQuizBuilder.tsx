@@ -270,6 +270,7 @@ export const ArticleQuizBuilder = () => {
                   onDuplicateQuestion={duplicateQuestion}
                   onReorderQuestions={reorderQuestions}
                   onDeleteQuestion={deleteQuestion}
+                  onUpdateConfig={updateConfig}
                 />
               </DrawerContent>
             </Drawer>
@@ -315,6 +316,7 @@ export const ArticleQuizBuilder = () => {
               onDuplicateQuestion={duplicateQuestion}
               onReorderQuestions={reorderQuestions}
               onDeleteQuestion={deleteQuestion}
+              onUpdateConfig={updateConfig}
             />
             
             {/* Preview area */}
