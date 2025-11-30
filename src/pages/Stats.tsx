@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target, UserPlus } from "lucide-react";
 import { AnalyticsService, GlobalStats, TimeSeriesData, CampaignAnalytics, TypeDistribution } from "@/services/AnalyticsService";
 import { AdvancedAnalyticsService, GeoStats, DeviceStats, TrafficSource, PeakHour, EmailCollectionStats, FraudStats } from "@/services/AdvancedAnalyticsService";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { LiveFeed } from "@/components/stats/LiveFeed";
 import { StatsFilters } from "@/components/stats/StatsFilters";
@@ -47,6 +48,11 @@ const Stats = () => {
   const [peakHours, setPeakHours] = useState<PeakHour[]>([]);
   const [emailStats, setEmailStats] = useState<EmailCollectionStats | null>(null);
   const [fraudStats, setFraudStats] = useState<FraudStats | null>(null);
+  const [newParticipants, setNewParticipants] = useState<number>(0);
+  const [topCampaignsByParticipations, setTopCampaignsByParticipations] = useState<any[]>([]);
+  const [topCampaignsByParticipants, setTopCampaignsByParticipants] = useState<any[]>([]);
+  const [topCampaignsByOptIns, setTopCampaignsByOptIns] = useState<any[]>([]);
+  const [timeSeriesOptIns, setTimeSeriesOptIns] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   // Filtres
@@ -83,6 +89,12 @@ const Stats = () => {
           AdvancedAnalyticsService.getFraudStats(selectedCampaign || undefined),
         ]);
         
+        const newParticipantsCount = await AdvancedAnalyticsService.getNewParticipantsCount(selectedCampaign || undefined, dateRange);
+        const topByParticipations = await AdvancedAnalyticsService.getTopCampaigns('participations', 10, dateRange);
+        const topByParticipants = await AdvancedAnalyticsService.getTopCampaigns('participants', 10, dateRange);
+        const topByOptIns = await AdvancedAnalyticsService.getTopCampaigns('opt_ins', 10, dateRange);
+        const optInsTimeSeries = await AdvancedAnalyticsService.getTimeSeriesOptIns(dateRange, selectedCampaign || undefined);
+        
         setGlobalStats(stats);
         setTimeSeriesData(timeSeries);
         setCampaignAnalytics(campaignsData);
@@ -93,6 +105,11 @@ const Stats = () => {
         setPeakHours(hours);
         setEmailStats(email);
         setFraudStats(fraud);
+        setNewParticipants(newParticipantsCount);
+        setTopCampaignsByParticipations(topByParticipations);
+        setTopCampaignsByParticipants(topByParticipants);
+        setTopCampaignsByOptIns(topByOptIns);
+        setTimeSeriesOptIns(optInsTimeSeries);
       } catch (error) {
         console.error('Erreur chargement analytics:', error);
       } finally {
@@ -195,7 +212,7 @@ const Stats = () => {
 
         {/* Stats cards - Liquid Glass Effect */}
         <div 
-          className="grid grid-cols-4 gap-4 mb-6 p-5 relative overflow-hidden"
+          className="grid grid-cols-5 gap-4 mb-6 p-5 relative overflow-hidden"
           style={{
             borderRadius: '24px',
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',
@@ -257,10 +274,53 @@ const Stats = () => {
               </div>
             </div>
           ))}
+          
+          {/* New Participants Card */}
+          <div 
+            className="p-4 relative overflow-hidden group"
+            style={{ 
+              background: 'rgba(255, 255, 255, 0.25)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: '18px',
+              border: '1px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: `
+                0 4px 24px rgba(0, 0, 0, 0.06),
+                0 1px 2px rgba(0, 0, 0, 0.04),
+                inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+              `,
+            }}
+          >
+            <div 
+              className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+              style={{
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+              }}
+            />
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'radial-gradient(ellipse at 50% -20%, rgba(255, 255, 255, 0.5) 0%, transparent 70%)',
+                borderRadius: '18px',
+              }}
+            />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <UserPlus className="w-5 h-5" style={{ color: colors.emerald }} />
+              </div>
+              <p className="text-2xl font-semibold mb-1" style={{ color: colors.dark }}>
+                {newParticipants}
+              </p>
+              <p className="text-xs" style={{ color: colors.muted }}>
+                Nouveaux participants
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Secondary stats */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-3 gap-4 mb-6">
           {secondaryStats.map((stat, i) => (
             <div
               key={i}
@@ -291,6 +351,40 @@ const Stats = () => {
               </div>
             </div>
           ))}
+          
+          {/* Identified vs Anonymous Card */}
+          {emailStats && (
+            <div
+              className="p-4 rounded-2xl border"
+              style={{ 
+                background: colors.white,
+                borderColor: colors.border,
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div 
+                  className="p-3 rounded-xl"
+                  style={{ backgroundColor: `${colors.blue}15` }}
+                >
+                  <Users className="w-5 h-5" style={{ color: colors.blue }} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                      {emailStats.emails_collected}
+                    </p>
+                    <span className="text-sm" style={{ color: colors.muted }}>/ {emailStats.total_participations - emailStats.emails_collected}</span>
+                  </div>
+                  <p className="text-xs" style={{ color: colors.muted }}>
+                    Identifiés / Anonymes
+                  </p>
+                  <p className="text-xs mt-1 font-medium" style={{ color: colors.blue }}>
+                    {emailStats.collection_rate.toFixed(1)}% identifiés
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Charts Grid */}
@@ -448,6 +542,189 @@ const Stats = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            {/* Most Popular Campaigns */}
+            <div 
+              className="p-6 relative overflow-hidden"
+              style={{ 
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderRadius: '18px',
+                border: '1px solid rgba(255, 255, 255, 0.6)',
+                boxShadow: `
+                  0 4px 24px rgba(0, 0, 0, 0.06),
+                  0 1px 2px rgba(0, 0, 0, 0.04),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                  inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                `,
+              }}
+            >
+              <div className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                }}
+              />
+              <div className="flex items-center gap-2 mb-4">
+                <Trophy className="w-5 h-5" style={{ color: colors.gold }} />
+                <h3 className="text-lg font-semibold" style={{ color: colors.dark }}>
+                  Campagnes les plus populaires
+                </h3>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Par Participations */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3" style={{ color: colors.dark }}>Par Participations</h4>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">Campagne</TableHead>
+                        <TableHead className="text-xs text-right">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topCampaignsByParticipations.slice(0, 5).map((campaign) => (
+                        <TableRow key={campaign.id}>
+                          <TableCell className="font-medium text-xs truncate max-w-[150px]">{campaign.title}</TableCell>
+                          <TableCell className="text-xs text-right">{campaign.participations.toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Par Participants */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3" style={{ color: colors.dark }}>Par Participants</h4>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">Campagne</TableHead>
+                        <TableHead className="text-xs text-right">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topCampaignsByParticipants.slice(0, 5).map((campaign) => (
+                        <TableRow key={campaign.id}>
+                          <TableCell className="font-medium text-xs truncate max-w-[150px]">{campaign.title}</TableCell>
+                          <TableCell className="text-xs text-right">{campaign.participants.toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Par Opt-ins */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3" style={{ color: colors.dark }}>Par Newsletter & Marketing Opt-ins</h4>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-xs">Campagne</TableHead>
+                        <TableHead className="text-xs text-right">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {topCampaignsByOptIns.slice(0, 5).map((campaign) => (
+                        <TableRow key={campaign.id}>
+                          <TableCell className="font-medium text-xs truncate max-w-[150px]">{campaign.title}</TableCell>
+                          <TableCell className="text-xs text-right">{campaign.opt_ins.toLocaleString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </div>
+
+            {/* Opt-in Conversions Over Time */}
+            {timeSeriesOptIns && timeSeriesOptIns.dates.length > 0 && (
+              <div 
+                className="p-6 relative overflow-hidden"
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  borderRadius: '18px',
+                  border: '1px solid rgba(255, 255, 255, 0.6)',
+                  boxShadow: `
+                    0 4px 24px rgba(0, 0, 0, 0.06),
+                    0 1px 2px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                    inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                  `,
+                }}
+              >
+                <div className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                  }}
+                />
+                <h3 className="text-lg font-semibold mb-4" style={{ color: colors.dark }}>
+                  Conversions Opt-in dans le temps
+                </h3>
+                <ResponsiveContainer width="100%" height={350}>
+                  <AreaChart data={timeSeriesOptIns.dates.map((date: string, i: number) => ({
+                    date: new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+                    'Newsletter & Marketing': timeSeriesOptIns.newsletter[i],
+                    'Autres': timeSeriesOptIns.others[i],
+                    'Partenaires': timeSeriesOptIns.partners[i],
+                  }))}>
+                    <defs>
+                      <linearGradient id="colorNewsletter" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={colors.orange} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={colors.orange} stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorPartners" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={colors.blue} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={colors.blue} stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorOthers" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={colors.emerald} stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor={colors.emerald} stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke={colors.muted}
+                      tick={{ fill: colors.muted }}
+                    />
+                    <YAxis stroke={colors.muted} tick={{ fill: colors.muted }} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: colors.white, 
+                        borderRadius: '8px',
+                        border: `1px solid ${colors.border}`,
+                      }}
+                    />
+                    <Legend />
+                    <Area 
+                      type="monotone" 
+                      dataKey="Newsletter & Marketing" 
+                      stackId="1"
+                      stroke={colors.orange} 
+                      fill="url(#colorNewsletter)" 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="Partenaires" 
+                      stackId="1"
+                      stroke={colors.blue} 
+                      fill="url(#colorPartners)" 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="Autres" 
+                      stackId="1"
+                      stroke={colors.emerald} 
+                      fill="url(#colorOthers)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
 
             {/* Live Feed */}
             <LiveFeed />
