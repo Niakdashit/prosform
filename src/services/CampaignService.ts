@@ -19,10 +19,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return (data || []).map((row: any) => ({
-      ...row,
-      title: row.app_title ?? row.title,
-    }));
+    return data || [];
   },
 
   /**
@@ -41,33 +38,16 @@ export const CampaignService = {
       throw error;
     }
 
-    return data ? { ...data, title: (data as any).app_title ?? data.title } : null;
+    return data;
   },
 
   /**
    * Créer une nouvelle campagne
    */
   async create(campaign: CampaignCreate): Promise<Campaign> {
-    // Récupérer l'utilisateur connecté
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    
-    if (userError || !user) {
-      console.error('❌ [CampaignService] User not authenticated:', userError);
-      throw new Error('User not authenticated');
-    }
-
-    const dbPayload = {
-      user_id: user.id,
-      app_title: campaign.title,
-      type: campaign.type,
-      status: campaign.status || 'draft',
-      config: campaign.config || {},
-      thumbnail_url: campaign.thumbnail_url,
-    };
-
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([dbPayload])
+      .insert([campaign])
       .select()
       .single();
 
@@ -83,18 +63,10 @@ export const CampaignService = {
   /**
    * Mettre à jour une campagne
    */
-  async update(id: string, updates: Partial<Campaign>): Promise<Campaign> {
-    const dbPayload = {
-      app_title: updates.title,
-      type: updates.type,
-      status: updates.status,
-      config: updates.config,
-      thumbnail_url: updates.thumbnail_url,
-    };
-
+  async update(id: string, updates: CampaignUpdate): Promise<Campaign> {
     const { data, error } = await supabase
       .from('campaigns')
-      .update(dbPayload)
+      .update(updates)
       .eq('id', id)
       .select()
       .single();
@@ -111,12 +83,12 @@ export const CampaignService = {
   /**
    * Sauvegarder une campagne (create ou update)
    */
-  async save(campaign: Partial<Campaign> & { title: string; type: Campaign['type'] }): Promise<Campaign> {
+  async save(campaign: Partial<Campaign> & { name: string; type: Campaign['type'] }): Promise<Campaign> {
     if (campaign.id) {
-      const { id, created_at, user_id, ...rest } = campaign;
-      return this.update(id, rest);
+      const { id, created_at, ...updates } = campaign;
+      return this.update(id, updates);
     } else {
-      const { id, created_at, updated_at, user_id, ...createData } = campaign as Campaign;
+      const { id, created_at, updated_at, ...createData } = campaign as Campaign;
       return this.create({
         ...createData,
         mode: createData.mode || 'fullscreen',
@@ -169,11 +141,11 @@ export const CampaignService = {
     const original = await this.getById(id);
     if (!original) throw new Error('Campaign not found');
 
-    const { id: _, created_at, updated_at, published_at, slug, user_id, ...campaignData } = original;
+    const { id: _, created_at, updated_at, published_at, slug, ...campaignData } = original;
     
     return this.create({
       ...campaignData,
-      title: `${campaignData.title} (copie)`,
+      name: `${campaignData.name} (copie)`,
       status: 'draft',
     });
   },

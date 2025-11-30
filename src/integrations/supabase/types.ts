@@ -148,7 +148,6 @@ export type Database = {
       }
       campaigns: {
         Row: {
-          app_title: string
           config: Json
           created_at: string
           ends_at: string | null
@@ -163,13 +162,12 @@ export type Database = {
           starts_at: string | null
           status: string | null
           thumbnail_url: string | null
-          title: string | null
+          title: string
           type: Database["public"]["Enums"]["campaign_type"]
           updated_at: string
           user_id: string
         }
         Insert: {
-          app_title: string
           config?: Json
           created_at?: string
           ends_at?: string | null
@@ -184,13 +182,12 @@ export type Database = {
           starts_at?: string | null
           status?: string | null
           thumbnail_url?: string | null
-          title?: string | null
+          title: string
           type: Database["public"]["Enums"]["campaign_type"]
           updated_at?: string
           user_id: string
         }
         Update: {
-          app_title?: string
           config?: Json
           created_at?: string
           ends_at?: string | null
@@ -205,7 +202,7 @@ export type Database = {
           starts_at?: string | null
           status?: string | null
           thumbnail_url?: string | null
-          title?: string | null
+          title?: string
           type?: Database["public"]["Enums"]["campaign_type"]
           updated_at?: string
           user_id?: string

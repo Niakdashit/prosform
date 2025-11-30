@@ -254,7 +254,7 @@ export const ScratchBuilder = () => {
     campaign,
     config,
     prizes,
-    title: campaignName,
+    name: campaignName,
     startDate,
     startTime,
     endDate,
@@ -266,7 +266,7 @@ export const ScratchBuilder = () => {
     setPrizes,
     save,
     publish,
-    setTitle,
+    setName,
     setStartDate,
     setStartTime,
     setEndDate,
@@ -408,7 +408,6 @@ export const ScratchBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <ScratchTopToolbar 
-        campaignId={campaignId || undefined}
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
           try {
@@ -450,7 +449,7 @@ export const ScratchBuilder = () => {
           gameType="scratch"
           segments={[]}
           campaignName={campaignName}
-          onCampaignNameChange={setTitle}
+          onCampaignNameChange={setName}
           startDate={startDate}
           onStartDateChange={setStartDate}
           startTime={startTime}

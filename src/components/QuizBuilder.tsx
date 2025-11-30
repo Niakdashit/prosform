@@ -230,7 +230,7 @@ export const QuizBuilder = () => {
   const {
     campaign,
     config,
-    title: campaignName,
+    name: campaignName,
     startDate,
     startTime,
     endDate,
@@ -241,7 +241,7 @@ export const QuizBuilder = () => {
     setConfig,
     save,
     publish,
-    setTitle,
+    setName,
     setStartDate,
     setStartTime,
     setEndDate,
@@ -385,7 +385,6 @@ export const QuizBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <QuizTopToolbar 
-        campaignId={campaignId || undefined}
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
           localStorage.setItem('quiz-config', JSON.stringify(config));
