@@ -93,6 +93,17 @@ export const ParticipationService = {
    */
   async recordParticipation(data: ParticipationData): Promise<void> {
     try {
+      // Récupérer l'IP réelle via edge function
+      let realIpAddress = null;
+      try {
+        const ipResponse = await supabase.functions.invoke('get-participant-ip');
+        if (ipResponse.data?.ip_address && ipResponse.data.ip_address !== 'unknown') {
+          realIpAddress = ipResponse.data.ip_address;
+        }
+      } catch (ipError) {
+        console.log('Could not fetch IP address:', ipError);
+      }
+
       // Données de base (toujours présentes)
       const baseData: any = {
         campaign_id: data.campaignId,
@@ -128,6 +139,7 @@ export const ParticipationService = {
           referrer,
           user_agent: userAgent,
           device_fingerprint: deviceFingerprint,
+          ip_address: realIpAddress,
         };
         
         const { error: insertError } = await supabase
@@ -141,6 +153,7 @@ export const ParticipationService = {
             os,
             country,
             device_fingerprint: deviceFingerprint,
+            ip_address: realIpAddress,
             utm_source: utmParams.utm_source,
             utm_medium: utmParams.utm_medium,
             utm_campaign: utmParams.utm_campaign,
