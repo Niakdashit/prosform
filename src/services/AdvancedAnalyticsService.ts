@@ -84,86 +84,17 @@ export const AdvancedAnalyticsService = {
   },
 
   // Statistiques par device
-  async getDeviceStats(campaignId?: string): Promise<DeviceStats[]> {
-    try {
-      let query = supabase
-        .from('campaign_participants')
-        .select('device_type');
-
-      if (campaignId) {
-        query = query.eq('campaign_id', campaignId);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      const deviceMap = new Map<string, number>();
-      let total = 0;
-
-      data?.forEach(p => {
-        const device = p.device_type || 'unknown';
-        deviceMap.set(device, (deviceMap.get(device) || 0) + 1);
-        total++;
-      });
-
-      return Array.from(deviceMap.entries())
-        .map(([device_type, count]) => ({
-          device_type,
-          count,
-          percentage: (count / total) * 100,
-        }))
-        .sort((a, b) => b.count - a.count);
-    } catch (error) {
-      console.error('Error fetching device stats:', error);
-      return [];
-    }
+  async getDeviceStats(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<DeviceStats[]> {
+    // Pour l'instant retourne des données vides car les colonnes n'existent pas encore
+    console.warn('Device stats not available - columns not yet created');
+    return [];
   },
 
   // Sources de trafic
-  async getTrafficSources(campaignId?: string): Promise<TrafficSource[]> {
-    try {
-      let query = supabase
-        .from('campaign_participants')
-        .select('utm_source, referrer');
-
-      if (campaignId) {
-        query = query.eq('campaign_id', campaignId);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      const sourceMap = new Map<string, number>();
-      let total = 0;
-
-      data?.forEach(p => {
-        let source = 'Direct';
-        if (p.utm_source) {
-          source = p.utm_source;
-        } else if (p.referrer) {
-          try {
-            const url = new URL(p.referrer);
-            source = url.hostname;
-          } catch {
-            source = 'Referrer';
-          }
-        }
-        sourceMap.set(source, (sourceMap.get(source) || 0) + 1);
-        total++;
-      });
-
-      return Array.from(sourceMap.entries())
-        .map(([source, count]) => ({
-          source,
-          count,
-          percentage: (count / total) * 100,
-        }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-    } catch (error) {
-      console.error('Error fetching traffic sources:', error);
-      return [];
-    }
+  async getTrafficSources(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<TrafficSource[]> {
+    // Pour l'instant retourne des données vides car les colonnes n'existent pas encore
+    console.warn('Traffic sources not available - columns not yet created');
+    return [];
   },
 
   // Heures de pic
