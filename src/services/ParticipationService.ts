@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { emailSchema, phoneSchema, nameSchema } from '@/schemas/participation.schema';
+import { z } from 'zod';
 
 export interface ParticipationData {
   campaignId: string;
@@ -93,6 +95,42 @@ export const ParticipationService = {
    */
   async recordParticipation(data: ParticipationData): Promise<void> {
     try {
+      // Validation des données de contact avec Zod
+      const contactData = data.contactData || {};
+      
+      // Valider l'email si présent
+      if (contactData.email || data.email) {
+        try {
+          const emailToValidate = contactData.email || data.email;
+          const validatedEmail = emailSchema.parse(emailToValidate);
+          if (contactData.email) contactData.email = validatedEmail;
+          if (data.email) data.email = validatedEmail;
+        } catch (error) {
+          console.error('Invalid email:', error);
+          throw new Error('Email invalide');
+        }
+      }
+
+      // Valider le téléphone si présent
+      if (contactData.phone) {
+        try {
+          contactData.phone = phoneSchema.parse(contactData.phone);
+        } catch (error) {
+          console.error('Invalid phone:', error);
+          throw new Error('Numéro de téléphone invalide');
+        }
+      }
+
+      // Valider le nom si présent
+      if (contactData.name) {
+        try {
+          contactData.name = nameSchema.parse(contactData.name);
+        } catch (error) {
+          console.error('Invalid name:', error);
+          throw new Error('Nom invalide');
+        }
+      }
+
       // Récupérer l'IP réelle via edge function
       let realIpAddress = null;
       try {
@@ -107,9 +145,9 @@ export const ParticipationService = {
       // Données de base (toujours présentes)
       const baseData: any = {
         campaign_id: data.campaignId,
-        email: data.email || data.contactData?.email,
+        email: data.email || contactData.email,
         participation_data: {
-          contactData: data.contactData,
+          contactData: contactData,
           result: data.result,
           timestamp: new Date().toISOString(),
         },

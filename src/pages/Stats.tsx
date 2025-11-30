@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { LiveFeed } from "@/components/stats/LiveFeed";
 import { StatsFilters } from "@/components/stats/StatsFilters";
 import { useCampaigns } from "@/hooks/useCampaigns";
+import { ExportParticipantsButton } from "@/components/ExportParticipantsButton";
 
 const colors = {
   dark: '#3d3731',
@@ -211,10 +212,19 @@ const Stats = () => {
               Vue complète de vos performances et analytics
             </p>
           </div>
-          <Button onClick={handleExportCSV} variant="outline" className="gap-2">
-            <Download className="w-4 h-4" />
-            Export CSV
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleExportCSV} variant="outline" className="gap-2">
+              <Download className="w-4 h-4" />
+              Export Global CSV
+            </Button>
+            {selectedCampaign && campaigns.find(c => c.id === selectedCampaign) && (
+              <ExportParticipantsButton
+                campaignId={selectedCampaign}
+                campaignTitle={campaigns.find(c => c.id === selectedCampaign)?.title || 'Campagne'}
+                variant="default"
+              />
+            )}
+          </div>
         </div>
 
         {/* Filtres */}
