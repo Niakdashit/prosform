@@ -115,7 +115,7 @@ export const ArticleQuizBuilder = () => {
   const {
     campaign,
     config,
-    name: campaignName,
+    title: campaignName,
     startDate,
     startTime,
     endDate,
@@ -126,7 +126,7 @@ export const ArticleQuizBuilder = () => {
     setConfig,
     save,
     publish,
-    setName,
+    setTitle,
     setStartDate,
     setStartTime,
     setEndDate,

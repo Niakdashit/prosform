@@ -255,7 +255,7 @@ export const JackpotBuilder = () => {
     campaign,
     config,
     prizes,
-    name: campaignName,
+    title: campaignName,
     startDate,
     startTime,
     endDate,
@@ -267,7 +267,7 @@ export const JackpotBuilder = () => {
     setPrizes,
     save,
     publish,
-    setName,
+    setTitle,
     setStartDate,
     setStartTime,
     setEndDate,
@@ -486,7 +486,7 @@ export const JackpotBuilder = () => {
           segments={config.symbols.map(s => ({ id: s.id, label: s.emoji }))}
           symbols={config.symbols}
           campaignName={campaignName}
-          onCampaignNameChange={setName}
+          onCampaignNameChange={setTitle}
           startDate={startDate}
           onStartDateChange={setStartDate}
           startTime={startTime}

@@ -254,7 +254,7 @@ export const ScratchBuilder = () => {
     campaign,
     config,
     prizes,
-    name: campaignName,
+    title: campaignName,
     startDate,
     startTime,
     endDate,
@@ -266,7 +266,7 @@ export const ScratchBuilder = () => {
     setPrizes,
     save,
     publish,
-    setName,
+    setTitle,
     setStartDate,
     setStartTime,
     setEndDate,
@@ -450,7 +450,7 @@ export const ScratchBuilder = () => {
           gameType="scratch"
           segments={[]}
           campaignName={campaignName}
-          onCampaignNameChange={setName}
+          onCampaignNameChange={setTitle}
           startDate={startDate}
           onStartDateChange={setStartDate}
           startTime={startTime}

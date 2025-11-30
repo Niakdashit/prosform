@@ -83,12 +83,12 @@ export const CampaignService = {
   /**
    * Sauvegarder une campagne (create ou update)
    */
-  async save(campaign: Partial<Campaign> & { name: string; type: Campaign['type'] }): Promise<Campaign> {
+  async save(campaign: Partial<Campaign> & { title: string; type: Campaign['type'] }): Promise<Campaign> {
     if (campaign.id) {
-      const { id, created_at, ...updates } = campaign;
+      const { id, created_at, user_id, ...updates } = campaign;
       return this.update(id, updates);
     } else {
-      const { id, created_at, updated_at, ...createData } = campaign as Campaign;
+      const { id, created_at, updated_at, user_id, ...createData } = campaign as Campaign;
       return this.create({
         ...createData,
         mode: createData.mode || 'fullscreen',
@@ -141,11 +141,11 @@ export const CampaignService = {
     const original = await this.getById(id);
     if (!original) throw new Error('Campaign not found');
 
-    const { id: _, created_at, updated_at, published_at, slug, ...campaignData } = original;
+    const { id: _, created_at, updated_at, published_at, slug, user_id, ...campaignData } = original;
     
     return this.create({
       ...campaignData,
-      name: `${campaignData.name} (copie)`,
+      title: `${campaignData.title} (copie)`,
       status: 'draft',
     });
   },

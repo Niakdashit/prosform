@@ -259,7 +259,7 @@ export const WheelBuilder = () => {
     campaign,
     config,
     prizes,
-    name: campaignName,
+    title: campaignName,
     startDate,
     startTime,
     endDate,
@@ -271,7 +271,7 @@ export const WheelBuilder = () => {
     setPrizes,
     save,
     publish,
-    setName,
+    setTitle,
     setStartDate,
     setStartTime,
     setEndDate,
@@ -514,7 +514,7 @@ export const WheelBuilder = () => {
           gameType="wheel"
           segments={config.segments.map(s => ({ id: s.id, label: s.label }))}
           campaignName={campaignName}
-          onCampaignNameChange={setName}
+          onCampaignNameChange={setTitle}
           startDate={startDate}
           onStartDateChange={setStartDate}
           startTime={startTime}
