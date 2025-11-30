@@ -10,6 +10,7 @@ import { EndingLayouts } from "./layouts/EndingLayouts";
 import { ContactLayouts } from "./layouts/ContactLayouts";
 import { EditableTextBlock } from "./EditableTextBlock";
 import { cn } from "@/lib/utils";
+import { CampaignHeader, CampaignFooter } from "./campaign";
 
 interface QuizPreviewProps {
   config: QuizConfig;
@@ -282,8 +283,6 @@ export const QuizPreview = ({
                     isReadOnly={isReadOnly}
                     onFocus={() => !isReadOnly && setEditingField('welcome-title')}
                     onBlur={() => setEditingField(null)}
-                    showSparkles={!isReadOnly}
-                    showClear={!isReadOnly}
                     fieldType="title"
                     width={config.welcomeScreen.titleWidth || 100}
                     onWidthChange={(width) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, titleWidth: width } })}
@@ -369,8 +368,6 @@ export const QuizPreview = ({
                     isReadOnly={isReadOnly}
                     onFocus={() => !isReadOnly && setEditingField('welcome-subtitle')}
                     onBlur={() => setEditingField(null)}
-                    showSparkles={!isReadOnly}
-                    showClear={!isReadOnly}
                     fieldType="subtitle"
                     width={config.welcomeScreen.subtitleWidth || 100}
                     onWidthChange={(width) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitleWidth: width } })}
@@ -508,12 +505,6 @@ export const QuizPreview = ({
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
-                <div 
-                  className="absolute inset-0"
-                  style={{
-                    backgroundColor: `rgba(61, 55, 49, ${config.welcomeScreen.overlayOpacity ?? 0.6})`
-                  }}
-                />
                 <div className={`relative w-full h-full flex ${justifyContent} items-center px-24`}>
                   <div className="max-w-[700px]">
                     <TextContent />
@@ -605,12 +596,6 @@ export const QuizPreview = ({
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
-                <div 
-                  className="absolute inset-0"
-                  style={{
-                    backgroundColor: `rgba(61, 55, 49, ${config.welcomeScreen.overlayOpacity ?? 0.6})`
-                  }}
-                />
                 <div className="relative w-full h-full flex items-center justify-center px-5">
                   <div className="w-full max-w-[500px]">
                     <TextContent centered />
@@ -891,8 +876,6 @@ export const QuizPreview = ({
                     isReadOnly={isReadOnly}
                     onFocus={() => !isReadOnly && setEditingField('result-title')}
                     onBlur={() => setEditingField(null)}
-                    showSparkles={!isReadOnly}
-                    showClear={!isReadOnly}
                     fieldType="title"
                     width={config.resultScreen.titleWidth || 100}
                     onWidthChange={(width) => onUpdateConfig({ resultScreen: { ...config.resultScreen, titleWidth: width } })}
@@ -978,8 +961,6 @@ export const QuizPreview = ({
                     isReadOnly={isReadOnly}
                     onFocus={() => !isReadOnly && setEditingField('result-subtitle')}
                     onBlur={() => setEditingField(null)}
-                    showSparkles={!isReadOnly}
-                    showClear={!isReadOnly}
                     fieldType="subtitle"
                     width={config.resultScreen.subtitleWidth || 100}
                     onWidthChange={(width) => onUpdateConfig({ resultScreen: { ...config.resultScreen, subtitleWidth: width } })}
@@ -1071,9 +1052,23 @@ export const QuizPreview = ({
 
       <div 
         key={`preview-container-${viewMode}`}
-        className="relative overflow-hidden transition-all duration-300" 
+        className="relative overflow-hidden transition-all duration-300 flex flex-col" 
         style={{ 
-          backgroundColor: theme.backgroundColor, 
+          backgroundColor: (() => {
+            const hasBackgroundImage = (() => {
+              const applyToAll = config.welcomeScreen.applyBackgroundToAll;
+              const welcomeDesktop = config.welcomeScreen.backgroundImage;
+              const welcomeMobile = config.welcomeScreen.backgroundImageMobile;
+              if (applyToAll && (welcomeDesktop || welcomeMobile)) return true;
+              switch (activeView) {
+                case 'welcome': return !!(welcomeDesktop || welcomeMobile);
+                case 'contact': return !!(config.contactScreen.backgroundImage || config.contactScreen.backgroundImageMobile);
+                case 'result': return !!(config.resultScreen.backgroundImage || config.resultScreen.backgroundImageMobile);
+                default: return false;
+              }
+            })();
+            return hasBackgroundImage ? 'transparent' : theme.backgroundColor;
+          })(),
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
@@ -1110,60 +1105,63 @@ export const QuizPreview = ({
           };
           
           const bgImage = getScreenBackground();
-          const getOverlayOpacity = () => {
-            switch (activeView) {
-              case 'welcome': return config.welcomeScreen.overlayOpacity;
-              case 'contact': return (config.contactScreen as any).overlayOpacity;
-              case 'result': return config.resultScreen.overlayOpacity;
-              default: return undefined;
-            }
-          };
           
           if (!bgImage) return null;
           
           return (
             <div 
-              className="absolute inset-0 z-0"
+              className="absolute inset-0"
               style={{
                 backgroundImage: `url(${bgImage})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
+                backgroundRepeat: 'no-repeat',
+                zIndex: 0,
               }}
-            >
-              <div 
-                className="absolute inset-0" 
-                style={{ 
-                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                  opacity: getOverlayOpacity() !== undefined ? getOverlayOpacity()! / 100 : 0.4
-                }} 
-              />
-            </div>
+            />
           );
         })()}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${activeView}-${activeQuestionIndex}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="w-full h-full relative z-10"
-            onClick={(e) => {
-              // Ne pas blur si on clique sur un input, textarea ou button
-              const target = e.target as HTMLElement;
-              if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
-                return;
-              }
-              setEditingField(null);
-              if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                document.activeElement.blur();
-              }
-            }}
-          >
-            {renderContent()}
-          </motion.div>
-        </AnimatePresence>
+
+        {/* Header */}
+        {config.layout?.header?.enabled && (
+          <div className="relative z-20 flex-shrink-0">
+            <CampaignHeader config={config.layout.header} isPreview />
+          </div>
+        )}
+
+        {/* Contenu principal */}
+        <div className="flex-1 relative overflow-auto z-10 min-h-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${activeView}-${activeQuestionIndex}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="w-full h-full relative z-10"
+              onClick={(e) => {
+                // Ne pas blur si on clique sur un input, textarea ou button
+                const target = e.target as HTMLElement;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
+                  return;
+                }
+                setEditingField(null);
+                if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                  document.activeElement.blur();
+                }
+              }}
+            >
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        
+        {/* Footer en bas, en dehors de la zone scrollable */}
+        {config.layout?.footer?.enabled && (
+          <div className="flex-shrink-0 relative z-10">
+            <CampaignFooter config={config.layout.footer} isPreview />
+          </div>
+        )}
       </div>
 
       {/* Image Editor Modal */}

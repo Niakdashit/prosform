@@ -6,6 +6,8 @@ import { QuizPreview } from "./QuizPreview";
 import { QuizSettingsPanel } from "./QuizSettingsPanel";
 import { QuizTopToolbar } from "./QuizTopToolbar";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -14,6 +16,12 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import type { ContactField } from "./WheelBuilder";
 import { useCampaign } from "@/hooks/useCampaign";
+import { 
+  HeaderConfig, 
+  FooterConfig, 
+  defaultHeaderConfig, 
+  defaultFooterConfig,
+} from "./campaign";
 
 export interface QuizAnswer {
   id: string;
@@ -116,6 +124,11 @@ export interface QuizConfig {
     passingScore: number;
     answerStyle?: 'filled' | 'outline' | 'soft' | 'filled-square';
   };
+  // Layout global
+  layout?: {
+    header: HeaderConfig;
+    footer: FooterConfig;
+  };
 }
 
 const defaultQuizConfig: QuizConfig = {
@@ -198,6 +211,10 @@ const defaultQuizConfig: QuizConfig = {
     allowReview: true,
     passingScore: 70,
     answerStyle: 'filled'
+  },
+  layout: {
+    header: { ...defaultHeaderConfig, enabled: false },
+    footer: { ...defaultFooterConfig, enabled: false },
   }
 };
 
@@ -220,6 +237,7 @@ export const QuizBuilder = () => {
     endTime,
     isLoading,
     isSaving,
+    hasUnsavedChanges,
     setConfig,
     save,
     publish,
@@ -377,6 +395,7 @@ export const QuizBuilder = () => {
         onSave={handleSave}
         onPublish={handlePublish}
         isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
       />
         
       <div className="flex flex-1 overflow-hidden relative">
@@ -404,6 +423,7 @@ export const QuizBuilder = () => {
                   onDuplicateQuestion={duplicateQuestion}
                   onReorderQuestions={reorderQuestions}
                   onDeleteQuestion={deleteQuestion}
+                  onUpdateConfig={updateConfig}
                 />
               </DrawerContent>
             </Drawer>
@@ -481,10 +501,11 @@ export const QuizBuilder = () => {
               onDuplicateQuestion={duplicateQuestion}
               onReorderQuestions={reorderQuestions}
               onDeleteQuestion={deleteQuestion}
+              onUpdateConfig={updateConfig}
             />
             
             {/* Preview area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
@@ -531,6 +552,34 @@ export const QuizBuilder = () => {
                   }}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Quiz. Vue active: ${activeView}. Titre: ${config.welcomeScreen.title}. Questions: ${config.questions.length}`}
+                onApplyActions={createAIActionHandler(config, updateConfig, {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactScreen',
+                  result: 'resultScreen'
+                }, {
+                  onUpdateQuestions: (questions) => {
+                    const newQuestions = questions.map((q: any, i: number) => ({
+                      id: q.id || `q_${i}`,
+                      question: q.question,
+                      answers: (q.answers || []).map((a: any, j: number) => ({
+                        id: a.id || `a_${i}_${j}`,
+                        text: a.text,
+                        isCorrect: a.isCorrect ?? false
+                      })),
+                      image: q.image || '',
+                      points: q.points ?? 10,
+                    }));
+                    updateConfig({ questions: newQuestions });
+                  },
+                  onApplyTemplate: (template, colors) => {
+                    // Appliquer les couleurs du template
+                    console.log(`Template ${template} appliqué au quiz`);
+                  }
+                })}
+              />
             </div>
             
             <QuizSettingsPanel 

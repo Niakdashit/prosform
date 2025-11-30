@@ -8,6 +8,8 @@ import { WheelTopToolbar } from "./WheelTopToolbar";
 import { SegmentsModal } from "./SegmentsModal";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate, BrandPalette } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -15,6 +17,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { useCampaign } from "@/hooks/useCampaign";
+import { 
+  HeaderConfig, 
+  FooterConfig, 
+  defaultHeaderConfig, 
+  defaultFooterConfig,
+} from "./campaign";
 
 export interface Prize {
   id: string;
@@ -173,6 +181,11 @@ export interface WheelConfig {
     backgroundImage?: string;
     backgroundImageMobile?: string;
   };
+  // Layout global
+  layout?: {
+    header: HeaderConfig;
+    footer: FooterConfig;
+  };
 }
 
 const defaultWheelConfig: WheelConfig = {
@@ -226,6 +239,10 @@ const defaultWheelConfig: WheelConfig = {
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
+  },
+  layout: {
+    header: { ...defaultHeaderConfig, enabled: false },
+    footer: { ...defaultFooterConfig, enabled: false },
   }
 };
 
@@ -249,6 +266,7 @@ export const WheelBuilder = () => {
     endTime,
     isLoading,
     isSaving,
+    hasUnsavedChanges,
     setConfig,
     setPrizes,
     save,
@@ -481,6 +499,7 @@ export const WheelBuilder = () => {
         onSave={handleSave}
         onPublish={handlePublish}
         isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
@@ -530,6 +549,7 @@ export const WheelBuilder = () => {
                     setCampaignDefaultTab('dotation');
                     setLeftDrawerOpen(false);
                   }}
+                  onUpdateConfig={updateConfig}
                 />
               </DrawerContent>
             </Drawer>
@@ -595,11 +615,12 @@ export const WheelBuilder = () => {
                 setActiveTab('campaign');
                 setCampaignDefaultTab('dotation');
               }}
+              onUpdateConfig={updateConfig}
               prizes={prizes}
             />
             
             {/* Preview area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
@@ -636,6 +657,68 @@ export const WheelBuilder = () => {
                   onUpdatePrize={(updatedPrize) => setPrizes(prev => prev.map(p => p.id === updatedPrize.id ? updatedPrize : p))}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Roue de la fortune. Vue active: ${activeView}. Titre: ${config.welcomeScreen.title}. Segments: ${config.segments.map(s => s.label).join(', ')}`}
+                onBrandPaletteExtracted={(palette: BrandPalette) => {
+                  // Appliquer automatiquement les couleurs de marque aux segments
+                  updateConfig({
+                    segments: config.segments.map((s, i) => ({
+                      ...s,
+                      color: palette.palette[i % palette.palette.length],
+                      textColor: palette.text === '#ffffff' ? '#ffffff' : '#000000'
+                    }))
+                  });
+                  toast.success('Couleurs de marque appliquées aux segments !');
+                }}
+                onApplyActions={createAIActionHandler(config, updateConfig, {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactForm',
+                  wheel: 'wheelScreen',
+                  'ending-win': 'endingWin',
+                  'ending-lose': 'endingLose'
+                }, {
+                  onUpdateSegments: (segments) => {
+                    updateConfig({ segments: segments.map((s, i) => ({
+                      ...config.segments[i] || {},
+                      id: s.id || `seg_${i}`,
+                      label: s.label,
+                      color: s.color,
+                      textColor: s.textColor || '#ffffff',
+                    })) });
+                  },
+                  onUpdatePrizes: (newPrizes) => {
+                    setPrizes(newPrizes.map((p, i) => ({
+                      id: p.id || `prize_${i}`,
+                      name: p.name,
+                      description: p.description || '',
+                      code: p.code || '',
+                      probability: 10,
+                      quantity: p.quantity ?? 100,
+                      image: p.image || '',
+                      isActive: true,
+                    })));
+                  },
+                  onApplyTemplate: (template, colors) => {
+                    // Appliquer les couleurs du template aux segments
+                    if (colors) {
+                      // Utiliser les couleurs de segment spécifiques si disponibles
+                      const segmentColors = colors.segmentColors || [colors.primary, colors.secondary, colors.accent, colors.primary, colors.secondary, colors.accent];
+                      const segmentTextColor = colors.segmentTextColor || (colors.text === '#ffffff' ? '#ffffff' : '#000000');
+                      
+                      updateConfig({
+                        segments: config.segments.map((s, i) => ({
+                          ...s,
+                          color: segmentColors[i % segmentColors.length] || s.color,
+                          textColor: segmentTextColor
+                        }))
+                      });
+                      
+                      toast.success(`Style "${template}" appliqué !`);
+                    }
+                  }
+                })}
+              />
             </div>
             
             <WheelSettingsPanel 

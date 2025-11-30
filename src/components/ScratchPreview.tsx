@@ -12,6 +12,7 @@ import { ContactLayouts } from "./layouts/ContactLayouts";
 import { EndingLayouts } from "./layouts/EndingLayouts";
 import { EditableTextBlock } from "./EditableTextBlock";
 import { determineWinningSegment, consumePrize, DrawResult } from "@/utils/prizeDrawing";
+import { CampaignHeader, CampaignFooter } from "./campaign";
 
 // Variable pour stocker le résultat du tirage Scratch
 let globalScratchDrawResult: DrawResult | null = null;
@@ -469,8 +470,6 @@ export const ScratchPreview = ({
                       isReadOnly={isReadOnly}
                       onFocus={() => !isReadOnly && setEditingField('welcome-title')}
                       onBlur={() => setEditingField(null)}
-                      showSparkles={!isReadOnly}
-                      showClear={!isReadOnly}
                       fieldType="title"
                       width={config.welcomeScreen.titleWidth || 100}
                       onWidthChange={(width) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, titleWidth: width } })}
@@ -499,8 +498,6 @@ export const ScratchPreview = ({
                       isReadOnly={isReadOnly}
                       onFocus={() => !isReadOnly && setEditingField('welcome-subtitle')}
                       onBlur={() => setEditingField(null)}
-                      showSparkles={!isReadOnly}
-                      showClear={!isReadOnly}
                       fieldType="subtitle"
                       width={config.welcomeScreen.subtitleWidth || 100}
                       onWidthChange={(width) => onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitleWidth: width } })}
@@ -581,10 +578,6 @@ export const ScratchPreview = ({
                       ) : (
                         <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: theme.backgroundColor }} />
                       )}
-                      <div 
-                        className="absolute inset-0 bg-black" 
-                        style={{ opacity: config.welcomeScreen.overlayOpacity ?? 0.6 }}
-                      />
                       <div className={`relative z-10 flex ${justifyContent} items-center h-full px-16`}>
                         <div className="max-w-[700px]">
                           <TextContent />
@@ -784,10 +777,6 @@ export const ScratchPreview = ({
                     ) : (
                       <div className="absolute inset-0 w-full h-full" style={{ backgroundColor: theme.backgroundColor }} />
                     )}
-                    <div 
-                      className="absolute inset-0 bg-black" 
-                      style={{ opacity: config.welcomeScreen.overlayOpacity ?? 0.6 }}
-                    />
                     <div className="relative z-10 flex items-center justify-center h-full px-8">
                       <div className="w-full max-w-[700px] text-center">
                         <TextContent centered />
@@ -988,8 +977,6 @@ export const ScratchPreview = ({
                       lineHeight: '1.1',
                       letterSpacing: '-0.02em',
                     }}
-                    showSparkles={!isReadOnly}
-                    showClear={!isReadOnly}
                     fieldType="title"
                     width={config.scratchScreen.titleWidth || 100}
                     onWidthChange={(width) => onUpdateConfig({ scratchScreen: { ...config.scratchScreen, titleWidth: width } })}
@@ -1044,8 +1031,6 @@ export const ScratchPreview = ({
                 isReadOnly={isReadOnly}
                 onFocus={() => !isReadOnly && setEditingField('ending-win-title')}
                 onBlur={() => setEditingField(null)}
-                showSparkles={!isReadOnly}
-                showClear={!isReadOnly}
                 fieldType="title"
                 width={config.endingWin.titleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingWin: { ...config.endingWin, titleWidth: width } })}
@@ -1071,8 +1056,6 @@ export const ScratchPreview = ({
                 isReadOnly={isReadOnly}
                 onFocus={() => !isReadOnly && setEditingField('ending-win-subtitle')}
                 onBlur={() => setEditingField(null)}
-                showSparkles={!isReadOnly}
-                showClear={!isReadOnly}
                 fieldType="subtitle"
                 width={config.endingWin.subtitleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingWin: { ...config.endingWin, subtitleWidth: width } })}
@@ -1119,8 +1102,6 @@ export const ScratchPreview = ({
                 isReadOnly={isReadOnly}
                 onFocus={() => !isReadOnly && setEditingField('ending-lose-title')}
                 onBlur={() => setEditingField(null)}
-                showSparkles={!isReadOnly}
-                showClear={!isReadOnly}
                 fieldType="title"
                 width={config.endingLose.titleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingLose: { ...config.endingLose, titleWidth: width } })}
@@ -1146,8 +1127,6 @@ export const ScratchPreview = ({
                 isReadOnly={isReadOnly}
                 onFocus={() => !isReadOnly && setEditingField('ending-lose-subtitle')}
                 onBlur={() => setEditingField(null)}
-                showSparkles={!isReadOnly}
-                showClear={!isReadOnly}
                 fieldType="subtitle"
                 width={config.endingLose.subtitleWidth || 100}
                 onWidthChange={(width) => onUpdateConfig({ endingLose: { ...config.endingLose, subtitleWidth: width } })}
@@ -1199,9 +1178,25 @@ export const ScratchPreview = ({
 
       <div 
         key={`preview-container-${viewMode}`}
-        className="relative overflow-y-auto overflow-x-hidden transition-all duration-300 flex-shrink-0" 
+        className="relative overflow-hidden transition-all duration-300 flex-shrink-0 flex flex-col" 
         style={{ 
-          backgroundColor: theme.backgroundColor, 
+          backgroundColor: (() => {
+            const hasBackgroundImage = (() => {
+              const applyToAll = config.welcomeScreen.applyBackgroundToAll;
+              const welcomeDesktop = config.welcomeScreen.backgroundImage;
+              const welcomeMobile = config.welcomeScreen.backgroundImageMobile;
+              if (applyToAll && (welcomeDesktop || welcomeMobile)) return true;
+              switch (activeView) {
+                case 'welcome': return !!(welcomeDesktop || welcomeMobile);
+                case 'contact': return !!(config.contactForm.backgroundImage || config.contactForm.backgroundImageMobile);
+                case 'scratch': return !!(config.scratchScreen.backgroundImage || config.scratchScreen.backgroundImageMobile);
+                case 'ending-win': return !!(config.endingWin.backgroundImage || config.endingWin.backgroundImageMobile);
+                case 'ending-lose': return !!(config.endingLose.backgroundImage || config.endingLose.backgroundImageMobile);
+                default: return false;
+              }
+            })();
+            return hasBackgroundImage ? 'transparent' : theme.backgroundColor;
+          })(),
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
@@ -1246,16 +1241,6 @@ export const ScratchPreview = ({
           };
           
           const bgImage = getScreenBackground();
-          const getOverlayOpacity = () => {
-            switch (activeView) {
-              case 'welcome': return config.welcomeScreen.overlayOpacity;
-              case 'contact': return config.contactForm.overlayOpacity;
-              case 'scratch': return config.scratchScreen.overlayOpacity;
-              case 'ending-win': return config.endingWin.overlayOpacity;
-              case 'ending-lose': return config.endingLose.overlayOpacity;
-              default: return undefined;
-            }
-          };
           
           if (!bgImage) return null;
           
@@ -1268,40 +1253,50 @@ export const ScratchPreview = ({
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
               }}
-            >
-              <div 
-                className="absolute inset-0" 
-                style={{ 
-                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                  opacity: getOverlayOpacity() !== undefined ? getOverlayOpacity()! / 100 : 0.4
-                }} 
-              />
-            </div>
+            />
           );
         })()}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeView}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="w-full h-full relative z-10"
-            onClick={(e) => {
-              // Ne pas blur si on clique sur un input, textarea ou button
-              const target = e.target as HTMLElement;
-              if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
-                return;
-              }
-              setEditingField(null);
-              if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                document.activeElement.blur();
-              }
-            }}
-          >
-            {renderContent()}
-          </motion.div>
-        </AnimatePresence>
+
+        {/* Header */}
+        {config.layout?.header?.enabled && (
+          <div className="relative z-20 flex-shrink-0">
+            <CampaignHeader config={config.layout.header} isPreview />
+          </div>
+        )}
+
+        {/* Contenu principal */}
+        <div className="flex-1 relative overflow-auto z-10 min-h-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeView}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="w-full h-full relative z-10"
+              onClick={(e) => {
+                // Ne pas blur si on clique sur un input, textarea ou button
+                const target = e.target as HTMLElement;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
+                  return;
+                }
+                setEditingField(null);
+                if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                  document.activeElement.blur();
+                }
+              }}
+            >
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        
+        {/* Footer en bas, en dehors de la zone scrollable */}
+        {config.layout?.footer?.enabled && (
+          <div className="flex-shrink-0 relative z-10">
+            <CampaignFooter config={config.layout.footer} isPreview />
+          </div>
+        )}
       </div>
     </div>
   );

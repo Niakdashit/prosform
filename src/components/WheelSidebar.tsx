@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { WheelConfig } from "./WheelBuilder";
-import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, GripVertical, MoreVertical, Copy, Trash2, Clock } from "lucide-react";
+import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, GripVertical, MoreVertical, Copy, Trash2, Clock, PanelTop } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
 import { WheelBorderStyleSelector } from "@/components/ui/WheelBorderStyleSelector";
 import { ThemeStylePanel } from "@/components/ui/ThemeStylePanel";
+import { LayoutSettingsPanel } from "./campaign";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,8 @@ interface Prize {
   attributionMethod: 'probability' | 'calendar';
   winProbability?: number;
   assignedSegments?: string[];
+  calendarDate?: string;
+  calendarTime?: string;
   status: 'active' | 'depleted' | 'scheduled';
   remaining: number;
 }
@@ -37,6 +40,7 @@ interface WheelSidebarProps {
   onReorderSegments: (startIndex: number, endIndex: number) => void;
   onDeleteSegment: (id: string) => void;
   onGoToDotation: () => void;
+  onUpdateConfig: (updates: Partial<WheelConfig>) => void;
   prizes?: Prize[];
 }
 
@@ -49,6 +53,7 @@ export const WheelSidebar = ({
   onReorderSegments,
   onDeleteSegment,
   onGoToDotation,
+  onUpdateConfig,
   prizes = [],
 }: WheelSidebarProps) => {
   const { theme } = useTheme();
@@ -177,10 +182,14 @@ export const WheelSidebar = ({
   return (
     <div className="w-[280px] bg-background border-r border-border flex flex-col">
       <Tabs defaultValue="views" className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 mx-2 mt-3 mb-0 h-9">
+        <TabsList className="grid w-full grid-cols-3 mx-2 mt-3 mb-0 h-9">
           <TabsTrigger value="views" className="text-[10px] gap-0.5 px-1.5">
             <LayoutList className="w-3 h-3" />
             <span>Vues</span>
+          </TabsTrigger>
+          <TabsTrigger value="structure" className="text-[10px] gap-0.5 px-1.5">
+            <PanelTop className="w-3 h-3" />
+            <span>Structure</span>
           </TabsTrigger>
           <TabsTrigger value="style" className="text-[10px] gap-0.5 px-1.5">
             <Palette className="w-3 h-3" />
@@ -318,6 +327,13 @@ export const WheelSidebar = ({
               ))}
             </div>
           </ScrollArea>
+        </TabsContent>
+
+        <TabsContent value="structure" className="flex-1 mt-0 overflow-hidden">
+          <LayoutSettingsPanel 
+            layout={config.layout}
+            onUpdateLayout={(updates) => onUpdateConfig({ layout: { ...config.layout, ...updates } as any })}
+          />
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">

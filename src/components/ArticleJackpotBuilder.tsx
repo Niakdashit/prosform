@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { JackpotSidebar } from "./JackpotSidebar";
 import { ArticleJackpotPreview } from "./ArticleJackpotPreview";
@@ -6,11 +7,14 @@ import { JackpotSettingsPanel } from "./JackpotSettingsPanel";
 import { ArticleJackpotSettingsPanel } from "./ArticleJackpotSettingsPanel";
 import { JackpotTopToolbar } from "./JackpotTopToolbar";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaign } from "@/hooks/useCampaign";
 import { JackpotConfig, JackpotSymbol, JackpotPrize } from "./JackpotBuilder";
 
 const defaultJackpotConfig: JackpotConfig = {
@@ -102,18 +106,68 @@ const defaultArticleConfig: ArticleConfig = {
 
 export const ArticleJackpotBuilder = () => {
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
-  const [config, setConfig] = useState<JackpotConfig>(defaultJackpotConfig);
-  const [articleConfig, setArticleConfig] = useState<ArticleConfig>(defaultArticleConfig);
+  const themeContext = useTheme();
+  const { theme } = themeContext;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    campaign,
+    config,
+    prizes,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    isLoading,
+    isSaving,
+    hasUnsavedChanges,
+    setConfig,
+    setPrizes,
+    save,
+    publish,
+    setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
+  } = useCampaign(
+    { campaignId, type: 'jackpot', mode: 'article', defaultName: 'Nouvelle campagne jackpot (article)' },
+    { ...defaultJackpotConfig, articleConfig: defaultArticleConfig },
+    themeContext
+  );
+
+  // Article config is stored inside config.articleConfig
+  const articleConfig: ArticleConfig = (config as any).articleConfig || defaultArticleConfig;
+
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
-  const [prizes, setPrizes] = useState<JackpotPrize[]>([]);
+  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
 
   useEffect(() => {
     if (isMobile) setViewMode('mobile');
   }, [isMobile]);
+
+  // Sauvegarder et mettre à jour l'URL avec l'ID
+  const handleSave = async () => {
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/article-jackpot?id=${saved.id}`, { replace: true });
+    }
+  };
+
+  // Publier et mettre à jour l'URL
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/article-jackpot?id=${published.id}`, { replace: true });
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem('article-jackpot-config', JSON.stringify(config));
@@ -128,17 +182,20 @@ export const ArticleJackpotBuilder = () => {
   }, [theme]);
 
   const updateConfig = (updates: Partial<JackpotConfig>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ ...prev, ...updates }));
   };
 
   const updateArticleConfig = (updates: Partial<ArticleConfig>) => {
-    setArticleConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ 
+      ...prev, 
+      articleConfig: { ...(prev.articleConfig || defaultArticleConfig), ...updates } 
+    }));
   };
 
   const updateSymbol = (id: string, updates: Partial<JackpotSymbol>) => {
-    setConfig(prev => ({
+    setConfig((prev: any) => ({
       ...prev,
-      symbols: prev.symbols.map(s => s.id === id ? { ...s, ...updates } : s)
+      symbols: prev.symbols.map((s: JackpotSymbol) => s.id === id ? { ...s, ...updates } : s)
     }));
   };
 
@@ -148,16 +205,16 @@ export const ArticleJackpotBuilder = () => {
       emoji: '🎁',
       label: 'Nouveau symbole'
     };
-    setConfig(prev => ({ ...prev, symbols: [...prev.symbols, newSymbol] }));
+    setConfig((prev: any) => ({ ...prev, symbols: [...prev.symbols, newSymbol] }));
     toast.success("Symbole ajouté");
   };
 
   const deleteSymbol = (id: string) => {
-    if (config.symbols.length <= 3) {
+    if ((config as any).symbols?.length <= 3) {
       toast.error("Le jackpot doit avoir au moins 3 symboles");
       return;
     }
-    setConfig(prev => ({ ...prev, symbols: prev.symbols.filter(s => s.id !== id) }));
+    setConfig((prev: any) => ({ ...prev, symbols: prev.symbols.filter((s: JackpotSymbol) => s.id !== id) }));
     toast.success("Symbole supprimé");
   };
 
@@ -174,8 +231,12 @@ export const ArticleJackpotBuilder = () => {
             toast.error('Unable to open preview - data too large');
           }
         }}
-        activeTab="design"
-        onTabChange={() => {}}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
         
       <div className="flex flex-1 overflow-hidden relative">
@@ -235,7 +296,7 @@ export const ArticleJackpotBuilder = () => {
               onGoToDotation={() => {}}
             />
             
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
                   onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
@@ -262,6 +323,17 @@ export const ArticleJackpotBuilder = () => {
                   prizes={prizes}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Jackpot (Article). Vue active: ${activeView}. Titre: ${(config as any).welcomeScreen?.title || ''}`}
+                onApplyActions={createAIActionHandler(config, (updates) => setConfig({ ...config, ...updates }), {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactForm',
+                  jackpot: 'jackpotScreen',
+                  'ending-win': 'endingWin',
+                  'ending-lose': 'endingLose'
+                })}
+              />
             </div>
             
             <div className="w-72 bg-white border-l border-gray-200 flex flex-col h-full overflow-hidden">

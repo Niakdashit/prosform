@@ -120,8 +120,6 @@ export const EndingLayouts = ({
         isEditing={editingField === 'ending-title'}
         onFocus={onFocusTitle}
         onBlur={() => onBlurTitle?.(title)}
-        showSparkles={true}
-        showClear={true}
         fieldType="title"
         marginBottom="16px"
       />
@@ -140,8 +138,6 @@ export const EndingLayouts = ({
         isEditing={editingField === 'ending-subtitle'}
         onFocus={onFocusSubtitle}
         onBlur={() => onBlurSubtitle?.(subtitle)}
-        showSparkles={true}
-        showClear={true}
         fieldType="subtitle"
         marginBottom="32px"
       />

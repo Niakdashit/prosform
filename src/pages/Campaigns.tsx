@@ -203,29 +203,19 @@ const Campaigns = () => {
     return (
       <AppLayout>
         <div 
-          className="flex items-center justify-center"
+          className="flex flex-col items-center justify-center"
           style={{ 
             fontFamily: "'DM Sans', sans-serif",
             minHeight: 'calc(100vh - 120px)',
           }}
         >
-          {/* Grand cadre glass de loading - même fond que le container principal */}
-          <div
-            className="flex flex-col items-center justify-center w-full max-w-6xl mx-auto px-8 py-16"
-            style={{
-              borderRadius: '32px',
-              background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
-              boxShadow: '0 18px 55px rgba(15,23,42,0.12)',
-            }}
-          >
-            <Loader2 
-              className="w-10 h-10 animate-spin mb-4" 
-              style={{ color: colors.gold }} 
-            />
-            <p className="text-sm" style={{ color: colors.muted }}>
-              Chargement des campagnes...
-            </p>
-          </div>
+          <Loader2 
+            className="w-10 h-10 animate-spin mb-4" 
+            style={{ color: colors.gold }} 
+          />
+          <p className="text-sm" style={{ color: colors.muted }}>
+            Chargement des campagnes...
+          </p>
         </div>
       </AppLayout>
     );
@@ -233,14 +223,7 @@ const Campaigns = () => {
 
   return (
     <AppLayout>
-      <div
-        style={{
-          fontFamily: "'DM Sans', sans-serif",
-          background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
-          borderRadius: '32px',
-          padding: '24px',
-        }}
-      >
+      <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
         {/* Page title */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold" style={{ color: colors.dark }}>
@@ -256,15 +239,14 @@ const Campaigns = () => {
           className="grid grid-cols-4 gap-4 mb-6 p-5 relative overflow-hidden"
           style={{
             borderRadius: '24px',
-            // Dégradé quasi blanc avec une pointe de doré très légère
-            background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',
           }}
         >
           {/* Animated gradient overlay for depth */}
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.65) 0%, transparent 55%), radial-gradient(circle at 85% 100%, rgba(245,202,60,0.08) 0%, transparent 55%)',
+              background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 40%)',
             }}
           />
           {[
@@ -278,8 +260,8 @@ const Campaigns = () => {
               className="p-4 relative overflow-hidden group"
               style={{ 
                 background: 'rgba(255, 255, 255, 0.25)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
                 borderRadius: '18px',
                 border: '1px solid rgba(255, 255, 255, 0.6)',
                 boxShadow: `
@@ -320,19 +302,19 @@ const Campaigns = () => {
           ))}
         </div>
 
-        {/* Main content container - Liquid Glass Effect (même fond que les cartes de stats) */}
+        {/* Main content container - Liquid Glass Effect */}
         <div 
           className="relative overflow-hidden p-5"
           style={{
-            borderRadius: '28px',
-            background: 'linear-gradient(135deg, rgba(245,202,60,0.04) 0%, rgba(255,255,255,0.98) 35%, rgba(240,242,247,0.95) 100%)',
+            borderRadius: '24px',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',
           }}
         >
           {/* Gradient overlay for depth */}
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(circle at 15% 0%, rgba(255,255,255,0.65) 0%, transparent 55%), radial-gradient(circle at 85% 100%, rgba(245,202,60,0.08) 0%, transparent 55%)',
+              background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 40%)',
             }}
           />
 
@@ -341,8 +323,8 @@ const Campaigns = () => {
           className="flex items-center justify-between p-4 mb-4 relative overflow-hidden"
           style={{ 
             background: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             borderRadius: '18px',
             border: '1px solid rgba(255, 255, 255, 0.6)',
             boxShadow: `
@@ -431,8 +413,8 @@ const Campaigns = () => {
             className="relative overflow-hidden"
             style={{ 
               background: 'rgba(255, 255, 255, 0.25)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               borderRadius: '18px',
               border: '1px solid rgba(255, 255, 255, 0.6)',
               boxShadow: `
@@ -584,13 +566,13 @@ const Campaigns = () => {
           /* Grid view */
           <div className="grid grid-cols-4 gap-4">
             {filteredCampaigns.map((campaign) => {
-              // Dégradés doux par type, basés sur la palette de l'app (gris + or)
+              // Gradient colors based on campaign type - using DA colors
               const gradients: Record<CampaignType, string> = {
-                quiz: 'linear-gradient(135deg, rgba(245,202,60,0.20) 0%, rgba(249,250,251,0.96) 40%, rgba(212,214,220,0.90) 100%)',
-                form: 'linear-gradient(135deg, rgba(245,202,60,0.16) 0%, rgba(249,250,251,0.96) 40%, rgba(209,213,219,0.88) 100%)',
-                wheel: 'linear-gradient(135deg, rgba(245,202,60,0.22) 0%, rgba(249,250,251,0.96) 40%, rgba(212,214,220,0.90) 100%)',
-                jackpot: 'linear-gradient(135deg, rgba(245,202,60,0.18) 0%, rgba(249,250,251,0.96) 40%, rgba(209,213,219,0.88) 100%)',
-                scratch: 'linear-gradient(135deg, rgba(245,202,60,0.20) 0%, rgba(249,250,251,0.96) 40%, rgba(212,214,220,0.90) 100%)',
+                quiz: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
+                form: 'linear-gradient(135deg, #4a4540 0%, #6a6358 50%, #8a8070 100%)',
+                wheel: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
+                jackpot: 'linear-gradient(135deg, #4a4540 0%, #6a6358 50%, #8a8070 100%)',
+                scratch: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
               };
 
               return (
@@ -599,9 +581,17 @@ const Campaigns = () => {
                   className="relative overflow-hidden cursor-pointer transition-transform hover:scale-[1.02]"
                   style={{ 
                     background: gradients[campaign.type],
-                    borderRadius: '18px',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    borderRadius: '16px',
                     minHeight: '180px',
-                    boxShadow: '0 18px 55px rgba(15,23,42,0.18)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: `
+                      0 8px 32px rgba(0, 0, 0, 0.12),
+                      0 4px 16px rgba(0, 0, 0, 0.08),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.1)
+                    `,
                   }}
                   onClick={() => handleEditCampaign(campaign)}
                 >
