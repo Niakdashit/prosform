@@ -29,6 +29,7 @@ import ArticleJackpot from "./pages/ArticleJackpot";
 import ArticleJackpotPreview from "./pages/ArticleJackpotPreview";
 import PublicCampaign from "./pages/PublicCampaign";
 import MigrateData from "./pages/MigrateData";
+import InitAnalytics from "./pages/InitAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/article-jackpot" element={<ArticleJackpot />} />
             <Route path="/article-jackpot-preview" element={<ArticleJackpotPreview />} />
             <Route path="/migrate" element={<MigrateData />} />
+            <Route path="/init-analytics" element={<InitAnalytics />} />
             <Route path="/p/:slug" element={<PublicCampaign />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
