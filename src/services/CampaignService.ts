@@ -3,29 +3,53 @@ import type { Campaign, CampaignCreate, CampaignUpdate } from '@/types/campaign'
 import { campaignCreateSchema, campaignUpdateSchema, publishCampaignSchema } from '@/schemas/campaign.schema';
 
 /**
+ * Transforme les données Supabase en format Campaign
+ */
+function transformCampaign(data: any): Campaign {
+  return {
+    ...data,
+    name: data.app_title || data.title || data.name,
+  };
+}
+
+/**
+ * Prépare les données pour l'insertion/mise à jour Supabase
+ */
+function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = false): any {
+  // Champs à exclure (lecture seule ou gérés automatiquement)
+  const excludedFields = [
+    'id',
+    'created_at',
+    'updated_at',
+    'last_edited_at',
+    'name', // On le mappe vers app_title
+  ];
+  
+  // Si c'est une mise à jour, ne pas modifier user_id
+  if (isUpdate) {
+    excludedFields.push('user_id');
+  }
+  
+  const result: any = {};
+  
+  for (const [key, value] of Object.entries(campaign)) {
+    if (!excludedFields.includes(key) && value !== undefined) {
+      result[key] = value;
+    }
+  }
+  
+  // Mapper name vers app_title si présent
+  if (campaign.name !== undefined) {
+    result.app_title = campaign.name;
+  }
+  
+  return result;
+}
+
+/**
  * Service centralisé pour la gestion des campagnes avec validation et sécurité
  */
 export const CampaignService = {
-  /**
-   * Transforme les données Supabase en format Campaign
-   */
-  _transformCampaign(data: any): Campaign {
-    return {
-      ...data,
-      name: data.app_title || data.name, // Utiliser app_title comme name
-    };
-  },
-
-  /**
-   * Prépare les données pour l'insertion/mise à jour
-   */
-  _prepareCampaignData(campaign: Partial<Campaign>): any {
-    const { name, ...rest } = campaign;
-    return {
-      ...rest,
-      app_title: name || rest.app_title, // Mapper name vers app_title
-    };
-  },
 
   /**
    * Récupérer toutes les campagnes
@@ -41,7 +65,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return (data || []).map(this._transformCampaign);
+    return (data || []).map(transformCampaign);
   },
 
   /**
@@ -60,7 +84,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return this._transformCampaign(data);
+    return transformCampaign(data);
   },
 
   /**
@@ -70,8 +94,17 @@ export const CampaignService = {
     // Validation des données
     const validatedData = campaignCreateSchema.parse(campaign);
     
+    // Récupérer l'utilisateur authentifié (ou utiliser un ID par défaut)
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id || '00000000-0000-0000-0000-000000000000'; // ID par défaut pour dev
+    
     // Préparer les données pour Supabase
-    const supabaseData = this._prepareCampaignData(validatedData);
+    const supabaseData = {
+      ...prepareCampaignData(validatedData, false),
+      user_id: userId,
+      is_published: false,
+      last_edited_at: new Date().toISOString(),
+    };
     
     const { data, error } = await supabase
       .from('campaigns')
@@ -85,7 +118,7 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign created:', data.id);
-    return this._transformCampaign(data);
+    return transformCampaign(data);
   },
 
   /**
@@ -95,8 +128,11 @@ export const CampaignService = {
     // Validation des données
     const validatedData = campaignUpdateSchema.parse(updates);
     
-    // Préparer les données pour Supabase
-    const supabaseData = this._prepareCampaignData(validatedData);
+    // Préparer les données pour Supabase (isUpdate = true pour filtrer user_id)
+    const supabaseData = {
+      ...prepareCampaignData(validatedData, true),
+      last_edited_at: new Date().toISOString(),
+    };
     
     const { data, error } = await supabase
       .from('campaigns')
@@ -111,7 +147,7 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign updated:', id);
-    return this._transformCampaign(data);
+    return transformCampaign(data);
   },
 
   /**
