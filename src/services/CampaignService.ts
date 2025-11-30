@@ -7,6 +7,27 @@ import { campaignCreateSchema, campaignUpdateSchema, publishCampaignSchema } fro
  */
 export const CampaignService = {
   /**
+   * Transforme les données Supabase en format Campaign
+   */
+  _transformCampaign(data: any): Campaign {
+    return {
+      ...data,
+      name: data.app_title || data.name, // Utiliser app_title comme name
+    };
+  },
+
+  /**
+   * Prépare les données pour l'insertion/mise à jour
+   */
+  _prepareCampaignData(campaign: Partial<Campaign>): any {
+    const { name, ...rest } = campaign;
+    return {
+      ...rest,
+      app_title: name || rest.app_title, // Mapper name vers app_title
+    };
+  },
+
+  /**
    * Récupérer toutes les campagnes
    */
   async getAll(): Promise<Campaign[]> {
@@ -20,7 +41,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return data || [];
+    return (data || []).map(this._transformCampaign);
   },
 
   /**
@@ -39,7 +60,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return data;
+    return this._transformCampaign(data);
   },
 
   /**
@@ -49,9 +70,12 @@ export const CampaignService = {
     // Validation des données
     const validatedData = campaignCreateSchema.parse(campaign);
     
+    // Préparer les données pour Supabase
+    const supabaseData = this._prepareCampaignData(validatedData);
+    
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([validatedData])
+      .insert([supabaseData])
       .select()
       .single();
 
@@ -61,7 +85,7 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign created:', data.id);
-    return data;
+    return this._transformCampaign(data);
   },
 
   /**
@@ -71,9 +95,12 @@ export const CampaignService = {
     // Validation des données
     const validatedData = campaignUpdateSchema.parse(updates);
     
+    // Préparer les données pour Supabase
+    const supabaseData = this._prepareCampaignData(validatedData);
+    
     const { data, error } = await supabase
       .from('campaigns')
-      .update(validatedData)
+      .update(supabaseData)
       .eq('id', id)
       .select()
       .single();
@@ -84,7 +111,7 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign updated:', id);
-    return data;
+    return this._transformCampaign(data);
   },
 
   /**
@@ -138,18 +165,27 @@ export const CampaignService = {
     // Générer le slug si pas déjà présent
     let publicSlug = campaign.public_url_slug;
     if (!publicSlug) {
-      const { data: slugData, error: slugError } = await supabase
-        .rpc('generate_campaign_slug', {
-          campaign_title: campaign.name || campaign.app_title,
-          campaign_id: id
-        });
+      // Import dynamique pour éviter les dépendances circulaires
+      const { generateSlug } = await import('@/utils/inputValidation');
+      publicSlug = generateSlug(campaign.name, id);
       
-      if (slugError) {
-        console.error('❌ [CampaignService] slug generation error:', slugError);
-        throw slugError;
+      // Vérifier l'unicité du slug
+      let counter = 0;
+      let finalSlug = publicSlug;
+      while (true) {
+        const { data: existing } = await supabase
+          .from('campaigns')
+          .select('id')
+          .eq('public_url_slug', finalSlug)
+          .single();
+        
+        if (!existing) break;
+        
+        counter++;
+        finalSlug = `${publicSlug}-${counter}`;
       }
       
-      publicSlug = slugData;
+      publicSlug = finalSlug;
     }
     
     // URL publique complète

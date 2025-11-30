@@ -25,6 +25,35 @@ export function encodeForUrl(text: string): string {
 }
 
 /**
+ * Génère un slug unique à partir d'un titre et d'un ID
+ */
+export function generateSlug(title: string, id: string): string {
+  // Nettoyer le titre
+  let slug = title
+    .toLowerCase()
+    .trim()
+    // Remplacer les accents
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    // Remplacer les caractères non alphanumériques par des tirets
+    .replace(/[^a-z0-9]+/g, '-')
+    // Supprimer les tirets multiples
+    .replace(/-+/g, '-')
+    // Supprimer les tirets au début et à la fin
+    .replace(/^-+|-+$/g, '')
+    // Limiter à 50 caractères
+    .substring(0, 50)
+    // Supprimer les tirets à la fin après la coupure
+    .replace(/-+$/, '');
+  
+  // Ajouter les 8 premiers caractères de l'ID pour l'unicité
+  const shortId = id.substring(0, 8);
+  slug = slug ? `${slug}-${shortId}` : shortId;
+  
+  return slug;
+}
+
+/**
  * Valide un slug (caractères alphanumériques et tirets uniquement)
  */
 export function validateSlug(slug: string): boolean {
