@@ -335,7 +335,7 @@ $$;
 -- 4.1 Vue pour export complet des participants
 CREATE OR REPLACE VIEW participant_export_view AS
 SELECT 
-  COALESCE(c.title, c.app_title, c.id::text) as campaign_name,
+  c.id::text as campaign_name,
   c.type as campaign_type,
   cp.email,
   cp.created_at,
