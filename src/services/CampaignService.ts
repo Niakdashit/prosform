@@ -22,7 +22,6 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
     'created_at',
     'updated_at',
     'last_edited_at',
-    'name', // On le mappe vers app_title
   ];
   
   // Si c'est une mise à jour, ne pas modifier user_id
@@ -36,11 +35,6 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
     if (!excludedFields.includes(key) && value !== undefined) {
       result[key] = value;
     }
-  }
-  
-  // Mapper name vers app_title si présent
-  if (campaign.name !== undefined) {
-    result.app_title = campaign.name;
   }
   
   return result;
