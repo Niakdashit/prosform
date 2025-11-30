@@ -19,7 +19,10 @@ export const CampaignService = {
       throw error;
     }
 
-    return data || [];
+    return (data || []).map((row: any) => ({
+      ...row,
+      title: row.app_title ?? row.title,
+    }));
   },
 
   /**
@@ -38,7 +41,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return data;
+    return data ? { ...data, title: (data as any).app_title ?? data.title } : null;
   },
 
   /**
@@ -55,7 +58,7 @@ export const CampaignService = {
 
     const dbPayload = {
       user_id: user.id,
-      title: campaign.title,
+      app_title: campaign.title,
       type: campaign.type,
       status: campaign.status || 'draft',
       config: campaign.config || {},
@@ -82,7 +85,7 @@ export const CampaignService = {
    */
   async update(id: string, updates: Partial<Campaign>): Promise<Campaign> {
     const dbPayload = {
-      title: updates.title,
+      app_title: updates.title,
       type: updates.type,
       status: updates.status,
       config: updates.config,
