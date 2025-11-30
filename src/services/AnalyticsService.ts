@@ -98,7 +98,7 @@ export const AnalyticsService = {
     // Récupérer toutes les campagnes
     const { data: campaigns, error: campaignsError } = await supabase
       .from('campaigns')
-      .select('id, app_title, type');
+      .select('id, type');
 
     if (campaignsError) throw campaignsError;
 
@@ -158,7 +158,7 @@ export const AnalyticsService = {
 
       return {
         campaign_id: campaign.id,
-        campaign_name: (campaign as any).app_title || 'Sans nom',
+        campaign_name: (campaign as any).name || (campaign as any).title || 'Sans nom',
         campaign_type: (campaign as any).type || 'unknown',
         total_views: stats.total_views,
         total_participations: stats.total_participations,
@@ -174,7 +174,7 @@ export const AnalyticsService = {
     // Récupérer la campagne
     const { data: campaign, error: campaignError } = await supabase
       .from('campaigns')
-      .select('id, app_title, type')
+      .select('id, type')
       .eq('id', campaignId)
       .single();
 
@@ -228,7 +228,7 @@ export const AnalyticsService = {
 
     return {
       campaign_id: campaign.id,
-      campaign_name: (campaign as any).app_title || 'Sans nom',
+      campaign_name: (campaign as any).name || (campaign as any).title || 'Sans nom',
       campaign_type: (campaign as any).type || 'unknown',
       total_views: totals.total_views,
       total_participations: totals.total_participations,
