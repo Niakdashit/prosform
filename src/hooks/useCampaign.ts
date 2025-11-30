@@ -196,7 +196,7 @@ export function useCampaign(
     } finally {
       setIsSaving(false);
     }
-  }, [campaign, name, type, config, prizes, startDate, startTime, endDate, endTime, themeContext]);
+  }, [campaign, title, type, config, prizes, startDate, startTime, endDate, endTime, themeContext]);
 
   // Publier la campagne
   const publish = useCallback(async (): Promise<Campaign | null> => {
