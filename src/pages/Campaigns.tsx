@@ -828,7 +828,27 @@ const Campaigns = () => {
               {/* Main Stats Grid - 4 columns */}
               <div className="grid grid-cols-4 gap-4">
                 {/* Participations */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -846,7 +866,27 @@ const Campaigns = () => {
                 </div>
 
                 {/* Unique Participants */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -864,7 +904,27 @@ const Campaigns = () => {
                 </div>
 
                 {/* New Participants */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -882,7 +942,27 @@ const Campaigns = () => {
                 </div>
 
                 {/* Total Page Views */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -900,7 +980,27 @@ const Campaigns = () => {
                 </div>
 
                 {/* Completion Rate */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -924,7 +1024,27 @@ const Campaigns = () => {
                 </div>
 
                 {/* Newsletter & Marketing Opt-ins */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -942,7 +1062,27 @@ const Campaigns = () => {
                 </div>
 
                 {/* Legal & Rules Opt-ins */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -960,7 +1100,27 @@ const Campaigns = () => {
                 </div>
 
                 {/* Partner Opt-ins */}
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -980,7 +1140,27 @@ const Campaigns = () => {
 
               {/* Time series chart */}
               {campaignStats.timeSeries && campaignStats.timeSeries.length > 0 && (
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <h3 className="text-sm font-medium mb-4" style={{ color: colors.dark }}>
                     Évolution sur 7 jours
                   </h3>
@@ -1024,7 +1204,27 @@ const Campaigns = () => {
 
               {/* Bottom stats */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
                     Temps moyen passé
                   </span>
@@ -1035,7 +1235,27 @@ const Campaigns = () => {
                     }
                   </p>
                 </div>
-                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                <div 
+                  className="p-6 rounded-lg relative overflow-hidden transition-transform hover:scale-[1.02]"
+                  style={{ 
+                    background: 'rgba(255, 255, 255, 0.25)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                    boxShadow: `
+                      0 4px 24px rgba(0, 0, 0, 0.06),
+                      0 1px 2px rgba(0, 0, 0, 0.04),
+                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                    `,
+                  }}
+                >
+                  <div 
+                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                    }}
+                  />
                   <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
                     Dernière participation
                   </span>
