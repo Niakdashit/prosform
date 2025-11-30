@@ -22,22 +22,20 @@ const colors = {
   border: '#e5e7eb',
 };
 
-export const InstantWinSection = () => {
+interface InstantWinSectionProps {
+  campaignId: string;
+}
+
+export const InstantWinSection = ({ campaignId }: InstantWinSectionProps) => {
   const [winners, setWinners] = useState<InstantWinWinner[]>([]);
   const [prizesStatus, setPrizesStatus] = useState<PrizeStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('all');
-  const { campaigns } = useCampaigns();
 
   const loadData = async () => {
     setIsLoading(true);
     const [winnersData, statusData] = await Promise.all([
-      PrizesService.getInstantWinWinners(
-        selectedCampaign === 'all' ? undefined : selectedCampaign
-      ),
-      selectedCampaign !== 'all' 
-        ? PrizesService.getPrizesStatus(selectedCampaign)
-        : Promise.resolve([])
+      PrizesService.getInstantWinWinners(campaignId),
+      PrizesService.getPrizesStatus(campaignId)
     ]);
     setWinners(winnersData);
     setPrizesStatus(statusData);
@@ -46,7 +44,7 @@ export const InstantWinSection = () => {
 
   useEffect(() => {
     loadData();
-  }, [selectedCampaign]);
+  }, [campaignId]);
 
   const handleClaimToggle = async (participantId: string, currentStatus: boolean) => {
     const success = await PrizesService.updateClaimStatus(participantId, !currentStatus);
@@ -61,7 +59,7 @@ export const InstantWinSection = () => {
   const handleExport = () => {
     PrizesService.exportWinnersToCSV(
       winners,
-      `gagnants-${selectedCampaign === 'all' ? 'tous' : 'campagne'}-${new Date().toISOString().split('T')[0]}.csv`
+      `gagnants-campagne-${new Date().toISOString().split('T')[0]}.csv`
     );
     toast.success('Export réussi');
   };
@@ -70,7 +68,7 @@ export const InstantWinSection = () => {
     <div className="space-y-4">
       {/* Actions bar */}
       <div
-        className="flex items-center justify-between p-4"
+        className="flex items-center justify-end p-4"
         style={{
           background: 'rgba(255, 255, 255, 0.5)',
           backdropFilter: 'blur(10px)',
@@ -78,23 +76,6 @@ export const InstantWinSection = () => {
           border: '1px solid rgba(255, 255, 255, 0.8)',
         }}
       >
-        <div className="flex items-center gap-3">
-          <Filter className="w-4 h-4" style={{ color: colors.muted }} />
-          <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Toutes les campagnes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les campagnes</SelectItem>
-              {campaigns.map(c => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
         <Button
           onClick={handleExport}
           variant="outline"
@@ -105,8 +86,8 @@ export const InstantWinSection = () => {
         </Button>
       </div>
 
-      {/* Prizes status (only if single campaign selected) */}
-      {selectedCampaign !== 'all' && prizesStatus.length > 0 && (
+      {/* Prizes status */}
+      {prizesStatus.length > 0 && (
         <div
           className="p-4 space-y-4"
           style={{

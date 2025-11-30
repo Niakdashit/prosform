@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,14 +21,21 @@ interface DrawModalProps {
   onClose: () => void;
   onDrawComplete: () => void;
   campaigns: Campaign[];
+  preselectedCampaignId?: string;
 }
 
-export const DrawModal = ({ isOpen, onClose, onDrawComplete, campaigns }: DrawModalProps) => {
+export const DrawModal = ({ isOpen, onClose, onDrawComplete, campaigns, preselectedCampaignId }: DrawModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [drawName, setDrawName] = useState('');
-  const [campaignId, setCampaignId] = useState('');
+  const [campaignId, setCampaignId] = useState(preselectedCampaignId || '');
   const [winnersCount, setWinnersCount] = useState(1);
   const [filters, setFilters] = useState<PrizeDrawFilters>({});
+
+  useEffect(() => {
+    if (preselectedCampaignId) {
+      setCampaignId(preselectedCampaignId);
+    }
+  }, [preselectedCampaignId]);
 
   const handleDraw = async () => {
     if (!drawName || !campaignId || winnersCount < 1) {
