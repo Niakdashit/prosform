@@ -3,12 +3,14 @@ import { WheelConfig, WheelSegment } from "./WheelBuilder";
 import { useState } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { SmartWheel } from "./SmartWheel";
+import { ParticipationService } from "@/services/ParticipationService";
 
 interface ParticipantWheelRenderProps {
   config: WheelConfig;
+  campaignId: string;
 }
 
-export const ParticipantWheelRender = ({ config }: ParticipantWheelRenderProps) => {
+export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelRenderProps) => {
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
   const [wonPrize, setWonPrize] = useState<string | null>(null);
@@ -28,10 +30,21 @@ export const ParticipantWheelRender = ({ config }: ParticipantWheelRenderProps) 
     }
   };
 
-  const handleSpinComplete = (segment: WheelSegment) => {
+  const handleSpinComplete = async (segment: WheelSegment) => {
     // Determine if it's a win or lose based on segment
     const isWin = segment.prizeId !== undefined || segment.label.toLowerCase().includes('gagn');
     setWonPrize(segment.label);
+    
+    // Enregistrer la participation
+    await ParticipationService.recordParticipation({
+      campaignId,
+      contactData,
+      result: {
+        type: isWin ? 'win' : 'lose',
+        prize: isWin ? segment.label : undefined,
+      },
+    });
+    
     setTimeout(() => {
       setActiveView(isWin ? 'ending-win' : 'ending-lose');
     }, 1500);

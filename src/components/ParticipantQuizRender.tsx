@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ParticipationService } from "@/services/ParticipationService";
 
 interface ParticipantQuizRenderProps {
   config: QuizConfig;
+  campaignId: string;
 }
 
-export const ParticipantQuizRender = ({ config }: ParticipantQuizRenderProps) => {
+export const ParticipantQuizRender = ({ config, campaignId }: ParticipantQuizRenderProps) => {
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'question' | 'result'>('welcome');
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string }>({});
@@ -21,7 +23,7 @@ export const ParticipantQuizRender = ({ config }: ParticipantQuizRenderProps) =>
   const currentQuestion = config.questions[activeQuestionIndex];
   const totalQuestions = config.questions.length;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeView === 'welcome') {
       if (config.contactScreen?.enabled) {
         setActiveView('contact');
@@ -43,6 +45,18 @@ export const ParticipantQuizRender = ({ config }: ParticipantQuizRenderProps) =>
       if (activeQuestionIndex < totalQuestions - 1) {
         setActiveQuestionIndex(prev => prev + 1);
       } else {
+        // Enregistrer la participation
+        const finalScore = score + (currentQuestion && selectedAnswers[activeQuestionIndex] === currentQuestion.answers.find(a => a.isCorrect)?.id ? currentQuestion.points : 0);
+        await ParticipationService.recordParticipation({
+          campaignId,
+          contactData,
+          result: {
+            type: finalScore > 0 ? 'win' : 'lose',
+            score: finalScore,
+            answers: selectedAnswers,
+          },
+        });
+        
         setActiveView('result');
       }
     }

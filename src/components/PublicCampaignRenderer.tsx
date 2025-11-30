@@ -52,16 +52,16 @@ export function PublicCampaignRenderer({ campaign }: PublicCampaignRendererProps
   // Afficher le composant approprié selon le type
   switch (campaign.type) {
     case 'wheel':
-      return <ParticipantWheelRender config={config} />;
+      return <ParticipantWheelRender config={config} campaignId={campaign.id} />;
     
     case 'quiz':
-      return <ParticipantQuizRender config={config} />;
+      return <ParticipantQuizRender config={config} campaignId={campaign.id} />;
     
     case 'scratch':
-      return <ParticipantScratchRender config={config} />;
+      return <ParticipantScratchRender config={config} campaignId={campaign.id} />;
     
     case 'jackpot':
-      return <ParticipantJackpotRender config={config} />;
+      return <ParticipantJackpotRender config={config} campaignId={campaign.id} />;
     
     case 'form':
       // Le formulaire attend questions directement
