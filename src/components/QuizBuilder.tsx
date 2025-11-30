@@ -385,6 +385,7 @@ export const QuizBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <QuizTopToolbar 
+        campaignId={campaignId || undefined}
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
           localStorage.setItem('quiz-config', JSON.stringify(config));
