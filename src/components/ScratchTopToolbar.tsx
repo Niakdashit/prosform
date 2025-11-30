@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Eye, Save, Globe, Palette, Gift, Loader2, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ interface ScratchTopToolbarProps {
 
 export const ScratchTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges, activeTab, onTabChange }: ScratchTopToolbarProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [showExitDialog, setShowExitDialog] = useState(false);
 
   const handleClose = () => {
@@ -42,8 +44,8 @@ export const ScratchTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasU
 
   return (
     <>
-      <div className="h-12 bg-card border-b border-border flex items-center justify-center px-3">
-        <div className="flex items-center gap-1.5">
+      <div className={`h-12 bg-card border-b border-border flex items-center ${isMobile ? 'overflow-x-auto px-3' : 'justify-center px-3'}`}>
+        <div className={`flex items-center gap-1.5 ${isMobile ? 'flex-shrink-0' : ''}`}>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -73,7 +75,7 @@ export const ScratchTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasU
           </Button>
         </div>
 
-        <div className="flex items-center gap-2 absolute right-3">
+        <div className={`flex items-center gap-2 ${isMobile ? 'flex-shrink-0 ml-2' : 'absolute right-3'}`}>
           <Button 
             variant="ghost" 
             size="sm" 
