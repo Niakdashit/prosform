@@ -59,8 +59,6 @@ export const CampaignService = {
       type: campaign.type,
       status: campaign.status || 'draft',
       config: campaign.config || {},
-      starts_at: campaign.starts_at,
-      ends_at: campaign.ends_at,
       thumbnail_url: campaign.thumbnail_url,
     };
 
@@ -88,8 +86,6 @@ export const CampaignService = {
       type: updates.type,
       status: updates.status,
       config: updates.config,
-      starts_at: updates.starts_at,
-      ends_at: updates.ends_at,
       thumbnail_url: updates.thumbnail_url,
     };
 
