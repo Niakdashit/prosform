@@ -363,6 +363,8 @@ export const ArticleWheelBuilder = () => {
                     setCampaignDefaultTab('dotation');
                     setLeftDrawerOpen(false);
                   }}
+                  onUpdateConfig={updateConfig}
+                  prizes={prizes}
                 />
               </DrawerContent>
             </Drawer>
@@ -418,6 +420,7 @@ export const ArticleWheelBuilder = () => {
                 setCampaignDefaultTab('dotation');
               }}
               prizes={prizes}
+              onUpdateConfig={updateConfig}
             />
             
             {/* Preview area */}

@@ -283,6 +283,7 @@ export const ArticleScratchBuilder = () => {
                   onAddCard={addCard}
                   onDeleteCard={deleteCard}
                   onGoToDotation={() => { setActiveTab('campaign'); setCampaignDefaultTab('dotation'); setLeftDrawerOpen(false); }}
+                  onUpdateConfig={updateConfig}
                 />
               </DrawerContent>
             </Drawer>
@@ -325,6 +326,7 @@ export const ArticleScratchBuilder = () => {
               onAddCard={addCard}
               onDeleteCard={deleteCard}
               onGoToDotation={() => { setActiveTab('campaign'); setCampaignDefaultTab('dotation'); }}
+              onUpdateConfig={updateConfig}
             />
             
             {/* Preview area */}

@@ -252,6 +252,7 @@ export const ArticleJackpotBuilder = () => {
                   onAddSymbol={addSymbol}
                   onDeleteSymbol={deleteSymbol}
                   onGoToDotation={() => {}}
+                  onUpdateConfig={updateConfig}
                 />
               </DrawerContent>
             </Drawer>
@@ -294,6 +295,7 @@ export const ArticleJackpotBuilder = () => {
               onAddSymbol={addSymbol}
               onDeleteSymbol={deleteSymbol}
               onGoToDotation={() => {}}
+              onUpdateConfig={updateConfig}
             />
             
             <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">

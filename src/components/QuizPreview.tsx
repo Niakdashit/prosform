@@ -560,7 +560,6 @@ export const QuizPreview = ({
                 <TextContent />
               </div>
             );
-          } else if (mobileLayout === 'mobile-horizontal') {
             return (
               <div className="flex gap-4 w-full max-w-[700px]" style={{ padding: '35px' }}>
                 <div className="flex-1">
