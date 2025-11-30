@@ -502,6 +502,7 @@ export const WheelBuilder = () => {
         hasUnsavedChanges={hasUnsavedChanges}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        campaignId={campaign?.id}
       />
         
       {activeTab === 'campaign' ? (
