@@ -53,9 +53,20 @@ export const CampaignService = {
       throw new Error('User not authenticated');
     }
 
+    const dbPayload = {
+      user_id: user.id,
+      title: campaign.title,
+      type: campaign.type,
+      status: campaign.status || 'draft',
+      config: campaign.config || {},
+      starts_at: campaign.starts_at,
+      ends_at: campaign.ends_at,
+      thumbnail_url: campaign.thumbnail_url,
+    };
+
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([{ ...campaign, user_id: user.id }])
+      .insert([dbPayload])
       .select()
       .single();
 
@@ -71,10 +82,20 @@ export const CampaignService = {
   /**
    * Mettre à jour une campagne
    */
-  async update(id: string, updates: CampaignUpdate): Promise<Campaign> {
+  async update(id: string, updates: Partial<Campaign>): Promise<Campaign> {
+    const dbPayload = {
+      title: updates.title,
+      type: updates.type,
+      status: updates.status,
+      config: updates.config,
+      starts_at: updates.starts_at,
+      ends_at: updates.ends_at,
+      thumbnail_url: updates.thumbnail_url,
+    };
+
     const { data, error } = await supabase
       .from('campaigns')
-      .update(updates)
+      .update(dbPayload)
       .eq('id', id)
       .select()
       .single();
@@ -93,8 +114,8 @@ export const CampaignService = {
    */
   async save(campaign: Partial<Campaign> & { title: string; type: Campaign['type'] }): Promise<Campaign> {
     if (campaign.id) {
-      const { id, created_at, user_id, ...updates } = campaign;
-      return this.update(id, updates);
+      const { id, created_at, user_id, ...rest } = campaign;
+      return this.update(id, rest);
     } else {
       const { id, created_at, updated_at, user_id, ...createData } = campaign as Campaign;
       return this.create({
