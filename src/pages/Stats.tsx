@@ -53,6 +53,7 @@ const Stats = () => {
   const [topCampaignsByParticipants, setTopCampaignsByParticipants] = useState<any[]>([]);
   const [topCampaignsByOptIns, setTopCampaignsByOptIns] = useState<any[]>([]);
   const [timeSeriesOptIns, setTimeSeriesOptIns] = useState<any>(null);
+  const [uniqueParticipationsByIP, setUniqueParticipationsByIP] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   
   // Filtres
@@ -94,6 +95,7 @@ const Stats = () => {
         const topByParticipants = await AdvancedAnalyticsService.getTopCampaigns('participants', 10, dateRange);
         const topByOptIns = await AdvancedAnalyticsService.getTopCampaigns('opt_ins', 10, dateRange);
         const optInsTimeSeries = await AdvancedAnalyticsService.getTimeSeriesOptIns(dateRange, selectedCampaign || undefined);
+        const uniqueIPCount = await AdvancedAnalyticsService.getUniqueParticipationsByIP(selectedCampaign || undefined, dateRange);
         
         setGlobalStats(stats);
         setTimeSeriesData(timeSeries);
@@ -110,6 +112,7 @@ const Stats = () => {
         setTopCampaignsByParticipants(topByParticipants);
         setTopCampaignsByOptIns(topByOptIns);
         setTimeSeriesOptIns(optInsTimeSeries);
+        setUniqueParticipationsByIP(uniqueIPCount);
       } catch (error) {
         console.error('Erreur chargement analytics:', error);
       } finally {
@@ -146,10 +149,16 @@ const Stats = () => {
       icon: Eye 
     },
     { 
-      label: 'Participations', 
+      label: 'Participations totales', 
       value: globalStats?.total_participations.toLocaleString() || '0', 
       change: '+8%', 
       icon: MousePointer 
+    },
+    { 
+      label: 'Participations uniques (IP)', 
+      value: uniqueParticipationsByIP.toLocaleString(), 
+      change: `${globalStats?.total_participations ? Math.round((uniqueParticipationsByIP / globalStats.total_participations) * 100) : 0}%`, 
+      icon: Users 
     },
     { 
       label: 'Taux de conversion', 
@@ -212,7 +221,7 @@ const Stats = () => {
 
         {/* Stats cards - Liquid Glass Effect */}
         <div 
-          className="grid grid-cols-5 gap-4 mb-6 p-5 relative overflow-hidden"
+          className="grid grid-cols-6 gap-4 mb-6 p-5 relative overflow-hidden"
           style={{
             borderRadius: '24px',
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',

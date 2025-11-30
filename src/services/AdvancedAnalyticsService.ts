@@ -229,6 +229,32 @@ export const AdvancedAnalyticsService = {
     }
   },
 
+  // Participations uniques par IP
+  async getUniqueParticipationsByIP(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<number> {
+    try {
+      let query = supabase
+        .from('campaign_participants')
+        .select('ip_address');
+
+      if (campaignId) query = query.eq('campaign_id', campaignId);
+      if (dateRange && dateRange.from && dateRange.to) {
+        query = query
+          .gte('created_at', dateRange.from.toISOString())
+          .lte('created_at', dateRange.to.toISOString());
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      // Compter les IPs uniques (en excluant les nulls)
+      const uniqueIPs = new Set(data?.filter(p => p.ip_address).map(p => p.ip_address));
+      return uniqueIPs.size;
+    } catch (error) {
+      console.error('Error fetching unique participations by IP:', error);
+      return 0;
+    }
+  },
+
   // Taux de collecte email
   async getEmailCollectionStats(campaignId?: string): Promise<EmailCollectionStats> {
     try {
