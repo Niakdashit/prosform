@@ -47,6 +47,21 @@ export interface BlockedParticipant {
   metadata: any;
 }
 
+export interface CampaignSettings {
+  id?: string;
+  campaign_id: string;
+  ip_max_attempts: number;
+  ip_window_minutes: number;
+  email_max_attempts: number;
+  email_window_minutes: number;
+  device_max_attempts: number;
+  device_window_minutes: number;
+  auto_block_enabled: boolean;
+  block_duration_hours: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const ExternalBackendAnalyticsService = {
   /**
    * Récupère les stats complètes d'une campagne
@@ -233,6 +248,59 @@ export const ExternalBackendAnalyticsService = {
     } catch (error) {
       console.error('Error in unblockParticipant:', error);
       return false;
+    }
+  },
+
+  /**
+   * Récupère les settings de rate limiting pour une campagne
+   */
+  async getCampaignSettings(campaignId: string): Promise<CampaignSettings | null> {
+    try {
+      const { data, error } = await externalSupabase
+        .rpc('get_campaign_settings', { p_campaign_id: campaignId });
+
+      if (error) {
+        console.error('Error fetching campaign settings:', error);
+        return null;
+      }
+
+      // La fonction RPC retourne les valeurs par défaut si pas de settings
+      return data ? { ...data, campaign_id: campaignId } : null;
+    } catch (error) {
+      console.error('Error fetching campaign settings:', error);
+      return null;
+    }
+  },
+
+  /**
+   * Mettre à jour les settings de rate limiting pour une campagne
+   */
+  async updateCampaignSettings(
+    campaignId: string,
+    settings: Partial<Omit<CampaignSettings, 'id' | 'campaign_id' | 'created_at' | 'updated_at'>>
+  ): Promise<CampaignSettings | null> {
+    try {
+      const { data, error } = await externalSupabase.rpc('upsert_campaign_settings', {
+        p_campaign_id: campaignId,
+        p_ip_max_attempts: settings.ip_max_attempts,
+        p_ip_window_minutes: settings.ip_window_minutes,
+        p_email_max_attempts: settings.email_max_attempts,
+        p_email_window_minutes: settings.email_window_minutes,
+        p_device_max_attempts: settings.device_max_attempts,
+        p_device_window_minutes: settings.device_window_minutes,
+        p_auto_block_enabled: settings.auto_block_enabled,
+        p_block_duration_hours: settings.block_duration_hours,
+      });
+
+      if (error) {
+        console.error('Error updating campaign settings:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error updating campaign settings:', error);
+      return null;
     }
   },
 };
