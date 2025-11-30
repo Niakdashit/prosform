@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target, UserPlus } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target, UserPlus, Zap } from "lucide-react";
 import { AnalyticsService, GlobalStats, TimeSeriesData, CampaignAnalytics, TypeDistribution } from "@/services/AnalyticsService";
 import { AdvancedAnalyticsService, GeoStats, DeviceStats, TrafficSource, PeakHour, EmailCollectionStats, FraudStats } from "@/services/AdvancedAnalyticsService";
+import { useCampaignAdvancedStats } from "@/hooks/useCampaignAdvancedStats";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -61,6 +62,18 @@ const Stats = () => {
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: undefined,
     to: undefined,
+  });
+
+  // Hook pour les stats avancées du backend externe
+  const {
+    stats: advancedStats,
+    participationsByDay: advancedParticipations,
+    conversionFunnel,
+    isLoading: isLoadingAdvanced,
+  } = useCampaignAdvancedStats({
+    campaignId: selectedCampaign,
+    days: 30,
+    enabled: !!selectedCampaign,
   });
 
   useEffect(() => {
@@ -389,6 +402,102 @@ const Stats = () => {
             </div>
           )}
         </div>
+
+        {/* Backend Externe Stats - Affiché si une campagne est sélectionnée */}
+        {selectedCampaign && advancedStats && (
+          <div className="mb-6 p-6 rounded-2xl border" style={{ background: colors.white, borderColor: colors.border }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="w-5 h-5" style={{ color: colors.gold }} />
+              <h3 className="text-lg font-semibold" style={{ color: colors.dark }}>
+                Stats Avancées (Backend Externe)
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              <div className="p-4 rounded-xl" style={{ background: colors.background }}>
+                <p className="text-sm mb-1" style={{ color: colors.muted }}>Participants uniques</p>
+                <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                  {advancedStats.unique_participants}
+                </p>
+              </div>
+              <div className="p-4 rounded-xl" style={{ background: colors.background }}>
+                <p className="text-sm mb-1" style={{ color: colors.muted }}>Taux conversion</p>
+                <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                  {advancedStats.conversion_rate.toFixed(1)}%
+                </p>
+              </div>
+              <div className="p-4 rounded-xl" style={{ background: colors.background }}>
+                <p className="text-sm mb-1" style={{ color: colors.muted }}>Taux complétion</p>
+                <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                  {advancedStats.completion_rate.toFixed(1)}%
+                </p>
+              </div>
+              <div className="p-4 rounded-xl" style={{ background: colors.background }}>
+                <p className="text-sm mb-1" style={{ color: colors.muted }}>Temps moyen</p>
+                <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                  {Math.round(advancedStats.avg_time_spent)}s
+                </p>
+              </div>
+            </div>
+
+            {/* Funnel de conversion */}
+            {conversionFunnel && (
+              <div className="mb-6">
+                <h4 className="text-md font-semibold mb-3" style={{ color: colors.dark }}>
+                  Funnel de Conversion
+                </h4>
+                <div className="space-y-3">
+                  {conversionFunnel.steps.map((step, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-32 text-sm" style={{ color: colors.muted }}>{step.label}</div>
+                      <div className="flex-1 h-8 rounded-lg overflow-hidden" style={{ background: colors.background }}>
+                        <div
+                          className="h-full flex items-center px-3 text-sm font-medium text-white"
+                          style={{
+                            width: `${step.percent}%`,
+                            background: `linear-gradient(90deg, ${CHART_COLORS[i % CHART_COLORS.length]}, ${CHART_COLORS[(i + 1) % CHART_COLORS.length]})`,
+                          }}
+                        >
+                          {step.percent.toFixed(1)}%
+                        </div>
+                      </div>
+                      <div className="w-20 text-right font-semibold" style={{ color: colors.dark }}>
+                        {step.value.toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Participations par jour (backend externe) */}
+            {advancedParticipations.length > 0 && (
+              <div>
+                <h4 className="text-md font-semibold mb-3" style={{ color: colors.dark }}>
+                  Participations par Jour (30 derniers jours)
+                </h4>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={advancedParticipations}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
+                    <XAxis dataKey="date" stroke={colors.muted} />
+                    <YAxis stroke={colors.muted} />
+                    <Tooltip
+                      contentStyle={{
+                        background: colors.white,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="participations" fill={colors.blue} name="Participations" />
+                    <Bar dataKey="completions" fill={colors.emerald} name="Complétions" />
+                    <Bar dataKey="unique_emails" fill={colors.purple} name="Emails uniques" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Charts Grid */}
         {isLoading ? (
