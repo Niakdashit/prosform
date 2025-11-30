@@ -1,8 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Campaign, CampaignCreate, CampaignUpdate } from '@/types/campaign';
+import { campaignCreateSchema, campaignUpdateSchema, publishCampaignSchema } from '@/schemas/campaign.schema';
 
 /**
- * Service centralisé pour la gestion des campagnes
+ * Service centralisé pour la gestion des campagnes avec validation et sécurité
  */
 export const CampaignService = {
   /**
@@ -42,12 +43,15 @@ export const CampaignService = {
   },
 
   /**
-   * Créer une nouvelle campagne
+   * Créer une nouvelle campagne (avec validation)
    */
   async create(campaign: CampaignCreate): Promise<Campaign> {
+    // Validation des données
+    const validatedData = campaignCreateSchema.parse(campaign);
+    
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([campaign])
+      .insert([validatedData])
       .select()
       .single();
 
@@ -61,12 +65,15 @@ export const CampaignService = {
   },
 
   /**
-   * Mettre à jour une campagne
+   * Mettre à jour une campagne (avec validation)
    */
   async update(id: string, updates: CampaignUpdate): Promise<Campaign> {
+    // Validation des données
+    const validatedData = campaignUpdateSchema.parse(updates);
+    
     const { data, error } = await supabase
       .from('campaigns')
-      .update(updates)
+      .update(validatedData)
       .eq('id', id)
       .select()
       .single();
@@ -118,12 +125,42 @@ export const CampaignService = {
   },
 
   /**
-   * Publier une campagne
+   * Publier une campagne avec génération de slug et URL publique
    */
   async publish(id: string): Promise<Campaign> {
+    // Récupérer la campagne pour validation
+    const campaign = await this.getById(id);
+    if (!campaign) throw new Error('Campaign not found');
+    
+    // Validation avant publication
+    publishCampaignSchema.parse({ id, name: campaign.name });
+    
+    // Générer le slug si pas déjà présent
+    let publicSlug = campaign.public_url_slug;
+    if (!publicSlug) {
+      const { data: slugData, error: slugError } = await supabase
+        .rpc('generate_campaign_slug', {
+          campaign_title: campaign.name || campaign.app_title,
+          campaign_id: id
+        });
+      
+      if (slugError) {
+        console.error('❌ [CampaignService] slug generation error:', slugError);
+        throw slugError;
+      }
+      
+      publicSlug = slugData;
+    }
+    
+    // URL publique complète
+    const publicUrl = `${window.location.origin}/p/${publicSlug}`;
+    
     return this.update(id, {
       status: 'online',
+      is_published: true,
       published_at: new Date().toISOString(),
+      public_url_slug: publicSlug,
+      published_url: publicUrl,
     });
   },
 
