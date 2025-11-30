@@ -356,7 +356,7 @@ export const AdvancedAnalyticsService = {
     try {
       let query = supabase
         .from('campaign_participants')
-        .select('campaign_id, campaigns!inner(app_title), email, participation_data');
+        .select('campaign_id, campaigns!inner(name), email, participation_data');
 
       if (dateRange && dateRange.from && dateRange.to) {
         query = query
@@ -377,7 +377,7 @@ export const AdvancedAnalyticsService = {
 
       data.forEach((p: any) => {
         const campaignId = p.campaign_id;
-        const campaignTitle = p.campaigns?.app_title || 'Unknown';
+        const campaignTitle = p.campaigns?.name || 'Sans nom';
         
         if (!campaignStats.has(campaignId)) {
           campaignStats.set(campaignId, {
