@@ -166,12 +166,6 @@ const Stats = () => {
       change: '+3%', 
       icon: TrendingUp 
     },
-    { 
-      label: 'Gagnants', 
-      value: globalStats?.total_winners.toLocaleString() || '0', 
-      change: '+15%', 
-      icon: Trophy 
-    },
   ];
 
   const secondaryStats = [
@@ -221,7 +215,7 @@ const Stats = () => {
 
         {/* Stats cards - Liquid Glass Effect */}
         <div 
-          className="grid grid-cols-6 gap-4 mb-6 p-5 relative overflow-hidden"
+          className="grid grid-cols-5 gap-4 mb-6 p-5 relative overflow-hidden"
           style={{
             borderRadius: '24px',
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',
