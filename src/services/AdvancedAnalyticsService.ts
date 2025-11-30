@@ -32,6 +32,9 @@ export interface EmailCollectionStats {
   total_participations: number;
   emails_collected: number;
   collection_rate: number;
+  marketing_opt_ins: number;
+  legal_opt_ins: number;
+  partner_opt_ins: number;
 }
 
 export interface FraudStats {
@@ -287,7 +290,7 @@ export const AdvancedAnalyticsService = {
     try {
       let query = supabase
         .from('campaign_participants')
-        .select('email');
+        .select('email, participation_data');
 
       if (campaignId) {
         query = query.eq('campaign_id', campaignId);
@@ -302,14 +305,47 @@ export const AdvancedAnalyticsService = {
         ? (emails_collected / total_participations) * 100
         : 0;
 
+      // Count opt-ins from participation_data
+      let marketing_opt_ins = 0;
+      let legal_opt_ins = 0;
+      let partner_opt_ins = 0;
+
+      data?.forEach(p => {
+        const pData = p.participation_data as any;
+        if (pData) {
+          // Marketing opt-ins
+          if (pData.newsletter === true || pData.marketing === true) {
+            marketing_opt_ins++;
+          }
+          // Legal opt-ins
+          if (pData.legal === true || pData.rules === true || pData.terms === true) {
+            legal_opt_ins++;
+          }
+          // Partner opt-ins
+          if (pData.partner === true || pData.partners === true) {
+            partner_opt_ins++;
+          }
+        }
+      });
+
       return {
         total_participations,
         emails_collected,
         collection_rate,
+        marketing_opt_ins,
+        legal_opt_ins,
+        partner_opt_ins,
       };
     } catch (error) {
       console.error('Error fetching email collection stats:', error);
-      return { total_participations: 0, emails_collected: 0, collection_rate: 0 };
+      return { 
+        total_participations: 0, 
+        emails_collected: 0, 
+        collection_rate: 0,
+        marketing_opt_ins: 0,
+        legal_opt_ins: 0,
+        partner_opt_ins: 0,
+      };
     }
   },
 
