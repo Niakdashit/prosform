@@ -87,13 +87,13 @@ export function useCampaign(
           }
           
           // Restore dates
-          if (data.start_date) {
-            const startDateTime = new Date(data.start_date);
+          if (data.starts_at) {
+            const startDateTime = new Date(data.starts_at);
             setStartDate(startDateTime.toISOString().split('T')[0]);
             setStartTime(startDateTime.toTimeString().slice(0, 5));
           }
-          if (data.end_date) {
-            const endDateTime = new Date(data.end_date);
+          if (data.ends_at) {
+            const endDateTime = new Date(data.ends_at);
             setEndDate(endDateTime.toISOString().split('T')[0]);
             setEndTime(endDateTime.toTimeString().slice(0, 5));
           }
@@ -155,17 +155,17 @@ export function useCampaign(
     setIsSaving(true);
     setError(null);
 
-    // Build start_date and end_date from date + time
-    let start_date: string | undefined;
-    let end_date: string | undefined;
+    // Build starts_at and ends_at from date + time
+    let starts_at: string | undefined;
+    let ends_at: string | undefined;
     
     if (startDate) {
-      start_date = startTime 
+      starts_at = startTime 
         ? new Date(`${startDate}T${startTime}`).toISOString()
         : new Date(`${startDate}T00:00`).toISOString();
     }
     if (endDate) {
-      end_date = endTime 
+      ends_at = endTime 
         ? new Date(`${endDate}T${endTime}`).toISOString()
         : new Date(`${endDate}T23:59`).toISOString();
     }
@@ -180,8 +180,8 @@ export function useCampaign(
         config,
         prizes,
         theme: themeContext?.theme || campaign?.theme || {},
-        start_date,
-        end_date,
+        starts_at,
+        ends_at,
       });
 
       setCampaign(savedCampaign);

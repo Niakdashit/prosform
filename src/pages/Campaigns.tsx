@@ -123,7 +123,7 @@ const Campaigns = () => {
       type: c.type,
       mode: c.mode,
       status: displayStatus,
-      daysRemaining: c.end_date ? Math.max(0, Math.ceil((new Date(c.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null,
+      daysRemaining: c.ends_at ? Math.max(0, Math.ceil((new Date(c.ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : null,
       participants: 0,
       createdAt: c.created_at,
     };
