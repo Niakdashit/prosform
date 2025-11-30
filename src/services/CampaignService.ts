@@ -21,8 +21,10 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
     'id',
     'created_at',
     'updated_at',
-    'last_edited_at',
   ];
+
+  // Pour compatibilité avec l'ancien schéma, on ne met à jour que ces colonnes
+  const allowedFields = ['name', 'type', 'mode', 'status', 'config'];
   
   // Si c'est une mise à jour, ne pas modifier user_id
   if (isUpdate) {
@@ -32,7 +34,7 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
   const result: any = {};
   
   for (const [key, value] of Object.entries(campaign)) {
-    if (!excludedFields.includes(key) && value !== undefined) {
+    if (!excludedFields.includes(key) && allowedFields.includes(key) && value !== undefined) {
       result[key] = value;
     }
   }
@@ -88,18 +90,9 @@ export const CampaignService = {
     // Validation des données
     const validatedData = campaignCreateSchema.parse(campaign);
     
-    // Récupérer l'utilisateur authentifié (ou utiliser un ID par défaut)
-    const { data: { user } } = await supabase.auth.getUser();
-    const userId = user?.id || '00000000-0000-0000-0000-000000000000'; // ID par défaut pour dev
-    
-    // Préparer les données pour Supabase
-    const supabaseData = {
-      ...prepareCampaignData(validatedData, false),
-      user_id: userId,
-      is_published: false,
-      last_edited_at: new Date().toISOString(),
-    };
-    
+    // Préparer les données pour Supabase (compat schéma ancien)
+    const supabaseData = prepareCampaignData(validatedData, false);
+
     const { data, error } = await supabase
       .from('campaigns')
       .insert([supabaseData])
@@ -122,12 +115,9 @@ export const CampaignService = {
     // Validation des données
     const validatedData = campaignUpdateSchema.parse(updates);
     
-    // Préparer les données pour Supabase (isUpdate = true pour filtrer user_id)
-    const supabaseData = {
-      ...prepareCampaignData(validatedData, true),
-      last_edited_at: new Date().toISOString(),
-    };
-    
+    // Préparer les données pour Supabase (isUpdate = true pour filtrer user_id et rester compatible avec l'ancien schéma)
+    const supabaseData = prepareCampaignData(validatedData, true);
+
     const { data, error } = await supabase
       .from('campaigns')
       .update(supabaseData)
