@@ -6,6 +6,9 @@ import { AdvancedAnalyticsService, GeoStats, DeviceStats, TrafficSource, PeakHou
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { LiveFeed } from "@/components/stats/LiveFeed";
+import { StatsFilters } from "@/components/stats/StatsFilters";
+import { useCampaigns } from "@/hooks/useCampaigns";
 
 const colors = {
   dark: '#3d3731',
@@ -33,6 +36,7 @@ const typeLabels: Record<string, string> = {
 };
 
 const Stats = () => {
+  const { campaigns } = useCampaigns();
   const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>([]);
   const [campaignAnalytics, setCampaignAnalytics] = useState<CampaignAnalytics[]>([]);
@@ -44,6 +48,13 @@ const Stats = () => {
   const [emailStats, setEmailStats] = useState<EmailCollectionStats | null>(null);
   const [fraudStats, setFraudStats] = useState<FraudStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Filtres
+  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+    from: undefined,
+    to: undefined,
+  });
 
   useEffect(() => {
     const loadAnalytics = async () => {
@@ -51,7 +62,7 @@ const Stats = () => {
         const [
           stats, 
           timeSeries, 
-          campaigns, 
+          campaignsData, 
           types,
           geo,
           devices,
@@ -64,17 +75,17 @@ const Stats = () => {
           AnalyticsService.getTimeSeriesData(7),
           AnalyticsService.getCampaignAnalytics(),
           AnalyticsService.getTypeDistribution(),
-          AdvancedAnalyticsService.getGeoStats(),
-          AdvancedAnalyticsService.getDeviceStats(),
-          AdvancedAnalyticsService.getTrafficSources(),
-          AdvancedAnalyticsService.getPeakHours(),
-          AdvancedAnalyticsService.getEmailCollectionStats(),
-          AdvancedAnalyticsService.getFraudStats(),
+          AdvancedAnalyticsService.getGeoStats(selectedCampaign || undefined),
+          AdvancedAnalyticsService.getDeviceStats(selectedCampaign || undefined),
+          AdvancedAnalyticsService.getTrafficSources(selectedCampaign || undefined),
+          AdvancedAnalyticsService.getPeakHours(selectedCampaign || undefined),
+          AdvancedAnalyticsService.getEmailCollectionStats(selectedCampaign || undefined),
+          AdvancedAnalyticsService.getFraudStats(selectedCampaign || undefined),
         ]);
         
         setGlobalStats(stats);
         setTimeSeriesData(timeSeries);
-        setCampaignAnalytics(campaigns);
+        setCampaignAnalytics(campaignsData);
         setTypeDistribution(types);
         setGeoStats(geo);
         setDeviceStats(devices);
@@ -90,7 +101,7 @@ const Stats = () => {
     };
     
     loadAnalytics();
-  }, []);
+  }, [selectedCampaign, dateRange]);
 
   const handleExportCSV = async () => {
     try {
@@ -172,6 +183,15 @@ const Stats = () => {
             Export CSV
           </Button>
         </div>
+
+        {/* Filtres */}
+        <StatsFilters
+          campaigns={campaigns}
+          selectedCampaign={selectedCampaign}
+          dateRange={dateRange}
+          onCampaignChange={setSelectedCampaign}
+          onDateRangeChange={setDateRange}
+        />
 
         {/* Stats cards - Liquid Glass Effect */}
         <div 
@@ -428,6 +448,9 @@ const Stats = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            {/* Live Feed */}
+            <LiveFeed />
 
             {/* Grille 2 colonnes - Top campagnes & Types */}
             <div className="grid grid-cols-2 gap-6">
