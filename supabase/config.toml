@@ -1,1 +1,4 @@
 project_id = "nnzmjphdodqkzclhbdyl"
+
+[functions.publish-campaign]
+verify_jwt = true
