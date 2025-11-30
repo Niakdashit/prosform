@@ -8,7 +8,8 @@ import {
   Settings,
   Bell,
   ChevronDown,
-  Plus
+  Plus,
+  Trophy
 } from "lucide-react";
 
 // Couleurs DA
@@ -34,6 +35,7 @@ const navItems: NavItem[] = [
   { id: 'campaigns', label: 'Campagnes', icon: <LayoutGrid className="w-5 h-5" />, path: '/campaigns' },
   { id: 'stats', label: 'Statistiques', icon: <BarChart3 className="w-5 h-5" />, path: '/stats' },
   { id: 'contacts', label: 'Participants', icon: <Users className="w-5 h-5" />, path: '/contacts' },
+  { id: 'prizes', label: 'Gains & Tirages', icon: <Trophy className="w-5 h-5" />, path: '/prizes' },
   { id: 'media', label: 'Médias', icon: <Image className="w-5 h-5" />, path: '/media' },
   { id: 'settings', label: 'Paramètres', icon: <Settings className="w-5 h-5" />, path: '/settings' },
 ];
