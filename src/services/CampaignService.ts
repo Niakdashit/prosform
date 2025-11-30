@@ -2,9 +2,32 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Campaign, CampaignCreate, CampaignUpdate } from '@/types/campaign';
 
 /**
+ * Mapper les données Supabase vers le type Campaign
+ */
+const mapFromDB = (dbCampaign: any): Campaign => {
+  const { title, ...rest } = dbCampaign;
+  return {
+    ...rest,
+    name: title, // title (DB) → name (app)
+  };
+};
+
+/**
+ * Mapper le type Campaign vers les données Supabase
+ */
+const mapToDB = (campaign: any): any => {
+  const { name, ...rest } = campaign;
+  return {
+    ...rest,
+    title: name, // name (app) → title (DB)
+  };
+};
+
+/**
  * Service centralisé pour la gestion des campagnes
  */
 export const CampaignService = {
+
   /**
    * Récupérer toutes les campagnes
    */
@@ -19,7 +42,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return data || [];
+    return (data || []).map(mapFromDB);
   },
 
   /**
@@ -38,16 +61,17 @@ export const CampaignService = {
       throw error;
     }
 
-    return data;
+    return data ? mapFromDB(data) : null;
   },
 
   /**
    * Créer une nouvelle campagne
    */
   async create(campaign: CampaignCreate): Promise<Campaign> {
+    const dbData = mapToDB(campaign);
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([campaign])
+      .insert([dbData])
       .select()
       .single();
 
@@ -57,16 +81,17 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign created:', data.id);
-    return data;
+    return mapFromDB(data);
   },
 
   /**
    * Mettre à jour une campagne
    */
   async update(id: string, updates: CampaignUpdate): Promise<Campaign> {
+    const dbUpdates = mapToDB(updates);
     const { data, error } = await supabase
       .from('campaigns')
-      .update(updates)
+      .update(dbUpdates)
       .eq('id', id)
       .select()
       .single();
@@ -77,7 +102,7 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign updated:', id);
-    return data;
+    return mapFromDB(data);
   },
 
   /**
