@@ -88,7 +88,7 @@ export const AdvancedAnalyticsService = {
     try {
       let query = supabase
         .from('campaign_participants')
-        .select('device_type');
+        .select('participation_data');
 
       if (campaignId) query = query.eq('campaign_id', campaignId);
       if (dateRange && dateRange.from && dateRange.to) {
@@ -98,13 +98,17 @@ export const AdvancedAnalyticsService = {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.warn('Device stats query failed, returning empty data');
+        return [];
+      }
 
       const deviceMap = new Map<string, number>();
       let total = 0;
 
       data?.forEach(p => {
-        const type = (p as any).device_type || 'Inconnu';
+        const pData = (p as any).participation_data || {};
+        const type = pData.device_type || 'Inconnu';
         deviceMap.set(type, (deviceMap.get(type) || 0) + 1);
         total++;
       });
@@ -125,7 +129,7 @@ export const AdvancedAnalyticsService = {
     try {
       let query = supabase
         .from('campaign_participants')
-        .select('utm_source, referrer');
+        .select('participation_data');
 
       if (campaignId) query = query.eq('campaign_id', campaignId);
       if (dateRange && dateRange.from && dateRange.to) {
@@ -135,20 +139,23 @@ export const AdvancedAnalyticsService = {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.warn('Traffic sources query failed, returning empty data');
+        return [];
+      }
 
       const sourceMap = new Map<string, number>();
       let total = 0;
 
       data?.forEach(p => {
-        const row = p as any;
+        const pData = (p as any).participation_data || {};
         let source = 'Direct';
 
-        if (row.utm_source) {
-          source = `UTM: ${row.utm_source}`;
-        } else if (row.referrer) {
+        if (pData.utm_source) {
+          source = `UTM: ${pData.utm_source}`;
+        } else if (pData.referrer) {
           try {
-            const url = new URL(row.referrer);
+            const url = new URL(pData.referrer);
             source = `Referral: ${url.hostname}`;
           } catch {
             source = 'Referral';
