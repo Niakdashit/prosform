@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { externalSupabase } from '@/integrations/supabase/externalClient';
 
 /**
  * Service pour les analytics avancées utilisant les fonctions SQL du backend externe
@@ -42,7 +42,7 @@ export const ExternalBackendAnalyticsService = {
    */
   async getCampaignStats(campaignId: string): Promise<CampaignStatsAdvanced | null> {
     try {
-      const { data, error } = await supabase.rpc('get_campaign_stats', {
+      const { data, error } = await externalSupabase.rpc('get_campaign_stats', {
         p_campaign_id: campaignId,
       });
 
@@ -66,7 +66,7 @@ export const ExternalBackendAnalyticsService = {
     days: number = 30
   ): Promise<ParticipationByDay[]> {
     try {
-      const { data, error } = await supabase.rpc('get_participations_by_day', {
+      const { data, error } = await externalSupabase.rpc('get_participations_by_day', {
         p_campaign_id: campaignId,
         p_days: days,
       });
@@ -93,7 +93,7 @@ export const ExternalBackendAnalyticsService = {
    */
   async getConversionFunnel(campaignId: string): Promise<ConversionFunnel | null> {
     try {
-      const { data, error } = await supabase.rpc('get_conversion_funnel', {
+      const { data, error } = await externalSupabase.rpc('get_conversion_funnel', {
         p_campaign_id: campaignId,
       });
 
@@ -126,7 +126,7 @@ export const ExternalBackendAnalyticsService = {
     reason?: string;
   }> {
     try {
-      const { data, error } = await supabase.rpc('check_rate_limit', {
+      const { data, error } = await externalSupabase.rpc('check_rate_limit', {
         p_identifier: identifier,
         p_identifier_type: identifierType,
         p_campaign_id: campaignId,
@@ -156,7 +156,7 @@ export const ExternalBackendAnalyticsService = {
     deviceFingerprint?: string
   ): Promise<boolean> {
     try {
-      const { data, error } = await supabase.rpc('is_participant_blocked', {
+      const { data, error } = await externalSupabase.rpc('is_participant_blocked', {
         p_campaign_id: campaignId,
         p_ip_address: ipAddress || null,
         p_email: email || null,
