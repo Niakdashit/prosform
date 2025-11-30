@@ -23,8 +23,8 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
     'updated_at',
   ];
 
-  // Pour compatibilité avec l'ancien schéma, on ne met à jour que ces colonnes côté base
-  const allowedFields = ['name', 'type', 'status', 'config'];
+  // Pour compatibilité avec l'ancien schéma, on ne met à jour que ces colonnes
+  const allowedFields = ['name', 'type', 'mode', 'status', 'config'];
   
   // Si c'est une mise à jour, ne pas modifier user_id
   if (isUpdate) {
@@ -35,12 +35,7 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
   
   for (const [key, value] of Object.entries(campaign)) {
     if (!excludedFields.includes(key) && allowedFields.includes(key) && value !== undefined) {
-      // Mapper le champ "name" du front vers "app_title" en base
-      if (key === 'name') {
-        result['app_title'] = value;
-      } else {
-        result[key] = value;
-      }
+      result[key] = value;
     }
   }
   
@@ -150,6 +145,7 @@ export const CampaignService = {
       const { id, created_at, updated_at, ...createData } = campaign as Campaign;
       return this.create({
         ...createData,
+        mode: createData.mode || 'fullscreen',
         status: createData.status || 'draft',
         config: createData.config || {},
         prizes: createData.prizes || [],
