@@ -355,7 +355,15 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      realtime_stats: {
+        Row: {
+          active_campaigns: number | null
+          last_24h: number | null
+          last_hour: number | null
+          total_participations: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_campaign_slug: {
