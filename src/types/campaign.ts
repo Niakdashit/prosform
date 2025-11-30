@@ -6,7 +6,7 @@ export type CampaignStatus = 'draft' | 'online' | 'paused' | 'ended';
 // Interface principale pour une campagne
 export interface Campaign {
   id: string;
-  name: string;
+  title: string;
   type: CampaignType;
   mode: CampaignMode;
   status: CampaignStatus;
@@ -20,10 +20,11 @@ export interface Campaign {
   created_at: string;
   updated_at: string;
   published_at?: string;
+  user_id?: string;
 }
 
 // Type pour créer une nouvelle campagne (sans id ni timestamps)
-export type CampaignCreate = Omit<Campaign, 'id' | 'created_at' | 'updated_at'>;
+export type CampaignCreate = Omit<Campaign, 'id' | 'created_at' | 'updated_at' | 'user_id'>;
 
 // Type pour mettre à jour une campagne
 export type CampaignUpdate = Partial<Omit<Campaign, 'id' | 'created_at'>>;
