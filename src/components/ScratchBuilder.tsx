@@ -7,6 +7,8 @@ import { ScratchSettingsPanel } from "./ScratchSettingsPanel";
 import { ScratchTopToolbar } from "./ScratchTopToolbar";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -14,6 +16,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { useCampaign } from "@/hooks/useCampaign";
+import { 
+  HeaderConfig, 
+  FooterConfig, 
+  defaultHeaderConfig, 
+  defaultFooterConfig,
+} from "./campaign";
 
 export interface ScratchPrize {
   id: string;
@@ -168,6 +176,11 @@ export interface ScratchConfig {
     backgroundImage?: string;
     backgroundImageMobile?: string;
   };
+  // Layout global
+  layout?: {
+    header: HeaderConfig;
+    footer: FooterConfig;
+  };
 }
 
 const defaultScratchConfig: ScratchConfig = {
@@ -221,6 +234,10 @@ const defaultScratchConfig: ScratchConfig = {
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
+  },
+  layout: {
+    header: { ...defaultHeaderConfig, enabled: false },
+    footer: { ...defaultFooterConfig, enabled: false },
   }
 };
 
@@ -244,6 +261,7 @@ export const ScratchBuilder = () => {
     endTime,
     isLoading,
     isSaving,
+    hasUnsavedChanges,
     setConfig,
     setPrizes,
     save,
@@ -417,6 +435,7 @@ export const ScratchBuilder = () => {
         onSave={handleSave}
         onPublish={handlePublish}
         isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
@@ -461,6 +480,7 @@ export const ScratchBuilder = () => {
                     setCampaignDefaultTab('dotation');
                     setLeftDrawerOpen(false);
                   }}
+                  onUpdateConfig={updateConfig}
                 />
               </DrawerContent>
             </Drawer>
@@ -524,10 +544,11 @@ export const ScratchBuilder = () => {
                 setActiveTab('campaign');
                 setCampaignDefaultTab('dotation');
               }}
+              onUpdateConfig={updateConfig}
             />
             
             {/* Preview area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
@@ -564,6 +585,44 @@ export const ScratchBuilder = () => {
                   onUpdatePrize={(updatedPrize) => setPrizes(prev => prev.map(p => p.id === updatedPrize.id ? updatedPrize : p))}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Scratch Card. Vue active: ${activeView}. Titre: ${config.welcomeScreen.title}. Cartes: ${config.cards.map(c => c.label).join(', ')}`}
+                onApplyActions={createAIActionHandler(config, updateConfig, {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactForm',
+                  scratch: 'scratchScreen',
+                  'ending-win': 'endingWin',
+                  'ending-lose': 'endingLose'
+                }, {
+                  onUpdateCards: (cards) => {
+                    updateConfig({ cards: cards.map((c, i) => ({
+                      ...config.cards[i] || {},
+                      id: c.id || `card_${i}`,
+                      label: c.label,
+                      isWinning: c.isWinning ?? true,
+                      probability: c.probability ?? 10,
+                    })) });
+                  },
+                  onUpdatePrizes: (newPrizes) => {
+                    setPrizes(newPrizes.map((p, i) => ({
+                      id: p.id || `prize_${i}`,
+                      name: p.name,
+                      description: p.description || '',
+                      code: p.code || '',
+                      probability: 10,
+                      quantity: p.quantity ?? 100,
+                      image: p.image || '',
+                      isActive: true,
+                    })));
+                  },
+                  onApplyTemplate: (template, colors) => {
+                    if (colors) {
+                      updateConfig({ scratchScreen: { ...config.scratchScreen, scratchColor: colors.primary } });
+                    }
+                  }
+                })}
+              />
             </div>
             
             <ScratchSettingsPanel 

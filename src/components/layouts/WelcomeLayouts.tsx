@@ -117,8 +117,6 @@ export const WelcomeLayouts = ({
         isEditing={editingField === 'welcome-title'}
         onFocus={onFocusTitle}
         onBlur={() => onBlurTitle?.(title)}
-        showSparkles={true}
-        showClear={true}
         fieldType="title"
         marginBottom="16px"
       />
@@ -137,8 +135,6 @@ export const WelcomeLayouts = ({
         isEditing={editingField === 'welcome-subtitle'}
         onFocus={onFocusSubtitle}
         onBlur={() => onBlurSubtitle?.(subtitle)}
-        showSparkles={true}
-        showClear={true}
         fieldType="subtitle"
         marginBottom="32px"
       />

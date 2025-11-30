@@ -1,7 +1,7 @@
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { JackpotConfig, JackpotSymbol } from "./JackpotBuilder";
-import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, Trash2, Dices } from "lucide-react";
+import { Plus, Palette, LayoutList, Gift, Home, Mail, Award, Trash2, Dices, PanelTop } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ThemeStylePanel } from "@/components/ui/ThemeStylePanel";
+import { LayoutSettingsPanel } from "./campaign";
 
 interface JackpotSidebarProps {
   config: JackpotConfig;
@@ -19,6 +20,7 @@ interface JackpotSidebarProps {
   onAddSymbol: () => void;
   onDeleteSymbol: (id: string) => void;
   onGoToDotation: () => void;
+  onUpdateConfig: (updates: Partial<JackpotConfig>) => void;
 }
 
 export const JackpotSidebar = ({
@@ -29,6 +31,7 @@ export const JackpotSidebar = ({
   onAddSymbol,
   onDeleteSymbol,
   onGoToDotation,
+  onUpdateConfig,
 }: JackpotSidebarProps) => {
   const { theme } = useTheme();
 
@@ -43,10 +46,14 @@ export const JackpotSidebar = ({
   return (
     <div className="w-[280px] bg-background border-r border-border flex flex-col">
       <Tabs defaultValue="views" className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 mx-2 mt-3 mb-0 h-9">
+        <TabsList className="grid w-full grid-cols-3 mx-2 mt-3 mb-0 h-9">
           <TabsTrigger value="views" className="text-[10px] gap-0.5 px-1.5">
             <LayoutList className="w-3 h-3" />
             <span>Vues</span>
+          </TabsTrigger>
+          <TabsTrigger value="structure" className="text-[10px] gap-0.5 px-1.5">
+            <PanelTop className="w-3 h-3" />
+            <span>Structure</span>
           </TabsTrigger>
           <TabsTrigger value="style" className="text-[10px] gap-0.5 px-1.5">
             <Palette className="w-3 h-3" />
@@ -145,6 +152,13 @@ export const JackpotSidebar = ({
               })}
             </div>
           </ScrollArea>
+        </TabsContent>
+
+        <TabsContent value="structure" className="flex-1 mt-0 overflow-hidden">
+          <LayoutSettingsPanel 
+            layout={config.layout}
+            onUpdateLayout={(updates) => onUpdateConfig({ layout: { ...config.layout, ...updates } as any })}
+          />
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">

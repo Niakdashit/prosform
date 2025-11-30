@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { QuizSidebar } from "./QuizSidebar";
 import { ArticleQuizPreview } from "./ArticleQuizPreview";
@@ -6,11 +7,14 @@ import { QuizSettingsPanel } from "./QuizSettingsPanel";
 import { ArticleQuizSettingsPanel } from "./ArticleQuizSettingsPanel";
 import { QuizTopToolbar } from "./QuizTopToolbar";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaign } from "@/hooks/useCampaign";
 import { QuizConfig, QuizQuestion } from "./QuizBuilder";
 
 const defaultQuizConfig: QuizConfig = {
@@ -101,9 +105,41 @@ const defaultArticleConfig: ArticleConfig = {
 
 export const ArticleQuizBuilder = () => {
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
-  const [config, setConfig] = useState<QuizConfig>(defaultQuizConfig);
-  const [articleConfig, setArticleConfig] = useState<ArticleConfig>(defaultArticleConfig);
+  const themeContext = useTheme();
+  const { theme } = themeContext;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    campaign,
+    config,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    isLoading,
+    isSaving,
+    hasUnsavedChanges,
+    setConfig,
+    save,
+    publish,
+    setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
+  } = useCampaign(
+    { campaignId, type: 'quiz', mode: 'article', defaultName: 'Nouveau quiz (article)' },
+    { ...defaultQuizConfig, articleConfig: defaultArticleConfig },
+    themeContext
+  );
+
+  // Article config is stored inside config.articleConfig
+  const articleConfig: ArticleConfig = (config as any).articleConfig || defaultArticleConfig;
+
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'question' | 'result'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
@@ -113,6 +149,22 @@ export const ArticleQuizBuilder = () => {
   useEffect(() => {
     if (isMobile) setViewMode('mobile');
   }, [isMobile]);
+
+  // Sauvegarder et mettre à jour l'URL avec l'ID
+  const handleSave = async () => {
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/article-quiz?id=${saved.id}`, { replace: true });
+    }
+  };
+
+  // Publier et mettre à jour l'URL
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/article-quiz?id=${published.id}`, { replace: true });
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem('article-quiz-config', JSON.stringify(config));
@@ -127,11 +179,14 @@ export const ArticleQuizBuilder = () => {
   }, [theme]);
 
   const updateConfig = (updates: Partial<QuizConfig>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ ...prev, ...updates }));
   };
 
   const updateArticleConfig = (updates: Partial<ArticleConfig>) => {
-    setArticleConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ 
+      ...prev, 
+      articleConfig: { ...(prev.articleConfig || defaultArticleConfig), ...updates } 
+    }));
   };
 
   const addQuestion = () => {
@@ -144,39 +199,39 @@ export const ArticleQuizBuilder = () => {
       ],
       points: 10
     };
-    setConfig(prev => ({ ...prev, questions: [...prev.questions, newQuestion] }));
+    setConfig((prev: any) => ({ ...prev, questions: [...prev.questions, newQuestion] }));
     toast.success("Question ajoutée");
   };
 
   const deleteQuestion = (index: number) => {
-    if (config.questions.length <= 1) {
+    if ((config as any).questions?.length <= 1) {
       toast.error("Il doit y avoir au moins 1 question");
       return;
     }
-    setConfig(prev => ({ ...prev, questions: prev.questions.filter((_, i) => i !== index) }));
+    setConfig((prev: any) => ({ ...prev, questions: prev.questions.filter((_: any, i: number) => i !== index) }));
     toast.success("Question supprimée");
   };
 
   const duplicateQuestion = (index: number) => {
-    const q = config.questions[index];
+    const q = (config as any).questions?.[index];
     if (q) {
       const newQ: QuizQuestion = {
         ...q,
         id: String(Date.now()),
-        answers: q.answers.map(a => ({ ...a, id: `${Date.now()}-${a.id}` }))
+        answers: q.answers.map((a: any) => ({ ...a, id: `${Date.now()}-${a.id}` }))
       };
-      const newQuestions = [...config.questions];
+      const newQuestions = [...(config as any).questions];
       newQuestions.splice(index + 1, 0, newQ);
-      setConfig(prev => ({ ...prev, questions: newQuestions }));
+      setConfig((prev: any) => ({ ...prev, questions: newQuestions }));
       toast.success("Question dupliquée");
     }
   };
 
   const reorderQuestions = (startIndex: number, endIndex: number) => {
-    const newQuestions = [...config.questions];
+    const newQuestions = [...(config as any).questions];
     const [removed] = newQuestions.splice(startIndex, 1);
     newQuestions.splice(endIndex, 0, removed);
-    setConfig(prev => ({ ...prev, questions: newQuestions }));
+    setConfig((prev: any) => ({ ...prev, questions: newQuestions }));
   };
 
   return (
@@ -194,6 +249,10 @@ export const ArticleQuizBuilder = () => {
             toast.error('Unable to open preview - data too large');
           }
         }}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
       />
         
       <div className="flex flex-1 overflow-hidden relative">
@@ -259,7 +318,7 @@ export const ArticleQuizBuilder = () => {
             />
             
             {/* Preview area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
@@ -289,6 +348,15 @@ export const ArticleQuizBuilder = () => {
                   onQuestionIndexChange={setCurrentQuestionIndex}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Quiz (Article). Vue active: ${activeView}. Titre: ${(config as any).welcomeScreen?.title || ''}`}
+                onApplyActions={createAIActionHandler(config, (updates) => setConfig({ ...config, ...updates }), {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactScreen',
+                  result: 'resultScreen'
+                })}
+              />
             </div>
             
             {/* Right sidebar - View content settings + Article settings */}

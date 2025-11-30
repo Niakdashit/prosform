@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { ScratchSidebar } from "./ScratchSidebar";
 import { ArticleScratchPreview } from "./ArticleScratchPreview";
@@ -7,11 +8,14 @@ import { ArticleScratchSettingsPanel } from "./ArticleScratchSettingsPanel";
 import { ScratchTopToolbar } from "./ScratchTopToolbar";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaign } from "@/hooks/useCampaign";
 import { ScratchConfig, ScratchCard, ScratchPrize } from "./ScratchBuilder";
 
 const defaultScratchConfig: ScratchConfig = {
@@ -102,20 +106,69 @@ const defaultArticleConfig: ArticleConfig = {
 
 export const ArticleScratchBuilder = () => {
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
-  const [config, setConfig] = useState<ScratchConfig>(defaultScratchConfig);
-  const [articleConfig, setArticleConfig] = useState<ArticleConfig>(defaultArticleConfig);
+  const themeContext = useTheme();
+  const { theme } = themeContext;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    campaign,
+    config,
+    prizes,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    isLoading,
+    isSaving,
+    hasUnsavedChanges,
+    setConfig,
+    setPrizes,
+    save,
+    publish,
+    setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
+  } = useCampaign(
+    { campaignId, type: 'scratch', mode: 'article', defaultName: 'Nouvelle campagne scratch (article)' },
+    { ...defaultScratchConfig, articleConfig: defaultArticleConfig },
+    themeContext
+  );
+
+  // Article config is stored inside config.articleConfig
+  const articleConfig: ArticleConfig = (config as any).articleConfig || defaultArticleConfig;
+
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
-  const [prizes, setPrizes] = useState<ScratchPrize[]>([]);
 
   useEffect(() => {
     if (isMobile) setViewMode('mobile');
   }, [isMobile]);
+
+  // Sauvegarder et mettre à jour l'URL avec l'ID
+  const handleSave = async () => {
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/article-scratch?id=${saved.id}`, { replace: true });
+    }
+  };
+
+  // Publier et mettre à jour l'URL
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/article-scratch?id=${published.id}`, { replace: true });
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem('article-scratch-config', JSON.stringify(config));
@@ -130,17 +183,20 @@ export const ArticleScratchBuilder = () => {
   }, [theme]);
 
   const updateConfig = (updates: Partial<ScratchConfig>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ ...prev, ...updates }));
   };
 
   const updateArticleConfig = (updates: Partial<ArticleConfig>) => {
-    setArticleConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ 
+      ...prev, 
+      articleConfig: { ...(prev.articleConfig || defaultArticleConfig), ...updates } 
+    }));
   };
 
   const updateCard = (id: string, updates: Partial<ScratchCard>) => {
-    setConfig(prev => ({
+    setConfig((prev: any) => ({
       ...prev,
-      cards: prev.cards.map(card => card.id === id ? { ...card, ...updates } : card)
+      cards: prev.cards.map((card: ScratchCard) => card.id === id ? { ...card, ...updates } : card)
     }));
   };
 
@@ -151,33 +207,33 @@ export const ArticleScratchBuilder = () => {
       isWinning: false,
       probability: 10
     };
-    setConfig(prev => ({ ...prev, cards: [...prev.cards, newCard] }));
+    setConfig((prev: any) => ({ ...prev, cards: [...prev.cards, newCard] }));
     toast.success("Carte ajoutée");
   };
 
   const deleteCard = (id: string) => {
-    if (config.cards.length <= 1) {
+    if ((config as any).cards?.length <= 1) {
       toast.error("Il doit y avoir au moins 1 carte");
       return;
     }
-    setConfig(prev => ({ ...prev, cards: prev.cards.filter(c => c.id !== id) }));
+    setConfig((prev: any) => ({ ...prev, cards: prev.cards.filter((c: ScratchCard) => c.id !== id) }));
     toast.success("Carte supprimée");
   };
 
   const handleSavePrize = (prize: ScratchPrize) => {
-    const existingPrize = prizes.find(p => p.id === prize.id);
+    const existingPrize = (prizes as ScratchPrize[]).find(p => p.id === prize.id);
     if (existingPrize) {
       const used = Math.max(0, existingPrize.quantity - existingPrize.remaining);
       const newRemaining = Math.max(0, (prize.quantity ?? existingPrize.quantity) - used);
-      setPrizes(prizes.map(p => p.id === prize.id ? { ...p, ...prize, remaining: newRemaining, status: newRemaining === 0 ? 'depleted' : p.status } : p));
+      setPrizes((prizes as ScratchPrize[]).map(p => p.id === prize.id ? { ...p, ...prize, remaining: newRemaining, status: newRemaining === 0 ? 'depleted' : p.status } : p));
     } else {
-      setPrizes([...prizes, { ...prize, remaining: prize.quantity, status: 'active' as const }]);
+      setPrizes([...(prizes as ScratchPrize[]), { ...prize, remaining: prize.quantity, status: 'active' as const }]);
     }
     toast.success("Lot enregistré");
   };
 
   const handleDeletePrize = (id: string) => {
-    setPrizes(prizes.filter(p => p.id !== id));
+    setPrizes((prizes as ScratchPrize[]).filter(p => p.id !== id));
     toast.success("Lot supprimé");
   };
 
@@ -196,6 +252,10 @@ export const ArticleScratchBuilder = () => {
             toast.error('Unable to open preview - data too large');
           }
         }}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
@@ -268,7 +328,7 @@ export const ArticleScratchBuilder = () => {
             />
             
             {/* Preview area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
@@ -297,6 +357,17 @@ export const ArticleScratchBuilder = () => {
                   prizes={prizes}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Scratch Card (Article). Vue active: ${activeView}. Titre: ${(config as any).welcomeScreen?.title || ''}`}
+                onApplyActions={createAIActionHandler(config, (updates) => setConfig({ ...config, ...updates }), {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactForm',
+                  scratch: 'scratchScreen',
+                  'ending-win': 'endingWin',
+                  'ending-lose': 'endingLose'
+                })}
+              />
             </div>
             
             {/* Right sidebar - View content settings + Article settings */}

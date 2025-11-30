@@ -62,15 +62,30 @@ const Media = () => {
           </button>
         </div>
 
-        {/* Filters bar */}
+        {/* Filters bar - Liquid Glass Effect */}
         <div 
-          className="flex items-center justify-between p-4 mb-4"
+          className="flex items-center justify-between p-4 mb-4 relative overflow-hidden"
           style={{ 
-            backgroundColor: colors.white, 
-            borderRadius: '8px',
-            border: `1px solid ${colors.border}`,
+            background: 'rgba(255, 255, 255, 0.25)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: '18px',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+            boxShadow: `
+              0 4px 24px rgba(0, 0, 0, 0.06),
+              0 1px 2px rgba(0, 0, 0, 0.04),
+              inset 0 1px 1px rgba(255, 255, 255, 0.8),
+              inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+            `,
           }}
         >
+          {/* Top highlight line */}
+          <div 
+            className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+            }}
+          />
           <div 
             className="flex items-center gap-2 px-3 h-9"
             style={{ 
@@ -114,20 +129,47 @@ const Media = () => {
           </div>
         </div>
 
-        {/* Media grid */}
+        {/* Media grid - Liquid Glass Effect */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-6 gap-4">
+          <div 
+            className="grid grid-cols-6 gap-4 p-5 relative overflow-hidden"
+            style={{
+              borderRadius: '24px',
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',
+            }}
+          >
+            {/* Gradient overlay for depth */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 40%)',
+              }}
+            />
             {filteredMedia.map((item) => (
               <div
                 key={item.id}
-                className="group relative cursor-pointer"
+                className="group relative cursor-pointer overflow-hidden"
                 style={{ 
-                  backgroundColor: colors.white, 
-                  borderRadius: '8px',
-                  border: `1px solid ${colors.border}`,
-                  overflow: 'hidden',
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(255, 255, 255, 0.6)',
+                  boxShadow: `
+                    0 4px 24px rgba(0, 0, 0, 0.06),
+                    0 1px 2px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+                    inset 0 -1px 1px rgba(0, 0, 0, 0.02)
+                  `,
                 }}
               >
+                {/* Top highlight line */}
+                <div 
+                  className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none z-10"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
+                  }}
+                />
                 {item.type === 'folder' ? (
                   <div 
                     className="aspect-square flex items-center justify-center"

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { CampaignService } from '@/services/CampaignService';
-import type { Campaign, CampaignType } from '@/types/campaign';
+import type { Campaign, CampaignType, CampaignMode } from '@/types/campaign';
 import { toast } from 'sonner';
 
 // Deep merge utility function
@@ -30,6 +30,7 @@ function deepMerge<T extends Record<string, any>>(target: T, source: Record<stri
 interface UseCampaignOptions {
   campaignId?: string | null;
   type: CampaignType;
+  mode?: CampaignMode;
   defaultName?: string;
   autoSave?: boolean;
   autoSaveDelay?: number;
@@ -41,7 +42,7 @@ export function useCampaign(
   defaultConfig: any,
   themeContext?: { theme: any; updateTheme: (updates: any) => void }
 ) {
-  const { campaignId, type, defaultName = 'Nouvelle campagne', autoSave = false, autoSaveDelay = 3000 } = options;
+  const { campaignId, type, mode = 'fullscreen', defaultName = 'Nouvelle campagne', autoSave = false, autoSaveDelay = 3000 } = options;
   
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [config, setConfigState] = useState<any>(defaultConfig);
@@ -57,7 +58,7 @@ export function useCampaign(
   const [error, setError] = useState<string | null>(null);
   
   const autoSaveTimer = useRef<NodeJS.Timeout | null>(null);
-  const hasChanges = useRef(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Charger la campagne si ID fourni
   useEffect(() => {
@@ -113,7 +114,7 @@ export function useCampaign(
 
   // Auto-save avec debounce
   useEffect(() => {
-    if (!autoSave || !hasChanges.current || !campaign?.id) return;
+    if (!autoSave || !hasUnsavedChanges || !campaign?.id) return;
 
     if (autoSaveTimer.current) {
       clearTimeout(autoSaveTimer.current);
@@ -121,7 +122,7 @@ export function useCampaign(
 
     autoSaveTimer.current = setTimeout(() => {
       save();
-      hasChanges.current = false;
+      setHasUnsavedChanges(false);
     }, autoSaveDelay);
 
     return () => {
@@ -135,7 +136,7 @@ export function useCampaign(
   const setConfig = useCallback((updater: any) => {
     setConfigState((prev: any) => {
       const newConfig = typeof updater === 'function' ? updater(prev) : updater;
-      hasChanges.current = true;
+      setHasUnsavedChanges(true);
       return newConfig;
     });
   }, []);
@@ -144,7 +145,7 @@ export function useCampaign(
   const setPrizes = useCallback((updater: any) => {
     setPrizesState((prev: any[]) => {
       const newPrizes = typeof updater === 'function' ? updater(prev) : updater;
-      hasChanges.current = true;
+      setHasUnsavedChanges(true);
       return newPrizes;
     });
   }, []);
@@ -174,7 +175,7 @@ export function useCampaign(
         id: campaign?.id,
         name,
         type,
-        mode: campaign?.mode || 'fullscreen',
+        mode: campaign?.mode || mode,
         status: campaign?.status || 'draft',
         config,
         prizes,
@@ -184,7 +185,7 @@ export function useCampaign(
       });
 
       setCampaign(savedCampaign);
-      hasChanges.current = false;
+      setHasUnsavedChanges(false);
       toast.success('Campagne sauvegardée !');
       return savedCampaign;
     } catch (err) {
@@ -231,6 +232,7 @@ export function useCampaign(
     isLoading,
     isSaving,
     error,
+    hasUnsavedChanges,
     setConfig,
     setPrizes,
     save,

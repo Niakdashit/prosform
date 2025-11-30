@@ -7,6 +7,8 @@ import { JackpotSettingsPanel } from "./JackpotSettingsPanel";
 import { JackpotTopToolbar } from "./JackpotTopToolbar";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -15,6 +17,12 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { JackpotSymbolPickerModal } from "./JackpotSymbolPickerModal";
 import { useCampaign } from "@/hooks/useCampaign";
+import { 
+  HeaderConfig, 
+  FooterConfig, 
+  defaultHeaderConfig, 
+  defaultFooterConfig,
+} from "./campaign";
 
 export interface JackpotPrize {
   id: string;
@@ -166,6 +174,11 @@ export interface JackpotConfig {
     backgroundImage?: string;
     backgroundImageMobile?: string;
   };
+  // Layout global
+  layout?: {
+    header: HeaderConfig;
+    footer: FooterConfig;
+  };
 }
 
 const defaultJackpotConfig: JackpotConfig = {
@@ -222,6 +235,10 @@ const defaultJackpotConfig: JackpotConfig = {
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
+  },
+  layout: {
+    header: { ...defaultHeaderConfig, enabled: false },
+    footer: { ...defaultFooterConfig, enabled: false },
   }
 };
 
@@ -245,6 +262,7 @@ export const JackpotBuilder = () => {
     endTime,
     isLoading,
     isSaving,
+    hasUnsavedChanges,
     setConfig,
     setPrizes,
     save,
@@ -452,6 +470,7 @@ export const JackpotBuilder = () => {
         onSave={handleSave}
         onPublish={handlePublish}
         isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
@@ -508,6 +527,7 @@ export const JackpotBuilder = () => {
                     setCampaignDefaultTab('dotation');
                     setLeftDrawerOpen(false);
                   }}
+                  onUpdateConfig={updateConfig}
                 />
               </DrawerContent>
             </Drawer>
@@ -571,10 +591,11 @@ export const JackpotBuilder = () => {
                 setActiveTab('campaign');
                 setCampaignDefaultTab('dotation');
               }}
+              onUpdateConfig={updateConfig}
             />
             
             {/* Preview area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
@@ -611,6 +632,43 @@ export const JackpotBuilder = () => {
                   onUpdatePrize={handleSavePrize}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Jackpot/Machine à sous. Vue active: ${activeView}. Titre: ${config.welcomeScreen.title}. Symboles: ${config.symbols.map(s => s.label).join(', ')}`}
+                onApplyActions={createAIActionHandler(config, updateConfig, {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactForm',
+                  jackpot: 'jackpotScreen',
+                  'ending-win': 'endingWin',
+                  'ending-lose': 'endingLose'
+                }, {
+                  onUpdateSymbols: (symbols) => {
+                    updateConfig({ symbols: symbols.map((s, i) => ({
+                      ...config.symbols[i] || {},
+                      id: s.id || `sym_${i}`,
+                      label: s.label,
+                      image: s.image || config.symbols[i]?.image || '/gamification/neo/cherry.svg',
+                      value: s.value ?? 10,
+                    })) });
+                  },
+                  onUpdatePrizes: (newPrizes) => {
+                    setPrizes(newPrizes.map((p, i) => ({
+                      id: p.id || `prize_${i}`,
+                      name: p.name,
+                      description: p.description || '',
+                      code: p.code || '',
+                      probability: 10,
+                      quantity: p.quantity ?? 100,
+                      image: p.image || '',
+                      isActive: true,
+                    })));
+                  },
+                  onApplyTemplate: (template, colors) => {
+                    // Pas de couleurs spécifiques pour jackpot mais on pourrait changer le template
+                    console.log(`Template ${template} appliqué`);
+                  }
+                })}
+              />
             </div>
             
             <JackpotSettingsPanel 

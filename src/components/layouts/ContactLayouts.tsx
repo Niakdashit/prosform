@@ -123,8 +123,6 @@ export const ContactLayouts = ({
         isReadOnly={isReadOnly}
         onFocus={onFocusTitle}
         onBlur={() => onBlurTitle?.(title)}
-        showSparkles={!isReadOnly}
-        showClear={!isReadOnly}
         fieldType="title"
         marginBottom="16px"
       />
@@ -144,8 +142,6 @@ export const ContactLayouts = ({
         isReadOnly={isReadOnly}
         onFocus={onFocusSubtitle}
         onBlur={() => onBlurSubtitle?.(subtitle)}
-        showSparkles={!isReadOnly}
-        showClear={!isReadOnly}
         fieldType="subtitle"
         marginBottom="32px"
       />

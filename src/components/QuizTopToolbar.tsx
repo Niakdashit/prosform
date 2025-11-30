@@ -1,50 +1,108 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Eye, Save, Globe, Loader2 } from "lucide-react";
+import { Eye, Save, Globe, Loader2, X } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface QuizTopToolbarProps {
   onPreview: () => void;
   onSave?: () => void;
   onPublish?: () => void;
   isSaving?: boolean;
+  hasUnsavedChanges?: boolean;
 }
 
-export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving }: QuizTopToolbarProps) => {
+export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges }: QuizTopToolbarProps) => {
+  const navigate = useNavigate();
+  const [showExitDialog, setShowExitDialog] = useState(false);
+
+  const handleClose = () => {
+    if (hasUnsavedChanges) {
+      setShowExitDialog(true);
+    } else {
+      navigate('/campaigns');
+    }
+  };
+
+  const handleConfirmExit = () => {
+    setShowExitDialog(false);
+    navigate('/campaigns');
+  };
+
   return (
-    <div className="h-12 bg-card border-b border-border flex items-center justify-end px-3">
-      <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 w-8 p-0"
-          onClick={onPreview}
-        >
-          <Eye className="w-4 h-4" />
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="gap-2 h-8 px-3 text-xs font-medium"
-          onClick={onSave}
-          disabled={isSaving}
-        >
-          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
-        </Button>
-        <Button 
-          size="sm" 
-          className="gap-2 h-8 px-4 text-xs font-medium"
-          style={{ 
-            backgroundColor: '#f5ca3c', 
-            color: '#3d3731',
-            border: 'none',
-          }}
-          onClick={onPublish}
-          disabled={isSaving}
-        >
-          <Globe className="w-4 h-4" />
-          Publier
-        </Button>
+    <>
+      <div className="h-12 bg-card border-b border-border flex items-center justify-end px-3">
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+            onClick={onPreview}
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-2 h-8 px-3 text-xs font-medium"
+            onClick={onSave}
+            disabled={isSaving}
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2 h-8 px-3 text-xs font-medium"
+            onClick={handleClose}
+            disabled={isSaving}
+          >
+            <X className="w-4 h-4" />
+            Fermer
+          </Button>
+          <Button 
+            size="sm" 
+            className="gap-2 h-8 px-4 text-xs font-medium"
+            style={{ 
+              backgroundColor: '#f5ca3c', 
+              color: '#3d3731',
+              border: 'none',
+            }}
+            onClick={onPublish}
+            disabled={isSaving}
+          >
+            <Globe className="w-4 h-4" />
+            Publier
+          </Button>
+        </div>
       </div>
-    </div>
+
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Modifications non sauvegardées</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter sans sauvegarder ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continuer l'édition</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmExit} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Quitter sans sauvegarder
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };

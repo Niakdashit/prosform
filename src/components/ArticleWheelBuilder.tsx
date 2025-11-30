@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { WheelSidebar } from "./WheelSidebar";
 import { ArticleWheelPreview } from "./ArticleWheelPreview";
@@ -8,11 +9,14 @@ import { WheelTopToolbar } from "./WheelTopToolbar";
 import { SegmentsModal } from "./SegmentsModal";
 import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ChatToCreate } from "./ChatToCreate";
+import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCampaign } from "@/hooks/useCampaign";
 import { Prize, WheelSegment, WheelConfig } from "./WheelBuilder";
 
 const defaultWheelConfig: WheelConfig = {
@@ -109,9 +113,43 @@ const defaultArticleConfig: ArticleConfig = {
 
 export const ArticleWheelBuilder = () => {
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
-  const [config, setConfig] = useState<WheelConfig>(defaultWheelConfig);
-  const [articleConfig, setArticleConfig] = useState<ArticleConfig>(defaultArticleConfig);
+  const themeContext = useTheme();
+  const { theme } = themeContext;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    campaign,
+    config,
+    prizes,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    isLoading,
+    isSaving,
+    hasUnsavedChanges,
+    setConfig,
+    setPrizes,
+    save,
+    publish,
+    setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
+  } = useCampaign(
+    { campaignId, type: 'wheel', mode: 'article', defaultName: 'Nouvelle campagne roue (article)' },
+    { ...defaultWheelConfig, articleConfig: defaultArticleConfig },
+    themeContext
+  );
+
+  // Article config is stored inside config.articleConfig
+  const articleConfig: ArticleConfig = (config as any).articleConfig || defaultArticleConfig;
+
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
@@ -119,13 +157,28 @@ export const ArticleWheelBuilder = () => {
   const [segmentsModalOpen, setSegmentsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
   const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
-  const [prizes, setPrizes] = useState<Prize[]>([]);
 
   useEffect(() => {
     if (isMobile) {
       setViewMode('mobile');
     }
   }, [isMobile]);
+
+  // Sauvegarder et mettre à jour l'URL avec l'ID
+  const handleSave = async () => {
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/article-wheel?id=${saved.id}`, { replace: true });
+    }
+  };
+
+  // Publier et mettre à jour l'URL
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/article-wheel?id=${published.id}`, { replace: true });
+    }
+  };
 
   // Save configs to localStorage for preview
   useEffect(() => {
@@ -142,17 +195,20 @@ export const ArticleWheelBuilder = () => {
   }, [theme]);
 
   const updateConfig = (updates: Partial<WheelConfig>) => {
-    setConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ ...prev, ...updates }));
   };
 
   const updateArticleConfig = (updates: Partial<ArticleConfig>) => {
-    setArticleConfig(prev => ({ ...prev, ...updates }));
+    setConfig((prev: any) => ({ 
+      ...prev, 
+      articleConfig: { ...(prev.articleConfig || defaultArticleConfig), ...updates } 
+    }));
   };
 
   const updateSegment = (id: string, updates: Partial<WheelSegment>) => {
-    setConfig(prev => ({
+    setConfig((prev: any) => ({
       ...prev,
-      segments: prev.segments.map(s => 
+      segments: prev.segments.map((s: WheelSegment) => 
         s.id === id ? { ...s, ...updates } : s
       )
     }));
@@ -165,7 +221,7 @@ export const ArticleWheelBuilder = () => {
       color: '#' + Math.floor(Math.random()*16777215).toString(16),
       probability: 10
     };
-    setConfig(prev => ({
+    setConfig((prev: any) => ({
       ...prev,
       segments: [...prev.segments, newSegment]
     }));
@@ -173,8 +229,8 @@ export const ArticleWheelBuilder = () => {
   };
 
   const duplicateSegment = (id: string) => {
-    setConfig(prev => {
-      const segmentIndex = prev.segments.findIndex(s => s.id === id);
+    setConfig((prev: any) => {
+      const segmentIndex = prev.segments.findIndex((s: WheelSegment) => s.id === id);
       if (segmentIndex === -1) return prev;
       
       const segmentToDuplicate = prev.segments[segmentIndex];
@@ -193,7 +249,7 @@ export const ArticleWheelBuilder = () => {
   };
 
   const reorderSegments = (startIndex: number, endIndex: number) => {
-    setConfig(prev => {
+    setConfig((prev: any) => {
       const newSegments = Array.from(prev.segments);
       const [removed] = newSegments.splice(startIndex, 1);
       newSegments.splice(endIndex, 0, removed);
@@ -202,26 +258,26 @@ export const ArticleWheelBuilder = () => {
   };
 
   const deleteSegment = (id: string) => {
-    if (config.segments.length <= 2) {
+    if ((config as any).segments?.length <= 2) {
       toast.error("La roue doit avoir au moins 2 segments");
       return;
     }
     
-    setConfig(prev => ({
+    setConfig((prev: any) => ({
       ...prev,
-      segments: prev.segments.filter(s => s.id !== id)
+      segments: prev.segments.filter((s: WheelSegment) => s.id !== id)
     }));
     toast.success("Segment supprimé");
   };
 
   const handleSavePrize = (prize: Prize) => {
-    const existingPrize = prizes.find(p => p.id === prize.id);
+    const existingPrize = (prizes as Prize[]).find(p => p.id === prize.id);
 
     if (existingPrize) {
       const used = Math.max(0, existingPrize.quantity - existingPrize.remaining);
       const newRemaining = Math.max(0, (prize.quantity ?? existingPrize.quantity) - used);
 
-      setPrizes(prizes.map(p => 
+      setPrizes((prizes as Prize[]).map(p => 
         p.id === prize.id
           ? {
               ...p,
@@ -233,7 +289,7 @@ export const ArticleWheelBuilder = () => {
       ));
     } else {
       setPrizes([
-        ...prizes,
+        ...(prizes as Prize[]),
         {
           ...prize,
           remaining: prize.quantity,
@@ -246,7 +302,7 @@ export const ArticleWheelBuilder = () => {
   };
 
   const handleDeletePrize = (id: string) => {
-    setPrizes(prizes.filter(p => p.id !== id));
+    setPrizes((prizes as Prize[]).filter(p => p.id !== id));
     toast.success("Lot supprimé");
   };
 
@@ -265,6 +321,10 @@ export const ArticleWheelBuilder = () => {
             toast.error('Unable to open preview - data too large');
           }
         }}
+        onSave={handleSave}
+        onPublish={handlePublish}
+        isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
@@ -276,7 +336,7 @@ export const ArticleWheelBuilder = () => {
           onSavePrize={handleSavePrize}
           onDeletePrize={handleDeletePrize}
           gameType="wheel"
-          segments={config.segments.map(s => ({ id: s.id, label: s.label }))}
+          segments={(config as any).segments?.map((s: any) => ({ id: s.id, label: s.label })) || []}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
@@ -361,7 +421,7 @@ export const ArticleWheelBuilder = () => {
             />
             
             {/* Preview area */}
-            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100">
+            <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
               {/* Top bar: view toggle on the right */}
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
@@ -390,6 +450,17 @@ export const ArticleWheelBuilder = () => {
                   prizes={prizes}
                 />
               </div>
+              
+              <ChatToCreate 
+                context={`Type: Roue de la fortune (Article). Vue active: ${activeView}. Titre: ${(config as any).welcomeScreen?.title || ''}`}
+                onApplyActions={createAIActionHandler(config, (updates) => setConfig({ ...config, ...updates }), {
+                  welcome: 'welcomeScreen',
+                  contact: 'contactForm',
+                  wheel: 'wheelScreen',
+                  'ending-win': 'endingWin',
+                  'ending-lose': 'endingLose'
+                })}
+              />
             </div>
             
             {/* Right sidebar - View content settings + Article settings */}
