@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target } from "lucide-react";
 import { AnalyticsService, GlobalStats, TimeSeriesData, CampaignAnalytics, TypeDistribution } from "@/services/AnalyticsService";
+import { AdvancedAnalyticsService, GeoStats, DeviceStats, TrafficSource, PeakHour, EmailCollectionStats, FraudStats } from "@/services/AdvancedAnalyticsService";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const colors = {
   dark: '#3d3731',
@@ -15,6 +18,8 @@ const colors = {
   blue: '#3b82f6',
   purple: '#a855f7',
   rose: '#f43f5e',
+  orange: '#f59e0b',
+  emerald: '#10b981',
 };
 
 const CHART_COLORS = ['#3b82f6', '#a855f7', '#f59e0b', '#10b981', '#f43f5e'];
@@ -32,22 +37,51 @@ const Stats = () => {
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>([]);
   const [campaignAnalytics, setCampaignAnalytics] = useState<CampaignAnalytics[]>([]);
   const [typeDistribution, setTypeDistribution] = useState<TypeDistribution[]>([]);
+  const [geoStats, setGeoStats] = useState<GeoStats[]>([]);
+  const [deviceStats, setDeviceStats] = useState<DeviceStats[]>([]);
+  const [trafficSources, setTrafficSources] = useState<TrafficSource[]>([]);
+  const [peakHours, setPeakHours] = useState<PeakHour[]>([]);
+  const [emailStats, setEmailStats] = useState<EmailCollectionStats | null>(null);
+  const [fraudStats, setFraudStats] = useState<FraudStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadAnalytics = async () => {
       try {
-        const [stats, timeSeries, campaigns, types] = await Promise.all([
+        const [
+          stats, 
+          timeSeries, 
+          campaigns, 
+          types,
+          geo,
+          devices,
+          traffic,
+          hours,
+          email,
+          fraud,
+        ] = await Promise.all([
           AnalyticsService.getGlobalStats(),
           AnalyticsService.getTimeSeriesData(7),
           AnalyticsService.getCampaignAnalytics(),
           AnalyticsService.getTypeDistribution(),
+          AdvancedAnalyticsService.getGeoStats(),
+          AdvancedAnalyticsService.getDeviceStats(),
+          AdvancedAnalyticsService.getTrafficSources(),
+          AdvancedAnalyticsService.getPeakHours(),
+          AdvancedAnalyticsService.getEmailCollectionStats(),
+          AdvancedAnalyticsService.getFraudStats(),
         ]);
         
         setGlobalStats(stats);
         setTimeSeriesData(timeSeries);
         setCampaignAnalytics(campaigns);
         setTypeDistribution(types);
+        setGeoStats(geo);
+        setDeviceStats(devices);
+        setTrafficSources(traffic);
+        setPeakHours(hours);
+        setEmailStats(email);
+        setFraudStats(fraud);
       } catch (error) {
         console.error('Erreur chargement analytics:', error);
       } finally {
@@ -57,6 +91,24 @@ const Stats = () => {
     
     loadAnalytics();
   }, []);
+
+  const handleExportCSV = async () => {
+    try {
+      const csv = await AdvancedAnalyticsService.exportToCSV();
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analytics-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('Export réussi !');
+    } catch (error) {
+      toast.error('Erreur lors de l\'export');
+    }
+  };
 
   const stats = [
     { 
@@ -85,17 +137,40 @@ const Stats = () => {
     },
   ];
 
+  const secondaryStats = [
+    {
+      label: 'Collecte email',
+      value: `${emailStats?.collection_rate.toFixed(1) || 0}%`,
+      subtext: `${emailStats?.emails_collected || 0} emails`,
+      icon: Mail,
+      color: colors.emerald,
+    },
+    {
+      label: 'Taux de fraude',
+      value: `${fraudStats?.fraud_rate.toFixed(1) || 0}%`,
+      subtext: `${fraudStats?.duplicate_ips || 0} doublons`,
+      icon: AlertTriangle,
+      color: fraudStats && fraudStats.fraud_rate > 10 ? colors.rose : colors.orange,
+    },
+  ];
+
   return (
     <AppLayout>
       <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
-        {/* Page title */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold" style={{ color: colors.dark }}>
-            Statistiques
-          </h1>
-          <p className="text-sm mt-1" style={{ color: colors.muted }}>
-            Vue d'ensemble de vos performances
-          </p>
+        {/* Page title with export button */}
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold" style={{ color: colors.dark }}>
+              Statistiques Avancées
+            </h1>
+            <p className="text-sm mt-1" style={{ color: colors.muted }}>
+              Vue complète de vos performances et analytics
+            </p>
+          </div>
+          <Button onClick={handleExportCSV} variant="outline" className="gap-2">
+            <Download className="w-4 h-4" />
+            Export CSV
+          </Button>
         </div>
 
         {/* Stats cards - Liquid Glass Effect */}
@@ -106,7 +181,6 @@ const Stats = () => {
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)',
           }}
         >
-          {/* Animated gradient overlay for depth */}
           <div 
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -131,14 +205,12 @@ const Stats = () => {
                 `,
               }}
             >
-              {/* Top highlight line - liquid glass signature */}
               <div 
                 className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
                 style={{
                   background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
                 }}
               />
-              {/* Inner glow */}
               <div 
                 className="absolute inset-0 pointer-events-none"
                 style={{
@@ -162,6 +234,40 @@ const Stats = () => {
                 <p className="text-xs" style={{ color: colors.muted }}>
                   {stat.label}
                 </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Secondary stats */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {secondaryStats.map((stat, i) => (
+            <div
+              key={i}
+              className="p-4 rounded-2xl border"
+              style={{ 
+                background: colors.white,
+                borderColor: colors.border,
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div 
+                  className="p-3 rounded-xl"
+                  style={{ backgroundColor: `${stat.color}15` }}
+                >
+                  <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                    {stat.value}
+                  </p>
+                  <p className="text-xs" style={{ color: colors.muted }}>
+                    {stat.label}
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: colors.muted }}>
+                    {stat.subtext}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
@@ -245,7 +351,85 @@ const Stats = () => {
               </ResponsiveContainer>
             </div>
 
-            {/* Grille 2 colonnes */}
+            {/* 4 colonnes - Geo, Device, Traffic, Heures */}
+            <div className="grid grid-cols-4 gap-4">
+              {/* Géolocalisation */}
+              <div className="p-4 rounded-2xl border" style={{ background: colors.white, borderColor: colors.border }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Globe className="w-4 h-4" style={{ color: colors.blue }} />
+                  <h4 className="text-sm font-semibold" style={{ color: colors.dark }}>Top Pays</h4>
+                </div>
+                <div className="space-y-2">
+                  {geoStats.slice(0, 5).map((geo, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs">
+                      <span style={{ color: colors.muted }}>{geo.country}</span>
+                      <span className="font-medium" style={{ color: colors.dark }}>{geo.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Devices */}
+              <div className="p-4 rounded-2xl border" style={{ background: colors.white, borderColor: colors.border }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Smartphone className="w-4 h-4" style={{ color: colors.purple }} />
+                  <h4 className="text-sm font-semibold" style={{ color: colors.dark }}>Devices</h4>
+                </div>
+                <ResponsiveContainer width="100%" height={120}>
+                  <PieChart>
+                    <Pie
+                      data={deviceStats}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={30}
+                      outerRadius={50}
+                      dataKey="count"
+                      label={({ device_type, percentage }) => `${device_type}: ${percentage.toFixed(0)}%`}
+                    >
+                      {deviceStats.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Traffic Sources */}
+              <div className="p-4 rounded-2xl border" style={{ background: colors.white, borderColor: colors.border }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Target className="w-4 h-4" style={{ color: colors.emerald }} />
+                  <h4 className="text-sm font-semibold" style={{ color: colors.dark }}>Sources</h4>
+                </div>
+                <div className="space-y-2">
+                  {trafficSources.slice(0, 5).map((source, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs">
+                      <span style={{ color: colors.muted }} className="truncate">{source.source}</span>
+                      <span className="font-medium" style={{ color: colors.dark }}>{source.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Heures de pic */}
+              <div className="p-4 rounded-2xl border" style={{ background: colors.white, borderColor: colors.border }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="w-4 h-4" style={{ color: colors.orange }} />
+                  <h4 className="text-sm font-semibold" style={{ color: colors.dark }}>Heures de pic</h4>
+                </div>
+                <ResponsiveContainer width="100%" height={120}>
+                  <BarChart data={peakHours}>
+                    <XAxis 
+                      dataKey="hour" 
+                      tick={{ fontSize: 10 }}
+                      tickFormatter={(h) => `${h}h`}
+                    />
+                    <Bar dataKey="count" fill={colors.orange} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Grille 2 colonnes - Top campagnes & Types */}
             <div className="grid grid-cols-2 gap-6">
               {/* Top campagnes */}
               <div 

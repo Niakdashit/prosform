@@ -101,40 +101,64 @@ export type Database = {
       }
       campaign_participants: {
         Row: {
+          browser: string | null
           campaign_id: string
           city: string | null
           completed_at: string | null
           country: string | null
           created_at: string
           device_fingerprint: string | null
+          device_type: string | null
           email: string | null
           id: string
           ip_address: string | null
+          os: string | null
           participation_data: Json | null
+          referrer: string | null
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
         }
         Insert: {
+          browser?: string | null
           campaign_id: string
           city?: string | null
           completed_at?: string | null
           country?: string | null
           created_at?: string
           device_fingerprint?: string | null
+          device_type?: string | null
           email?: string | null
           id?: string
           ip_address?: string | null
+          os?: string | null
           participation_data?: Json | null
+          referrer?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Update: {
+          browser?: string | null
           campaign_id?: string
           city?: string | null
           completed_at?: string | null
           country?: string | null
           created_at?: string
           device_fingerprint?: string | null
+          device_type?: string | null
           email?: string | null
           id?: string
           ip_address?: string | null
+          os?: string | null
           participation_data?: Json | null
+          referrer?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: [
           {
