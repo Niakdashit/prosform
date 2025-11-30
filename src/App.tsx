@@ -27,6 +27,7 @@ import ArticleQuiz from "./pages/ArticleQuiz";
 import ArticleQuizPreview from "./pages/ArticleQuizPreview";
 import ArticleJackpot from "./pages/ArticleJackpot";
 import ArticleJackpotPreview from "./pages/ArticleJackpotPreview";
+import Prizes from "./pages/Prizes";
 import PublicCampaign from "./pages/PublicCampaign";
 import NotFound from "./pages/NotFound";
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/campaigns" element={<Campaigns />} />
             <Route path="/stats" element={<Stats />} />
             <Route path="/contacts" element={<Contacts />} />
+            <Route path="/prizes" element={<Prizes />} />
             <Route path="/media" element={<Media />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/form" element={<Index />} />
