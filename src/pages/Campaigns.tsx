@@ -785,7 +785,7 @@ const Campaigns = () => {
       {/* Campaign Statistics Modal */}
       <Dialog open={statsModalOpen} onOpenChange={setStatsModalOpen}>
         <DialogContent 
-          className="max-w-6xl max-h-[90vh] overflow-y-auto relative"
+          className="max-w-6xl h-[85vh] overflow-hidden relative flex flex-col"
           style={{
             background: 'rgba(255, 255, 255, 0.35)',
             backdropFilter: 'blur(24px)',
@@ -798,6 +798,8 @@ const Campaigns = () => {
               inset 0 1px 1px rgba(255, 255, 255, 0.9),
               inset 0 -1px 1px rgba(0, 0, 0, 0.02)
             `,
+            top: '50%',
+            transform: 'translateY(-50%)',
           }}
         >
           {/* Top highlight line - liquid glass signature */}
@@ -855,11 +857,11 @@ const Campaigns = () => {
           </DialogHeader>
 
           {loadingStats ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center flex-1">
               <Loader2 className="w-8 h-8 animate-spin" style={{ color: colors.gold }} />
             </div>
           ) : campaignStats ? (
-            <div className="space-y-6 py-4 relative z-10">
+            <div className="space-y-6 py-4 relative z-10 overflow-y-auto flex-1">
               {/* Main Stats Grid - 4 columns */}
               <div className="grid grid-cols-4 gap-4">
                 {/* Participations */}
