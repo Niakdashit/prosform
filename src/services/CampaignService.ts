@@ -93,18 +93,25 @@ export const CampaignService = {
    */
   async save(campaign: Partial<Campaign> & { title: string; type: Campaign['type'] }): Promise<Campaign> {
     if (campaign.id) {
-      const { id, created_at, user_id, ...updates } = campaign;
+      // Ne pas envoyer les colonnes qui ne sont pas présentes dans le schéma REST (ex: ends_at)
+      // pour éviter les erreurs "Could not find column in schema cache"
+      const { id, created_at, user_id, ends_at, starts_at, ...rawUpdates } = campaign as any;
+
+      const updates: Partial<Campaign> = {
+        ...rawUpdates,
+      };
+
       return this.update(id, updates);
     } else {
-      const { id, created_at, updated_at, user_id, ...createData } = campaign as Campaign;
+      const { id, created_at, updated_at, user_id, ends_at, starts_at, ...createData } = campaign as Campaign;
       return this.create({
         ...createData,
-        mode: createData.mode || 'fullscreen',
+        mode: (createData as any).mode || 'fullscreen',
         status: createData.status || 'draft',
         config: createData.config || {},
-        prizes: createData.prizes || [],
-        theme: createData.theme || {},
-      });
+        prizes: (createData as any).prizes || [],
+        theme: (createData as any).theme || {},
+      } as any);
     }
   },
 
