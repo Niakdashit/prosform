@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Eye, Save, Globe, Loader2, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +24,7 @@ interface QuizTopToolbarProps {
 
 export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges }: QuizTopToolbarProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [showExitDialog, setShowExitDialog] = useState(false);
 
   const handleClose = () => {
@@ -40,8 +42,8 @@ export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsa
 
   return (
     <>
-      <div className="h-12 bg-card border-b border-border flex items-center justify-end px-3">
-        <div className="flex items-center gap-2">
+      <div className={`h-12 bg-card border-b border-border flex items-center ${isMobile ? 'overflow-x-auto' : 'justify-end'} px-3`}>
+        <div className={`flex items-center gap-2 ${isMobile ? 'flex-shrink-0' : ''}`}>
           <Button 
             variant="ghost" 
             size="sm" 
