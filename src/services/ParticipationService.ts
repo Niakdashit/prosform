@@ -57,30 +57,30 @@ export const ParticipationService = {
    */
   async recordParticipation(data: ParticipationData): Promise<void> {
     try {
-      // Parser le user agent
-      const userAgent = navigator.userAgent;
-      const { device_type, browser, os } = parseUserAgent(userAgent);
+      // Données de base (toujours présentes)
+      const baseData: any = {
+        campaign_id: data.campaignId,
+        email: data.email || data.contactData?.email,
+        participation_data: {
+          contactData: data.contactData,
+          result: data.result,
+          timestamp: new Date().toISOString(),
+        },
+        completed_at: new Date().toISOString(),
+      };
       
-      // Estimation simple du pays à partir de la langue du navigateur
-      const language = navigator.language || (navigator as any).userLanguage || '';
-      const country = language.includes('-') ? language.split('-')[1]?.toUpperCase() : null;
-      
-      // Extraire les UTM params
-      const utmParams = extractUTMParams();
-      
-      const { error } = await supabase
-        .from('campaign_participants')
-        .insert({
-          campaign_id: data.campaignId,
-          email: data.email || data.contactData?.email,
-          participation_data: {
-            contactData: data.contactData,
-            result: data.result,
-            timestamp: new Date().toISOString(),
-          },
-          completed_at: new Date().toISOString(),
-          user_agent: userAgent,
-          referrer: document.referrer || undefined,
+      // Essayer d'abord avec toutes les colonnes avancées
+      try {
+        const userAgent = navigator.userAgent;
+        const { device_type, browser, os } = parseUserAgent(userAgent);
+        const language = navigator.language || (navigator as any).userLanguage || '';
+        const country = language.includes('-') ? language.split('-')[1]?.toUpperCase() : null;
+        const utmParams = extractUTMParams();
+        const referrer = document.referrer || undefined;
+        
+        // Enrichir participation_data avec les données de tracking
+        baseData.participation_data = {
+          ...baseData.participation_data,
           device_type,
           browser,
           os,
@@ -88,11 +88,52 @@ export const ParticipationService = {
           utm_source: utmParams.utm_source,
           utm_medium: utmParams.utm_medium,
           utm_campaign: utmParams.utm_campaign,
-        });
+          referrer,
+          user_agent: userAgent,
+        };
+        
+        const { error: insertError } = await supabase
+          .from('campaign_participants')
+          .insert({
+            ...baseData,
+            user_agent: userAgent,
+            referrer: referrer,
+            device_type,
+            browser,
+            os,
+            country,
+            utm_source: utmParams.utm_source,
+            utm_medium: utmParams.utm_medium,
+            utm_campaign: utmParams.utm_campaign,
+          });
 
-      if (error) {
-        console.error('Error recording participation:', error);
-        throw error;
+        if (insertError) {
+          // Si erreur de colonne manquante, réessayer avec données de base uniquement
+          if (insertError.message?.includes('column') || insertError.code === '42703') {
+            console.warn('Advanced columns not available, using basic insert with enriched participation_data');
+            const { error: basicError } = await supabase
+              .from('campaign_participants')
+              .insert(baseData);
+            
+            if (basicError) {
+              console.error('Error recording participation (basic):', basicError);
+              throw basicError;
+            }
+          } else {
+            throw insertError;
+          }
+        }
+      } catch (advancedError: any) {
+        // Fallback: insertion basique si l'insertion avancée échoue
+        console.warn('Fallback to basic participation recording:', advancedError);
+        const { error: basicError } = await supabase
+          .from('campaign_participants')
+          .insert(baseData);
+        
+        if (basicError) {
+          console.error('Error recording participation (fallback):', basicError);
+          throw basicError;
+        }
       }
 
       // Mettre à jour les analytics de la campagne (table campaign_analytics)
