@@ -15,8 +15,8 @@ export interface Campaign {
   theme: Record<string, unknown>;
   slug?: string;
   thumbnail_url?: string;
-  start_date?: string;
-  end_date?: string;
+  starts_at?: string;
+  ends_at?: string;
   created_at: string;
   updated_at: string;
   published_at?: string;
