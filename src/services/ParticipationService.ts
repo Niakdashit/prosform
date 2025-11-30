@@ -48,6 +48,42 @@ function extractUTMParams() {
   };
 }
 
+// Générer un device fingerprint basé sur les caractéristiques du navigateur
+function generateDeviceFingerprint(): string {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  let hash = '';
+  
+  if (ctx) {
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Arial';
+    ctx.fillText('fingerprint', 2, 2);
+    hash = canvas.toDataURL().slice(-50);
+  }
+  
+  const components = [
+    navigator.userAgent,
+    navigator.language,
+    screen.colorDepth,
+    screen.width + 'x' + screen.height,
+    new Date().getTimezoneOffset(),
+    !!window.sessionStorage,
+    !!window.localStorage,
+    hash
+  ];
+  
+  // Simple hash function
+  let fingerprint = 0;
+  const str = components.join('###');
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    fingerprint = ((fingerprint << 5) - fingerprint) + char;
+    fingerprint = fingerprint & fingerprint;
+  }
+  
+  return Math.abs(fingerprint).toString(36);
+}
+
 /**
  * Service pour enregistrer les participations aux campagnes
  */
@@ -77,6 +113,7 @@ export const ParticipationService = {
         const country = language.includes('-') ? language.split('-')[1]?.toUpperCase() : null;
         const utmParams = extractUTMParams();
         const referrer = document.referrer || undefined;
+        const deviceFingerprint = generateDeviceFingerprint();
         
         // Enrichir participation_data avec les données de tracking
         baseData.participation_data = {
@@ -90,6 +127,7 @@ export const ParticipationService = {
           utm_campaign: utmParams.utm_campaign,
           referrer,
           user_agent: userAgent,
+          device_fingerprint: deviceFingerprint,
         };
         
         const { error: insertError } = await supabase
@@ -102,6 +140,7 @@ export const ParticipationService = {
             browser,
             os,
             country,
+            device_fingerprint: deviceFingerprint,
             utm_source: utmParams.utm_source,
             utm_medium: utmParams.utm_medium,
             utm_campaign: utmParams.utm_campaign,
