@@ -61,6 +61,10 @@ export const ParticipationService = {
       const userAgent = navigator.userAgent;
       const { device_type, browser, os } = parseUserAgent(userAgent);
       
+      // Estimation simple du pays à partir de la langue du navigateur
+      const language = navigator.language || (navigator as any).userLanguage || '';
+      const country = language.includes('-') ? language.split('-')[1]?.toUpperCase() : null;
+      
       // Extraire les UTM params
       const utmParams = extractUTMParams();
       
@@ -80,6 +84,7 @@ export const ParticipationService = {
           device_type,
           browser,
           os,
+          country,
           utm_source: utmParams.utm_source,
           utm_medium: utmParams.utm_medium,
           utm_campaign: utmParams.utm_campaign,
