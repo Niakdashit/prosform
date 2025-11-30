@@ -364,4 +364,150 @@ export const AdvancedAnalyticsService = {
       throw error;
     }
   },
+
+  // Nouveaux participants (uniques dans la période)
+  async getNewParticipantsCount(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<number> {
+    try {
+      let query = supabase
+        .from('campaign_participants')
+        .select('email', { count: 'exact', head: false });
+
+      if (campaignId) query = query.eq('campaign_id', campaignId);
+      if (dateRange && dateRange.from && dateRange.to) {
+        query = query
+          .gte('created_at', dateRange.from.toISOString())
+          .lte('created_at', dateRange.to.toISOString());
+      }
+
+      const { data } = await query;
+      const emails = data?.map(p => p.email).filter(Boolean) || [];
+      
+      const uniqueEmails = new Set(emails);
+      return uniqueEmails.size;
+    } catch (error) {
+      console.error('Error fetching new participants count:', error);
+      return 0;
+    }
+  },
+
+  // Top campagnes par métrique
+  async getTopCampaigns(
+    metric: 'participations' | 'participants' | 'new_participants' | 'opt_ins',
+    limit: number = 10,
+    dateRange?: { from: Date | undefined; to: Date | undefined }
+  ) {
+    try {
+      let query = supabase
+        .from('campaign_participants')
+        .select('campaign_id, campaigns!inner(app_title), email, participation_data');
+
+      if (dateRange && dateRange.from && dateRange.to) {
+        query = query
+          .gte('created_at', dateRange.from.toISOString())
+          .lte('created_at', dateRange.to.toISOString());
+      }
+
+      const { data } = await query;
+      if (!data) return [];
+
+      const campaignStats = new Map<string, {
+        id: string;
+        title: string;
+        participations: number;
+        participants: Set<string>;
+        optIns: number;
+      }>();
+
+      data.forEach((p: any) => {
+        const campaignId = p.campaign_id;
+        const campaignTitle = p.campaigns?.app_title || 'Unknown';
+        
+        if (!campaignStats.has(campaignId)) {
+          campaignStats.set(campaignId, {
+            id: campaignId,
+            title: campaignTitle,
+            participations: 0,
+            participants: new Set(),
+            optIns: 0,
+          });
+        }
+
+        const stats = campaignStats.get(campaignId)!;
+        stats.participations++;
+        if (p.email) stats.participants.add(p.email);
+        
+        const participationData = p.participation_data as any;
+        if (participationData?.optIn || participationData?.newsletter) stats.optIns++;
+      });
+
+      const campaigns = Array.from(campaignStats.values()).map(c => ({
+        id: c.id,
+        title: c.title,
+        participations: c.participations,
+        participants: c.participants.size,
+        new_participants: c.participants.size,
+        opt_ins: c.optIns,
+      }));
+
+      const sorted = campaigns.sort((a, b) => b[metric] - a[metric]);
+      return sorted.slice(0, limit);
+    } catch (error) {
+      console.error('Error fetching top campaigns:', error);
+      return [];
+    }
+  },
+
+  // Séries temporelles des opt-ins
+  async getTimeSeriesOptIns(
+    dateRange: { from: Date | undefined; to: Date | undefined },
+    campaignId?: string
+  ) {
+    try {
+      if (!dateRange.from || !dateRange.to) {
+        return { dates: [], newsletter: [], others: [], partners: [] };
+      }
+
+      let query = supabase
+        .from('campaign_participants')
+        .select('created_at, participation_data')
+        .gte('created_at', dateRange.from.toISOString())
+        .lte('created_at', dateRange.to.toISOString())
+        .order('created_at');
+
+      if (campaignId) query = query.eq('campaign_id', campaignId);
+
+      const { data } = await query;
+      if (!data) return { dates: [], newsletter: [], others: [], partners: [] };
+
+      const dailyStats = new Map<string, { newsletter: number; others: number; partners: number }>();
+
+      data.forEach((p: any) => {
+        const date = new Date(p.created_at).toISOString().split('T')[0];
+        if (!dailyStats.has(date)) {
+          dailyStats.set(date, { newsletter: 0, others: 0, partners: 0 });
+        }
+
+        const stats = dailyStats.get(date)!;
+        const participationData = p.participation_data as any;
+        
+        if (participationData?.optIn || participationData?.newsletter) {
+          stats.newsletter++;
+        }
+        if (participationData?.partners) {
+          stats.partners++;
+        }
+      });
+
+      const sorted = Array.from(dailyStats.entries()).sort();
+      return {
+        dates: sorted.map(([date]) => date),
+        newsletter: sorted.map(([, stats]) => stats.newsletter),
+        others: sorted.map(([, stats]) => stats.others),
+        partners: sorted.map(([, stats]) => stats.partners),
+      };
+    } catch (error) {
+      console.error('Error fetching time series opt-ins:', error);
+      return { dates: [], newsletter: [], others: [], partners: [] };
+    }
+  },
 };
