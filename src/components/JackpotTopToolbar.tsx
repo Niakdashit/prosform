@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Eye, Save, Globe, Palette, Gift, Loader2, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "sonner";
+import { PublishService } from "@/services/PublishService";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,12 +24,14 @@ interface JackpotTopToolbarProps {
   hasUnsavedChanges?: boolean;
   activeTab: 'design' | 'campaign' | 'templates';
   onTabChange: (tab: 'design' | 'campaign' | 'templates') => void;
+  campaignId?: string;
 }
 
-export const JackpotTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges, activeTab, onTabChange }: JackpotTopToolbarProps) => {
+export const JackpotTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges, activeTab, onTabChange, campaignId }: JackpotTopToolbarProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const handleClose = () => {
     if (hasUnsavedChanges) {
@@ -40,6 +44,50 @@ export const JackpotTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasU
   const handleConfirmExit = () => {
     setShowExitDialog(false);
     navigate('/campaigns');
+  };
+
+  const handlePublish = async () => {
+    if (!campaignId) {
+      toast.error("Impossible de publier : ID de campagne manquant");
+      return;
+    }
+
+    if (hasUnsavedChanges && onSave) {
+      toast.info("Sauvegarde des modifications...");
+      await onSave();
+    }
+
+    setIsPublishing(true);
+
+    try {
+      const result = await PublishService.publish(campaignId);
+
+      if (result.success) {
+        toast.success("Campagne publiée avec succès !", {
+          description: "Votre campagne est maintenant accessible au public",
+          action: {
+            label: "Copier le lien",
+            onClick: () => {
+              if (result.publicUrl) {
+                navigator.clipboard.writeText(result.publicUrl);
+                toast.success("Lien copié !");
+              }
+            },
+          },
+        });
+
+        if (onPublish) {
+          onPublish();
+        }
+      } else {
+        toast.error(result.error || "Erreur lors de la publication");
+      }
+    } catch (error) {
+      console.error("Publish error:", error);
+      toast.error("Erreur lors de la publication de la campagne");
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   return (
@@ -112,11 +160,20 @@ export const JackpotTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasU
               color: '#3d3731',
               border: 'none',
             }}
-            onClick={onPublish}
-            disabled={isSaving}
+            onClick={handlePublish}
+            disabled={isSaving || isPublishing}
           >
-            <Globe className="w-4 h-4" />
-            Publier
+            {isPublishing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Publication...
+              </>
+            ) : (
+              <>
+                <Globe className="w-4 h-4" />
+                Publier
+              </>
+            )}
           </Button>
         </div>
       </div>
