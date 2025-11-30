@@ -16,6 +16,38 @@ export interface ParticipationData {
   };
 }
 
+// Helper pour parser le user agent
+function parseUserAgent(ua: string) {
+  const mobile = /mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+  const tablet = /tablet|ipad/i.test(ua);
+  const device_type = tablet ? 'tablet' : mobile ? 'mobile' : 'desktop';
+  
+  let browser = 'Other';
+  if (ua.includes('Chrome')) browser = 'Chrome';
+  else if (ua.includes('Safari')) browser = 'Safari';
+  else if (ua.includes('Firefox')) browser = 'Firefox';
+  else if (ua.includes('Edge')) browser = 'Edge';
+  
+  let os = 'Other';
+  if (ua.includes('Windows')) os = 'Windows';
+  else if (ua.includes('Mac')) os = 'MacOS';
+  else if (ua.includes('Linux')) os = 'Linux';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('iOS') || ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+  
+  return { device_type, browser, os };
+}
+
+// Helper pour extraire les UTM params de l'URL
+function extractUTMParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    utm_source: params.get('utm_source') || undefined,
+    utm_medium: params.get('utm_medium') || undefined,
+    utm_campaign: params.get('utm_campaign') || undefined,
+  };
+}
+
 /**
  * Service pour enregistrer les participations aux campagnes
  */
@@ -25,6 +57,13 @@ export const ParticipationService = {
    */
   async recordParticipation(data: ParticipationData): Promise<void> {
     try {
+      // Parser le user agent
+      const userAgent = navigator.userAgent;
+      const { device_type, browser, os } = parseUserAgent(userAgent);
+      
+      // Extraire les UTM params
+      const utmParams = extractUTMParams();
+      
       const { error } = await supabase
         .from('campaign_participants')
         .insert({
@@ -36,6 +75,14 @@ export const ParticipationService = {
             timestamp: new Date().toISOString(),
           },
           completed_at: new Date().toISOString(),
+          user_agent: userAgent,
+          referrer: document.referrer || undefined,
+          device_type,
+          browser,
+          os,
+          utm_source: utmParams.utm_source,
+          utm_medium: utmParams.utm_medium,
+          utm_campaign: utmParams.utm_campaign,
         });
 
       if (error) {
