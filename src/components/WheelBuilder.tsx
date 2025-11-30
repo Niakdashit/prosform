@@ -445,6 +445,7 @@ export const WheelBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <WheelTopToolbar 
+        campaignId={campaignId || undefined}
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
           // Clear old preview data first to free up space

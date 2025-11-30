@@ -412,6 +412,7 @@ export const JackpotBuilder = () => {
   return (
     <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <JackpotTopToolbar 
+        campaignId={campaignId || undefined}
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
           // Clear old data first to make room
