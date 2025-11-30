@@ -39,9 +39,8 @@ function appToDbCampaign(
   user_id: string,
 ): DbCampaignInsert {
   return {
-    // Use the existing `title` column so we stay compatible with the
-    // current backend schema. Newer schemas with `app_title` can derive it
-    // from `title` if needed.
+    // Backend actuel : on utilise uniquement les colonnes sûres
+    // (title, user_id, type, status, public_url_slug, thumbnail_url, config).
     title: campaign.name,
     user_id,
     type: campaign.type,
@@ -54,10 +53,6 @@ function appToDbCampaign(
     status: campaign.status || 'draft',
     public_url_slug: campaign.slug || null,
     thumbnail_url: campaign.thumbnail_url || null,
-    starts_at: campaign.start_date || null,
-    ends_at: campaign.end_date || null,
-    is_published: campaign.status === 'online',
-    published_at: campaign.published_at || null,
   } as DbCampaignInsert;
 }
 
@@ -70,12 +65,6 @@ function appToDbUpdate(updates: Partial<Campaign>): DbCampaignUpdate {
     (dbUpdate as any).public_url_slug = updates.slug;
   if (updates.thumbnail_url !== undefined)
     (dbUpdate as any).thumbnail_url = updates.thumbnail_url;
-  if (updates.start_date !== undefined)
-    (dbUpdate as any).starts_at = updates.start_date;
-  if (updates.end_date !== undefined)
-    (dbUpdate as any).ends_at = updates.end_date;
-  if (updates.published_at !== undefined)
-    (dbUpdate as any).published_at = updates.published_at;
 
   // Emballer mode, prizes, theme, config dans le JSON config
   if (
