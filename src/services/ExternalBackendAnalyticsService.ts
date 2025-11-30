@@ -36,6 +36,17 @@ export interface ConversionFunnel {
   steps: ConversionFunnelStep[];
 }
 
+export interface BlockedParticipant {
+  id: string;
+  campaign_id: string;
+  ip_address: string | null;
+  email: string | null;
+  device_fingerprint: string | null;
+  block_reason: string;
+  blocked_at: string;
+  metadata: any;
+}
+
 export const ExternalBackendAnalyticsService = {
   /**
    * Récupère les stats complètes d'une campagne
@@ -171,6 +182,56 @@ export const ExternalBackendAnalyticsService = {
       return data === true;
     } catch (error) {
       console.error('Error in isParticipantBlocked:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Récupère la liste des participants bloqués pour une campagne
+   */
+  async getBlockedParticipants(campaignId?: string): Promise<BlockedParticipant[]> {
+    try {
+      let query = externalSupabase
+        .from('blocked_participations')
+        .select('*')
+        .order('blocked_at', { ascending: false });
+
+      if (campaignId) {
+        query = query.eq('campaign_id', campaignId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching blocked participants:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getBlockedParticipants:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Débloque un participant
+   */
+  async unblockParticipant(blockedParticipantId: string): Promise<boolean> {
+    try {
+      const { error } = await externalSupabase
+        .from('blocked_participations')
+        .delete()
+        .eq('id', blockedParticipantId);
+
+      if (error) {
+        console.error('Error unblocking participant:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in unblockParticipant:', error);
       return false;
     }
   },
