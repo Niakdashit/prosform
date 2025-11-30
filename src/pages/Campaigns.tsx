@@ -784,42 +784,10 @@ const Campaigns = () => {
 
       {/* Campaign Statistics Modal */}
       <Dialog open={statsModalOpen} onOpenChange={setStatsModalOpen}>
-        <DialogContent 
-          className="max-w-6xl h-[85vh] overflow-hidden relative flex flex-col"
-          style={{
-            background: 'rgba(255, 255, 255, 0.35)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(255, 255, 255, 0.6)',
-            borderRadius: '28px',
-            boxShadow: `
-              0 8px 32px rgba(0, 0, 0, 0.08),
-              0 4px 16px rgba(0, 0, 0, 0.05),
-              inset 0 1px 1px rgba(255, 255, 255, 0.9),
-              inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-            `,
-            top: '50%',
-            transform: 'translateY(-50%)',
-          }}
-        >
-          {/* Top highlight line - liquid glass signature */}
-          <div 
-            className="absolute top-0 left-4 right-4 h-[1px] pointer-events-none z-10"
-            style={{
-              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.95) 20%, rgba(255,255,255,0.95) 80%, transparent 100%)',
-            }}
-          />
-          {/* Inner glow */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-[28px]"
-            style={{
-              background: 'radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.6) 0%, transparent 60%)',
-            }}
-          />
-          
-          <DialogHeader className="relative z-10">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
             <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center gap-2" style={{ color: colors.dark }}>
+              <DialogTitle className="flex items-center gap-2">
                 <BarChart2 className="w-5 h-5" />
                 Statistiques de la campagne
               </DialogTitle>
@@ -827,11 +795,6 @@ const Campaigns = () => {
                 variant="outline"
                 size="sm"
                 className="gap-2"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.5)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255, 255, 255, 0.6)',
-                }}
                 onClick={async () => {
                   if (selectedCampaignForStats) {
                     try {
@@ -857,38 +820,16 @@ const Campaigns = () => {
           </DialogHeader>
 
           {loadingStats ? (
-            <div className="flex items-center justify-center flex-1">
+            <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin" style={{ color: colors.gold }} />
             </div>
           ) : campaignStats ? (
-            <div className="space-y-6 py-4 relative z-10 overflow-y-auto flex-1">
+            <div className="space-y-6 py-4">
               {/* Main Stats Grid - 4 columns */}
               <div className="grid grid-cols-4 gap-4">
                 {/* Participations */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.gold}15` }}
@@ -905,30 +846,8 @@ const Campaigns = () => {
                 </div>
 
                 {/* Unique Participants */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.gold}15` }}
@@ -945,30 +864,8 @@ const Campaigns = () => {
                 </div>
 
                 {/* New Participants */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.gold}15` }}
@@ -985,30 +882,8 @@ const Campaigns = () => {
                 </div>
 
                 {/* Total Page Views */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.gold}15` }}
@@ -1025,30 +900,8 @@ const Campaigns = () => {
                 </div>
 
                 {/* Completion Rate */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.success}15` }}
@@ -1071,30 +924,8 @@ const Campaigns = () => {
                 </div>
 
                 {/* Newsletter & Marketing Opt-ins */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.gold}15` }}
@@ -1111,30 +942,8 @@ const Campaigns = () => {
                 </div>
 
                 {/* Legal & Rules Opt-ins */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.gold}15` }}
@@ -1151,30 +960,8 @@ const Campaigns = () => {
                 </div>
 
                 {/* Partner Opt-ins */}
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <div className="flex flex-col items-center text-center relative z-10">
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <div className="flex flex-col items-center text-center">
                     <div 
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: `${colors.gold}15` }}
@@ -1193,30 +980,8 @@ const Campaigns = () => {
 
               {/* Time series chart */}
               {campaignStats.timeSeries && campaignStats.timeSeries.length > 0 && (
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none z-10"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <h3 className="text-sm font-medium mb-4 relative z-10" style={{ color: colors.dark }}>
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <h3 className="text-sm font-medium mb-4" style={{ color: colors.dark }}>
                     Évolution sur 7 jours
                   </h3>
                   <ResponsiveContainer width="100%" height={250}>
@@ -1259,66 +1024,22 @@ const Campaigns = () => {
 
               {/* Bottom stats */}
               <div className="grid grid-cols-2 gap-4">
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <span className="text-xs font-medium uppercase tracking-wide relative z-10" style={{ color: colors.muted }}>
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
                     Temps moyen passé
                   </span>
-                  <p className="text-2xl font-semibold mt-2 relative z-10" style={{ color: colors.dark }}>
+                  <p className="text-2xl font-semibold mt-2" style={{ color: colors.dark }}>
                     {campaignStats.avg_time_spent 
                       ? `${Math.round(campaignStats.avg_time_spent)}s`
                       : 'N/A'
                     }
                   </p>
                 </div>
-                <div 
-                  className="p-6 relative overflow-hidden"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.25)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderRadius: '18px',
-                    border: '1px solid rgba(255, 255, 255, 0.6)',
-                    boxShadow: `
-                      0 4px 24px rgba(0, 0, 0, 0.06),
-                      0 1px 2px rgba(0, 0, 0, 0.04),
-                      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-                      inset 0 -1px 1px rgba(0, 0, 0, 0.02)
-                    `,
-                  }}
-                >
-                  {/* Top highlight line */}
-                  <div 
-                    className="absolute top-0 left-2 right-2 h-[1px] pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.9) 80%, transparent 100%)',
-                    }}
-                  />
-                  <span className="text-xs font-medium uppercase tracking-wide relative z-10" style={{ color: colors.muted }}>
+                <div className="p-6 rounded-lg border" style={{ backgroundColor: colors.white }}>
+                  <span className="text-xs font-medium uppercase tracking-wide" style={{ color: colors.muted }}>
                     Dernière participation
                   </span>
-                  <p className="text-2xl font-semibold mt-2 relative z-10" style={{ color: colors.dark }}>
+                  <p className="text-2xl font-semibold mt-2" style={{ color: colors.dark }}>
                     {campaignStats.last_participation_at 
                       ? new Date(campaignStats.last_participation_at).toLocaleDateString('fr-FR', {
                           day: '2-digit',
