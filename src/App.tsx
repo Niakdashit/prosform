@@ -27,6 +27,7 @@ import ArticleQuiz from "./pages/ArticleQuiz";
 import ArticleQuizPreview from "./pages/ArticleQuizPreview";
 import ArticleJackpot from "./pages/ArticleJackpot";
 import ArticleJackpotPreview from "./pages/ArticleJackpotPreview";
+import PublicCampaign from "./pages/PublicCampaign";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="/article-quiz-preview" element={<ArticleQuizPreview />} />
             <Route path="/article-jackpot" element={<ArticleJackpot />} />
             <Route path="/article-jackpot-preview" element={<ArticleJackpotPreview />} />
+            <Route path="/p/:slug" element={<PublicCampaign />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
