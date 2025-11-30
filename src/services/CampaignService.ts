@@ -45,9 +45,17 @@ export const CampaignService = {
    * Créer une nouvelle campagne
    */
   async create(campaign: CampaignCreate): Promise<Campaign> {
+    // Récupérer l'utilisateur connecté
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.error('❌ [CampaignService] User not authenticated:', userError);
+      throw new Error('User not authenticated');
+    }
+
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([campaign])
+      .insert([{ ...campaign, user_id: user.id }])
       .select()
       .single();
 
