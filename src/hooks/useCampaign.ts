@@ -155,29 +155,34 @@ export function useCampaign(
     setIsSaving(true);
     setError(null);
 
-    // Build starts_at and ends_at from date + time (stockées dans la config uniquement)
-    let scheduling: any = undefined;
+    // Build starts_at and ends_at from date + time
+    let starts_at: string | undefined;
+    let ends_at: string | undefined;
     
-    if (startDate || endDate) {
-      scheduling = {
-        startDate,
-        startTime,
-        endDate,
-        endTime,
-      };
+    if (startDate) {
+      starts_at = startTime 
+        ? new Date(`${startDate}T${startTime}`).toISOString()
+        : new Date(`${startDate}T00:00`).toISOString();
     }
- 
+    if (endDate) {
+      ends_at = endTime 
+        ? new Date(`${endDate}T${endTime}`).toISOString()
+        : new Date(`${endDate}T23:59`).toISOString();
+    }
+
     try {
-       const savedCampaign = await CampaignService.save({
-         id: campaign?.id,
-         title,
-         type,
-         mode: campaign?.mode || mode,
-         status: campaign?.status || 'draft',
-         config: scheduling ? { ...config, scheduling } : config,
-         prizes,
-         theme: themeContext?.theme || campaign?.theme || {},
-       });
+      const savedCampaign = await CampaignService.save({
+        id: campaign?.id,
+        title,
+        type,
+        mode: campaign?.mode || mode,
+        status: campaign?.status || 'draft',
+        config,
+        prizes,
+        theme: themeContext?.theme || campaign?.theme || {},
+        starts_at,
+        ends_at,
+      });
 
       setCampaign(savedCampaign);
       setHasUnsavedChanges(false);
@@ -191,7 +196,7 @@ export function useCampaign(
     } finally {
       setIsSaving(false);
     }
-  }, [campaign, title, type, config, prizes, startDate, startTime, endDate, endTime, themeContext]);
+  }, [campaign, name, type, config, prizes, startDate, startTime, endDate, endTime, themeContext]);
 
   // Publier la campagne
   const publish = useCallback(async (): Promise<Campaign | null> => {
