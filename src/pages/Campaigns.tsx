@@ -119,7 +119,7 @@ const Campaigns = () => {
     
     return {
       id: c.id,
-      name: c.title || 'Sans titre',
+      name: c.name,
       type: c.type,
       mode: c.mode,
       status: displayStatus,
@@ -130,7 +130,7 @@ const Campaigns = () => {
   });
 
   const filteredCampaigns = campaigns.filter(campaign => {
-    const matchesSearch = campaign.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? true;
+    const matchesSearch = campaign.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || campaign.status === statusFilter;
     return matchesSearch && matchesStatus;
   });

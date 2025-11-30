@@ -230,7 +230,7 @@ export const QuizBuilder = () => {
   const {
     campaign,
     config,
-    title: campaignName,
+    name: campaignName,
     startDate,
     startTime,
     endDate,
@@ -241,7 +241,7 @@ export const QuizBuilder = () => {
     setConfig,
     save,
     publish,
-    setTitle,
+    setName,
     setStartDate,
     setStartTime,
     setEndDate,

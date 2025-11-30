@@ -17,110 +17,21 @@ export const PublishService = {
    */
   async publish(campaignId: string): Promise<PublishResponse> {
     try {
-      // Récupérer la campagne pour vérifier son état actuel
-      const { data: campaign, error: fetchError } = await supabase
-        .from('campaigns')
-        .select('*')
-        .eq('id', campaignId)
-        .single();
+      const { data, error } = await supabase.functions.invoke('publish-campaign', {
+        body: { campaignId },
+      });
 
-      if (fetchError || !campaign) {
-        console.error('❌ [PublishService] Fetch error:', fetchError);
-        return {
-          success: false,
-          error: 'Campagne introuvable ou accès refusé',
-        };
+      if (error) {
+        console.error('❌ [PublishService] Error:', error);
+        throw error;
       }
 
-      // Si déjà publiée, on renvoie directement les infos
-      if (campaign.is_published && campaign.public_url_slug) {
-        const publicUrl = `${window.location.origin}/p/${campaign.public_url_slug}`;
-        return {
-          success: true,
-          slug: campaign.public_url_slug,
-          publicUrl,
-          message: 'Campagne déjà publiée',
-        };
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to publish campaign');
       }
 
-      if (!campaign.title || campaign.title.trim() === '') {
-        return {
-          success: false,
-          error: 'La campagne doit avoir un titre pour être publiée',
-        };
-      }
-
-      // Générer un slug unique via la fonction SQL sécurisée
-      const { data: slugData, error: slugError } = await supabase.rpc(
-        'generate_campaign_slug',
-        {
-          campaign_title: campaign.title,
-          campaign_id: campaignId,
-        }
-      );
-
-      if (slugError || !slugData) {
-        console.error('❌ [PublishService] Slug error:', slugError);
-        return {
-          success: false,
-          error: 'Impossible de générer une URL publique',
-        };
-      }
-
-      const slug = slugData as string;
-      const publicUrl = `${window.location.origin}/p/${slug}`;
-
-      // Mettre à jour la campagne
-      const { data: updatedCampaign, error: updateError } = await supabase
-        .from('campaigns')
-        .update({
-          is_published: true,
-          status: 'online',
-          published_at: new Date().toISOString(),
-          public_url_slug: slug,
-          published_url: publicUrl,
-          last_edited_at: new Date().toISOString(),
-        })
-        .eq('id', campaignId)
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error('❌ [PublishService] Update error:', updateError);
-        return {
-          success: false,
-          error: "Erreur lors de la mise à jour de la campagne",
-        };
-      }
-
-      // Initialiser les analytics si besoin (upsert sur la clé campaign_id)
-      const { error: analyticsError } = await supabase
-        .from('campaign_analytics')
-        .upsert(
-          {
-            campaign_id: campaignId,
-            total_views: 0,
-            total_participations: 0,
-            total_completions: 0,
-            avg_time_spent: 0,
-          },
-          {
-            onConflict: 'campaign_id',
-          }
-        );
-
-      if (analyticsError) {
-        console.warn('⚠️ [PublishService] Analytics init warning:', analyticsError);
-      }
-
-      console.log('✅ [PublishService] Campaign published:', publicUrl);
-      return {
-        success: true,
-        campaign: updatedCampaign,
-        slug,
-        publicUrl,
-        message: 'Campagne publiée avec succès',
-      } as any;
+      console.log('✅ [PublishService] Campaign published:', data.publicUrl);
+      return data;
     } catch (error) {
       console.error('❌ [PublishService] Publish error:', error);
       return {
