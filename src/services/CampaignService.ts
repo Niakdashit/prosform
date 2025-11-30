@@ -2,28 +2,6 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Campaign, CampaignCreate, CampaignUpdate } from '@/types/campaign';
 
 /**
- * Mapper les données Supabase vers le type Campaign
- */
-const mapFromDB = (dbCampaign: any): Campaign => {
-  const { title, ...rest } = dbCampaign;
-  return {
-    ...rest,
-    name: title, // title (DB) → name (app)
-  };
-};
-
-/**
- * Mapper le type Campaign vers les données Supabase
- */
-const mapToDB = (campaign: any): any => {
-  const { name, ...rest } = campaign;
-  return {
-    ...rest,
-    title: name, // name (app) → title (DB)
-  };
-};
-
-/**
  * Service centralisé pour la gestion des campagnes
  */
 export const CampaignService = {
@@ -42,7 +20,7 @@ export const CampaignService = {
       throw error;
     }
 
-    return (data || []).map(mapFromDB);
+    return data || [];
   },
 
   /**
@@ -61,17 +39,16 @@ export const CampaignService = {
       throw error;
     }
 
-    return data ? mapFromDB(data) : null;
+    return data;
   },
 
   /**
    * Créer une nouvelle campagne
    */
   async create(campaign: CampaignCreate): Promise<Campaign> {
-    const dbData = mapToDB(campaign);
     const { data, error } = await supabase
       .from('campaigns')
-      .insert([dbData])
+      .insert([campaign])
       .select()
       .single();
 
@@ -81,17 +58,16 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign created:', data.id);
-    return mapFromDB(data);
+    return data;
   },
 
   /**
    * Mettre à jour une campagne
    */
   async update(id: string, updates: CampaignUpdate): Promise<Campaign> {
-    const dbUpdates = mapToDB(updates);
     const { data, error } = await supabase
       .from('campaigns')
-      .update(dbUpdates)
+      .update(updates)
       .eq('id', id)
       .select()
       .single();
@@ -102,13 +78,13 @@ export const CampaignService = {
     }
 
     console.log('✅ [CampaignService] Campaign updated:', id);
-    return mapFromDB(data);
+    return data;
   },
 
   /**
    * Sauvegarder une campagne (create ou update)
    */
-  async save(campaign: Partial<Campaign> & { name: string; type: Campaign['type'] }): Promise<Campaign> {
+  async save(campaign: Partial<Campaign> & { title: string; type: Campaign['type'] }): Promise<Campaign> {
     if (campaign.id) {
       const { id, created_at, ...updates } = campaign;
       return this.update(id, updates);
@@ -170,7 +146,7 @@ export const CampaignService = {
     
     return this.create({
       ...campaignData,
-      name: `${campaignData.name} (copie)`,
+      title: `${campaignData.title} (copie)`,
       status: 'draft',
     });
   },
