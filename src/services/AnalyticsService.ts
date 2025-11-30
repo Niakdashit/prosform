@@ -116,6 +116,41 @@ export const AnalyticsService = {
       last_participation_at: item.last_participation_at,
     }));
   },
+
+  /**
+   * Récupère les analytics d'une campagne spécifique
+   */
+  async getCampaignAnalyticsById(campaignId: string): Promise<CampaignAnalytics | null> {
+    const { data, error } = await supabase
+      .from('campaign_analytics')
+      .select(`
+        *,
+        campaigns!inner(app_title, type)
+      `)
+      .eq('campaign_id', campaignId)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching campaign analytics:', error);
+      return null;
+    }
+    
+    if (!data) return null;
+    
+    return {
+      campaign_id: data.campaign_id,
+      campaign_name: (data.campaigns as any)?.app_title || 'Sans nom',
+      campaign_type: (data.campaigns as any)?.type || 'unknown',
+      total_views: data.total_views || 0,
+      total_participations: data.total_participations || 0,
+      total_completions: data.total_completions || 0,
+      conversion_rate: data.total_participations > 0
+        ? Math.round((data.total_completions / data.total_participations) * 100)
+        : 0,
+      avg_time_spent: Math.round(data.avg_time_spent || 0),
+      last_participation_at: data.last_participation_at,
+    };
+  },
   
   /**
    * Récupère les données de séries temporelles (7 derniers jours)
@@ -145,6 +180,57 @@ export const AnalyticsService = {
     // Remplir avec les vraies données
     (data || []).forEach(participant => {
       const dateKey = participant.created_at.split('T')[0];
+      const dayData = groupedByDay.get(dateKey);
+      
+      if (dayData) {
+        dayData.participations += 1;
+        if (participant.completed_at) {
+          dayData.conversions += 1;
+        }
+        // Pour l'instant, views = participations * 2.5 (estimation)
+        dayData.views = Math.round(dayData.participations * 2.5);
+      }
+    });
+    
+    return Array.from(groupedByDay.entries()).map(([date, data]) => ({
+      date,
+      ...data,
+    }));
+  },
+
+  /**
+   * Récupère les données de séries temporelles pour une campagne spécifique
+   */
+  async getTimeSeriesDataByCampaign(campaignId: string, days: number = 7): Promise<TimeSeriesData[]> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    
+    const { data, error } = await supabase
+      .from('campaign_participants')
+      .select('created_at, completed_at')
+      .eq('campaign_id', campaignId)
+      .gte('created_at', startDate.toISOString());
+    
+    if (error) {
+      console.error('Error fetching time series data:', error);
+      return [];
+    }
+    
+    // Grouper par jour
+    const groupedByDay = new Map<string, { views: number; participations: number; conversions: number }>();
+    
+    // Initialiser tous les jours
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      groupedByDay.set(dateKey, { views: 0, participations: 0, conversions: 0 });
+    }
+    
+    // Remplir avec les vraies données
+    (data || []).forEach(participant => {
+      const date = new Date(participant.created_at);
+      const dateKey = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
       const dayData = groupedByDay.get(dateKey);
       
       if (dayData) {

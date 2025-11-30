@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Search, 
   MoreVertical, 
@@ -12,7 +12,10 @@ import {
   CircleDot,
   Loader2,
   Trash2,
-  Copy
+  Copy,
+  BarChart2,
+  TrendingUp,
+  Activity
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
@@ -35,7 +38,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { CampaignType, CampaignStatus, CampaignMode } from "@/types/campaign";
+import { AnalyticsService } from "@/services/AnalyticsService";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 // Couleurs DA - harmonisées avec /form
 const colors = {
@@ -109,6 +120,10 @@ const Campaigns = () => {
   const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [campaignToDelete, setCampaignToDelete] = useState<string | null>(null);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
+  const [selectedCampaignForStats, setSelectedCampaignForStats] = useState<string | null>(null);
+  const [campaignStats, setCampaignStats] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(false);
 
   // Transform campaigns for display
   const campaigns = rawCampaigns.map(c => {
@@ -197,6 +212,30 @@ const Campaigns = () => {
     };
     navigate(`${routes[campaign.type]}?id=${campaign.id}`);
   };
+
+  const handleViewStats = async (campaignId: string) => {
+    setSelectedCampaignForStats(campaignId);
+    setStatsModalOpen(true);
+    setLoadingStats(true);
+    
+    try {
+      const stats = await AnalyticsService.getCampaignAnalyticsById(campaignId);
+      const timeSeries = await AnalyticsService.getTimeSeriesDataByCampaign(campaignId, 7);
+      setCampaignStats({ ...stats, timeSeries });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      toast.error('Erreur lors du chargement des statistiques');
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!statsModalOpen) {
+      setCampaignStats(null);
+      setSelectedCampaignForStats(null);
+    }
+  }, [statsModalOpen]);
 
   // Afficher un spinner plein page pendant le chargement initial
   if (isLoading) {
@@ -529,6 +568,10 @@ const Campaigns = () => {
                       <DropdownMenuItem onClick={() => handleEditCampaign(campaign)}>
                         Modifier
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleViewStats(campaign.id)}>
+                        <BarChart2 className="w-4 h-4 mr-2" />
+                        Statistiques
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDuplicate(campaign.id)}>
                         <Copy className="w-4 h-4 mr-2" />
                         Dupliquer
@@ -716,6 +759,134 @@ const Campaigns = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Campaign Statistics Modal */}
+      <Dialog open={statsModalOpen} onOpenChange={setStatsModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BarChart2 className="w-5 h-5" />
+              Statistiques de la campagne
+            </DialogTitle>
+          </DialogHeader>
+
+          {loadingStats ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin" style={{ color: colors.gold }} />
+            </div>
+          ) : campaignStats ? (
+            <div className="space-y-6 py-4">
+              {/* Stats cards */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium" style={{ color: colors.muted }}>Vues</span>
+                    <Activity className="w-4 h-4" style={{ color: colors.gold }} />
+                  </div>
+                  <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                    {campaignStats.total_views || 0}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium" style={{ color: colors.muted }}>Participations</span>
+                    <Users className="w-4 h-4" style={{ color: colors.gold }} />
+                  </div>
+                  <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                    {campaignStats.total_participations || 0}
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium" style={{ color: colors.muted }}>Taux de conversion</span>
+                    <TrendingUp className="w-4 h-4" style={{ color: colors.gold }} />
+                  </div>
+                  <p className="text-2xl font-semibold" style={{ color: colors.dark }}>
+                    {campaignStats.total_views > 0 
+                      ? `${((campaignStats.total_participations / campaignStats.total_views) * 100).toFixed(1)}%`
+                      : '0%'
+                    }
+                  </p>
+                </div>
+              </div>
+
+              {/* Time series chart */}
+              {campaignStats.timeSeries && campaignStats.timeSeries.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium mb-4" style={{ color: colors.dark }}>
+                    Évolution sur 7 jours
+                  </h3>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <AreaChart data={campaignStats.timeSeries}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
+                      <XAxis 
+                        dataKey="date" 
+                        stroke={colors.muted}
+                        style={{ fontSize: '12px' }}
+                      />
+                      <YAxis 
+                        stroke={colors.muted}
+                        style={{ fontSize: '12px' }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: colors.white,
+                          border: `1px solid ${colors.border}`,
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="views" 
+                        stroke={colors.gold}
+                        fill={`${colors.gold}40`}
+                        name="Vues"
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="participations" 
+                        stroke={colors.success}
+                        fill={`${colors.success}40`}
+                        name="Participations"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {/* Additional stats */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
+                  <span className="text-xs font-medium" style={{ color: colors.muted }}>
+                    Temps moyen passé
+                  </span>
+                  <p className="text-lg font-semibold mt-1" style={{ color: colors.dark }}>
+                    {campaignStats.avg_time_spent 
+                      ? `${Math.round(campaignStats.avg_time_spent)}s`
+                      : 'N/A'
+                    }
+                  </p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.border }}>
+                  <span className="text-xs font-medium" style={{ color: colors.muted }}>
+                    Dernière participation
+                  </span>
+                  <p className="text-lg font-semibold mt-1" style={{ color: colors.dark }}>
+                    {campaignStats.last_participation_at 
+                      ? new Date(campaignStats.last_participation_at).toLocaleDateString('fr-FR')
+                      : 'Aucune'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12">
+              <p style={{ color: colors.muted }}>Aucune donnée disponible</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 };
