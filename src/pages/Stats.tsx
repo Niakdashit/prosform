@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target, UserPlus, Zap } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target, UserPlus, Zap, ShieldAlert, Unlock } from "lucide-react";
 import { AnalyticsService, GlobalStats, TimeSeriesData, CampaignAnalytics, TypeDistribution } from "@/services/AnalyticsService";
 import { AdvancedAnalyticsService, GeoStats, DeviceStats, TrafficSource, PeakHour, EmailCollectionStats, FraudStats } from "@/services/AdvancedAnalyticsService";
 import { useCampaignAdvancedStats } from "@/hooks/useCampaignAdvancedStats";
@@ -12,6 +12,7 @@ import { LiveFeed } from "@/components/stats/LiveFeed";
 import { StatsFilters } from "@/components/stats/StatsFilters";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { ExportParticipantsButton } from "@/components/ExportParticipantsButton";
+import { ExternalBackendAnalyticsService, BlockedParticipant } from "@/services/ExternalBackendAnalyticsService";
 
 const colors = {
   dark: '#3d3731',
@@ -57,6 +58,8 @@ const Stats = () => {
   const [timeSeriesOptIns, setTimeSeriesOptIns] = useState<any>(null);
   const [uniqueParticipationsByIP, setUniqueParticipationsByIP] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [blockedParticipants, setBlockedParticipants] = useState<BlockedParticipant[]>([]);
+  const [isUnblocking, setIsUnblocking] = useState<string | null>(null);
   
   // Filtres
   const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
@@ -110,6 +113,7 @@ const Stats = () => {
         const topByOptIns = await AdvancedAnalyticsService.getTopCampaigns('opt_ins', 10, dateRange);
         const optInsTimeSeries = await AdvancedAnalyticsService.getTimeSeriesOptIns(dateRange, selectedCampaign || undefined);
         const uniqueIPCount = await AdvancedAnalyticsService.getUniqueParticipationsByIP(selectedCampaign || undefined, dateRange);
+        const blocked = await ExternalBackendAnalyticsService.getBlockedParticipants(selectedCampaign || undefined);
         
         setGlobalStats(stats);
         setTimeSeriesData(timeSeries);
@@ -127,6 +131,7 @@ const Stats = () => {
         setTopCampaignsByOptIns(topByOptIns);
         setTimeSeriesOptIns(optInsTimeSeries);
         setUniqueParticipationsByIP(uniqueIPCount);
+        setBlockedParticipants(blocked);
       } catch (error) {
         console.error('Erreur chargement analytics:', error);
       } finally {
@@ -136,6 +141,23 @@ const Stats = () => {
     
     loadAnalytics();
   }, [selectedCampaign, dateRange]);
+
+  const handleUnblock = async (blockedId: string) => {
+    setIsUnblocking(blockedId);
+    try {
+      const success = await ExternalBackendAnalyticsService.unblockParticipant(blockedId);
+      if (success) {
+        setBlockedParticipants(prev => prev.filter(b => b.id !== blockedId));
+        toast.success('Participant débloqué avec succès');
+      } else {
+        toast.error('Erreur lors du déblocage');
+      }
+    } catch (error) {
+      toast.error('Erreur lors du déblocage');
+    } finally {
+      setIsUnblocking(null);
+    }
+  };
 
   const handleExportCSV = async () => {
     try {
@@ -957,6 +979,100 @@ const Stats = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Section Participants Bloqués */}
+        {blockedParticipants.length > 0 && (
+          <div className="mb-6 p-6 rounded-2xl border" style={{ background: colors.white, borderColor: colors.border }}>
+            <div className="flex items-center gap-2 mb-4">
+              <ShieldAlert className="w-5 h-5" style={{ color: colors.rose }} />
+              <h3 className="text-lg font-semibold" style={{ color: colors.dark }}>
+                Participants Bloqués ({blockedParticipants.length})
+              </h3>
+            </div>
+            
+            <p className="text-sm mb-4" style={{ color: colors.muted }}>
+              Liste des participants temporairement bloqués en raison de tentatives suspectes ou répétées.
+            </p>
+
+            <div className="rounded-lg border overflow-hidden" style={{ borderColor: colors.border }}>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>IP</TableHead>
+                    <TableHead>Device</TableHead>
+                    <TableHead>Raison</TableHead>
+                    <TableHead>Bloqué le</TableHead>
+                    <TableHead>Campagne</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {blockedParticipants.map((blocked) => {
+                    const campaign = campaigns.find(c => c.id === blocked.campaign_id);
+                    return (
+                      <TableRow key={blocked.id}>
+                        <TableCell className="font-medium">
+                          {blocked.email || <span style={{ color: colors.muted }}>-</span>}
+                        </TableCell>
+                        <TableCell>
+                          {blocked.ip_address || <span style={{ color: colors.muted }}>-</span>}
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-xs font-mono" style={{ color: colors.muted }}>
+                            {blocked.device_fingerprint ? blocked.device_fingerprint.substring(0, 8) + '...' : '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-xs px-2 py-1 rounded" style={{ 
+                            backgroundColor: `${colors.rose}15`, 
+                            color: colors.rose 
+                          }}>
+                            {blocked.block_reason}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm" style={{ color: colors.muted }}>
+                            {new Date(blocked.blocked_at).toLocaleDateString('fr-FR', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm" style={{ color: colors.muted }}>
+                            {campaign?.title || campaign?.app_title || 'Inconnue'}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUnblock(blocked.id)}
+                            disabled={isUnblocking === blocked.id}
+                            className="gap-2"
+                          >
+                            <Unlock className="w-4 h-4" />
+                            {isUnblocking === blocked.id ? 'Déblocage...' : 'Débloquer'}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+
+            {selectedCampaign && (
+              <p className="text-xs mt-4" style={{ color: colors.muted }}>
+                💡 Filtré pour la campagne sélectionnée. Désélectionnez pour voir tous les participants bloqués.
+              </p>
+            )}
           </div>
         )}
       </div>
