@@ -18,26 +18,25 @@ const colors = {
   border: '#e5e7eb',
 };
 
-export const TimelineSection = () => {
+interface TimelineSectionProps {
+  campaignId: string;
+}
+
+export const TimelineSection = ({ campaignId }: TimelineSectionProps) => {
   const [timeline, setTimeline] = useState<PrizeTimelineDay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('all');
   const [days, setDays] = useState(30);
-  const { campaigns } = useCampaigns();
 
   const loadTimeline = async () => {
     setIsLoading(true);
-    const data = await PrizesService.getPrizesTimeline(
-      selectedCampaign === 'all' ? undefined : selectedCampaign,
-      days
-    );
+    const data = await PrizesService.getPrizesTimeline(campaignId, days);
     setTimeline(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
     loadTimeline();
-  }, [selectedCampaign, days]);
+  }, [campaignId, days]);
 
   const chartData = timeline.map(day => ({
     date: new Date(day.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
@@ -52,7 +51,7 @@ export const TimelineSection = () => {
     <div className="space-y-4">
       {/* Filters */}
       <div
-        className="flex items-center justify-between p-4"
+        className="flex items-center justify-end p-4"
         style={{
           background: 'rgba(255, 255, 255, 0.5)',
           backdropFilter: 'blur(10px)',
@@ -62,20 +61,6 @@ export const TimelineSection = () => {
       >
         <div className="flex items-center gap-3">
           <Filter className="w-4 h-4" style={{ color: colors.muted }} />
-          <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Toutes les campagnes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les campagnes</SelectItem>
-              {campaigns.map(c => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
           <Select value={days.toString()} onValueChange={(v) => setDays(parseInt(v))}>
             <SelectTrigger className="w-[150px]">
               <SelectValue />

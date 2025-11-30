@@ -20,25 +20,26 @@ const colors = {
   border: '#e5e7eb',
 };
 
-export const DrawsSection = () => {
+interface DrawsSectionProps {
+  campaignId: string;
+}
+
+export const DrawsSection = ({ campaignId }: DrawsSectionProps) => {
   const [draws, setDraws] = useState<PrizeDrawHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDrawModalOpen, setIsDrawModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('all');
   const { campaigns } = useCampaigns();
 
   const loadDraws = async () => {
     setIsLoading(true);
-    const data = await PrizesService.getDrawsHistory(
-      selectedCampaign === 'all' ? undefined : selectedCampaign
-    );
+    const data = await PrizesService.getDrawsHistory(campaignId);
     setDraws(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
     loadDraws();
-  }, [selectedCampaign]);
+  }, [campaignId]);
 
   const handleDrawComplete = () => {
     loadDraws();
@@ -70,7 +71,7 @@ export const DrawsSection = () => {
     <div className="space-y-4">
       {/* Actions bar */}
       <div
-        className="flex items-center justify-between p-4"
+        className="flex items-center justify-end p-4"
         style={{
           background: 'rgba(255, 255, 255, 0.5)',
           backdropFilter: 'blur(10px)',
@@ -78,23 +79,6 @@ export const DrawsSection = () => {
           border: '1px solid rgba(255, 255, 255, 0.8)',
         }}
       >
-        <div className="flex items-center gap-3">
-          <Filter className="w-4 h-4" style={{ color: colors.muted }} />
-          <Select value={selectedCampaign} onValueChange={setSelectedCampaign}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Toutes les campagnes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Toutes les campagnes</SelectItem>
-              {campaigns.map(c => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
         <Button
           onClick={() => setIsDrawModalOpen(true)}
           style={{ backgroundColor: colors.gold, color: colors.dark }}
@@ -223,6 +207,7 @@ export const DrawsSection = () => {
         onClose={() => setIsDrawModalOpen(false)}
         onDrawComplete={handleDrawComplete}
         campaigns={campaigns}
+        preselectedCampaignId={campaignId}
       />
     </div>
   );
