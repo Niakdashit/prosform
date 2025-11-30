@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { WheelConfig } from "@/components/WheelBuilder";
 import { ThemeProvider, ThemeSettings } from "@/contexts/ThemeContext";
 import { WheelPreview } from "@/components/WheelPreview";
+import { ParticipationService } from "@/services/ParticipationService";
 
 const WheelPreviewContent = () => {
   const [config, setConfig] = useState<WheelConfig | null>(null);
@@ -37,6 +38,8 @@ const WheelPreviewContent = () => {
     );
   }
 
+  const campaignId = new URLSearchParams(window.location.search).get('id');
+
   const handleNext = () => {
     if (activeView === 'welcome') {
       if (config.contactForm?.enabled) {
@@ -49,10 +52,22 @@ const WheelPreviewContent = () => {
     }
   };
 
-  const handleGoToEnding = (isWin: boolean) => {
+  const handleGoToEnding = async (isWin: boolean) => {
     setActiveView(isWin ? 'ending-win' : 'ending-lose');
-  };
 
+    if (campaignId) {
+      try {
+        await ParticipationService.recordParticipation({
+          campaignId,
+          result: {
+            type: isWin ? 'win' : 'lose',
+          },
+        });
+      } catch (error) {
+        console.error('Failed to record preview participation', error);
+      }
+    }
+  };
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden">
       <WheelPreview
