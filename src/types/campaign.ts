@@ -6,7 +6,7 @@ export type CampaignStatus = 'draft' | 'online' | 'paused' | 'ended';
 // Interface principale pour une campagne
 export interface Campaign {
   id: string;
-  name: string;
+  title: string;
   type: CampaignType;
   mode: CampaignMode;
   status: CampaignStatus;

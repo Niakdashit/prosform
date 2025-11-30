@@ -119,7 +119,7 @@ const Campaigns = () => {
     
     return {
       id: c.id,
-      name: c.name,
+      name: c.title,
       type: c.type,
       mode: c.mode,
       status: displayStatus,

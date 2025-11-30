@@ -47,7 +47,7 @@ export function useCampaign(
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [config, setConfigState] = useState<any>(defaultConfig);
   const [prizes, setPrizesState] = useState<any[]>([]);
-  const [name, setName] = useState(defaultName);
+  const [title, setTitle] = useState(defaultName);
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -78,7 +78,7 @@ export function useCampaign(
           console.log('✅ Config loaded:', mergedConfig);
           console.log('✅ Background image:', mergedConfig.welcomeScreen?.backgroundImage ? 'Present' : 'Missing');
           setPrizesState(data.prizes || []);
-          setName(data.name);
+          setTitle(data.title);
           
           // Restore theme if saved and themeContext provided
           if (data.theme && Object.keys(data.theme).length > 0 && themeContext) {
@@ -173,7 +173,7 @@ export function useCampaign(
     try {
       const savedCampaign = await CampaignService.save({
         id: campaign?.id,
-        name,
+        title,
         type,
         mode: campaign?.mode || mode,
         status: campaign?.status || 'draft',
@@ -196,7 +196,7 @@ export function useCampaign(
     } finally {
       setIsSaving(false);
     }
-  }, [campaign, name, type, config, prizes, startDate, startTime, endDate, endTime, themeContext]);
+  }, [campaign, title, type, config, prizes, startDate, startTime, endDate, endTime, themeContext]);
 
   // Publier la campagne
   const publish = useCallback(async (): Promise<Campaign | null> => {
@@ -224,7 +224,7 @@ export function useCampaign(
     campaign,
     config,
     prizes,
-    name,
+    title,
     startDate,
     startTime,
     endDate,
@@ -237,7 +237,7 @@ export function useCampaign(
     setPrizes,
     save,
     publish,
-    setName,
+    setTitle,
     setStartDate,
     setStartTime,
     setEndDate,
