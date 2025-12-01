@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ScratchConfig, ScratchCard } from "./ScratchBuilder";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { SmartScratch } from "./SmartScratch/SmartScratch";
 import { ParticipationService } from "@/services/ParticipationService";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 
 interface ParticipantScratchRenderProps {
   config: ScratchConfig;
@@ -17,6 +18,11 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
   const [hasScratched, setHasScratched] = useState(false);
   const { theme } = useTheme();
   const buttonStyles = getButtonStyles(theme);
+
+  // Track initial welcome view
+  useEffect(() => {
+    AnalyticsTrackingService.trackStepView(campaignId, 'welcome');
+  }, [campaignId]);
 
   // Determine the winning card once when entering scratch view
   const selectedCard = useMemo(() => {
@@ -36,11 +42,14 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
     if (activeView === 'welcome') {
       if (config.contactForm?.enabled) {
         setActiveView('contact');
+        AnalyticsTrackingService.trackStepView(campaignId, 'contact');
       } else {
         setActiveView('scratch');
+        AnalyticsTrackingService.trackStepView(campaignId, 'game');
       }
     } else if (activeView === 'contact') {
       setActiveView('scratch');
+      AnalyticsTrackingService.trackStepView(campaignId, 'game');
     }
   };
 
@@ -60,6 +69,7 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
     
     setTimeout(() => {
       setActiveView(isWin ? 'ending-win' : 'ending-lose');
+      AnalyticsTrackingService.trackStepView(campaignId, 'ending');
     }, 1500);
   };
 
