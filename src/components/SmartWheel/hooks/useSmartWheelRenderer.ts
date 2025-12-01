@@ -718,7 +718,15 @@ export const useSmartWheelRenderer = ({
           ctx.lineWidth = 5;
           ctx.stroke();
         } else {
-          // Fallback visuel pendant le chargement: simple dégradé métallique
+          // IMPORTANT : pour les styles premium (goldRing / silverRing),
+          // on ne dessine PAS de bordure de secours afin d'éviter le flash jaune.
+          // On attend simplement que l'image soit prête.
+          if (borderStyleName === 'goldRing' || borderStyleName === 'silverRing') {
+            ctx.restore();
+            return;
+          }
+
+          // Fallback visuel pendant le chargement pour les autres styles pattern : simple dégradé métallique
           const metallicGradient = createMetallicGradient(ctx, borderStyleConfig.colors, centerX, centerY, radius);
           ctx.beginPath();
           ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
