@@ -543,24 +543,106 @@ export const QuizPreview = ({
                     <TextContent />
                   </div>
                 </div>
-                <div className="absolute right-0 top-0 w-1/2 h-full">
-                  <img
-                    src={config.welcomeScreen.wallpaperImage || "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1600&h=1600&fit=crop"}
-                    alt="Background"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="absolute right-0 top-0 w-1/2 h-full group">
+                  {config.welcomeScreen.wallpaperImage ? (
+                    <>
+                      <img
+                        src={config.welcomeScreen.wallpaperImage}
+                        alt="Background"
+                        className="w-full h-full object-cover"
+                      />
+                      {!isReadOnly && (
+                        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
+                          <button
+                            onClick={() => setShowEditorModal(true)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                            title="Éditer l'image"
+                          >
+                            <Pencil className="w-4 h-4 text-white" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              onUpdateConfig({
+                                welcomeScreen: { ...config.welcomeScreen, showImage: false, wallpaperImage: undefined },
+                              });
+                              setImageSettings(defaultSettings);
+                            }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                            title="Supprimer l'image"
+                          >
+                            <Trash2 className="w-4 h-4 text-white" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div
+                      onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                      className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <Upload className="w-16 h-16 mb-4" style={{ color: theme.accentColor }} />
+                      <p className="text-lg font-medium" style={{ color: theme.accentColor }}>
+                        Upload Image
+                      </p>
+                      <p className="text-sm mt-2" style={{ color: theme.textSecondaryColor }}>
+                        Click to browse
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             );
           } else if (desktopLayout === 'desktop-panel') {
             return (
               <div className="relative w-full h-full flex">
-                <div className="absolute left-0 top-0 w-1/2 h-full">
-                  <img
-                    src={config.welcomeScreen.wallpaperImage || "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1600&h=1600&fit=crop"}
-                    alt="Background"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="absolute left-0 top-0 w-1/2 h-full group">
+                  {config.welcomeScreen.wallpaperImage ? (
+                    <>
+                      <img
+                        src={config.welcomeScreen.wallpaperImage}
+                        alt="Background"
+                        className="w-full h-full object-cover"
+                      />
+                      {!isReadOnly && (
+                        <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
+                          <button
+                            onClick={() => setShowEditorModal(true)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                            title="Éditer l'image"
+                          >
+                            <Pencil className="w-4 h-4 text-white" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              onUpdateConfig({
+                                welcomeScreen: { ...config.welcomeScreen, showImage: false, wallpaperImage: undefined },
+                              });
+                              setImageSettings(defaultSettings);
+                            }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                            title="Supprimer l'image"
+                          >
+                            <Trash2 className="w-4 h-4 text-white" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div
+                      onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                      className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <Upload className="w-16 h-16 mb-4" style={{ color: theme.accentColor }} />
+                      <p className="text-lg font-medium" style={{ color: theme.accentColor }}>
+                        Upload Image
+                      </p>
+                      <p className="text-sm mt-2" style={{ color: theme.textSecondaryColor }}>
+                        Click to browse
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
                   <div className="max-w-[500px]">
@@ -593,12 +675,53 @@ export const QuizPreview = ({
           } else if (mobileLayout === 'mobile-centered') {
             return (
               <div className="flex flex-col w-full h-full">
-                <div className="w-full relative" style={{ height: '40%', minHeight: '250px' }}>
-                  <img
-                    src={config.welcomeScreen.wallpaperImage || "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1600&h=1600&fit=crop"}
-                    alt="Background"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="w-full relative group" style={{ height: '40%', minHeight: '250px' }}>
+                  {config.welcomeScreen.wallpaperImage ? (
+                    <>
+                      <img
+                        src={config.welcomeScreen.wallpaperImage}
+                        alt="Background"
+                        className="w-full h-full object-cover"
+                      />
+                      {!isReadOnly && (
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
+                          <button
+                            onClick={() => setShowEditorModal(true)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                            style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                            title="Éditer l'image"
+                          >
+                            <Pencil className="w-4 h-4 text-white" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              onUpdateConfig({
+                                welcomeScreen: { ...config.welcomeScreen, showImage: false, wallpaperImage: undefined },
+                              });
+                              setImageSettings(defaultSettings);
+                            }}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                            title="Supprimer l'image"
+                          >
+                            <Trash2 className="w-4 h-4 text-white" />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div
+                      onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                      className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <Upload className="w-12 h-12 mb-3" style={{ color: theme.accentColor }} />
+                      <p className="text-sm font-medium" style={{ color: theme.accentColor }}>
+                        Upload Banner
+                      </p>
+                      <p className="text-xs mt-1" style={{ color: theme.textSecondaryColor }}>
+                        Click to browse
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 flex items-start justify-center px-5 pt-6 pb-24">
                   <div className="w-full max-w-[500px]">
