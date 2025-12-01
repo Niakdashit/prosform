@@ -178,7 +178,7 @@ export const ContactLayouts = ({
             return (
               <div key={index} className="text-left">
                 <label 
-                  className="block mb-2 text-base font-normal"
+                  className="block mb-2 text-sm font-normal"
                   style={{ color: textColor }}
                 >
                   {field.label}
@@ -187,7 +187,7 @@ export const ContactLayouts = ({
                   onValueChange={(value) => onFieldChange(field.id || field.type, value)}
                 >
                   <SelectTrigger 
-                    className="h-14 text-base pointer-events-auto"
+                    className="h-10 text-sm pointer-events-auto"
                     style={{
                       backgroundColor: backgroundColor,
                       borderColor: textColor,
@@ -225,13 +225,13 @@ export const ContactLayouts = ({
             return (
               <div key={index} className="text-left">
                 <label 
-                  className="block mb-2 text-base font-normal"
+                  className="block mb-2 text-sm font-normal"
                   style={{ color: textColor }}
                 >
                   {field.label}
                 </label>
                 <textarea
-                  className="w-full text-base px-4 py-3 min-h-[100px] resize-none"
+                  className="w-full text-sm px-3 py-2 min-h-[80px] resize-none"
                   style={{
                     backgroundColor: backgroundColor,
                     borderColor: textColor,
@@ -251,7 +251,7 @@ export const ContactLayouts = ({
           return (
             <div key={index} className="text-left">
               <label 
-                className="block mb-2 text-base font-normal"
+                className="block mb-2 text-sm font-normal"
                 style={{ color: textColor }}
               >
                 {field.label}
@@ -261,7 +261,7 @@ export const ContactLayouts = ({
                 value={contactData[field.type as keyof typeof contactData]}
                 onChange={(e) => onFieldChange(field.type, e.target.value)}
                 required={field.required}
-                className="h-14 text-base"
+                className="h-10 text-sm"
                 style={{
                   backgroundColor: backgroundColor,
                   borderColor: textColor,
