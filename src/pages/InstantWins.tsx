@@ -92,6 +92,25 @@ export default function InstantWins() {
 
   const [formFields, setFormFields] = useState<string[]>([]);
 
+  const flattenParticipationData = (data: any): Record<string, any> => {
+    if (!data || typeof data !== 'object') return {};
+    const flat: Record<string, any> = {};
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'contactData' && value && typeof value === 'object') {
+        Object.entries(value as Record<string, any>).forEach(([subKey, subVal]) => {
+          flat[subKey] = subVal;
+        });
+      } else if (key === 'result') {
+        flat['result'] = value;
+      } else if (typeof value !== 'object' || value === null) {
+        flat[key] = value;
+      }
+    });
+
+    return flat;
+  };
+
   // Extract unique form fields from all participations
   const extractFormFields = (participations: Participation[]) => {
     const fieldsSet = new Set<string>();
@@ -112,19 +131,12 @@ export default function InstantWins() {
     ];
     
     participations.forEach(part => {
-      if (part.participation_data && typeof part.participation_data === 'object') {
-        Object.keys(part.participation_data).forEach(key => {
-          // Exclure les champs liés aux prix, opt-ins et infos techniques
-          if (
-            !key.startsWith('prize') &&
-            !key.startsWith('optin_') &&
-            !key.includes('optin') &&
-            !excludedFields.includes(key)
-          ) {
-            fieldsSet.add(key);
-          }
-        });
-      }
+      const flatData = flattenParticipationData(part.participation_data);
+      Object.keys(flatData).forEach(key => {
+        if (!excludedFields.includes(key)) {
+          fieldsSet.add(key);
+        }
+      });
     });
     
     const fields = Array.from(fieldsSet).sort();
@@ -681,14 +693,13 @@ export default function InstantWins() {
                   </TableHeader>
                   <TableBody>
                     {allParticipations.slice(0, 100).map((part) => {
-                      const formData = part.participation_data || {};
+                      const formData = flattenParticipationData(part.participation_data);
                       const createdAt = new Date(part.created_at);
                       const browser = part.browser || formData.browser;
                       const os = part.os || formData.os;
                       const deviceType = part.device_type || formData.device_type;
-                      const country = (part as any).country || formData.country;
                       const referrer = part.referrer || formData.referrer;
-                      const userAgent = part.user_agent || formData.user_agent;
+                      const ip = part.ip_address || formData.ip_address;
                       
                       return (
                         <TableRow key={part.id}>
@@ -698,7 +709,7 @@ export default function InstantWins() {
                           <TableCell className="text-xs whitespace-nowrap">
                             {createdAt.toLocaleTimeString('fr-FR')}
                           </TableCell>
-                          <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
+                          <TableCell className="text-xs">{ip || '-'}</TableCell>
                           <TableCell className="text-xs">{part.email || '-'}</TableCell>
                           <TableCell className="text-xs">{deviceType || '-'}</TableCell>
                           <TableCell className="text-xs">{browser || '-'}</TableCell>
@@ -761,13 +772,13 @@ export default function InstantWins() {
                   </TableHeader>
                   <TableBody>
                     {uniqueParticipations.slice(0, 100).map((part) => {
-                      const formData = part.participation_data || {};
+                      const formData = flattenParticipationData(part.participation_data);
                       const createdAt = new Date(part.created_at);
                       const browser = part.browser || formData.browser;
                       const os = part.os || formData.os;
                       const deviceType = part.device_type || formData.device_type;
-                      const country = (part as any).country || formData.country;
                       const referrer = part.referrer || formData.referrer;
+                      const ip = part.ip_address || formData.ip_address;
                       
                       return (
                         <TableRow key={part.id}>
@@ -777,7 +788,7 @@ export default function InstantWins() {
                           <TableCell className="text-xs whitespace-nowrap">
                             {createdAt.toLocaleTimeString('fr-FR')}
                           </TableCell>
-                          <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
+                          <TableCell className="text-xs">{ip || '-'}</TableCell>
                           <TableCell className="text-xs">{part.email || '-'}</TableCell>
                           <TableCell className="text-xs">{deviceType || '-'}</TableCell>
                           <TableCell className="text-xs">{browser || '-'}</TableCell>
