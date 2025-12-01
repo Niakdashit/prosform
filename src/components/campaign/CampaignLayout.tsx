@@ -81,8 +81,8 @@ export const CampaignLayout = ({
         onConfigChange={onHeaderChange}
       />
 
-      {/* Contenu principal - flex-grow au lieu de flex-1 pour permettre au footer de pousser */}
-      <main className={`flex-grow flex flex-col items-center ${paddingClass} relative z-10`}>
+      {/* Contenu principal */}
+      <main className={`flex flex-col items-center ${paddingClass} relative z-10`}>
         <div className={`w-full ${maxWidthClass}`}>
           {children}
         </div>
