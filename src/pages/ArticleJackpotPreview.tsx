@@ -10,6 +10,7 @@ const ArticleJackpotPreview = () => {
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     const savedConfig = localStorage.getItem('article-jackpot-config');
@@ -146,6 +147,7 @@ const ArticleJackpotPreview = () => {
               <SmartJackpot
                 symbols={config.symbols.map(s => s.emoji)}
                 spinDuration={config.jackpotScreen.spinDuration}
+                onAssetsReady={() => setAssetsReady(true)}
               />
             </div>
           </div>
@@ -187,7 +189,11 @@ const ArticleJackpotPreview = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: articleConfig.pageBackgroundColor || '#3d3731' }}>
+    <>
+      {!assetsReady && (
+        <div className="fixed inset-0 bg-white z-50" />
+      )}
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: articleConfig.pageBackgroundColor || '#3d3731' }}>
       <div
         style={{
           width: `${canvasWidth}px`,
@@ -215,6 +221,7 @@ const ArticleJackpotPreview = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

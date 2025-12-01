@@ -7,6 +7,7 @@ const ScratchPreviewContent = () => {
   const [config, setConfig] = useState<ScratchConfig | null>(null);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
+  const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     const savedConfig = localStorage.getItem('scratch-config');
@@ -55,7 +56,11 @@ const ScratchPreviewContent = () => {
 
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+      {!assetsReady && (
+        <div className="fixed inset-0 bg-white z-50" />
+      )}
       <ScratchPreview
+        onAssetsReady={() => setAssetsReady(true)}
         config={config}
         activeView={activeView}
         onUpdateConfig={() => {}}

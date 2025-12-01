@@ -7,6 +7,7 @@ const JackpotPreviewContent = () => {
   const [config, setConfig] = useState<JackpotConfig | null>(null);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'jackpot' | 'ending-win' | 'ending-lose'>('welcome');
+  const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     const savedConfig = localStorage.getItem('jackpot-config');
@@ -55,7 +56,11 @@ const JackpotPreviewContent = () => {
 
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+      {!assetsReady && (
+        <div className="fixed inset-0 bg-white z-50" />
+      )}
       <JackpotPreview
+        onAssetsReady={() => setAssetsReady(true)}
         config={config}
         activeView={activeView}
         onUpdateConfig={() => {}}

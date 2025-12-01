@@ -27,6 +27,7 @@ interface JackpotPreviewProps {
   isReadOnly?: boolean;
   onNext: () => void;
   onGoToEnding?: (isWin: boolean) => void;
+  onAssetsReady?: () => void;
   prizes?: JackpotPrize[];
   onUpdatePrize?: (prize: JackpotPrize) => void;
 }
@@ -41,6 +42,7 @@ export const JackpotPreview = ({
   isReadOnly = false,
   onNext,
   onGoToEnding,
+  onAssetsReady,
   prizes = [],
   onUpdatePrize
 }: JackpotPreviewProps) => {
@@ -1190,6 +1192,7 @@ export const JackpotPreview = ({
                 modernInnerColor={theme.modernJackpotInnerColor}
                 spinDuration={config.jackpotScreen?.spinDuration || 2000}
                 onBeforeSpin={handleSpinStart}
+                onAssetsReady={onAssetsReady}
                 onWin={(result) => {
                   const drawResult = globalJackpotDrawResult;
                   

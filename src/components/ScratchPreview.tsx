@@ -27,6 +27,7 @@ interface ScratchPreviewProps {
   isReadOnly?: boolean;
   onNext: () => void;
   onGoToEnding?: (isWin: boolean) => void;
+  onAssetsReady?: () => void;
   prizes?: ScratchPrize[];
   onUpdatePrize?: (prize: ScratchPrize) => void;
 }
@@ -41,6 +42,7 @@ export const ScratchPreview = ({
   isReadOnly = false,
   onNext,
   onGoToEnding,
+  onAssetsReady,
   prizes = [],
   onUpdatePrize
 }: ScratchPreviewProps) => {
@@ -1264,6 +1266,7 @@ export const ScratchPreview = ({
                               brushSize={config.scratchScreen.brushSize}
                               revealText={finalRevealText}
                               revealImage={finalRevealImage}
+                              onAssetsReady={onAssetsReady}
                               onComplete={() => {
                                 console.log('🎫 [ScratchPreview] Carte grattée, résultat:', drawResult);
                                 

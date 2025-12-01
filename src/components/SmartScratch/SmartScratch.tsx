@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useSmartScratchRenderer } from './hooks/useSmartScratchRenderer';
 import './SmartScratch.css';
 
 interface SmartScratchProps {
@@ -9,6 +10,7 @@ interface SmartScratchProps {
   revealImage?: string;
   revealText?: string;
   onComplete?: (percentage: number) => void;
+  onAssetsReady?: () => void;
   threshold?: number;
   brushSize?: number;
   disabled?: boolean;
@@ -24,12 +26,17 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
   revealImage,
   revealText = '🎉 Gagné !',
   onComplete,
+  onAssetsReady,
   threshold = 70,
   brushSize = 30,
   disabled = false,
   showProgress = true,
   borderRadius = 16
 }) => {
+  const { shouldRender } = useSmartScratchRenderer({
+    revealImage,
+    onAssetsReady
+  });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScratching, setIsScratching] = useState(false);
   const [scratchPercentage, setScratchPercentage] = useState(0);
@@ -169,6 +176,10 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
     setIsScratching(false);
     lastPosRef.current = null;
   }, []);
+
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <div 
