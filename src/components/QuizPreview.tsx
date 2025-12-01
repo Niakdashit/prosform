@@ -52,7 +52,6 @@ export const QuizPreview = ({
   const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme, viewMode);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Listen for FloatingToolbar style updates
   useEffect(() => {
