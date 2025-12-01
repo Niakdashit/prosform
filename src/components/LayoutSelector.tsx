@@ -17,6 +17,8 @@ interface LayoutSelectorProps {
   mobileLayout: MobileLayoutType;
   onDesktopLayoutChange: (layout: DesktopLayoutType) => void;
   onMobileLayoutChange: (layout: MobileLayoutType) => void;
+  excludeDesktopLayouts?: DesktopLayoutType[];
+  excludeMobileLayouts?: MobileLayoutType[];
 }
 
 const LayoutIcon = ({ type }: { type: string }) => {
@@ -42,8 +44,12 @@ export const LayoutSelector = ({
   desktopLayout,
   mobileLayout,
   onDesktopLayoutChange,
-  onMobileLayoutChange
+  onMobileLayoutChange,
+  excludeDesktopLayouts = [],
+  excludeMobileLayouts = []
 }: LayoutSelectorProps) => {
+  const filteredDesktopLayouts = DESKTOP_LAYOUTS.filter(layout => !excludeDesktopLayouts.includes(layout.id));
+  const filteredMobileLayouts = MOBILE_LAYOUTS.filter(layout => !excludeMobileLayouts.includes(layout.id));
   return (
     <div className="flex gap-2">
       {/* Mobile */}
@@ -58,7 +64,7 @@ export const LayoutSelector = ({
             </div>
           </SelectTrigger>
           <SelectContent>
-            {MOBILE_LAYOUTS.map((layout) => (
+            {filteredMobileLayouts.map((layout) => (
               <SelectItem key={layout.id} value={layout.id} className="text-xs">
                 <div className="flex items-center gap-2.5">
                   <div className="w-5 h-5">
@@ -84,7 +90,7 @@ export const LayoutSelector = ({
             </div>
           </SelectTrigger>
           <SelectContent>
-            {DESKTOP_LAYOUTS.map((layout) => (
+            {filteredDesktopLayouts.map((layout) => (
               <SelectItem key={layout.id} value={layout.id} className="text-xs">
                 <div className="flex items-center gap-2.5">
                   <div className="w-5 h-5">
