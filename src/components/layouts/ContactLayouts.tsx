@@ -247,7 +247,7 @@ export const ContactLayouts = ({
             );
           }
 
-          // Default: text, email, tel inputs
+          // Default: text, email, tel, date inputs
           return (
             <div key={index} className="text-left">
               <label 
@@ -257,9 +257,10 @@ export const ContactLayouts = ({
                 {field.label}
               </label>
               <Input
-                type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
+                type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : field.type === 'date' ? 'date' : 'text'}
                 value={contactData[field.type as keyof typeof contactData]}
-                onChange={(e) => onFieldChange(field.type, e.target.value)}
+                onChange={(e) => onFieldChange(field.id || field.type, e.target.value)}
+                placeholder={field.placeholder}
                 required={field.required}
                 className="h-10 text-sm"
                 style={{
