@@ -849,7 +849,7 @@ export const useSmartWheelRenderer = ({
     
     if (theme.effects.shadow) {
       ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = 4;
+      ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 1;
       ctx.shadowOffsetY = 1;
     }
