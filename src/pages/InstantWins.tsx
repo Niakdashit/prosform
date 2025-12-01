@@ -95,16 +95,32 @@ export default function InstantWins() {
   // Extract unique form fields from all participations
   const extractFormFields = (participations: Participation[]) => {
     const fieldsSet = new Set<string>();
-    const excludedFields = ['prize', 'prizeWon', 'prize_won', 'prize_name'];
+    const excludedFields = [
+      'prize',
+      'prizeWon',
+      'prize_won',
+      'prize_name',
+      // Champs techniques déjà affichés dans des colonnes dédiées
+      'browser',
+      'country',
+      'device_type',
+      'os',
+      'referrer',
+      'timestamp',
+      'user_agent',
+      'ip_address',
+    ];
     
     participations.forEach(part => {
       if (part.participation_data && typeof part.participation_data === 'object') {
         Object.keys(part.participation_data).forEach(key => {
-          // Exclure les champs liés aux prix et les opt-ins
-          if (!key.startsWith('prize') && 
-              !key.startsWith('optin_') && 
-              !key.includes('optin') &&
-              !excludedFields.includes(key)) {
+          // Exclure les champs liés aux prix, opt-ins et infos techniques
+          if (
+            !key.startsWith('prize') &&
+            !key.startsWith('optin_') &&
+            !key.includes('optin') &&
+            !excludedFields.includes(key)
+          ) {
             fieldsSet.add(key);
           }
         });
@@ -646,7 +662,8 @@ export default function InstantWins() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date & Heure</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Heure</TableHead>
                       <TableHead>IP</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Appareil</TableHead>
@@ -665,27 +682,39 @@ export default function InstantWins() {
                   <TableBody>
                     {allParticipations.slice(0, 100).map((part) => {
                       const formData = part.participation_data || {};
+                      const createdAt = new Date(part.created_at);
+                      const browser = part.browser || formData.browser;
+                      const os = part.os || formData.os;
+                      const deviceType = part.device_type || formData.device_type;
+                      const country = (part as any).country || formData.country;
+                      const referrer = part.referrer || formData.referrer;
+                      const userAgent = part.user_agent || formData.user_agent;
                       
                       return (
                         <TableRow key={part.id}>
                           <TableCell className="text-xs whitespace-nowrap">
-                            {new Date(part.created_at).toLocaleString('fr-FR')}
+                            {createdAt.toLocaleDateString('fr-FR')}
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            {createdAt.toLocaleTimeString('fr-FR')}
                           </TableCell>
                           <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
                           <TableCell className="text-xs">{part.email || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.browser || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.os || '-'}</TableCell>
+                          <TableCell className="text-xs">{deviceType || '-'}</TableCell>
+                          <TableCell className="text-xs">{browser || '-'}</TableCell>
+                          <TableCell className="text-xs">{os || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_source || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
-                          <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
+                          <TableCell className="text-xs max-w-xs truncate">{referrer || '-'}</TableCell>
                           {formFields.map(field => {
                             const value = formData[field];
-                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            const displayValue = value != null
+                              ? (typeof value === 'object' ? JSON.stringify(value) : String(value))
+                              : '-';
                             return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
                           })}
-                          <TableCell className="text-xs">{part.prize_won?.name || '-'}</TableCell>
+                          <TableCell className="text-xs">{(part as any).prize_won?.name || '-'}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -714,7 +743,8 @@ export default function InstantWins() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date & Heure</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Heure</TableHead>
                       <TableHead>IP</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Appareil</TableHead>
@@ -732,24 +762,35 @@ export default function InstantWins() {
                   <TableBody>
                     {uniqueParticipations.slice(0, 100).map((part) => {
                       const formData = part.participation_data || {};
+                      const createdAt = new Date(part.created_at);
+                      const browser = part.browser || formData.browser;
+                      const os = part.os || formData.os;
+                      const deviceType = part.device_type || formData.device_type;
+                      const country = (part as any).country || formData.country;
+                      const referrer = part.referrer || formData.referrer;
                       
                       return (
                         <TableRow key={part.id}>
                           <TableCell className="text-xs whitespace-nowrap">
-                            {new Date(part.created_at).toLocaleString('fr-FR')}
+                            {createdAt.toLocaleDateString('fr-FR')}
+                          </TableCell>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            {createdAt.toLocaleTimeString('fr-FR')}
                           </TableCell>
                           <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
                           <TableCell className="text-xs">{part.email || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.browser || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.os || '-'}</TableCell>
+                          <TableCell className="text-xs">{deviceType || '-'}</TableCell>
+                          <TableCell className="text-xs">{browser || '-'}</TableCell>
+                          <TableCell className="text-xs">{os || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_source || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
-                          <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
+                          <TableCell className="text-xs max-w-xs truncate">{referrer || '-'}</TableCell>
                           {formFields.map(field => {
                             const value = formData[field];
-                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            const displayValue = value != null
+                              ? (typeof value === 'object' ? JSON.stringify(value) : String(value))
+                              : '-';
                             return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
                           })}
                         </TableRow>
