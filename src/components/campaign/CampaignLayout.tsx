@@ -56,7 +56,7 @@ export const CampaignLayout = ({
 
   return (
     <div 
-      className={`flex flex-col ${config.minHeight === 'screen' ? 'min-h-screen' : ''}`}
+      className="flex flex-col"
       style={{ 
         backgroundColor: config.backgroundColor,
         backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : undefined,
@@ -82,7 +82,7 @@ export const CampaignLayout = ({
       />
 
       {/* Contenu principal */}
-      <main className={`flex flex-col items-center ${paddingClass} relative z-10`}>
+      <main className={`flex flex-col items-center ${paddingClass} relative z-10 ${config.minHeight === 'screen' ? 'min-h-screen' : ''}`}>
         <div className={`w-full ${maxWidthClass}`}>
           {children}
         </div>
