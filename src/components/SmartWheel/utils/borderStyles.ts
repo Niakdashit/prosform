@@ -291,6 +291,16 @@ export const BORDER_STYLES: Record<string, BorderStyle> = {
     }
   },
   
+  custom: {
+    name: 'Personnalisée',
+    type: 'solid',
+    colors: ['#1F2937'],
+    width: 12,
+    effects: {
+      shadow: true
+    }
+  },
+  
   // Image-based gold ring template (uses PNG/SVG ring asset)
   goldRing: {
     name: 'Or (Template)',
