@@ -4,14 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { LayoutSelector } from "./LayoutSelector";
 import { SettingsSection } from "./ui/SettingsSection";
 import { SettingsField } from "./ui/SettingsField";
 import { SaveIndicator } from "./ui/SaveIndicator";
 import { SegmentCard } from "./SegmentCard";
-import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import { 
   Layout, 
@@ -108,88 +105,117 @@ export const WheelSettingsPanelOptimized = ({
 
       case 'contact':
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Form Settings */}
-            <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
-              <div>
-                <div className="text-sm font-medium">Enable contact form</div>
+            <SettingsSection 
+              title="Form Settings" 
+              icon={<FileText className="w-4 h-4" />}
+            >
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+                <div>
+                  <div className="text-sm font-medium">Contact Form</div>
+                  <div className="text-xs text-muted-foreground">
+                    {config.contactForm.enabled ? 'Enabled' : 'Disabled'}
+                  </div>
+                </div>
+                <Switch 
+                  checked={config.contactForm.enabled}
+                  onCheckedChange={(checked) => onUpdateConfig({ 
+                    contactForm: { ...config.contactForm, enabled: checked } 
+                  })}
+                />
               </div>
-              <Switch 
-                checked={config.contactForm.enabled}
-                onCheckedChange={(checked) => onUpdateConfig({ 
-                  contactForm: { ...config.contactForm, enabled: checked } 
-                })}
-              />
-            </div>
+            </SettingsSection>
 
             {config.contactForm.enabled && (
               <>
                 <Separator />
 
-                <SettingsField label="Form title">
-                  <Input 
-                    type="text" 
-                    value={config.contactForm.title}
-                    onChange={(e) => onUpdateConfig({ 
-                      contactForm: { ...config.contactForm, title: e.target.value } 
+                {/* Layout Section */}
+                <SettingsSection 
+                  title="Layout" 
+                  icon={<Layout className="w-4 h-4" />}
+                  defaultCollapsed={true}
+                >
+                  <LayoutSelector
+                    desktopLayout={config.contactForm.desktopLayout}
+                    mobileLayout={config.contactForm.mobileLayout}
+                    onDesktopLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, desktopLayout: layout }
                     })}
-                    className="h-9"
-                  />
-                </SettingsField>
-
-                <SettingsField label="Subtitle">
-                  <Input 
-                    type="text" 
-                    value={config.contactForm.subtitle}
-                    onChange={(e) => onUpdateConfig({ 
-                      contactForm: { ...config.contactForm, subtitle: e.target.value } 
+                    onMobileLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...config.contactForm, mobileLayout: layout }
                     })}
-                    className="h-9"
                   />
-                </SettingsField>
+                </SettingsSection>
 
                 <Separator />
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Block spacing: {config.contactForm.blockSpacing}x
-                  </Label>
-                  <Slider
-                    value={[config.contactForm.blockSpacing]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, blockSpacing: value }
-                    })}
-                    min={0.5}
-                    max={3}
-                    step={0.25}
-                    className="w-full"
-                  />
-                </div>
+                {/* Content Section */}
+                <SettingsSection 
+                  title="Content" 
+                  icon={<FileText className="w-4 h-4" />}
+                >
+                  <SettingsField label="Form title">
+                    <Input 
+                      type="text" 
+                      value={config.contactForm.title}
+                      onChange={(e) => onUpdateConfig({ 
+                        contactForm: { ...config.contactForm, title: e.target.value } 
+                      })}
+                      className="h-9"
+                    />
+                  </SettingsField>
+
+                  <SettingsField label="Subtitle">
+                    <Input 
+                      type="text" 
+                      value={config.contactForm.subtitle}
+                      onChange={(e) => onUpdateConfig({ 
+                        contactForm: { ...config.contactForm, subtitle: e.target.value } 
+                      })}
+                      className="h-9"
+                    />
+                  </SettingsField>
+                </SettingsSection>
 
                 <Separator />
 
-                {config.welcomeScreen.applyBackgroundToAll ? (
-                  <div className="text-xs text-muted-foreground italic">
-                    Background appliqué depuis Welcome Screen
+                {/* Fields Section */}
+                <SettingsSection 
+                  title="Fields" 
+                  icon={<FileText className="w-4 h-4" />}
+                  badge={config.contactForm.fields.length}
+                >
+                  <div className="space-y-2">
+                    {config.contactForm.fields.map((field, index) => (
+                      <div 
+                        key={field.type} 
+                        className="flex items-center justify-between p-2 rounded-md border bg-card"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${field.required ? 'bg-primary' : 'bg-muted-foreground'}`} />
+                          <span className="text-sm capitalize">{field.label}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            {field.required ? 'Required' : 'Optional'}
+                          </span>
+                          <Switch 
+                            checked={field.required}
+                            onCheckedChange={(checked) => {
+                              const newFields = [...config.contactForm.fields];
+                              newFields[index] = { ...field, required: checked };
+                              onUpdateConfig({ 
+                                contactForm: { ...config.contactForm, fields: newFields } 
+                              });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <BackgroundUploader
-                    desktopImage={config.contactForm.backgroundImage}
-                    mobileImage={config.contactForm.backgroundImageMobile}
-                    onDesktopImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: image }
-                    })}
-                    onDesktopImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: undefined }
-                    })}
-                    onMobileImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: image }
-                    })}
-                    onMobileImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
-                    })}
-                  />
-                )}
+                </SettingsSection>
               </>
             )}
           </div>

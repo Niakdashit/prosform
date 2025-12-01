@@ -7,10 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
-import { SettingsSection } from "./ui/SettingsSection";
-import { SettingsField } from "./ui/SettingsField";
-import { Switch } from "@/components/ui/switch";
-import { Layout, FileText } from "lucide-react";
 
 interface JackpotSettingsPanelProps {
   config: JackpotConfig;
@@ -128,89 +124,62 @@ export const JackpotSettingsPanel = ({
       case 'contact':
         return (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
-              <div>
-                <div className="text-sm font-medium">Enable contact form</div>
-              </div>
-              <Switch 
-                checked={config.contactForm.enabled}
-                onCheckedChange={(checked) => onUpdateConfig({ 
-                  contactForm: { ...config.contactForm, enabled: checked } 
+            <div className="space-y-3">
+              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+              <LayoutSelector
+                desktopLayout={config.contactForm.desktopLayout}
+                mobileLayout={config.contactForm.mobileLayout}
+                onDesktopLayoutChange={(layout) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, desktopLayout: layout }
+                })}
+                onMobileLayoutChange={(layout) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, mobileLayout: layout }
                 })}
               />
             </div>
+            
+            <Separator />
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Block spacing: {config.contactForm.blockSpacing}x
+              </Label>
+              <Slider
+                value={[config.contactForm.blockSpacing]}
+                onValueChange={([value]) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, blockSpacing: value }
+                })}
+                min={0.5}
+                max={3}
+                step={0.25}
+                className="w-full"
+              />
+            </div>
 
-            {config.contactForm.enabled && (
-              <>
-                <Separator />
+            <Separator />
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">Form title</Label>
-                  <Input 
-                    type="text" 
-                    value={config.contactForm.title}
-                    onChange={(e) => onUpdateConfig({ 
-                      contactForm: { ...config.contactForm, title: e.target.value } 
-                    })}
-                    className="h-9"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
-                  <Input 
-                    type="text" 
-                    value={config.contactForm.subtitle}
-                    onChange={(e) => onUpdateConfig({ 
-                      contactForm: { ...config.contactForm, subtitle: e.target.value } 
-                    })}
-                    className="h-9"
-                  />
-                </div>
-
-                <Separator />
-
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Block spacing: {config.contactForm.blockSpacing}x
-                  </Label>
-                  <Slider
-                    value={[config.contactForm.blockSpacing]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, blockSpacing: value }
-                    })}
-                    min={0.5}
-                    max={3}
-                    step={0.25}
-                    className="w-full"
-                  />
-                </div>
-
-                <Separator />
-
-                {config.welcomeScreen.applyBackgroundToAll ? (
-                  <div className="text-xs text-muted-foreground italic">
-                    Background appliqué depuis Welcome Screen
-                  </div>
-                ) : (
-                  <BackgroundUploader
-                    desktopImage={config.contactForm.backgroundImage}
-                    mobileImage={config.contactForm.backgroundImageMobile}
-                    onDesktopImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: image }
-                    })}
-                    onDesktopImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: undefined }
-                    })}
-                    onMobileImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: image }
-                    })}
-                    onMobileImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
-                    })}
-                  />
-                )}
-              </>
+            {/* Background Image - only show if not applying from Welcome */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.contactForm.backgroundImage}
+                mobileImage={config.contactForm.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
+                })}
+              />
             )}
           </div>
         );

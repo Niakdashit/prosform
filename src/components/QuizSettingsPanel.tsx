@@ -9,13 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutSelector } from "./LayoutSelector";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Plus, Trash2, Check, AlignCenter, Image, Split, Layout, FileText } from "lucide-react";
+import { Upload, X, Plus, Trash2, Check, AlignCenter, Image, Split } from "lucide-react";
 import { WallpaperUploadModal } from "./WallpaperUploadModal";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
-import { SettingsSection } from "./ui/SettingsSection";
-import { SettingsField } from "./ui/SettingsField";
 
 interface QuizSettingsPanelProps {
   config: QuizConfig;
@@ -238,100 +236,85 @@ export const QuizSettingsPanel = ({
       case 'contact':
         return (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
-              <div>
-                <div className="text-sm font-medium">Enable contact form</div>
-              </div>
-              <Switch 
-                checked={config.contactScreen.enabled}
-                onCheckedChange={(checked) => onUpdateConfig({ 
-                  contactScreen: { ...config.contactScreen, enabled: checked } 
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Titre</Label>
+              <Input
+                type="text"
+                value={config.contactScreen.title}
+                onChange={(e) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, title: e.target.value }
                 })}
+                className="text-xs h-8"
               />
             </div>
 
-            {config.contactScreen.enabled && (
-              <>
-                <Separator />
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Sous-titre</Label>
+              <Textarea
+                value={config.contactScreen.subtitle}
+                onChange={(e) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, subtitle: e.target.value }
+                })}
+                className="text-xs min-h-[70px]"
+              />
+            </div>
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">Form title</Label>
-                  <Input
-                    type="text"
-                    value={config.contactScreen.title}
-                    onChange={(e) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, title: e.target.value }
-                    })}
-                    className="h-9"
-                  />
-                </div>
+            <Separator />
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
-                  <Textarea
-                    value={config.contactScreen.subtitle}
-                    onChange={(e) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, subtitle: e.target.value }
-                    })}
-                    className="min-h-[70px]"
-                  />
-                </div>
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">Texte du bouton</Label>
+              <Input
+                type="text"
+                value={config.contactScreen.buttonText}
+                onChange={(e) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, buttonText: e.target.value }
+                })}
+                className="text-xs h-8"
+              />
+            </div>
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">Button text</Label>
-                  <Input
-                    type="text"
-                    value={config.contactScreen.buttonText}
-                    onChange={(e) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, buttonText: e.target.value }
-                    })}
-                    className="h-9"
-                  />
-                </div>
+            <Separator />
 
-                <Separator />
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Block spacing: {config.contactScreen.blockSpacing}x
+              </Label>
+              <Slider
+                value={[config.contactScreen.blockSpacing]}
+                onValueChange={([value]) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, blockSpacing: value }
+                })}
+                min={0.5}
+                max={3}
+                step={0.25}
+                className="w-full"
+              />
+            </div>
 
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Block spacing: {config.contactScreen.blockSpacing}x
-                  </Label>
-                  <Slider
-                    value={[config.contactScreen.blockSpacing]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, blockSpacing: value }
-                    })}
-                    min={0.5}
-                    max={3}
-                    step={0.25}
-                    className="w-full"
-                  />
-                </div>
+            <Separator />
 
-                <Separator />
-
-                {config.welcomeScreen.applyBackgroundToAll ? (
-                  <div className="text-xs text-muted-foreground italic">
-                    Background appliqué depuis Welcome Screen
-                  </div>
-                ) : (
-                  <BackgroundUploader
-                    desktopImage={config.contactScreen.backgroundImage}
-                    mobileImage={config.contactScreen.backgroundImageMobile}
-                    onDesktopImageChange={(image) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImage: image }
-                    })}
-                    onDesktopImageRemove={() => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImage: undefined }
-                    })}
-                    onMobileImageChange={(image) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
-                    })}
-                    onMobileImageRemove={() => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
-                    })}
-                  />
-                )}
-              </>
+            {/* Background Image */}
+            {config.welcomeScreen.applyBackgroundToAll ? (
+              <div className="text-xs text-muted-foreground italic">
+                Background appliqué depuis Welcome Screen
+              </div>
+            ) : (
+              <BackgroundUploader
+                desktopImage={config.contactScreen.backgroundImage}
+                mobileImage={config.contactScreen.backgroundImageMobile}
+                onDesktopImageChange={(image) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImage: image }
+                })}
+                onDesktopImageRemove={() => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImage: undefined }
+                })}
+                onMobileImageChange={(image) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
+                })}
+                onMobileImageRemove={() => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
+                })}
+              />
             )}
           </div>
         );
