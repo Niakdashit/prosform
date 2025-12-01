@@ -256,8 +256,6 @@ export const ArticleQuizBuilder = () => {
         activeTab="design"
         onTabChange={() => {}}
       />
-      />
-      />
         
       <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
