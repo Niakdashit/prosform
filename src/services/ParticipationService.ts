@@ -313,8 +313,9 @@ export const ParticipationService = {
         }
       }
 
-      // Mettre à jour les analytics de la campagne (table campaign_analytics)
-      const { data: existingAnalytics, error: fetchError } = await supabase
+      // Mettre à jour les analytics de la campagne (table campaign_analytics sur backend externe)
+      const { externalSupabase } = await import('@/integrations/supabase/externalClient');
+      const { data: existingAnalytics, error: fetchError } = await externalSupabase
         .from('campaign_analytics')
         .select('id, total_views, total_participations, total_completions')
         .eq('campaign_id', data.campaignId)
@@ -328,7 +329,7 @@ export const ParticipationService = {
       const isWin = data.result.type === 'win';
 
       if (!existingAnalytics) {
-        const { error: insertAnalyticsError } = await supabase
+        const { error: insertAnalyticsError } = await externalSupabase
           .from('campaign_analytics')
           .insert({
             campaign_id: data.campaignId,
@@ -342,7 +343,7 @@ export const ParticipationService = {
           console.error('Error inserting campaign analytics:', insertAnalyticsError);
         }
       } else {
-        const { error: updateAnalyticsError } = await supabase
+        const { error: updateAnalyticsError } = await externalSupabase
           .from('campaign_analytics')
           .update({
             // Ne plus incrémenter total_views ici - c'est géré par AnalyticsTrackingService

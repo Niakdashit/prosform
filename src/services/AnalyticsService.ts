@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { externalSupabase } from '@/integrations/supabase/externalClient';
 
 export interface CampaignAnalytics {
   campaign_id: string;
@@ -41,8 +42,8 @@ export interface GlobalStats {
 export const AnalyticsService = {
   
   async getGlobalStats(): Promise<GlobalStats> {
-    // Récupérer la somme de toutes les vues depuis campaign_analytics
-    const { data: analyticsData, error: analyticsError } = await supabase
+    // Récupérer la somme de toutes les vues depuis campaign_analytics (backend externe)
+    const { data: analyticsData, error: analyticsError } = await externalSupabase
       .from('campaign_analytics')
       .select('total_views, avg_time_spent');
 
@@ -110,8 +111,8 @@ export const AnalyticsService = {
 
     if (campaignsError) throw campaignsError;
 
-    // Récupérer les analytics de toutes les campagnes
-    const { data: analyticsData, error: analyticsError } = await supabase
+    // Récupérer les analytics de toutes les campagnes (backend externe)
+    const { data: analyticsData, error: analyticsError } = await externalSupabase
       .from('campaign_analytics')
       .select('campaign_id, total_views, avg_time_spent');
 
@@ -210,8 +211,8 @@ export const AnalyticsService = {
       return null;
     }
 
-    // Récupérer les analytics de cette campagne
-    const { data: analyticsData, error: analyticsError } = await supabase
+    // Récupérer les analytics de cette campagne (backend externe)
+    const { data: analyticsData, error: analyticsError } = await externalSupabase
       .from('campaign_analytics')
       .select('total_views, avg_time_spent')
       .eq('campaign_id', campaignId)
