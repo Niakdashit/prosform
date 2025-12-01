@@ -236,85 +236,150 @@ export const QuizSettingsPanel = ({
       case 'contact':
         return (
           <div className="space-y-4">
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Titre</Label>
-              <Input
-                type="text"
-                value={config.contactScreen.title}
-                onChange={(e) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, title: e.target.value }
-                })}
-                className="text-xs h-8"
-              />
-            </div>
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Sous-titre</Label>
-              <Textarea
-                value={config.contactScreen.subtitle}
-                onChange={(e) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, subtitle: e.target.value }
-                })}
-                className="text-xs min-h-[70px]"
-              />
-            </div>
-
-            <Separator />
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Texte du bouton</Label>
-              <Input
-                type="text"
-                value={config.contactScreen.buttonText}
-                onChange={(e) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, buttonText: e.target.value }
-                })}
-                className="text-xs h-8"
-              />
-            </div>
-
-            <Separator />
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.contactScreen.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.contactScreen.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
-
-            <Separator />
-
-            {/* Background Image */}
-            {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
-                Background appliqué depuis Welcome Screen
+            {/* Form Settings */}
+            <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+              <div>
+                <div className="text-sm font-medium">Contact Form</div>
+                <div className="text-xs text-muted-foreground">
+                  {config.contactScreen.enabled ? 'Enabled' : 'Disabled'}
+                </div>
               </div>
-            ) : (
-              <BackgroundUploader
-                desktopImage={config.contactScreen.backgroundImage}
-                mobileImage={config.contactScreen.backgroundImageMobile}
-                onDesktopImageChange={(image) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, backgroundImage: image }
-                })}
-                onDesktopImageRemove={() => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, backgroundImage: undefined }
-                })}
-                onMobileImageChange={(image) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
-                })}
-                onMobileImageRemove={() => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
+              <Switch 
+                checked={config.contactScreen.enabled}
+                onCheckedChange={(checked) => onUpdateConfig({ 
+                  contactScreen: { ...config.contactScreen, enabled: checked } 
                 })}
               />
+            </div>
+
+            {config.contactScreen.enabled && (
+              <>
+                <Separator />
+
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+                  <LayoutSelector
+                    desktopLayout={config.contactScreen.desktopLayout}
+                    mobileLayout={config.contactScreen.mobileLayout}
+                    onDesktopLayoutChange={(layout) => onUpdateConfig({
+                      contactScreen: { ...config.contactScreen, desktopLayout: layout }
+                    })}
+                    onMobileLayoutChange={(layout) => onUpdateConfig({
+                      contactScreen: { ...config.contactScreen, mobileLayout: layout }
+                    })}
+                  />
+                </div>
+                
+                <Separator />
+
+                {/* Content Section */}
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Content</Label>
+                  
+                  <div>
+                    <Label className="text-xs mb-1.5 block">Form title</Label>
+                    <Input 
+                      type="text" 
+                      value={config.contactScreen.title}
+                      onChange={(e) => onUpdateConfig({ 
+                        contactScreen: { ...config.contactScreen, title: e.target.value } 
+                      })}
+                      className="h-9"
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-xs mb-1.5 block">Subtitle</Label>
+                    <Input 
+                      type="text" 
+                      value={config.contactScreen.subtitle}
+                      onChange={(e) => onUpdateConfig({ 
+                        contactScreen: { ...config.contactScreen, subtitle: e.target.value } 
+                      })}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Fields Section */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Fields ({config.contactScreen.fields.length})</Label>
+                  <div className="space-y-2">
+                    {config.contactScreen.fields.map((field, index) => (
+                      <div 
+                        key={field.type} 
+                        className="flex items-center justify-between p-2 rounded-md border bg-card"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${field.required ? 'bg-primary' : 'bg-muted-foreground'}`} />
+                          <span className="text-sm capitalize">{field.label}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            {field.required ? 'Required' : 'Optional'}
+                          </span>
+                          <Switch 
+                            checked={field.required}
+                            onCheckedChange={(checked) => {
+                              const newFields = [...config.contactScreen.fields];
+                              newFields[index] = { ...field, required: checked };
+                              onUpdateConfig({ 
+                                contactScreen: { ...config.contactScreen, fields: newFields } 
+                              });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">
+                    Block spacing: {config.contactScreen.blockSpacing}x
+                  </Label>
+                  <Slider
+                    value={[config.contactScreen.blockSpacing]}
+                    onValueChange={([value]) => onUpdateConfig({
+                      contactScreen: { ...config.contactScreen, blockSpacing: value }
+                    })}
+                    min={0.5}
+                    max={3}
+                    step={0.25}
+                    className="w-full"
+                  />
+                </div>
+
+                <Separator />
+
+                {/* Background Image */}
+                {config.welcomeScreen.applyBackgroundToAll ? (
+                  <div className="text-xs text-muted-foreground italic">
+                    Background appliqué depuis Welcome Screen
+                  </div>
+                ) : (
+                  <BackgroundUploader
+                    desktopImage={config.contactScreen.backgroundImage}
+                    mobileImage={config.contactScreen.backgroundImageMobile}
+                    onDesktopImageChange={(image) => onUpdateConfig({
+                      contactScreen: { ...config.contactScreen, backgroundImage: image }
+                    })}
+                    onDesktopImageRemove={() => onUpdateConfig({
+                      contactScreen: { ...config.contactScreen, backgroundImage: undefined }
+                    })}
+                    onMobileImageChange={(image) => onUpdateConfig({
+                      contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
+                    })}
+                    onMobileImageRemove={() => onUpdateConfig({
+                      contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
+                    })}
+                  />
+                )}
+              </>
             )}
           </div>
         );
