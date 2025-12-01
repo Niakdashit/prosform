@@ -332,7 +332,8 @@ export const ParticipationService = {
           .from('campaign_analytics')
           .insert({
             campaign_id: data.campaignId,
-            total_views: 0, // Les vues sont trackées séparément par étape
+            // On considère qu'une participation complète = 4 pages vues (welcome, contact, jeu, ending)
+            total_views: 4,
             total_participations: 1,
             total_completions: isWin ? 1 : 0,
             last_participation_at: new Date().toISOString(),
@@ -345,7 +346,8 @@ export const ParticipationService = {
         const { error: updateAnalyticsError } = await supabase
           .from('campaign_analytics')
           .update({
-            // Ne plus incrémenter total_views ici - c'est géré par AnalyticsTrackingService
+            // On dérive désormais les vues des participations : 1 participation complète = 4 vues
+            total_views: (existingAnalytics.total_views || 0) + 4,
             total_participations: (existingAnalytics.total_participations || 0) + 1,
             total_completions: (existingAnalytics.total_completions || 0) + (isWin ? 1 : 0),
             last_participation_at: new Date().toISOString(),
