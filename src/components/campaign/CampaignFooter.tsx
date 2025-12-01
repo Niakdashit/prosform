@@ -127,10 +127,10 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
   );
 
   const renderCenteredLayout = () => (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex items-center justify-center gap-4 flex-wrap">
       {/* Réseaux sociaux */}
       {config.showSocialLinks && config.socialLinks && config.socialLinks.length > 0 && (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-shrink-0">
           {config.socialLinks.map(social => (
             <a
               key={social.id}
@@ -148,18 +148,18 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
 
       {/* Liens légaux */}
       {config.showLegalLinks && config.legalLinks && config.legalLinks.length > 0 && (
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {config.legalLinks.map((link, i) => (
-            <span key={link.id} className="flex items-center gap-4">
+            <span key={link.id} className="flex items-center gap-2">
               <a
                 href={link.url}
-                className="text-sm hover:underline transition-all"
+                className="text-sm hover:underline transition-all whitespace-nowrap"
                 style={{ color: config.textColor }}
               >
                 {link.label}
               </a>
               {i < (config.legalLinks?.length || 0) - 1 && (
-                <span className="hidden md:inline" style={{ color: config.textColor + '40' }}>|</span>
+                <span style={{ color: config.textColor + '40' }}>|</span>
               )}
             </span>
           ))}
@@ -167,19 +167,19 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
       )}
 
       {/* Copyright */}
-      <div className="text-sm text-center" style={{ color: config.textColor }}>
+      <div className="text-sm flex-shrink-0 whitespace-nowrap" style={{ color: config.textColor }}>
         {config.copyrightText} {config.companyName && `- ${config.companyName}`}
       </div>
 
       {/* Powered by */}
       {config.showPoweredBy && (
-        <div className="text-xs" style={{ color: config.textColor + '80' }}>
+        <div className="text-xs flex-shrink-0" style={{ color: config.textColor + '80' }}>
           {config.poweredByText}{' '}
           <a 
             href={config.poweredByUrl} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:underline"
+            className="hover:underline whitespace-nowrap"
             style={{ color: config.accentColor }}
           >
             Prosform
@@ -252,7 +252,7 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
       className={`w-full ${paddingClass} flex-shrink-0`}
       style={{ backgroundColor: config.backgroundColor }}
     >
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 overflow-x-auto">
         {config.layout === 'simple' && renderSimpleLayout()}
         {config.layout === 'centered' && renderCenteredLayout()}
         {config.layout === 'columns' && renderColumnsLayout()}
