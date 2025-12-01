@@ -41,11 +41,7 @@ const ArticleWheelPreview = () => {
   };
 
   if (!config || !articleConfig) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#3d3731' }}>
-        <p className="text-white">Chargement...</p>
-      </div>
-    );
+    return <div className="fixed inset-0 bg-background" />;
   }
 
   const handleNext = () => {

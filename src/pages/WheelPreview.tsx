@@ -31,11 +31,7 @@ const WheelPreviewContent = () => {
   }, []);
 
   if (!config) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
-        <p className="text-white">Chargement...</p>
-      </div>
-    );
+    return <div className="fixed inset-0 bg-background" />;
   }
 
   const campaignId = new URLSearchParams(window.location.search).get('id');
@@ -99,11 +95,7 @@ const WheelPreviewPage = () => {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
-        <p className="text-white">Chargement...</p>
-      </div>
-    );
+    return <div className="fixed inset-0 bg-background" />;
   }
 
   return (
