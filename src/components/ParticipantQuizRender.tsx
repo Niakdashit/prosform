@@ -138,18 +138,24 @@ export const ParticipantQuizRender = ({ config, campaignId }: ParticipantQuizRen
           
           <div className="space-y-4">
             {config.contactScreen.fields?.map((field, index) => (
-              <input
-                key={index}
-                type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-                placeholder={field.label}
-                className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
-                style={{ 
-                  borderColor: theme.accentColor + '40',
-                  backgroundColor: theme.backgroundColor,
-                  color: theme.textColor
-                }}
-                onChange={(e) => setContactData(prev => ({ ...prev, [field.type]: e.target.value }))}
-              />
+              <div key={index}>
+                <label 
+                  className="block mb-2 text-base font-normal"
+                  style={{ color: theme.textColor }}
+                >
+                  {field.label}
+                </label>
+                <input
+                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
+                  className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
+                  style={{ 
+                    borderColor: theme.accentColor + '40',
+                    backgroundColor: theme.backgroundColor,
+                    color: theme.textColor
+                  }}
+                  onChange={(e) => setContactData(prev => ({ ...prev, [field.type]: e.target.value }))}
+                />
+              </div>
             ))}
           </div>
           

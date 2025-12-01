@@ -113,39 +113,52 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
             {config.contactForm.fields?.map((field, index) => {
               if (field.type === 'select' && field.options) {
                 return (
-                  <select
-                    key={index}
-                    className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
-                    style={{ 
-                      borderColor: theme.accentColor + '40',
-                      backgroundColor: theme.backgroundColor,
-                      color: theme.textColor
-                    }}
-                    onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
-                    required={field.required}
-                  >
-                    <option value="">{field.label}</option>
-                    {field.options.map((opt, i) => (
-                      <option key={i} value={opt}>{opt}</option>
-                    ))}
-                  </select>
+                  <div key={index}>
+                    <label 
+                      className="block mb-2 text-base font-normal"
+                      style={{ color: theme.textColor }}
+                    >
+                      {field.label}
+                    </label>
+                    <select
+                      className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
+                      style={{ 
+                        borderColor: theme.accentColor + '40',
+                        backgroundColor: theme.backgroundColor,
+                        color: theme.textColor
+                      }}
+                      onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
+                      required={field.required}
+                    >
+                      <option value="">Sélectionnez une option</option>
+                      {field.options.map((opt, i) => (
+                        <option key={i} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
                 );
               }
               
               if (field.type === 'textarea') {
                 return (
-                  <textarea
-                    key={index}
-                    placeholder={field.placeholder || field.label}
-                    className="w-full px-4 py-3 rounded-lg border-2 transition-colors min-h-[100px] resize-none"
-                    style={{ 
-                      borderColor: theme.accentColor + '40',
-                      backgroundColor: theme.backgroundColor,
-                      color: theme.textColor
-                    }}
-                    onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
-                    required={field.required}
-                  />
+                  <div key={index}>
+                    <label 
+                      className="block mb-2 text-base font-normal"
+                      style={{ color: theme.textColor }}
+                    >
+                      {field.label}
+                    </label>
+                    <textarea
+                      className="w-full px-4 py-3 rounded-lg border-2 transition-colors min-h-[100px] resize-none"
+                      style={{ 
+                        borderColor: theme.accentColor + '40',
+                        backgroundColor: theme.backgroundColor,
+                        color: theme.textColor
+                      }}
+                      onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
+                      required={field.required}
+                    />
+                  </div>
                 );
               }
 
@@ -172,19 +185,25 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
               }
               
               return (
-                <input
-                  key={index}
-                  type={field.type === 'email' ? 'email' : (field.type === 'phone' || field.type === 'tel') ? 'tel' : 'text'}
-                  placeholder={field.placeholder || field.label}
-                  className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
-                  style={{ 
-                    borderColor: theme.accentColor + '40',
-                    backgroundColor: theme.backgroundColor,
-                    color: theme.textColor
-                  }}
-                  onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
-                  required={field.required}
-                />
+                <div key={index}>
+                  <label 
+                    className="block mb-2 text-base font-normal"
+                    style={{ color: theme.textColor }}
+                  >
+                    {field.label}
+                  </label>
+                  <input
+                    type={field.type === 'email' ? 'email' : (field.type === 'phone' || field.type === 'tel') ? 'tel' : 'text'}
+                    className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
+                    style={{ 
+                      borderColor: theme.accentColor + '40',
+                      backgroundColor: theme.backgroundColor,
+                      color: theme.textColor
+                    }}
+                    onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
+                    required={field.required}
+                  />
+                </div>
               );
             })}
           </div>
