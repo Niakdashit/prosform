@@ -227,10 +227,13 @@ export const LayoutSettingsPanel = ({ layout, onUpdateLayout }: LayoutSettingsPa
                     value={[header.logoSize || 120]}
                     onValueChange={([v]) => updateHeader({ logoSize: v })}
                     min={40}
-                    max={200}
+                    max={Math.min(200, (header.height || 64) - 16)}
                     step={10}
                     className="mt-2"
                   />
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    Max: {Math.min(200, (header.height || 64) - 16)}px (basé sur hauteur header)
+                  </p>
                 </div>
               </div>
 
