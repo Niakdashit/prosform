@@ -60,6 +60,9 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
     }
   };
 
+  // Calculer la hauteur minimale du header basée sur la taille du logo
+  const minHeaderHeight = Math.max(config.height || 64, (config.logoSize || 120) + 24);
+
   const logoPositionClass = {
     left: 'justify-start',
     center: 'justify-center',
@@ -71,7 +74,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
       className={`w-full transition-all ${config.sticky ? 'sticky top-0 z-50' : ''}`}
       style={{
         ...getBackgroundStyle(),
-        height: config.height || 64,
+        height: minHeaderHeight,
         borderBottom: config.borderBottom ? `1px solid ${config.borderColor || '#e5e7eb'}` : 'none',
       }}
     >
@@ -100,7 +103,6 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
               alt="Logo"
               style={{ 
                 height: config.logoSize || 120,
-                maxHeight: (config.height || 64) - 16,
                 objectFit: 'contain'
               }}
               className="cursor-pointer"
