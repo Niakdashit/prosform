@@ -638,6 +638,7 @@ export const QuizPreview = ({
             backgroundColor={theme.backgroundColor}
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
+            backgroundImage={viewMode === 'desktop' ? config.contactScreen.backgroundImage : config.contactScreen.backgroundImageMobile}
             editingField={editingField}
             isReadOnly={isReadOnly}
             onFocusTitle={() => !isReadOnly && setEditingField('contact-title')}
