@@ -369,12 +369,76 @@ export const WheelSettingsPanel = ({
                             <SelectContent>
                               <SelectItem value="text">Texte</SelectItem>
                               <SelectItem value="email">Email</SelectItem>
-                              <SelectItem value="phone">Téléphone</SelectItem>
-                              <SelectItem value="name">Nom</SelectItem>
+                              <SelectItem value="tel">Téléphone</SelectItem>
+                              <SelectItem value="select">Liste déroulante</SelectItem>
+                              <SelectItem value="textarea">Zone de texte</SelectItem>
+                              <SelectItem value="checkbox">Case à cocher (opt-in)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
+
+                      {/* Placeholder for text, email, tel, textarea */}
+                      {['text', 'email', 'tel', 'textarea'].includes(field.type) && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Placeholder</Label>
+                          <Input 
+                            type="text" 
+                            value={field.placeholder || ''}
+                            placeholder="Texte indicatif..."
+                            onChange={(e) => {
+                              const newFields = [...config.contactForm.fields];
+                              newFields[index] = { ...field, placeholder: e.target.value };
+                              onUpdateConfig({ 
+                                contactForm: { ...config.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                      )}
+
+                      {/* Help text for checkbox */}
+                      {field.type === 'checkbox' && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Texte d'aide (RGPD)</Label>
+                          <Input 
+                            type="text" 
+                            value={field.helpText || ''}
+                            placeholder="Ex: Vous pouvez vous désabonner à tout moment"
+                            onChange={(e) => {
+                              const newFields = [...config.contactForm.fields];
+                              newFields[index] = { ...field, helpText: e.target.value };
+                              onUpdateConfig({ 
+                                contactForm: { ...config.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                      )}
+
+                      {/* Options for select */}
+                      {field.type === 'select' && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Options (une par ligne)</Label>
+                          <textarea
+                            value={(field.options || []).join('\n')}
+                            onChange={(e) => {
+                              const newFields = [...config.contactForm.fields];
+                              newFields[index] = { 
+                                ...field, 
+                                options: e.target.value.split('\n').filter(o => o.trim()) 
+                              };
+                              onUpdateConfig({ 
+                                contactForm: { ...config.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="w-full px-2 py-1 text-xs border rounded min-h-[60px]"
+                            placeholder="Option 1&#10;Option 2&#10;Option 3"
+                          />
+                        </div>
+                      )}
                       
                       {/* Required Checkbox */}
                       <div className="flex items-center gap-2">
@@ -395,14 +459,15 @@ export const WheelSettingsPanel = ({
                     </div>
                   ))}
                   
-                  {/* Add Field Button */}
-                  <div className="flex gap-2 pt-2">
+                   {/* Add Field Button */}
+                  <div className="flex flex-col gap-2 pt-2">
                     <Button
                       onClick={() => {
                         const newField: ContactField = {
                           id: 'field_' + Date.now(),
                           type: 'text',
                           label: 'Nouveau champ',
+                          placeholder: '',
                           required: false
                         };
                         onUpdateConfig({ 
@@ -412,9 +477,30 @@ export const WheelSettingsPanel = ({
                           } 
                         });
                       }}
-                      className="flex-1 h-9 bg-[#3d3731] hover:bg-[#2d2721] text-white text-xs"
+                      className="h-9 bg-[#3d3731] hover:bg-[#2d2721] text-white text-xs"
                     >
-                      + Champ
+                      + Ajouter un champ
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const newField: ContactField = {
+                          id: 'optin_' + Date.now(),
+                          type: 'checkbox',
+                          label: 'J\'accepte de recevoir des communications marketing',
+                          helpText: 'Conformément au RGPD, vous pouvez vous désabonner à tout moment',
+                          required: true
+                        };
+                        onUpdateConfig({ 
+                          contactForm: { 
+                            ...config.contactForm, 
+                            fields: [...config.contactForm.fields, newField] 
+                          } 
+                        });
+                      }}
+                      variant="outline"
+                      className="h-9 text-xs"
+                    >
+                      + Ajouter un opt-in RGPD
                     </Button>
                   </div>
                 </div>
