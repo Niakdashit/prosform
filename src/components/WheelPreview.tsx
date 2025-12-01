@@ -449,7 +449,7 @@ export const WheelPreview = ({
                     />
                   ) : (
                     <div
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={() => !isReadOnly && fileInputRef.current?.click()}
                       className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                     >
                       <Upload className="w-12 h-12 mb-3" style={{ color: theme.accentColor }} />
@@ -463,27 +463,29 @@ export const WheelPreview = ({
                   )}
                   
                   {/* Boutons au survol */}
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
-                    <button
-                      onClick={() => setShowEditorModal(true)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                      style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
-                      title="Éditer l'image"
-                    >
-                      <Edit3 className="w-4 h-4 text-white" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setUploadedImage(null);
-                        setImageSettings(defaultSettings);
-                        onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, showImage: false, image: undefined, imageSettings: undefined } });
-                      }}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
-                      title="Supprimer l'image"
-                    >
-                      <X className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
+                  {!isReadOnly && (
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
+                      <button
+                        onClick={() => setShowEditorModal(true)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                        style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                        title="Éditer l'image"
+                      >
+                        <Edit3 className="w-4 h-4 text-white" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setUploadedImage(null);
+                          setImageSettings(defaultSettings);
+                          onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, showImage: false, image: undefined, imageSettings: undefined } });
+                        }}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                        title="Supprimer l'image"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
 
@@ -652,28 +654,30 @@ export const WheelPreview = ({
                                 transition: 'transform 0.3s ease'
                               }}
                             />
-                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                              <button
-                                onClick={() => setShowUploadModal(true)}
-                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                title="Change image"
-                              >
-                                <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                              <button
-                                onClick={() => setShowEditorModal(true)}
-                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                title="Edit image"
-                              >
-                                <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                            </div>
+                            {!isReadOnly && (
+                              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                                <button
+                                  onClick={() => setShowUploadModal(true)}
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  title="Change image"
+                                >
+                                  <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                </button>
+                                <button
+                                  onClick={() => setShowEditorModal(true)}
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                  title="Edit image"
+                                >
+                                  <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                </button>
+                              </div>
+                            )}
                           </>
                         ) : (
                           <div
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() => !isReadOnly && fileInputRef.current?.click()}
                             className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                           >
                             <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -703,28 +707,30 @@ export const WheelPreview = ({
                                   transition: 'transform 0.3s ease'
                                 }}
                               />
-                              <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                                <button
-                                  onClick={() => setShowUploadModal(true)}
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                  title="Change image"
-                                >
-                                  <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                </button>
-                                <button
-                                  onClick={() => setShowEditorModal(true)}
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                  title="Edit image"
-                                >
-                                  <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                </button>
-                              </div>
+                              {!isReadOnly && (
+                                <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                                  <button
+                                    onClick={() => setShowUploadModal(true)}
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                    title="Change image"
+                                  >
+                                    <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                  </button>
+                                  <button
+                                    onClick={() => setShowEditorModal(true)}
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                    title="Edit image"
+                                  >
+                                    <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                  </button>
+                                </div>
+                              )}
                             </>
                         ) : (
                           <div
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() => !isReadOnly && fileInputRef.current?.click()}
                             className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                           >
                             <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -770,28 +776,30 @@ export const WheelPreview = ({
                               transition: 'transform 0.3s ease'
                             }}
                           />
-                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                            <button
-                              onClick={() => setShowUploadModal(true)}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              title="Change image"
-                            >
-                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                            <button
-                              onClick={() => setShowEditorModal(true)}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              title="Edit image"
-                            >
-                              <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                          </div>
+                          {!isReadOnly && (
+                            <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                              <button
+                                onClick={() => setShowUploadModal(true)}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Change image"
+                              >
+                                <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
+                              <button
+                                onClick={() => setShowEditorModal(true)}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                                title="Edit image"
+                              >
+                                <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
+                            </div>
+                          )}
                         </>
                       ) : (
                         <div
-                          onClick={() => fileInputRef.current?.click()}
+                          onClick={() => !isReadOnly && fileInputRef.current?.click()}
                           className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                         >
                           <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
