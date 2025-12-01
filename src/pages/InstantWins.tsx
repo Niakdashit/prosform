@@ -96,6 +96,7 @@ export default function InstantWins() {
     if (!data || typeof data !== 'object') return {};
     const flat: Record<string, any> = {};
 
+    // Flatten contactData object first to get all form fields
     Object.entries(data).forEach(([key, value]) => {
       if (key === 'contactData' && value && typeof value === 'object') {
         Object.entries(value as Record<string, any>).forEach(([subKey, subVal]) => {

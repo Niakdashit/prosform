@@ -32,9 +32,9 @@ const defaultJackpotConfig: JackpotConfig = {
     subtitle: "Pour vous envoyer votre gain",
     blockSpacing: 1,
     fields: [
-      { type: 'name', required: true, label: 'Nom complet' },
-      { type: 'email', required: true, label: 'Email' },
-      { type: 'phone', required: false, label: 'Téléphone' }
+      { id: 'name', type: 'text', required: true, label: 'Nom complet' },
+      { id: 'email', type: 'email', required: true, label: 'Email' },
+      { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"

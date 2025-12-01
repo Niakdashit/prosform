@@ -56,9 +56,11 @@ export interface JackpotSymbol {
 }
 
 export interface ContactField {
-  type: 'name' | 'email' | 'phone';
+  id: string; // Identifiant unique du champ (ex: 'civilite', 'prenom', 'nom')
+  type: 'text' | 'email' | 'phone' | 'select'; // Type de champ
   required: boolean;
   label: string;
+  options?: string[]; // Pour les champs select
 }
 
 export interface TextStyle {
@@ -196,9 +198,9 @@ const defaultJackpotConfig: JackpotConfig = {
     subtitle: "Pour vous envoyer votre gain",
     blockSpacing: 1,
     fields: [
-      { type: 'name', required: true, label: 'Nom complet' },
-      { type: 'email', required: true, label: 'Email' },
-      { type: 'phone', required: false, label: 'Téléphone' }
+      { id: 'name', type: 'text', required: true, label: 'Nom complet' },
+      { id: 'email', type: 'email', required: true, label: 'Email' },
+      { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
     desktopLayout: "desktop-centered"
