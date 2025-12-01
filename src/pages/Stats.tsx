@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target, UserPlus, Zap, ShieldAlert, Unlock } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Eye, MousePointer, Trophy, Activity, Clock, Globe, Smartphone, Mail, AlertTriangle, Download, Target, UserPlus, Zap, ShieldAlert, Unlock, Loader2 } from "lucide-react";
 import { AnalyticsService, GlobalStats, TimeSeriesData, CampaignAnalytics, TypeDistribution } from "@/services/AnalyticsService";
 import { AdvancedAnalyticsService, GeoStats, DeviceStats, TrafficSource, PeakHour, EmailCollectionStats, FraudStats } from "@/services/AdvancedAnalyticsService";
 import { useCampaignAdvancedStats } from "@/hooks/useCampaignAdvancedStats";
@@ -225,19 +225,17 @@ const Stats = () => {
     return (
       <AppLayout>
         <div 
-          className="flex flex-col items-center justify-center h-[calc(100vh-200px)]"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
+          className="flex flex-col items-center justify-center"
+          style={{ 
+            fontFamily: "'DM Sans', sans-serif",
+            minHeight: 'calc(100vh - 120px)',
+          }}
         >
-          <div className="relative">
-            <div 
-              className="w-16 h-16 rounded-full animate-spin"
-              style={{
-                border: '3px solid rgba(245, 202, 60, 0.2)',
-                borderTopColor: colors.gold,
-              }}
-            />
-          </div>
-          <p className="mt-6 text-sm" style={{ color: colors.muted }}>
+          <Loader2 
+            className="w-10 h-10 animate-spin mb-4" 
+            style={{ color: colors.gold }} 
+          />
+          <p className="text-sm" style={{ color: colors.muted }}>
             Chargement des statistiques...
           </p>
         </div>
