@@ -75,7 +75,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
         borderBottom: config.borderBottom ? `1px solid ${config.borderColor || '#e5e7eb'}` : 'none',
       }}
     >
-      <div className="h-full w-full flex items-center">
+      <div className="h-full w-full px-4 flex items-center">
         {/* Logo à gauche */}
         {(config.logoPosition === 'left' || !config.logoPosition) && (
           <div className="flex items-center shrink-0">
