@@ -1219,87 +1219,108 @@ export const WheelPreview = ({
         );
 
       case 'wheel':
+        // Adapter les segments pour SmartWheel
+        const adaptedSegments = config.segments.map(seg => ({
+          ...seg,
+          value: seg.label
+        }));
+
+        // Wheel size calculation
+        const wheelSizePercent = config.wheelScreen.wheelSize || 100;
+        const baseWheelSize = viewMode === 'desktop' ? 380 : 280;
+        const scaledWheelSize = Math.round(baseWheelSize * (wheelSizePercent / 100));
+
+        const wheelNode = (
+          <div className="flex items-center justify-center">
+            <SmartWheel
+              key="wheel-instance"
+              segments={adaptedSegments}
+              disabled={wheelDisabled}
+              onBeforeSpin={handleSpinStart}
+              onComplete={(winnerSegment, winnerSegmentId) => {
+                setIsSpinning(false);
+                setWheelDisabled(true);
+                
+                const result = globalDrawResult;
+                
+                console.log('🎰 [WheelPreview] onComplete appelé');
+                console.log('🎰 [WheelPreview] winnerSegment:', winnerSegment);
+                console.log('🎰 [WheelPreview] winnerSegmentId:', winnerSegmentId);
+                console.log('🎰 [WheelPreview] globalDrawResult:', result);
+                
+                if (result && result.won && result.prize) {
+                  console.log('🎰 [WheelPreview] ✅ Gain confirmé:', result.prize.name);
+                  setWonPrize(result.prize.name);
+                  if (onUpdatePrize) {
+                    onUpdatePrize(consumePrize(result.prize) as Prize);
+                  }
+                  setTimeout(() => {
+                    setWheelDisabled(false);
+                    resetGlobalWheelRotation();
+                    if (onGoToEnding) onGoToEnding(true);
+                    else onNext();
+                  }, 1500);
+                } else {
+                  console.log('🎰 [WheelPreview] ❌ Pas de gain - result:', result);
+                  setWonPrize(null);
+                  setTimeout(() => {
+                    setWheelDisabled(false);
+                    resetGlobalWheelRotation();
+                    if (onGoToEnding) onGoToEnding(false);
+                    else onNext();
+                  }, 1500);
+                }
+                
+                globalDrawResult = null;
+              }}
+              brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
+              size={scaledWheelSize}
+              borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
+              customBorderColor={
+                theme.wheelBorderStyle === 'custom'
+                  ? theme.wheelBorderCustomColor
+                  : undefined
+              }
+              showBulbs={true}
+              onAssetsReady={onAssetsReady}
+            />
+          </div>
+        );
+
+        // Render layout-specific structure
+        if (viewMode === 'desktop' && currentLayout === 'desktop-left-right') {
+          return (
+            <div className="grid grid-cols-2 h-full">
+              {/* Left column - empty to show background image */}
+              <div className="relative" />
+              {/* Right column - content and wheel */}
+              <div className="flex items-center justify-center p-12">
+                <div className="flex flex-col items-center space-y-8">
+                  <div className="text-center w-full max-w-[700px]">
+                    <h1 
+                      className="text-4xl md:text-5xl font-bold mb-4"
+                      style={{ color: theme.textColor }}
+                    >
+                      {config.wheelScreen.title}
+                    </h1>
+                    <p 
+                      className="text-lg md:text-xl mb-8"
+                      style={{ color: theme.textColor, opacity: 0.9 }}
+                    >
+                      {config.wheelScreen.subtitle}
+                    </p>
+                  </div>
+                  {wheelNode}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        // Default centered layout for other cases
         return (
           <div className="flex w-full h-full items-center justify-center">
-            {(() => {
-              // Adapter les segments pour SmartWheel
-              const adaptedSegments = config.segments.map(seg => ({
-                ...seg,
-                value: seg.label
-              }));
-
-              // Wheel size calculation
-              const wheelSizePercent = config.wheelScreen.wheelSize || 100;
-              const baseWheelSize = viewMode === 'desktop' ? 380 : 280;
-              const scaledWheelSize = Math.round(baseWheelSize * (wheelSizePercent / 100));
-              const containerSize = viewMode === 'desktop' ? 450 : 320;
-              const scaledContainerSize = Math.round(containerSize * (wheelSizePercent / 100));
-
-              return (
-                <div
-                  className="flex items-center justify-center"
-                  style={{ 
-                    width: `${scaledContainerSize}px`,
-                    height: `${scaledContainerSize}px`,
-                    maxWidth: '100%',
-                    flexShrink: 0
-                  }}
-                >
-                  <SmartWheel
-                    key="wheel-instance"
-                    segments={adaptedSegments}
-                    disabled={wheelDisabled}
-                    onBeforeSpin={handleSpinStart}
-                    onComplete={(winnerSegment, winnerSegmentId) => {
-                      setIsSpinning(false);
-                      setWheelDisabled(true);
-                      
-                      const result = globalDrawResult;
-                      
-                      console.log('🎰 [WheelPreview] onComplete appelé');
-                      console.log('🎰 [WheelPreview] winnerSegment:', winnerSegment);
-                      console.log('🎰 [WheelPreview] winnerSegmentId:', winnerSegmentId);
-                      console.log('🎰 [WheelPreview] globalDrawResult:', result);
-                      
-                      if (result && result.won && result.prize) {
-                        console.log('🎰 [WheelPreview] ✅ Gain confirmé:', result.prize.name);
-                        setWonPrize(result.prize.name);
-                        if (onUpdatePrize) {
-                          onUpdatePrize(consumePrize(result.prize) as Prize);
-                        }
-                        setTimeout(() => {
-                          setWheelDisabled(false);
-                          resetGlobalWheelRotation();
-                          if (onGoToEnding) onGoToEnding(true);
-                          else onNext();
-                        }, 1500);
-                      } else {
-                        console.log('🎰 [WheelPreview] ❌ Pas de gain - result:', result);
-                        setWonPrize(null);
-                        setTimeout(() => {
-                          setWheelDisabled(false);
-                          resetGlobalWheelRotation();
-                          if (onGoToEnding) onGoToEnding(false);
-                          else onNext();
-                        }, 1500);
-                      }
-                      
-                      globalDrawResult = null;
-                    }}
-                    brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                    size={scaledWheelSize}
-                    borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
-                    customBorderColor={
-                      theme.wheelBorderStyle === 'custom'
-                        ? theme.wheelBorderCustomColor
-                        : undefined
-                    }
-                    showBulbs={true}
-                    onAssetsReady={onAssetsReady}
-                  />
-                </div>
-              );
-            })()}
+            {wheelNode}
           </div>
         );
 
