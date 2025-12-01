@@ -99,7 +99,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
               src={config.logo}
               alt="Logo"
               style={{ 
-                height: config.logoSize || 40,
+                height: config.logoSize || 120,
                 maxHeight: (config.height || 64) - 16,
                 objectFit: 'contain'
               }}
