@@ -1571,14 +1571,10 @@ export const WheelPreview = ({
             }
           })();
           
-          // Calculer la hauteur du header pour positionner correctement le background
-          const headerHeight = config.layout?.header?.enabled ? (config.layout.header.height || 64) : 0;
-          
           return (
             <div 
-              className="absolute left-0 right-0 bottom-0"
+              className="absolute inset-0"
               style={{
-                top: config.layout?.footer?.enabled ? `${headerHeight}px` : '0',
                 backgroundImage: `url(${bgImage})`,
                 backgroundSize: isLeftRightLayout ? 'cover' : 'cover',
                 backgroundPosition: isLeftRightLayout ? 'left center' : 'center',
