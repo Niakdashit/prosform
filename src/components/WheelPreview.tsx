@@ -1493,26 +1493,7 @@ export const WheelPreview = ({
         key={`preview-container-${viewMode}`}
         className="relative overflow-hidden transition-all duration-300 flex-shrink-0 flex flex-col" 
         style={{ 
-          backgroundColor: (() => {
-            // Si un background image est défini, on utilise transparent pour laisser l'image visible
-            const hasBackgroundImage = (() => {
-              const applyToAll = config.welcomeScreen.applyBackgroundToAll;
-              const welcomeDesktop = config.welcomeScreen.backgroundImage;
-              const welcomeMobile = config.welcomeScreen.backgroundImageMobile;
-              
-              if (applyToAll && (welcomeDesktop || welcomeMobile)) return true;
-              
-              switch (activeView) {
-                case 'welcome': return !!(welcomeDesktop || welcomeMobile);
-                case 'contact': return !!(config.contactForm.backgroundImage || config.contactForm.backgroundImageMobile);
-                case 'wheel': return !!(config.wheelScreen.backgroundImage || config.wheelScreen.backgroundImageMobile);
-                case 'ending-win': return !!(config.endingWin.backgroundImage || config.endingWin.backgroundImageMobile);
-                case 'ending-lose': return !!(config.endingLose.backgroundImage || config.endingLose.backgroundImageMobile);
-                default: return false;
-              }
-            })();
-            return hasBackgroundImage ? 'transparent' : theme.backgroundColor;
-          })(),
+          backgroundColor: theme.backgroundColor,
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
@@ -1571,15 +1552,39 @@ export const WheelPreview = ({
             }
           })();
           
+          // Hauteur du header pour que l'image commence en dessous
+          const headerHeight = config.layout?.header?.enabled ? (config.layout.header.height || 64) : 0;
+          
+          const commonStyles = {
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: 'cover' as const,
+            backgroundRepeat: 'no-repeat' as const,
+            zIndex: 0 as const,
+          };
+          
+          // En desktop-left-right, on limite l'image à la colonne de gauche
+          if (isLeftRightLayout && viewMode === 'desktop') {
+            return (
+              <div 
+                className="absolute left-0 bottom-0"
+                style={{
+                  top: `${headerHeight}px`,
+                  width: '50%',
+                  backgroundPosition: 'left center',
+                  ...commonStyles,
+                }}
+              />
+            );
+          }
+          
+          // Autres layouts : image sur toute la largeur mais sous le header
           return (
             <div 
-              className="absolute inset-0"
+              className="absolute left-0 right-0 bottom-0"
               style={{
-                backgroundImage: `url(${bgImage})`,
-                backgroundSize: isLeftRightLayout ? 'cover' : 'cover',
-                backgroundPosition: isLeftRightLayout ? 'left center' : 'center',
-                backgroundRepeat: 'no-repeat',
-                zIndex: 0,
+                top: `${headerHeight}px`,
+                backgroundPosition: 'center',
+                ...commonStyles,
               }}
             />
           );
