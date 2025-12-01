@@ -135,7 +135,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
       >
         {/* Top header */}
         <header
-          className="h-[56px] flex items-center justify-between px-6 sticky top-0 z-20 backdrop-blur-4xl"
+          className="h-[56px] flex items-center justify-between px-6 sticky top-0 z-20 backdrop-blur-4xl overflow-x-hidden"
           style={{
             background:
               "linear-gradient(90deg, rgba(39, 7, 54, 0.98) 0%, rgba(30, 15, 60, 0.98) 40%, rgba(25, 20, 70, 0.98) 100%)",
