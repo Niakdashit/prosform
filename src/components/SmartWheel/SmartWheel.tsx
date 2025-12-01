@@ -249,6 +249,11 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
     onAssetsReady
   });
   
+  // Ne rien rendre tant que les assets ne sont pas prêts
+  if (!assetsReady) {
+    return null;
+  }
+  
   const handleSpin = async () => {
     // Bloquer si la roue a déjà été lancée
     if (hasSpun) {
