@@ -10,7 +10,6 @@ const ArticleScratchPreview = () => {
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'scratch' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     // Load configs from localStorage
@@ -180,7 +179,6 @@ const ArticleScratchPreview = () => {
               revealText="🎉 Félicitations !"
               threshold={config.scratchScreen.threshold}
               brushSize={config.scratchScreen.brushSize}
-              onAssetsReady={() => setAssetsReady(true)}
               onComplete={(percentage) => {
                 // Simulate win/lose based on random
                 const isWin = Math.random() > 0.3;
@@ -240,14 +238,10 @@ const ArticleScratchPreview = () => {
   };
 
   return (
-    <>
-      {!assetsReady && (
-        <div className="fixed inset-0 bg-white z-50" />
-      )}
-      <div 
-        className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: articleConfig.pageBackgroundColor || '#3d3731' }}
-      >
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ backgroundColor: articleConfig.pageBackgroundColor || '#3d3731' }}
+    >
       <div
         style={{
           width: `${canvasWidth}px`,
@@ -304,7 +298,6 @@ const ArticleScratchPreview = () => {
         )}
       </div>
     </div>
-    </>
   );
 };
 
