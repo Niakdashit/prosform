@@ -90,6 +90,23 @@ export default function InstantWins() {
   const [loading, setLoading] = useState(true);
   const [campaignName, setCampaignName] = useState('');
 
+  const [formFields, setFormFields] = useState<string[]>([]);
+
+  // Extract unique form fields from all participations
+  const extractFormFields = (participations: Participation[]) => {
+    const fieldsSet = new Set<string>();
+    participations.forEach(part => {
+      if (part.participation_data) {
+        Object.keys(part.participation_data).forEach(key => {
+          if (!key.startsWith('prize') && !key.startsWith('optin_')) {
+            fieldsSet.add(key);
+          }
+        });
+      }
+    });
+    return Array.from(fieldsSet).sort();
+  };
+
   useEffect(() => {
     if (!campaignId) {
       toast.error('ID de campagne manquant');
@@ -138,6 +155,12 @@ export default function InstantWins() {
         .order('created_at', { ascending: false });
       
       setAllParticipations(allPartData || []);
+      
+      // Extract form fields from participations
+      if (allPartData) {
+        const fields = extractFormFields(allPartData as Participation[]);
+        setFormFields(fields);
+      }
 
       // Charger les participations uniques (1 par IP)
       const { data: uniquePartData } = await externalSupabase
@@ -605,17 +628,15 @@ export default function InstantWins() {
                       <TableHead>UTM Medium</TableHead>
                       <TableHead>UTM Campaign</TableHead>
                       <TableHead>Referrer</TableHead>
-                      <TableHead>Données formulaire</TableHead>
+                      {formFields.map(field => (
+                        <TableHead key={field} className="capitalize">{field}</TableHead>
+                      ))}
                       <TableHead>Prix</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {allParticipations.slice(0, 100).map((part) => {
                       const formData = part.participation_data || {};
-                      const formFields = Object.entries(formData)
-                        .filter(([key]) => !key.startsWith('prize') && !key.startsWith('optin_'))
-                        .map(([key, value]) => `${key}: ${value}`)
-                        .join(', ');
                       
                       return (
                         <TableRow key={part.id}>
@@ -631,9 +652,9 @@ export default function InstantWins() {
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
-                          <TableCell className="text-xs max-w-xs truncate">
-                            {formFields || '-'}
-                          </TableCell>
+                          {formFields.map(field => (
+                            <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
+                          ))}
                           <TableCell className="text-xs">{part.prize_won?.name || '-'}</TableCell>
                         </TableRow>
                       );
@@ -673,16 +694,14 @@ export default function InstantWins() {
                       <TableHead>UTM Medium</TableHead>
                       <TableHead>UTM Campaign</TableHead>
                       <TableHead>Referrer</TableHead>
-                      <TableHead>Données formulaire</TableHead>
+                      {formFields.map(field => (
+                        <TableHead key={field} className="capitalize">{field}</TableHead>
+                      ))}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {uniqueParticipations.slice(0, 100).map((part) => {
                       const formData = part.participation_data || {};
-                      const formFields = Object.entries(formData)
-                        .filter(([key]) => !key.startsWith('prize') && !key.startsWith('optin_'))
-                        .map(([key, value]) => `${key}: ${value}`)
-                        .join(', ');
                       
                       return (
                         <TableRow key={part.id}>
@@ -698,9 +717,9 @@ export default function InstantWins() {
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
-                          <TableCell className="text-xs max-w-xs truncate">
-                            {formFields || '-'}
-                          </TableCell>
+                          {formFields.map(field => (
+                            <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
+                          ))}
                         </TableRow>
                       );
                     })}
