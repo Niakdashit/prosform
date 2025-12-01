@@ -58,6 +58,7 @@ export const WheelPreview = ({
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const [wheelDisabled, setWheelDisabled] = useState(false); // Bloquer la roue après le spin
   const [showVariableMenu, setShowVariableMenu] = useState(false);
+  const [isWheelReady, setIsWheelReady] = useState(false);
   
   // Fonction pour effectuer le tirage (appelée par SmartWheel via onBeforeSpin)
   const handleSpinStart = () => {
@@ -103,6 +104,19 @@ export const WheelPreview = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme, viewMode);
+
+  // Délai d'affichage de la roue pour laisser charger les assets en arrière-plan
+  useEffect(() => {
+    if (activeView === 'wheel') {
+      setIsWheelReady(false);
+      const timer = setTimeout(() => {
+        setIsWheelReady(true);
+      }, 400); // 400ms de délai
+      return () => clearTimeout(timer);
+    } else {
+      setIsWheelReady(false);
+    }
+  }, [activeView]);
 
   // Sync image from config when it changes (e.g., after loading from Supabase)
   useEffect(() => {
@@ -1196,9 +1210,13 @@ export const WheelPreview = ({
         );
 
       case 'wheel':
+        // Ne rien afficher tant que le délai n'est pas écoulé
+        if (!isWheelReady) {
+          return <div className="flex w-full h-full" />;
+        }
+
         return (
-          <div className="flex w-full h-full items-center justify-center">
-            {(() => {
+          <div className="flex w-full h-full items-center justify-center">{(() => {
               // Adapter les segments pour SmartWheel
               const adaptedSegments = config.segments.map(seg => ({
                 ...seg,

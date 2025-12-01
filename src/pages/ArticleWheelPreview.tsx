@@ -10,6 +10,7 @@ const ArticleWheelPreview = () => {
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [isWheelReady, setIsWheelReady] = useState(false);
 
   useEffect(() => {
     // Load configs from localStorage
@@ -33,6 +34,19 @@ const ArticleWheelPreview = () => {
       setViewMode('mobile');
     }
   }, []);
+
+  // Délai d'affichage de la roue pour laisser charger les assets en arrière-plan
+  useEffect(() => {
+    if (activeView === 'wheel') {
+      setIsWheelReady(false);
+      const timer = setTimeout(() => {
+        setIsWheelReady(true);
+      }, 400); // 400ms de délai
+      return () => clearTimeout(timer);
+    } else {
+      setIsWheelReady(false);
+    }
+  }, [activeView]);
 
   // Get font family CSS value
   const getFontFamily = (fontValue: string) => {
@@ -171,6 +185,11 @@ const ArticleWheelPreview = () => {
           ...seg,
           value: seg.label
         }));
+
+        // Ne rien afficher tant que le délai n'est pas écoulé
+        if (!isWheelReady) {
+          return <div className="p-6 flex flex-col items-center justify-center min-h-[400px]" />;
+        }
         
         return (
           <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
