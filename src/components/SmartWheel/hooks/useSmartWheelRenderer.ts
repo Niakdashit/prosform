@@ -285,7 +285,7 @@ export const useSmartWheelRenderer = ({
 
     const count = BULB_COUNT;
     // Réduire la taille des ampoules pour un rendu plus fin
-    const bulbRadius = Math.max(1.5 * scaleFactor, Math.min(5 * scaleFactor, borderW * 0.18));
+    const bulbRadius = Math.max(1 * scaleFactor, Math.min(3 * scaleFactor, borderW * 0.12));
     const startAngle = -Math.PI / 2; // aligné sur le pointeur en haut
 
     for (let i = 0; i < count; i++) {
