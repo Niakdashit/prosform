@@ -147,6 +147,36 @@ export const JackpotSettingsPanel = ({
 
             <Separator />
 
+            {/* Content Section */}
+            <SettingsSection 
+              title="Content" 
+              icon={<FileText className="w-4 h-4" />}
+            >
+              <SettingsField label="Title">
+                <Input 
+                  type="text" 
+                  value={config.contactForm.title}
+                  onChange={(e) => onUpdateConfig({ 
+                    contactForm: { ...config.contactForm, title: e.target.value } 
+                  })}
+                  className="h-9"
+                />
+              </SettingsField>
+
+              <SettingsField label="Subtitle">
+                <Input 
+                  type="text" 
+                  value={config.contactForm.subtitle}
+                  onChange={(e) => onUpdateConfig({ 
+                    contactForm: { ...config.contactForm, subtitle: e.target.value } 
+                  })}
+                  className="h-9"
+                />
+              </SettingsField>
+            </SettingsSection>
+
+            <Separator />
+
             {/* Spacing Section */}
             <SettingsSection 
               title="Spacing" 
