@@ -1,4 +1,4 @@
-import { externalSupabase } from '@/integrations/supabase/externalClient';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Service pour tracker les vues par étape dans les campagnes
@@ -16,15 +16,20 @@ export const AnalyticsTrackingService = {
       console.log(`📊 Tracking view: ${step} for campaign ${campaignId}`);
       
       // Vérifier si une entrée existe déjà pour cette campagne
-      const { data: existing } = await externalSupabase
+      const { data: existing, error: fetchError } = await supabase
         .from('campaign_analytics')
         .select('id, total_views')
         .eq('campaign_id', campaignId)
         .maybeSingle();
 
+      if (fetchError) {
+        console.error('Error fetching analytics for view tracking:', fetchError);
+        return;
+      }
+
       if (existing) {
         // Incrémenter le compteur de vues
-        const { error } = await externalSupabase
+        const { error } = await supabase
           .from('campaign_analytics')
           .update({
             total_views: (existing.total_views || 0) + 1,
@@ -37,7 +42,7 @@ export const AnalyticsTrackingService = {
         }
       } else {
         // Créer une nouvelle entrée
-        const { error } = await externalSupabase
+        const { error } = await supabase
           .from('campaign_analytics')
           .insert({
             campaign_id: campaignId,
@@ -62,22 +67,31 @@ export const AnalyticsTrackingService = {
    */
   async trackMultipleViews(campaignId: string, count: number): Promise<void> {
     try {
-      const { data: existing } = await externalSupabase
+      const { data: existing, error: fetchError } = await supabase
         .from('campaign_analytics')
         .select('id, total_views')
         .eq('campaign_id', campaignId)
         .maybeSingle();
 
+      if (fetchError) {
+        console.error('Error fetching analytics for multiple view tracking:', fetchError);
+        return;
+      }
+
       if (existing) {
-        await externalSupabase
+        const { error } = await supabase
           .from('campaign_analytics')
           .update({
             total_views: (existing.total_views || 0) + count,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existing.id);
+
+        if (error) {
+          console.error('Error updating multiple view count:', error);
+        }
       } else {
-        await externalSupabase
+        const { error } = await supabase
           .from('campaign_analytics')
           .insert({
             campaign_id: campaignId,
@@ -86,6 +100,10 @@ export const AnalyticsTrackingService = {
             total_completions: 0,
             avg_time_spent: 0,
           });
+
+        if (error) {
+          console.error('Error creating analytics entry for multiple views:', error);
+        }
       }
     } catch (error) {
       console.error('Error in trackMultipleViews:', error);
