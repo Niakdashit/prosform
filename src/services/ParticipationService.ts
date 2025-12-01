@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { emailSchema, phoneSchema, nameSchema } from '@/schemas/participation.schema';
 import { ExternalBackendAnalyticsService, CampaignSettings } from './ExternalBackendAnalyticsService';
+import { StepDurationStorage } from '@/utils/stepDurationStorage';
 import { z } from 'zod';
 
 export interface ParticipationData {
@@ -230,6 +231,17 @@ export const ParticipationService = {
 
       // ===== FIN VÉRIFICATIONS ANTI-SPAM =====
 
+      // Récupérer les durées stockées en sessionStorage si disponibles
+      let stepDurations: Record<string, number> = {};
+      try {
+        const stored = sessionStorage.getItem(`step_durations_${data.campaignId}`);
+        if (stored) {
+          stepDurations = JSON.parse(stored);
+        }
+      } catch (e) {
+        console.log('Could not retrieve step durations:', e);
+      }
+
       // Données de base (toujours présentes)
       const baseData: any = {
         campaign_id: data.campaignId,
@@ -238,6 +250,7 @@ export const ParticipationService = {
           contactData: contactData,
           result: data.result,
           timestamp: new Date().toISOString(),
+          stepDurations, // Ajouter les durées par étape
         },
         completed_at: new Date().toISOString(),
       };
@@ -357,6 +370,9 @@ export const ParticipationService = {
           console.error('Error updating campaign analytics (external):', updateAnalyticsError);
         }
       }
+
+      // Nettoyer les durées stockées maintenant que la participation est enregistrée
+      StepDurationStorage.clearStepDurations(data.campaignId);
     } catch (err) {
       console.error('Failed to record participation:', err);
       // Ne pas bloquer l'expérience utilisateur si l'enregistrement échoue
