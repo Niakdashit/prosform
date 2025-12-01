@@ -588,150 +588,142 @@ export const ScratchSettingsPanel = ({
             
             <Separator />
             
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Largeur de la carte: {config.scratchScreen.cardWidth}px
-              </Label>
-              <Slider
-                value={[config.scratchScreen.cardWidth]}
-                onValueChange={([value]) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, cardWidth: value }
-                })}
-                min={200}
-                max={400}
-                step={10}
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Hauteur de la carte: {config.scratchScreen.cardHeight}px
-              </Label>
-              <Slider
-                value={[config.scratchScreen.cardHeight]}
-                onValueChange={([value]) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, cardHeight: value }
-                })}
-                min={150}
-                max={300}
-                step={10}
-                className="w-full"
-              />
-            </div>
-            
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Arrondi des angles: {config.scratchScreen.cardBorderRadius}px
-              </Label>
-              <Slider
-                value={[config.scratchScreen.cardBorderRadius]}
-                onValueChange={([value]) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, cardBorderRadius: value }
-                })}
-                min={0}
-                max={50}
-                step={2}
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Épaisseur bordure: {config.scratchScreen.cardBorderWidth}px
-              </Label>
-              <Slider
-                value={[config.scratchScreen.cardBorderWidth]}
-                onValueChange={([value]) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, cardBorderWidth: value }
-                })}
-                min={0}
-                max={20}
-                step={1}
-                className="w-full"
-              />
-            </div>
-            
-            {config.scratchScreen.cardBorderWidth > 0 && (
-              <div>
-                <Label className="text-xs text-muted-foreground mb-2 block">Couleur de bordure</Label>
-                <div className="flex gap-2">
-                  <Input 
-                    type="color" 
-                    value={config.scratchScreen.cardBorderColor}
-                    onChange={(e) => onUpdateConfig({
-                      scratchScreen: { ...config.scratchScreen, cardBorderColor: e.target.value }
-                    })}
-                    className="h-8 w-16" 
-                  />
-                  <Input 
-                    type="text" 
-                    value={config.scratchScreen.cardBorderColor}
-                    onChange={(e) => onUpdateConfig({
-                      scratchScreen: { ...config.scratchScreen, cardBorderColor: e.target.value }
-                    })}
-                    className="h-8 text-xs flex-1" 
-                  />
-                </div>
-              </div>
-            )}
-            
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Seuil de révélation: {config.scratchScreen.threshold}%
-              </Label>
-              <Slider
-                value={[config.scratchScreen.threshold]}
-                onValueChange={([value]) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, threshold: value }
-                })}
-                min={50}
-                max={100}
-                step={5}
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Taille du pinceau: {config.scratchScreen.brushSize}px
-              </Label>
-              <Slider
-                value={[config.scratchScreen.brushSize]}
-                onValueChange={([value]) => onUpdateConfig({
-                  scratchScreen: { ...config.scratchScreen, brushSize: value }
-                })}
-                min={10}
-                max={50}
-                step={5}
-                className="w-full"
-              />
-            </div>
+            {/* Accordion for Card Settings */}
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="card-settings" className="border-none">
+                <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline py-2">
+                  Scratch Card
+                </AccordionTrigger>
+                <AccordionContent className="pt-3 space-y-4">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">
+                      Largeur de la carte: {config.scratchScreen.cardWidth}px
+                    </Label>
+                    <Slider
+                      value={[config.scratchScreen.cardWidth]}
+                      onValueChange={([value]) => onUpdateConfig({
+                        scratchScreen: { ...config.scratchScreen, cardWidth: value }
+                      })}
+                      min={200}
+                      max={400}
+                      step={10}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">
+                      Hauteur de la carte: {config.scratchScreen.cardHeight}px
+                    </Label>
+                    <Slider
+                      value={[config.scratchScreen.cardHeight]}
+                      onValueChange={([value]) => onUpdateConfig({
+                        scratchScreen: { ...config.scratchScreen, cardHeight: value }
+                      })}
+                      min={150}
+                      max={300}
+                      step={10}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">
+                      Arrondi des angles: {config.scratchScreen.cardBorderRadius}px
+                    </Label>
+                    <Slider
+                      value={[config.scratchScreen.cardBorderRadius]}
+                      onValueChange={([value]) => onUpdateConfig({
+                        scratchScreen: { ...config.scratchScreen, cardBorderRadius: value }
+                      })}
+                      min={0}
+                      max={50}
+                      step={2}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">
+                      Épaisseur bordure: {config.scratchScreen.cardBorderWidth}px
+                    </Label>
+                    <Slider
+                      value={[config.scratchScreen.cardBorderWidth]}
+                      onValueChange={([value]) => onUpdateConfig({
+                        scratchScreen: { ...config.scratchScreen, cardBorderWidth: value }
+                      })}
+                      min={0}
+                      max={20}
+                      step={1}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  {config.scratchScreen.cardBorderWidth > 0 && (
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-2 block">Couleur de bordure</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          type="color" 
+                          value={config.scratchScreen.cardBorderColor}
+                          onChange={(e) => onUpdateConfig({
+                            scratchScreen: { ...config.scratchScreen, cardBorderColor: e.target.value }
+                          })}
+                          className="h-8 w-16" 
+                        />
+                        <Input 
+                          type="text" 
+                          value={config.scratchScreen.cardBorderColor}
+                          onChange={(e) => onUpdateConfig({
+                            scratchScreen: { ...config.scratchScreen, cardBorderColor: e.target.value }
+                          })}
+                          className="h-8 text-xs flex-1" 
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  <Separator />
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">
+                      Seuil de révélation: {config.scratchScreen.threshold}%
+                    </Label>
+                    <Slider
+                      value={[config.scratchScreen.threshold]}
+                      onValueChange={([value]) => onUpdateConfig({
+                        scratchScreen: { ...config.scratchScreen, threshold: value }
+                      })}
+                      min={50}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">
+                      Taille du pinceau: {config.scratchScreen.brushSize}px
+                    </Label>
+                    <Slider
+                      value={[config.scratchScreen.brushSize]}
+                      onValueChange={([value]) => onUpdateConfig({
+                        scratchScreen: { ...config.scratchScreen, brushSize: value }
+                      })}
+                      min={10}
+                      max={50}
+                      step={5}
+                      className="w-full"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
             
             {!hideSpacingAndBackground && (
               <>
-                <Separator />
-                
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Block spacing: {config.scratchScreen.blockSpacing}x
-                  </Label>
-                  <Slider
-                    value={[config.scratchScreen.blockSpacing]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      scratchScreen: { ...config.scratchScreen, blockSpacing: value }
-                    })}
-                    min={0.5}
-                    max={3}
-                    step={0.25}
-                    className="w-full"
-                  />
-                </div>
-
                 <Separator />
 
                 {/* Background Image */}
