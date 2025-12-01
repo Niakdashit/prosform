@@ -183,10 +183,10 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </header>
 
-        {/* Scrollable content area */}
-        <div className="flex-1 overflow-auto">
+        {/* Content area - No scroll */}
+        <div className="flex-1 overflow-hidden">
           {/* Page content with rounded liquid glass frame */}
-          <main className="p-4">
+          <main className="p-4 h-full">
           <div
             className="min-h-full rounded-[28px] p-6 relative"
             style={{
