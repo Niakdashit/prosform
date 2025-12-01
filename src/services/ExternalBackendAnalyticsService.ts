@@ -1,4 +1,4 @@
-import { externalSupabase } from '@/integrations/supabase/externalClient';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Service pour les analytics avancées utilisant les fonctions SQL du backend externe
@@ -68,7 +68,7 @@ export const ExternalBackendAnalyticsService = {
    */
   async getCampaignStats(campaignId: string): Promise<CampaignStatsAdvanced | null> {
     try {
-      const { data, error } = await externalSupabase.rpc('get_campaign_stats', {
+      const { data, error } = await supabase.rpc('get_campaign_stats', {
         p_campaign_id: campaignId,
       });
 
@@ -92,7 +92,7 @@ export const ExternalBackendAnalyticsService = {
     days: number = 30
   ): Promise<ParticipationByDay[]> {
     try {
-      const { data, error } = await externalSupabase.rpc('get_participations_by_day', {
+      const { data, error } = await supabase.rpc('get_participations_by_day', {
         p_campaign_id: campaignId,
         p_days: days,
       });
@@ -119,7 +119,7 @@ export const ExternalBackendAnalyticsService = {
    */
   async getConversionFunnel(campaignId: string): Promise<ConversionFunnel | null> {
     try {
-      const { data, error } = await externalSupabase.rpc('get_conversion_funnel', {
+      const { data, error } = await supabase.rpc('get_conversion_funnel', {
         p_campaign_id: campaignId,
       });
 
@@ -152,7 +152,7 @@ export const ExternalBackendAnalyticsService = {
     reason?: string;
   }> {
     try {
-      const { data, error } = await externalSupabase.rpc('check_rate_limit', {
+      const { data, error } = await supabase.rpc('check_rate_limit', {
         p_identifier: identifier,
         p_identifier_type: identifierType,
         p_campaign_id: campaignId,
@@ -182,7 +182,7 @@ export const ExternalBackendAnalyticsService = {
     deviceFingerprint?: string
   ): Promise<boolean> {
     try {
-      const { data, error } = await externalSupabase.rpc('is_participant_blocked', {
+      const { data, error } = await supabase.rpc('is_participant_blocked', {
         p_campaign_id: campaignId,
         p_ip_address: ipAddress || null,
         p_email: email || null,
@@ -206,7 +206,7 @@ export const ExternalBackendAnalyticsService = {
    */
   async getBlockedParticipants(campaignId?: string): Promise<BlockedParticipant[]> {
     try {
-      let query = externalSupabase
+      let query = supabase
         .from('blocked_participations')
         .select('*')
         .order('blocked_at', { ascending: false });
@@ -239,7 +239,7 @@ export const ExternalBackendAnalyticsService = {
    */
   async unblockParticipant(blockedParticipantId: string): Promise<boolean> {
     try {
-      const { error } = await externalSupabase
+      const { error } = await supabase
         .from('blocked_participations')
         .delete()
         .eq('id', blockedParticipantId);
@@ -269,7 +269,7 @@ export const ExternalBackendAnalyticsService = {
     try {
       console.error('🔍 [DEBUG START] Fetching campaign_analytics for:', campaignId);
       
-      const { data, error } = await externalSupabase
+      const { data, error } = await supabase
         .from('campaign_analytics')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -294,7 +294,7 @@ export const ExternalBackendAnalyticsService = {
    */
   async getCampaignSettings(campaignId: string | null): Promise<CampaignSettings | null> {
     try {
-      const { data, error } = await externalSupabase
+      const { data, error } = await supabase
         .rpc('get_campaign_settings', { p_campaign_id: campaignId });
 
       if (error) {
@@ -319,7 +319,7 @@ export const ExternalBackendAnalyticsService = {
     settings: Partial<Omit<CampaignSettings, 'id' | 'campaign_id' | 'created_at' | 'updated_at'>>
   ): Promise<CampaignSettings | null> {
     try {
-      const { data, error } = await externalSupabase.rpc('upsert_campaign_settings', {
+      const { data, error } = await supabase.rpc('upsert_campaign_settings', {
         p_campaign_id: campaignId,
         p_ip_max_attempts: settings.ip_max_attempts,
         p_ip_window_minutes: settings.ip_window_minutes,

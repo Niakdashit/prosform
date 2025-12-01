@@ -1,7 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { emailSchema, phoneSchema, nameSchema } from '@/schemas/participation.schema';
 import { ExternalBackendAnalyticsService, CampaignSettings } from './ExternalBackendAnalyticsService';
-import { externalSupabase } from '@/integrations/supabase/externalClient';
 import { z } from 'zod';
 
 export interface ParticipationData {
@@ -315,7 +314,7 @@ export const ParticipationService = {
       }
 
       // Mettre à jour les analytics de la campagne (table campaign_analytics sur backend externe)
-      const { data: existingAnalytics, error: fetchError } = await externalSupabase
+      const { data: existingAnalytics, error: fetchError } = await supabase
         .from('campaign_analytics')
         .select('id, total_views, total_participations, total_completions')
         .eq('campaign_id', data.campaignId)
@@ -329,7 +328,7 @@ export const ParticipationService = {
       const isWin = data.result.type === 'win';
 
       if (!existingAnalytics) {
-        const { error: insertAnalyticsError } = await externalSupabase
+        const { error: insertAnalyticsError } = await supabase
           .from('campaign_analytics')
           .insert({
             campaign_id: data.campaignId,
@@ -343,7 +342,7 @@ export const ParticipationService = {
           console.error('Error inserting campaign analytics (external):', insertAnalyticsError);
         }
       } else {
-        const { error: updateAnalyticsError } = await externalSupabase
+        const { error: updateAnalyticsError } = await supabase
           .from('campaign_analytics')
           .update({
             // Ne plus incrémenter total_views ici - c'est géré par AnalyticsTrackingService

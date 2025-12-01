@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { externalSupabase } from '@/integrations/supabase/externalClient';
+import { supabase } from '@/integrations/supabase/client';
 import type { Campaign } from '@/types/campaign';
 import { Loader2 } from 'lucide-react';
 import { PublicCampaignRenderer } from '@/components/PublicCampaignRenderer';
@@ -32,7 +32,7 @@ export default function PublicCampaign() {
       setError(null);
 
       // Charger la campagne depuis le slug public
-      const { data, error: supabaseError } = await externalSupabase
+      const { data, error: supabaseError } = await supabase
         .from('campaigns')
         .select('*')
         .eq('public_url_slug', campaignSlug)

@@ -1,4 +1,4 @@
-import { externalSupabase } from '@/integrations/supabase/externalClient';
+import { supabase } from '@/integrations/supabase/client';
 import type { ContactField } from '@/components/WheelBuilder';
 
 export interface SavedForm {
@@ -11,7 +11,7 @@ export interface SavedForm {
 
 export const FormTemplateService = {
   async getAll(): Promise<SavedForm[]> {
-    const { data, error } = await externalSupabase
+    const { data, error } = await supabase
       .from('saved_forms')
       .select('*')
       .order('created_at', { ascending: false });
@@ -25,7 +25,7 @@ export const FormTemplateService = {
   },
 
   async getById(id: string): Promise<SavedForm | null> {
-    const { data, error } = await externalSupabase
+    const { data, error } = await supabase
       .from('saved_forms')
       .select('*')
       .eq('id', id)
@@ -40,7 +40,7 @@ export const FormTemplateService = {
   },
 
   async create(name: string, fields: ContactField[]): Promise<SavedForm> {
-    const { data, error } = await externalSupabase
+    const { data, error } = await supabase
       .from('saved_forms')
       .insert({ name, fields })
       .select()
@@ -55,7 +55,7 @@ export const FormTemplateService = {
   },
 
   async update(id: string, name: string, fields: ContactField[]): Promise<SavedForm> {
-    const { data, error } = await externalSupabase
+    const { data, error } = await supabase
       .from('saved_forms')
       .update({ name, fields })
       .eq('id', id)
@@ -71,7 +71,7 @@ export const FormTemplateService = {
   },
 
   async delete(id: string): Promise<void> {
-    const { error } = await externalSupabase
+    const { error } = await supabase
       .from('saved_forms')
       .delete()
       .eq('id', id);
@@ -83,7 +83,7 @@ export const FormTemplateService = {
   },
 
   async search(query: string): Promise<SavedForm[]> {
-    const { data, error } = await externalSupabase
+    const { data, error } = await supabase
       .from('saved_forms')
       .select('*')
       .ilike('name', `%${query}%`)

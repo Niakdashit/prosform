@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Dices, History, Filter, Users, Calendar, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { externalSupabase } from "@/integrations/supabase/externalClient";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ExportService } from "@/services/ExportService";
 import {
@@ -134,7 +134,7 @@ export default function PrizeDraws() {
     setLoading(true);
     try {
       // Charger le nom de la campagne
-      const { data: campaign } = await externalSupabase
+      const { data: campaign } = await supabase
         .from('campaigns')
         .select('app_title')
         .eq('id', campaignId)
@@ -143,7 +143,7 @@ export default function PrizeDraws() {
       if (campaign) setCampaignName(campaign.app_title);
 
       // Charger toutes les participations
-      const { data: allPartData } = await externalSupabase
+      const { data: allPartData } = await supabase
         .from('campaign_participants')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -172,7 +172,7 @@ export default function PrizeDraws() {
       setUniqueParticipations(uniqueByIP);
 
       // Charger l'historique des tirages
-      const { data: drawsData } = await externalSupabase
+      const { data: drawsData } = await supabase
         .from('prize_draws')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -194,7 +194,7 @@ export default function PrizeDraws() {
   const loadOptIns = async () => {
     try {
       // Récupérer toutes les participations avec leurs données
-      const { data: participations } = await externalSupabase
+      const { data: participations } = await supabase
         .from('campaign_participants')
         .select('participation_data')
         .eq('campaign_id', campaignId)
@@ -233,7 +233,7 @@ export default function PrizeDraws() {
 
   const loadOptInParticipants = async (optIn: OptIn) => {
     try {
-      const { data: participants } = await externalSupabase
+      const { data: participants } = await supabase
         .from('campaign_participants')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -305,7 +305,7 @@ export default function PrizeDraws() {
       const winners = shuffled.slice(0, winnersCount);
 
       // Enregistrer le tirage
-      const { error } = await externalSupabase
+      const { error } = await supabase
         .from('prize_draws')
         .insert({
           campaign_id: campaignId,

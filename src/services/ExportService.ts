@@ -1,4 +1,4 @@
-import { externalSupabase } from '@/integrations/supabase/externalClient';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Service pour exporter les données des participants
@@ -29,7 +29,7 @@ export const ExportService = {
    */
   async getParticipantsForExport(campaignId: string): Promise<ParticipantExport[]> {
     try {
-      const { data, error } = await externalSupabase
+      const { data, error } = await supabase
         .from('participant_export_view')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -159,7 +159,7 @@ export const ExportService = {
    */
   async exportAllCampaigns(): Promise<boolean> {
     try {
-      const { data, error } = await externalSupabase
+      const { data, error } = await supabase
         .from('participant_export_view')
         .select('*')
         .order('created_at', { ascending: false });
