@@ -125,23 +125,15 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
       </aside>
 
-      {/* Main content area */}
-      <div
-        className="flex-1 ml-24 flex flex-col backdrop-blur-4xl relative overflow-x-hidden"
+      {/* Top header - Fixed */}
+      <header
+        className="h-[56px] flex items-center justify-between px-6 fixed top-0 left-24 right-0 z-20 backdrop-blur-4xl overflow-x-hidden"
         style={{
-          backgroundColor: "rgba(226, 232, 240, 0.12)",
-          zIndex: 2,
+          background:
+            "linear-gradient(90deg, rgba(39, 7, 54, 0.98) 0%, rgba(30, 15, 60, 0.98) 40%, rgba(25, 20, 70, 0.98) 100%)",
+          borderBottom: "none",
         }}
       >
-        {/* Top header */}
-        <header
-          className="h-[56px] flex items-center justify-between px-6 sticky top-0 z-20 backdrop-blur-4xl overflow-x-hidden"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(39, 7, 54, 0.98) 0%, rgba(30, 15, 60, 0.98) 40%, rgba(25, 20, 70, 0.98) 100%)",
-            borderBottom: "none",
-          }}
-        >
           <div />
 
           <div className="flex items-center gap-3">
@@ -183,8 +175,16 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </header>
 
+      {/* Main content area */}
+      <div
+        className="flex-1 ml-24 pt-[56px] backdrop-blur-4xl relative overflow-x-hidden"
+        style={{
+          backgroundColor: "rgba(226, 232, 240, 0.12)",
+          zIndex: 2,
+        }}
+      >
         {/* Page content with rounded liquid glass frame */}
-        <main className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
+        <main className="h-full p-4 overflow-y-auto overflow-x-hidden">
           <div
             className="min-h-full rounded-[28px] p-6 relative overflow-x-auto"
             style={{
