@@ -327,28 +327,32 @@ export const QuizSettingsPanel = ({
 
                     <Separator />
 
-                    {/* Background Image */}
+                    {/* Background Image - masqué pour mobile-centered, desktop-panel, desktop-card */}
                     {config.welcomeScreen.applyBackgroundToAll ? (
                       <div className="text-xs text-muted-foreground italic">
                         Background appliqué depuis Welcome Screen
                       </div>
                     ) : (
-                      <BackgroundUploader
-                        desktopImage={config.contactScreen.backgroundImage}
-                        mobileImage={config.contactScreen.backgroundImageMobile}
-                        onDesktopImageChange={(image) => onUpdateConfig({
-                          contactScreen: { ...config.contactScreen, backgroundImage: image }
-                        })}
-                        onDesktopImageRemove={() => onUpdateConfig({
-                          contactScreen: { ...config.contactScreen, backgroundImage: undefined }
-                        })}
-                        onMobileImageChange={(image) => onUpdateConfig({
-                          contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
-                        })}
-                        onMobileImageRemove={() => onUpdateConfig({
-                          contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
-                        })}
-                      />
+                      (config.contactScreen.desktopLayout !== 'desktop-panel' && 
+                       config.contactScreen.desktopLayout !== 'desktop-card' &&
+                       config.contactScreen.mobileLayout !== 'mobile-centered') && (
+                        <BackgroundUploader
+                          desktopImage={config.contactScreen.backgroundImage}
+                          mobileImage={config.contactScreen.backgroundImageMobile}
+                          onDesktopImageChange={(image) => onUpdateConfig({
+                            contactScreen: { ...config.contactScreen, backgroundImage: image }
+                          })}
+                          onDesktopImageRemove={() => onUpdateConfig({
+                            contactScreen: { ...config.contactScreen, backgroundImage: undefined }
+                          })}
+                          onMobileImageChange={(image) => onUpdateConfig({
+                            contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
+                          })}
+                          onMobileImageRemove={() => onUpdateConfig({
+                            contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
+                          })}
+                        />
+                      )
                     )}
 
                     <Separator />

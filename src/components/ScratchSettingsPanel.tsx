@@ -226,28 +226,32 @@ export const ScratchSettingsPanel = ({
 
                     <Separator />
 
-                    {/* Background Image */}
+                    {/* Background Image - masqué pour mobile-centered, desktop-panel, desktop-card */}
                     {scratchConfig.welcomeScreen.applyBackgroundToAll ? (
                       <div className="text-xs text-muted-foreground italic">
                         Background appliqué depuis Welcome Screen
                       </div>
                     ) : (
-                      <BackgroundUploader
-                        desktopImage={scratchConfig.contactForm.backgroundImage}
-                        mobileImage={scratchConfig.contactForm.backgroundImageMobile}
-                        onDesktopImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...scratchConfig.contactForm, backgroundImage: image }
-                        })}
-                        onDesktopImageRemove={() => onUpdateConfig({
-                          contactForm: { ...scratchConfig.contactForm, backgroundImage: undefined }
-                        })}
-                        onMobileImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...scratchConfig.contactForm, backgroundImageMobile: image }
-                        })}
-                        onMobileImageRemove={() => onUpdateConfig({
-                          contactForm: { ...scratchConfig.contactForm, backgroundImageMobile: undefined }
-                        })}
-                      />
+                      (scratchConfig.contactForm.desktopLayout !== 'desktop-panel' && 
+                       scratchConfig.contactForm.desktopLayout !== 'desktop-card' &&
+                       scratchConfig.contactForm.mobileLayout !== 'mobile-centered') && (
+                        <BackgroundUploader
+                          desktopImage={scratchConfig.contactForm.backgroundImage}
+                          mobileImage={scratchConfig.contactForm.backgroundImageMobile}
+                          onDesktopImageChange={(image) => onUpdateConfig({
+                            contactForm: { ...scratchConfig.contactForm, backgroundImage: image }
+                          })}
+                          onDesktopImageRemove={() => onUpdateConfig({
+                            contactForm: { ...scratchConfig.contactForm, backgroundImage: undefined }
+                          })}
+                          onMobileImageChange={(image) => onUpdateConfig({
+                            contactForm: { ...scratchConfig.contactForm, backgroundImageMobile: image }
+                          })}
+                          onMobileImageRemove={() => onUpdateConfig({
+                            contactForm: { ...scratchConfig.contactForm, backgroundImageMobile: undefined }
+                          })}
+                        />
+                      )
                     )}
 
                     <Separator />
