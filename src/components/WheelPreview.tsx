@@ -37,6 +37,7 @@ interface WheelPreviewProps {
   onGoToEnding?: (isWin: boolean) => void;
   prizes?: Prize[];
   onUpdatePrize?: (prize: Prize) => void;
+  onAssetsReady?: () => void;
 }
 
 export const WheelPreview = ({ 
@@ -50,7 +51,8 @@ export const WheelPreview = ({
   onNext,
   onGoToEnding,
   prizes = [],
-  onUpdatePrize
+  onUpdatePrize,
+  onAssetsReady
 }: WheelPreviewProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [contactData, setContactData] = useState({ name: '', email: '', phone: '' });
@@ -1272,6 +1274,7 @@ export const WheelPreview = ({
                         : undefined
                     }
                     showBulbs={true}
+                    onAssetsReady={onAssetsReady}
                   />
                 </div>
               );

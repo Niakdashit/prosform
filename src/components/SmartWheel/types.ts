@@ -49,6 +49,7 @@ export interface SmartWheelProps {
   onResult?: (segment: WheelSegment) => void;
   onComplete?: (prize: string | null, segmentId?: string) => void; // Callback quand le jeu est terminé
   onShowParticipationModal?: () => void; // Callback pour ouvrir le modal de participation au niveau supérieur
+  onAssetsReady?: () => void; // Callback quand tous les assets sont chargés
   brandColors?: {
     primary: string;
     secondary: string;

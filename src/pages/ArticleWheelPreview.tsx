@@ -10,6 +10,7 @@ const ArticleWheelPreview = () => {
   const [theme, setTheme] = useState<ThemeSettings | null>(null);
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     // Load configs from localStorage
@@ -174,6 +175,14 @@ const ArticleWheelPreview = () => {
         
         return (
           <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
+            {/* Overlay blanc tant que les assets ne sont pas chargés */}
+            {!assetsReady && (
+              <div 
+                className="absolute inset-0 z-50"
+                style={{ backgroundColor: articleConfig.frameColor }}
+              />
+            )}
+            
             <div 
               style={{ 
                 transform: viewMode === 'mobile' ? 'scale(0.6)' : 'scale(0.8)',
@@ -195,6 +204,7 @@ const ArticleWheelPreview = () => {
                     : undefined
                 }
                 showBulbs={true}
+                onAssetsReady={() => setAssetsReady(true)}
               />
             </div>
           </div>
