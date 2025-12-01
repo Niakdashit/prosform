@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Loader2, Sparkles } from 'lucide-react';
+import { Search, Loader2, FilePlus } from 'lucide-react';
 import { useFormTemplates } from '@/hooks/useFormTemplates';
 import type { SavedForm } from '@/services/FormTemplateService';
 import { createExampleForm } from '@/utils/createExampleForm';
@@ -34,7 +34,6 @@ export function FormTemplateModal({
   const [formName, setFormName] = useState('');
   const [updateExisting, setUpdateExisting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isCreatingExample, setIsCreatingExample] = useState(false);
 
   useEffect(() => {
     if (mode === 'load') {
@@ -75,16 +74,11 @@ export function FormTemplateModal({
     }
   };
 
-  const handleCreateExample = async () => {
-    setIsCreatingExample(true);
-    try {
-      await createExampleForm();
-      // Rafraîchir la liste
-      window.location.reload();
-    } catch (error) {
-      console.error('Error creating example form:', error);
-    } finally {
-      setIsCreatingExample(false);
+  const handleCreateNew = () => {
+    // Vider tous les champs du formulaire
+    if (onLoad) {
+      onLoad([]);
+      onOpenChange(false);
     }
   };
 
@@ -111,21 +105,11 @@ export function FormTemplateModal({
               </div>
               <Button
                 variant="outline"
-                onClick={handleCreateExample}
-                disabled={isCreatingExample}
+                onClick={handleCreateNew}
                 className="shrink-0"
               >
-                {isCreatingExample ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Création...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Créer exemple
-                  </>
-                )}
+                <FilePlus className="w-4 h-4 mr-2" />
+                Nouveau
               </Button>
             </div>
 
