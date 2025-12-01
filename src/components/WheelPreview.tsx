@@ -1548,9 +1548,9 @@ export const WheelPreview = ({
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
-          height: isMobileResponsive ? '100vh' : (viewMode === 'desktop' ? '100vh' : '100vh'),
-          minHeight: isMobileResponsive ? undefined : '100vh',
-          maxHeight: isMobileResponsive ? undefined : '100vh',
+          height: isMobileResponsive ? '100%' : undefined,
+          minHeight: '100vh',
+          maxHeight: undefined,
         }}
       >
         {/* Background image from config settings - doit être AVANT le header dans le DOM */}
