@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Eye, Save, Globe, Loader2, X } from "lucide-react";
+import { Eye, Save, Globe, Loader2, X, Palette, Gift } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   AlertDialog,
@@ -20,9 +20,11 @@ interface QuizTopToolbarProps {
   onPublish?: () => void;
   isSaving?: boolean;
   hasUnsavedChanges?: boolean;
+  activeTab: 'design' | 'campaign' | 'templates';
+  onTabChange: (tab: 'design' | 'campaign' | 'templates') => void;
 }
 
-export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges }: QuizTopToolbarProps) => {
+export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges, activeTab, onTabChange }: QuizTopToolbarProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [showExitDialog, setShowExitDialog] = useState(false);
@@ -42,8 +44,38 @@ export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsa
 
   return (
     <>
-      <div className={`h-12 bg-card border-b border-border flex items-center ${isMobile ? 'overflow-x-auto' : 'justify-end'} px-3`}>
-        <div className={`flex items-center gap-2 ${isMobile ? 'flex-shrink-0' : ''}`}>
+      <div className={`h-12 bg-card border-b border-border flex items-center ${isMobile ? 'overflow-x-auto px-3' : 'justify-center px-3'}`}>
+        <div className={`flex items-center gap-1.5 ${isMobile ? 'flex-shrink-0' : ''}`}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`gap-1.5 h-8 text-xs px-2.5 ${activeTab === 'design' ? 'bg-accent' : ''}`}
+            onClick={() => onTabChange('design')}
+          >
+            <Palette className="w-3.5 h-3.5" />
+            Campagne
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`gap-1.5 h-8 text-xs px-2.5 ${activeTab === 'campaign' ? 'bg-accent' : ''}`}
+            onClick={() => onTabChange('campaign')}
+          >
+            <Gift className="w-3.5 h-3.5" />
+            Paramètres et dotations
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`gap-1.5 h-8 text-xs px-2.5 ${activeTab === 'templates' ? 'bg-accent' : ''}`}
+            onClick={() => onTabChange('templates')}
+          >
+            <Palette className="w-3.5 h-3.5" />
+            Templates
+          </Button>
+        </div>
+
+        <div className={`flex items-center gap-2 ${isMobile ? 'flex-shrink-0 ml-2' : 'absolute right-3'}`}>
           <Button 
             variant="ghost" 
             size="sm" 
