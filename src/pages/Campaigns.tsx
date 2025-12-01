@@ -596,14 +596,18 @@ const Campaigns = () => {
                         <BarChart2 className="w-4 h-4 mr-2" />
                         Statistiques
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/instant-wins?id=${campaign.id}`)}>
-                        <Trophy className="w-4 h-4 mr-2" />
-                        Instants gagnants
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/prize-draws?id=${campaign.id}`)}>
-                        <Ticket className="w-4 h-4 mr-2" />
-                        Tirages au sort
-                      </DropdownMenuItem>
+                      {['wheel', 'jackpot', 'scratch'].includes(campaign.type) && (
+                        <DropdownMenuItem onClick={() => navigate(`/instant-wins?id=${campaign.id}`)}>
+                          <Trophy className="w-4 h-4 mr-2" />
+                          Instants gagnants
+                        </DropdownMenuItem>
+                      )}
+                      {['form', 'quiz'].includes(campaign.type) && (
+                        <DropdownMenuItem onClick={() => navigate(`/prize-draws?id=${campaign.id}`)}>
+                          <Ticket className="w-4 h-4 mr-2" />
+                          Tirages au sort
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={() => handleDuplicate(campaign.id)}>
                         <Copy className="w-4 h-4 mr-2" />
                         Dupliquer
