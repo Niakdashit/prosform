@@ -192,8 +192,8 @@ const defaultTheme: ThemeSettings = {
   backdropBlur: 0,
   
   // Game-specific
-  wheelBorderStyle: 'classic',
-  wheelBorderCustomColor: '#d4d4d8',
+  wheelBorderStyle: 'custom',
+  wheelBorderCustomColor: '#1F2937',
   jackpotTemplate: 'jackpot-3',
   customJackpotFrame: undefined,
   modernJackpotFrameColor: '#F59E0B',
