@@ -839,12 +839,6 @@ export const WheelPreview = ({
             onFocusSubtitle={() => !isReadOnly && setEditingField('contact-subtitle')}
             onBlurTitle={(value) => handleTitleBlur('contact-title', value)}
             onBlurSubtitle={(value) => handleSubtitleBlur('contact-subtitle', value)}
-            onChangeTitle={(value, html) => onUpdateConfig({ contactForm: { ...config.contactForm, title: value, titleHtml: html } })}
-            onChangeSubtitle={(value, html) => onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: value, subtitleHtml: html } })}
-            onClearTitle={() => onUpdateConfig({ contactForm: { ...config.contactForm, title: '', titleHtml: '' } })}
-            onClearSubtitle={() => onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: '', subtitleHtml: '' } })}
-            titleStyle={config.contactForm.titleStyle}
-            subtitleStyle={config.contactForm.subtitleStyle}
             showVariableMenu={showVariableMenu}
             variableTarget={variableTarget}
             menuView={menuView}
