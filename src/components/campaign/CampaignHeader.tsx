@@ -93,7 +93,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
         )}
 
         {/* Logo */}
-        <div className={`flex items-center ${config.showNavigation ? '' : `flex-1 ${logoPositionClass}`}`}>
+        <div className={`flex items-center flex-1 ${logoPositionClass}`}>
           {config.logo ? (
             <img
               src={config.logo}
