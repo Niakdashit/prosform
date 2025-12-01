@@ -271,11 +271,11 @@ const Contacts = () => {
 
             {/* Contacts table */}
             <div 
+              className="overflow-x-auto"
               style={{ 
                 backgroundColor: colors.white, 
                 borderRadius: '8px',
                 border: `1px solid ${colors.border}`,
-                overflow: 'hidden',
               }}
             >
               {/* Table header */}

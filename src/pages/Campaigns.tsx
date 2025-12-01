@@ -477,7 +477,7 @@ const Campaigns = () => {
         {/* Campaigns - List or Grid view */}
         {viewMode === 'list' ? (
           <div 
-            className="relative overflow-hidden"
+            className="relative overflow-x-auto"
             style={{ 
               background: 'rgba(255, 255, 255, 0.25)',
               backdropFilter: 'blur(20px)',
