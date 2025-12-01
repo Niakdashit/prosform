@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { SmartScratch } from "./SmartScratch/SmartScratch";
 import { ParticipationService } from "@/services/ParticipationService";
-import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
+import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantScratchRenderProps {
   config: ScratchConfig;
@@ -19,10 +19,16 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
   const { theme } = useTheme();
   const buttonStyles = getButtonStyles(theme);
 
-  // Track initial welcome view
-  useEffect(() => {
-    AnalyticsTrackingService.trackStepView(campaignId, 'welcome');
-  }, [campaignId]);
+  // Déterminer l'étape actuelle pour le tracking
+  const getCurrentStep = (): 'welcome' | 'contact' | 'game' | 'ending' => {
+    if (activeView === 'welcome') return 'welcome';
+    if (activeView === 'contact') return 'contact';
+    if (activeView === 'scratch') return 'game';
+    return 'ending';
+  };
+
+  // Track automatiquement le temps passé par étape
+  useStepTracking(campaignId, getCurrentStep());
 
   // Determine the winning card once when entering scratch view
   const selectedCard = useMemo(() => {
@@ -42,14 +48,11 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
     if (activeView === 'welcome') {
       if (config.contactForm?.enabled) {
         setActiveView('contact');
-        AnalyticsTrackingService.trackStepView(campaignId, 'contact');
       } else {
         setActiveView('scratch');
-        AnalyticsTrackingService.trackStepView(campaignId, 'game');
       }
     } else if (activeView === 'contact') {
       setActiveView('scratch');
-      AnalyticsTrackingService.trackStepView(campaignId, 'game');
     }
   };
 
@@ -69,7 +72,6 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
     
     setTimeout(() => {
       setActiveView(isWin ? 'ending-win' : 'ending-lose');
-      AnalyticsTrackingService.trackStepView(campaignId, 'ending');
     }, 1500);
   };
 

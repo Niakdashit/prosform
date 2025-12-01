@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import SmartJackpot from "./SmartJackpot/SmartJackpot";
 import { ParticipationService } from "@/services/ParticipationService";
-import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
+import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantJackpotRenderProps {
   config: JackpotConfig;
@@ -19,23 +19,26 @@ export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJack
   const { theme } = useTheme();
   const buttonStyles = getButtonStyles(theme);
 
-  // Track initial welcome view
-  useEffect(() => {
-    AnalyticsTrackingService.trackStepView(campaignId, 'welcome');
-  }, [campaignId]);
+  // Déterminer l'étape actuelle pour le tracking
+  const getCurrentStep = (): 'welcome' | 'contact' | 'game' | 'ending' => {
+    if (activeView === 'welcome') return 'welcome';
+    if (activeView === 'contact') return 'contact';
+    if (activeView === 'jackpot') return 'game';
+    return 'ending';
+  };
+
+  // Track automatiquement le temps passé par étape
+  useStepTracking(campaignId, getCurrentStep());
 
   const handleNext = () => {
     if (activeView === 'welcome') {
       if (config.contactForm?.enabled) {
         setActiveView('contact');
-        AnalyticsTrackingService.trackStepView(campaignId, 'contact');
       } else {
         setActiveView('jackpot');
-        AnalyticsTrackingService.trackStepView(campaignId, 'game');
       }
     } else if (activeView === 'contact') {
       setActiveView('jackpot');
-      AnalyticsTrackingService.trackStepView(campaignId, 'game');
     }
   };
 
@@ -54,7 +57,6 @@ export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJack
     
     setTimeout(() => {
       setActiveView(isWin ? 'ending-win' : 'ending-lose');
-      AnalyticsTrackingService.trackStepView(campaignId, 'ending');
     }, 1500);
   };
 

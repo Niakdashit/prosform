@@ -5,7 +5,7 @@ import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Star, Heart, ThumbsUp, Smile, Meh, Frown } from "lucide-react";
-import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
+import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantFormRenderProps {
   questions: Question[];
@@ -23,19 +23,16 @@ export const ParticipantFormRender = ({ questions, campaignId }: ParticipantForm
   const totalQuestions = questions.length;
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
 
-  // Track each question view (each question is a step)
-  useEffect(() => {
-    if (campaignId && currentQuestion) {
-      // Track welcome for first question, game for others, ending for completion
-      if (currentIndex === 0) {
-        AnalyticsTrackingService.trackStepView(campaignId, 'welcome');
-      } else if (isComplete) {
-        AnalyticsTrackingService.trackStepView(campaignId, 'ending');
-      } else {
-        AnalyticsTrackingService.trackStepView(campaignId, 'game');
-      }
-    }
-  }, [currentIndex, isComplete, campaignId, currentQuestion]);
+  // Déterminer l'étape actuelle pour le tracking
+  const getCurrentStep = (): 'welcome' | 'contact' | 'game' | 'ending' => {
+    if (isComplete) return 'ending';
+    if (currentIndex === 0 && currentQuestion?.type === 'welcome') return 'welcome';
+    if (currentQuestion?.type === 'ending') return 'ending';
+    return 'game';
+  };
+
+  // Track automatiquement le temps passé par étape
+  useStepTracking(campaignId || '', getCurrentStep(), !!campaignId);
 
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {

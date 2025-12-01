@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { StepDurationStorage } from '@/utils/stepDurationStorage';
 
 /**
  * Service pour tracker les vues par étape dans les campagnes
@@ -7,18 +8,28 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const AnalyticsTrackingService = {
   /**
-   * Track une vue pour une étape spécifique
+   * Track une vue pour une étape spécifique avec durée optionnelle
    * @param campaignId ID de la campagne
    * @param step Type d'étape vue (welcome, contact, game, ending)
+   * @param durationSeconds Durée passée sur l'étape (en secondes), optionnel
    */
-  async trackStepView(campaignId: string, step: 'welcome' | 'contact' | 'game' | 'ending'): Promise<void> {
+  async trackStepView(
+    campaignId: string, 
+    step: 'welcome' | 'contact' | 'game' | 'ending',
+    durationSeconds?: number
+  ): Promise<void> {
     try {
-      console.log(`📊 Tracking view: ${step} for campaign ${campaignId}`);
+      console.log(`📊 Tracking view: ${step} for campaign ${campaignId}${durationSeconds ? ` (duration: ${durationSeconds}s)` : ''}`);
+      
+      // Stocker la durée dans sessionStorage pour la récupérer lors de la participation
+      if (durationSeconds !== undefined && durationSeconds > 0) {
+        StepDurationStorage.setStepDuration(campaignId, step, durationSeconds);
+      }
       
       // Vérifier si une entrée existe déjà pour cette campagne
       const { data: existing, error: fetchError } = await supabase
         .from('campaign_analytics')
-        .select('id, total_views')
+        .select('id, total_views, avg_time_spent')
         .eq('campaign_id', campaignId)
         .maybeSingle();
 
@@ -29,12 +40,22 @@ export const AnalyticsTrackingService = {
 
       if (existing) {
         // Incrémenter total_views à chaque étape vue
+        const updateData: any = {
+          total_views: (existing.total_views || 0) + 1,
+          updated_at: new Date().toISOString(),
+        };
+
+        // Si une durée est fournie, recalculer avg_time_spent
+        if (durationSeconds !== undefined && durationSeconds > 0) {
+          const currentTotalTime = (existing.avg_time_spent || 0) * (existing.total_views || 0);
+          const newTotalViews = (existing.total_views || 0) + 1;
+          const newAvgTime = (currentTotalTime + durationSeconds) / newTotalViews;
+          updateData.avg_time_spent = Math.round(newAvgTime);
+        }
+
         const { error } = await supabase
           .from('campaign_analytics')
-          .update({
-            total_views: (existing.total_views || 0) + 1,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updateData)
           .eq('id', existing.id);
 
         if (error) {
