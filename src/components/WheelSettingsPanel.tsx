@@ -7,9 +7,10 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
+import { Upload, X, FolderOpen, Save } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WallpaperUploadModal } from "./WallpaperUploadModal";
+import { FormTemplateModal } from "./FormTemplateModal";
 import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,9 @@ export const WheelSettingsPanel = ({
 }: WheelSettingsPanelProps) => {
   const [wallpaperModalOpen, setWallpaperModalOpen] = useState(false);
   const [activeWallpaperSection, setActiveWallpaperSection] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [templateModalMode, setTemplateModalMode] = useState<'load' | 'save'>('load');
+  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
   
   const handleWallpaperSelect = (imageUrl: string) => {
     switch (activeWallpaperSection) {
@@ -236,6 +240,39 @@ export const WheelSettingsPanel = ({
             {config.contactForm.enabled && (
               <>
                 <Separator />
+                
+                {/* Form Template Actions */}
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setTemplateModalMode('load');
+                      setTemplateModalOpen(true);
+                    }}
+                    className="flex-1"
+                  >
+                    <FolderOpen className="w-4 h-4 mr-2" />
+                    Charger
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setTemplateModalMode('save');
+                      setTemplateModalOpen(true);
+                    }}
+                    className="flex-1"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Sauvegarder
+                  </Button>
+                </div>
+                
+                <Separator />
+                
                 <div>
                   <Label className="text-xs text-muted-foreground mb-2 block">Form title</Label>
                   <Input 
@@ -735,6 +772,26 @@ export const WheelSettingsPanel = ({
         onOpenChange={setWallpaperModalOpen}
         onImageSelect={handleWallpaperSelect}
         currentImage={getCurrentWallpaper()}
+      />
+      
+      <FormTemplateModal
+        open={templateModalOpen}
+        onOpenChange={setTemplateModalOpen}
+        mode={templateModalMode}
+        currentFields={config.contactForm.fields || []}
+        selectedFormId={selectedFormId}
+        onLoad={(fields) => {
+          onUpdateConfig({ 
+            contactForm: { 
+              ...config.contactForm, 
+              fields: fields as ContactField[] 
+            } 
+          });
+          setSelectedFormId(fields.length > 0 ? 'loaded' : null);
+        }}
+        onSave={() => {
+          console.log('Form saved successfully');
+        }}
       />
     </>
   );
