@@ -99,56 +99,6 @@ export type Database = {
           },
         ]
       }
-      daily_analytics: {
-        Row: {
-          id: string
-          campaign_id: string
-          date: string
-          views: number
-          participations: number
-          completions: number
-          unique_visitors: number
-          avg_time_spent: number
-          time_spent_count: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          campaign_id: string
-          date: string
-          views?: number
-          participations?: number
-          completions?: number
-          unique_visitors?: number
-          avg_time_spent?: number
-          time_spent_count?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          campaign_id?: string
-          date?: string
-          views?: number
-          participations?: number
-          completions?: number
-          unique_visitors?: number
-          avg_time_spent?: number
-          time_spent_count?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "daily_analytics_campaign_id_fkey"
-            columns: ["campaign_id"]
-            isOneToOne: false
-            referencedRelation: "campaigns"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       campaign_participants: {
         Row: {
           browser: string | null

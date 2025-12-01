@@ -184,9 +184,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         </header>
 
         {/* Page content with rounded liquid glass frame */}
-        <main className="flex-1 p-4">
+        <main className="flex-1 p-4 overflow-auto">
           <div
-            className="h-full rounded-[28px] p-6 overflow-auto relative"
+            className="min-h-full rounded-[28px] p-6 relative"
             style={{
               background: 'rgba(255, 255, 255, 0.35)',
               backdropFilter: 'blur(24px)',
