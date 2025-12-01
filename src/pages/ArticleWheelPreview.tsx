@@ -193,7 +193,11 @@ const ArticleWheelPreview = () => {
                 brandColors={theme ? { primary: theme.systemColor, secondary: theme.accentColor } : undefined}
                 size={350}
                 borderStyle={theme?.wheelBorderStyle === 'gold' ? 'goldRing' : theme?.wheelBorderStyle === 'silver' ? 'silverRing' : theme?.wheelBorderStyle || 'classic'}
-                customBorderColor={theme?.wheelBorderStyle === 'classic' ? theme?.wheelBorderCustomColor : undefined}
+                customBorderColor={
+                  theme?.wheelBorderStyle === 'classic' || theme?.wheelBorderStyle === 'custom'
+                    ? theme?.wheelBorderCustomColor
+                    : undefined
+                }
                 showBulbs={true}
               />
             </div>
