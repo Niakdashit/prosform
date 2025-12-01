@@ -8,6 +8,7 @@ import { ArticleQuizSettingsPanel } from "./ArticleQuizSettingsPanel";
 import { QuizTopToolbar } from "./QuizTopToolbar";
 import { FloatingToolbar } from "./FloatingToolbar";
 import { ChatToCreate } from "./ChatToCreate";
+import { CampaignSettings } from "./CampaignSettings";
 import { createAIActionHandler } from "@/utils/aiActionHandler";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
@@ -145,6 +146,7 @@ export const ArticleQuizBuilder = () => {
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
 
   useEffect(() => {
     if (isMobile) setViewMode('mobile');
@@ -253,12 +255,35 @@ export const ArticleQuizBuilder = () => {
         onPublish={handlePublish}
         isSaving={isSaving}
         hasUnsavedChanges={hasUnsavedChanges}
-        activeTab="design"
-        onTabChange={() => {}}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
         
       <div className="flex flex-1 overflow-hidden relative">
-        {isMobile ? (
+        {activeTab === 'campaign' ? (
+          <CampaignSettings
+            campaignName={campaignName}
+            onCampaignNameChange={setName}
+            startDate={startDate}
+            onStartDateChange={setStartDate}
+            startTime={startTime}
+            onStartTimeChange={setStartTime}
+            endDate={endDate}
+            onEndDateChange={setEndDate}
+            endTime={endTime}
+            onEndTimeChange={setEndTime}
+            campaignUrl={campaign?.published_url || ''}
+            prizes={[]}
+            onSavePrize={() => {}}
+            onDeletePrize={() => {}}
+            gameType="wheel"
+            segments={[]}
+          />
+        ) : activeTab === 'templates' ? (
+          <div className="flex-1 flex items-center justify-center bg-muted">
+            <p className="text-muted-foreground">Templates à venir</p>
+          </div>
+        ) : isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
               <DrawerContent className="h-[85vh]">
