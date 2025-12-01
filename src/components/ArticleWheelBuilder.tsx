@@ -50,12 +50,10 @@ const defaultWheelConfig: WheelConfig = {
     desktopLayout: "desktop-centered"
   },
   segments: [
-    { id: '1', label: 'Segment 1', color: '#FF6B6B', probability: 16.67 },
-    { id: '2', label: 'Segment 2', color: '#4ECDC4', probability: 16.67 },
-    { id: '3', label: 'Segment 3', color: '#45B7D1', probability: 16.67 },
-    { id: '4', label: 'Segment 4', color: '#FFA07A', probability: 16.67 },
-    { id: '5', label: 'Segment 5', color: '#98D8C8', probability: 16.67 },
-    { id: '6', label: 'Segment 6', color: '#F7DC6F', probability: 16.65 }
+    { id: '1', label: 'Segment 1', color: '#1F2937', probability: 25 },
+    { id: '2', label: 'Segment 2', color: '#FFFFFF', probability: 25 },
+    { id: '3', label: 'Segment 3', color: '#1F2937', probability: 25 },
+    { id: '4', label: 'Segment 4', color: '#FFFFFF', probability: 25 }
   ],
   endingWin: {
     title: "Félicitations !",
