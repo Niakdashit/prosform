@@ -133,9 +133,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           zIndex: 2,
         }}
       >
-        {/* Top header */}
+        {/* Top header - Fixed */}
         <header
-          className="h-[56px] flex items-center justify-between px-6 sticky top-0 z-20 backdrop-blur-4xl"
+          className="h-[56px] flex items-center justify-between px-6 flex-shrink-0 backdrop-blur-4xl"
           style={{
             background:
               "linear-gradient(90deg, rgba(39, 7, 54, 0.98) 0%, rgba(30, 15, 60, 0.98) 40%, rgba(25, 20, 70, 0.98) 100%)",
@@ -183,8 +183,10 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </header>
 
-        {/* Page content with rounded liquid glass frame */}
-        <main className="flex-1 p-4 overflow-auto">
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-auto">
+          {/* Page content with rounded liquid glass frame */}
+          <main className="p-4">
           <div
             className="min-h-full rounded-[28px] p-6 relative"
             style={{
@@ -216,11 +218,10 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 background: 'radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.6) 0%, transparent 60%)',
               }}
             />
-            <div className="relative z-10">
               {children}
             </div>
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );
