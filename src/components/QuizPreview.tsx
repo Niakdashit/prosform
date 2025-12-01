@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { QuizConfig } from "./QuizBuilder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Monitor, Smartphone, Clock, CheckCircle2, XCircle, X, Upload, Edit3, ImagePlus } from "lucide-react";
+import { Monitor, Smartphone, Clock, CheckCircle2, XCircle, X, Upload, Pencil, Trash2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { ImageEditorModal, ImageSettings, defaultSettings } from "./ImageEditorModal";
 import { ImageUploadModal } from "./ImageUploadModal";
@@ -255,7 +255,7 @@ export const QuizPreview = ({
                   style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
                   title="Éditer l'image"
                 >
-                  <Edit3 className="w-4 h-4 text-white" />
+                  <Pencil className="w-4 h-4 text-white" />
                 </button>
                 <button
                   type="button"
@@ -268,7 +268,7 @@ export const QuizPreview = ({
                   className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
                   title="Supprimer l'image"
                 >
-                  <X className="w-4 h-4 text-white" />
+                  <Trash2 className="w-4 h-4 text-white" />
                 </button>
               </div>
             </div>
@@ -818,22 +818,25 @@ export const QuizPreview = ({
                       className="w-full h-full object-cover"
                     />
                     {!isReadOnly && (
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                        <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Change image"
-                        >
-                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
                         <button
                           onClick={() => setShowEditorModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Edit image"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                          title="Éditer l'image"
                         >
-                          <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                          <Pencil className="w-4 h-4 text-white" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            onUpdateConfig({
+                              contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined, backgroundImage: undefined },
+                            });
+                          }}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                          title="Supprimer l'image"
+                        >
+                          <Trash2 className="w-4 h-4 text-white" />
                         </button>
                       </div>
                     )}
@@ -882,22 +885,25 @@ export const QuizPreview = ({
                       className="w-full h-full object-cover"
                     />
                     {!isReadOnly && (
-                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                        <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Change image"
-                        >
-                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
                         <button
                           onClick={() => setShowEditorModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Edit image"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                          title="Éditer l'image"
                         >
-                          <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                          <Pencil className="w-4 h-4 text-white" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            onUpdateConfig({
+                              contactScreen: { ...config.contactScreen, backgroundImage: undefined },
+                            });
+                          }}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                          title="Supprimer l'image"
+                        >
+                          <Trash2 className="w-4 h-4 text-white" />
                         </button>
                       </div>
                     )}
@@ -936,22 +942,25 @@ export const QuizPreview = ({
                       className="w-full h-full object-cover"
                     />
                     {!isReadOnly && (
-                      <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
-                        <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Change image"
-                        >
-                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
+                      <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
                         <button
                           onClick={() => setShowEditorModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Edit image"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                          title="Éditer l'image"
                         >
-                          <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                          <Pencil className="w-4 h-4 text-white" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            onUpdateConfig({
+                              contactScreen: { ...config.contactScreen, backgroundImage: undefined },
+                            });
+                          }}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                          title="Supprimer l'image"
+                        >
+                          <Trash2 className="w-4 h-4 text-white" />
                         </button>
                       </div>
                     )}
