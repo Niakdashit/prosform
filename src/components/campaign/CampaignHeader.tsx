@@ -100,7 +100,6 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
               alt="Logo"
               style={{ 
                 height: config.logoSize || 120,
-                maxHeight: (config.height || 64) - 16,
                 objectFit: 'contain'
               }}
               className="cursor-pointer"
