@@ -241,38 +241,6 @@ export const WheelSettingsPanel = ({
               <>
                 <Separator />
                 
-                {/* Form Template Actions */}
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setTemplateModalMode('load');
-                      setTemplateModalOpen(true);
-                    }}
-                    className="flex-1"
-                  >
-                    <FolderOpen className="w-4 h-4 mr-2" />
-                    Charger
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setTemplateModalMode('save');
-                      setTemplateModalOpen(true);
-                    }}
-                    className="flex-1"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Sauvegarder
-                  </Button>
-                </div>
-                
-                <Separator />
-                
                 <div>
                   <Label className="text-xs text-muted-foreground mb-2 block">Form title</Label>
                   <Input 
@@ -346,6 +314,38 @@ export const WheelSettingsPanel = ({
                     <Separator />
                   </>
                 )}
+
+                {/* Form Template Actions */}
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setTemplateModalMode('load');
+                      setTemplateModalOpen(true);
+                    }}
+                    className="flex-1"
+                  >
+                    <FolderOpen className="w-4 h-4 mr-2" />
+                    Charger
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setTemplateModalMode('save');
+                      setTemplateModalOpen(true);
+                    }}
+                    className="flex-1"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Sauvegarder
+                  </Button>
+                </div>
+                
+                <Separator />
 
                 {/* Fields Manager */}
                 <div className="space-y-3">
