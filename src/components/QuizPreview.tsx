@@ -153,6 +153,8 @@ export const QuizPreview = ({
   const handleTitleBlur = (field: string, value: string) => {
     if (field === 'welcome-title' && value.trim() !== config.welcomeScreen.title) {
       onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, title: value.trim() } });
+    } else if (field === 'contact-title' && value.trim() !== config.contactScreen.title) {
+      onUpdateConfig({ contactScreen: { ...config.contactScreen, title: value.trim() } });
     } else if (field === 'result-title' && value.trim() !== config.resultScreen.title) {
       onUpdateConfig({ resultScreen: { ...config.resultScreen, title: value.trim() } });
     }
@@ -162,6 +164,8 @@ export const QuizPreview = ({
   const handleSubtitleBlur = (field: string, value: string) => {
     if (field === 'welcome-subtitle' && value.trim() !== config.welcomeScreen.subtitle) {
       onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, subtitle: value.trim() } });
+    } else if (field === 'contact-subtitle' && value.trim() !== config.contactScreen.subtitle) {
+      onUpdateConfig({ contactScreen: { ...config.contactScreen, subtitle: value.trim() } });
     } else if (field === 'result-subtitle' && value.trim() !== config.resultScreen.subtitle) {
       onUpdateConfig({ resultScreen: { ...config.resultScreen, subtitle: value.trim() } });
     }
@@ -634,7 +638,29 @@ export const QuizPreview = ({
             backgroundColor={theme.backgroundColor}
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
+            editingField={editingField}
             isReadOnly={isReadOnly}
+            onFocusTitle={() => !isReadOnly && setEditingField('contact-title')}
+            onFocusSubtitle={() => !isReadOnly && setEditingField('contact-subtitle')}
+            onBlurTitle={(value) => handleTitleBlur('contact-title', value)}
+            onBlurSubtitle={(value) => handleSubtitleBlur('contact-subtitle', value)}
+            onChangeTitle={(value, html) => onUpdateConfig({ contactScreen: { ...config.contactScreen, title: value, titleHtml: html } })}
+            onChangeSubtitle={(value, html) => onUpdateConfig({ contactScreen: { ...config.contactScreen, subtitle: value, subtitleHtml: html } })}
+            onClearTitle={() => onUpdateConfig({ contactScreen: { ...config.contactScreen, title: '', titleHtml: '' } })}
+            onClearSubtitle={() => onUpdateConfig({ contactScreen: { ...config.contactScreen, subtitle: '', subtitleHtml: '' } })}
+            showVariableMenu={showVariableMenu}
+            variableTarget={variableTarget}
+            menuView={menuView}
+            onToggleVariableMenu={(target) => {
+              setVariableTarget(target);
+              setShowVariableMenu(prev => !prev);
+              setMenuView('main');
+            }}
+            onSetMenuView={setMenuView}
+            availableVariables={availableVariables}
+            onInsertVariable={insertVariable}
+            titleStyle={config.contactScreen.titleStyle}
+            subtitleStyle={config.contactScreen.subtitleStyle}
           />
         );
       }

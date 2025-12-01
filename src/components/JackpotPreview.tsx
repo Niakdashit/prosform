@@ -822,6 +822,8 @@ export const JackpotPreview = ({
             onSetMenuView={setMenuView}
             availableVariables={availableVariables}
             onInsertVariable={insertVariable}
+            titleStyle={config.contactForm.titleStyle}
+            subtitleStyle={config.contactForm.subtitleStyle}
           />
         );
 

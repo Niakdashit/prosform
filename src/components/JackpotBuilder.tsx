@@ -60,7 +60,9 @@ export interface ContactField {
   type: 'text' | 'email' | 'phone' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'date'; // Type de champ
   required: boolean;
   label: string;
+  placeholder?: string; // Placeholder pour les champs de texte
   options?: string[]; // Pour les champs select
+  helpText?: string; // Texte d'aide pour les checkboxes (opt-ins)
 }
 
 export interface TextStyle {

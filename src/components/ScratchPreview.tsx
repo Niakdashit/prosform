@@ -813,12 +813,23 @@ export const ScratchPreview = ({
             isReadOnly={isReadOnly}
             onFocusTitle={() => !isReadOnly && setEditingField('contact-title')}
             onFocusSubtitle={() => !isReadOnly && setEditingField('contact-subtitle')}
-            onBlurTitle={() => setEditingField(null)}
-            onBlurSubtitle={() => setEditingField(null)}
+            onBlurTitle={(value) => handleTitleBlur('contact-title', value)}
+            onBlurSubtitle={(value) => handleSubtitleBlur('contact-subtitle', value)}
             onChangeTitle={(value, html) => onUpdateConfig({ contactForm: { ...config.contactForm, title: value, titleHtml: html } })}
             onChangeSubtitle={(value, html) => onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: value, subtitleHtml: html } })}
             onClearTitle={() => onUpdateConfig({ contactForm: { ...config.contactForm, title: '', titleHtml: '' } })}
             onClearSubtitle={() => onUpdateConfig({ contactForm: { ...config.contactForm, subtitle: '', subtitleHtml: '' } })}
+            showVariableMenu={showVariableMenu}
+            variableTarget={variableTarget}
+            menuView={menuView}
+            onToggleVariableMenu={(target) => {
+              setVariableTarget(target);
+              setShowVariableMenu(prev => !prev);
+              setMenuView('main');
+            }}
+            onSetMenuView={setMenuView}
+            availableVariables={availableVariables}
+            onInsertVariable={insertVariable}
             titleStyle={config.contactForm.titleStyle}
             subtitleStyle={config.contactForm.subtitleStyle}
           />
