@@ -133,9 +133,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           zIndex: 2,
         }}
       >
-        {/* Top header - Fixed */}
+        {/* Top header - Sticky */}
         <header
-          className="h-[56px] flex items-center justify-between px-6 flex-shrink-0 backdrop-blur-4xl"
+          className="h-[56px] flex items-center justify-between px-6 sticky top-0 z-50 backdrop-blur-4xl flex-shrink-0"
           style={{
             background:
               "linear-gradient(90deg, rgba(39, 7, 54, 0.98) 0%, rgba(30, 15, 60, 0.98) 40%, rgba(25, 20, 70, 0.98) 100%)",
