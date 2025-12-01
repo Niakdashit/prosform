@@ -249,8 +249,11 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
 
   return (
     <footer
-      className={`w-full ${paddingClass}`}
-      style={{ backgroundColor: config.backgroundColor }}
+      className={`w-full ${paddingClass} relative`}
+      style={{ 
+        backgroundColor: config.backgroundColor,
+        marginTop: 'auto'
+      }}
     >
       <div className="max-w-7xl mx-auto px-4">
         {config.layout === 'simple' && renderSimpleLayout()}
