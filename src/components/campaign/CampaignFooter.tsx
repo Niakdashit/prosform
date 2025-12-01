@@ -249,7 +249,7 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
 
   return (
     <footer
-      className={`w-full ${paddingClass}`}
+      className={`w-full ${paddingClass} flex-shrink-0`}
       style={{ backgroundColor: config.backgroundColor }}
     >
       <div className="max-w-7xl mx-auto px-4">
