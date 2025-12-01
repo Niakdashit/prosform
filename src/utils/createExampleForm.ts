@@ -8,7 +8,7 @@ export const exampleFormData: ContactField[] = [
     type: 'select',
     label: 'Civilité',
     required: true,
-    options: ['Homme', 'Femme'],
+    options: ['Homme', 'Femme', 'Non-binaire'],
   },
   {
     id: 'nom',
