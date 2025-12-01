@@ -432,12 +432,10 @@ export const JackpotBuilder = () => {
             const configWithoutImages = {
               ...config,
               welcomeScreen: { 
-                ...config.welcomeScreen, 
-                image: undefined, 
-                imageSettings: undefined,
+                ...config.welcomeScreen,
                 backgroundImage: undefined,
                 backgroundImageMobile: undefined,
-                wallpaperImage: undefined
+                wallpaperImage: undefined,
               },
               contactForm: {
                 ...config.contactForm,
