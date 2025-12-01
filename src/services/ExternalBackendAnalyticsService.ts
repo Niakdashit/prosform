@@ -218,6 +218,11 @@ export const ExternalBackendAnalyticsService = {
       const { data, error } = await query;
 
       if (error) {
+        // Si la table n'existe pas, retourner un tableau vide sans erreur
+        if (error.code === 'PGRST205' || error.code === '42P01') {
+          console.warn('Table blocked_participations not found in external database');
+          return [];
+        }
         console.error('Error fetching blocked participants:', error);
         return [];
       }
@@ -240,6 +245,11 @@ export const ExternalBackendAnalyticsService = {
         .eq('id', blockedParticipantId);
 
       if (error) {
+        // Si la table n'existe pas, retourner false sans erreur
+        if (error.code === 'PGRST205' || error.code === '42P01') {
+          console.warn('Table blocked_participations not found in external database');
+          return false;
+        }
         console.error('Error unblocking participant:', error);
         return false;
       }
