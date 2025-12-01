@@ -1,5 +1,6 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { useSmartJackpotRenderer } from './hooks/useSmartJackpotRenderer';
 import './SmartJackpot.css';
 
 interface SpinResult {
@@ -16,29 +17,12 @@ interface SmartJackpotProps {
   onWin?: (result: string[]) => void;
   onLose?: () => void;
   onBeforeSpin?: () => SpinResult | null; // Callback pour déterminer le résultat avant le spin
+  onAssetsReady?: () => void;
   disabled?: boolean;
   spinDuration?: number;
 }
 
 const DEFAULT_SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '⭐', '💎', '🔔', '7️⃣'];
-
-const TEMPLATE_MAP: Record<string, string> = {
-  'jackpot-frame': 'jackpot-frame.svg',
-  'jackpot-2': 'Jackpot 2.svg',
-  'jackpot-3': 'Jackpot 3.svg',
-  'jackpot-4': 'Jackpot 4.svg',
-  'jackpot-5': 'Jackpot 5.svg',
-  'jackpot-6': 'Jackpot 6.svg',
-  'jackpot-8': 'Jackpot 8.svg',
-  'jackpot-9': 'Jackpot 9.svg',
-  'jackpot-10': 'Jackpot 10.svg',
-  'jackpot-11': 'Jackpot 11.svg'
-};
-
-const getTemplateUrl = (templateId: string): string => {
-  const fileName = TEMPLATE_MAP[templateId] || 'Jackpot 11.svg';
-  return encodeURI(`/assets/slot-frames/${fileName}`);
-};
 
 const SLOT_HEIGHT = 80; // must match .reel height in CSS
 const STRIP_LENGTH = 12; // number of symbols in a spinning strip per reel
@@ -52,9 +36,15 @@ const SmartJackpot: React.FC<SmartJackpotProps> = ({
   onWin,
   onLose,
   onBeforeSpin,
+  onAssetsReady,
   disabled = false,
   spinDuration = 2000
 }) => {
+  const { shouldRender, templateUrl } = useSmartJackpotRenderer({
+    template,
+    customTemplateUrl,
+    onAssetsReady
+  });
   const [isSpinning, setIsSpinning] = useState(false);
   const [reels, setReels] = useState<string[]>([symbols[0], symbols[1], symbols[2]]);
   const [strips, setStrips] = useState<string[][]>([
@@ -83,12 +73,6 @@ const SmartJackpot: React.FC<SmartJackpotProps> = ({
     };
   }, []);
 
-  const templateUrl = useMemo(() => {
-    if (template === 'jackpot-custom' && customTemplateUrl) {
-      return customTemplateUrl;
-    }
-    return getTemplateUrl(template);
-  }, [template, customTemplateUrl]);
 
   const getRandomSymbol = useCallback(() => {
     return symbols[Math.floor(Math.random() * symbols.length)];
@@ -186,6 +170,10 @@ const SmartJackpot: React.FC<SmartJackpotProps> = ({
 
   const templateClass = `template-${template}`;
   const isModern = template === 'jackpot-6';
+
+  if (!shouldRender) {
+    return null;
+  }
 
   return (
     <div className={`smart-jackpot-container ${templateClass}`}>
