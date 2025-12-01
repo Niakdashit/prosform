@@ -1539,13 +1539,24 @@ export const WheelPreview = ({
           
           if (!bgImage) return null;
           
+          // Détecter si on est en layout left-right pour adapter le positionnement
+          const isLeftRightLayout = (() => {
+            if (viewMode === 'mobile') return false;
+            switch (activeView) {
+              case 'welcome': return config.welcomeScreen.desktopLayout === 'desktop-left-right';
+              case 'contact': return config.contactForm.desktopLayout === 'desktop-left-right';
+              case 'wheel': return config.wheelScreen.desktopLayout === 'desktop-left-right';
+              default: return false;
+            }
+          })();
+          
           return (
             <div 
               className="absolute inset-0"
               style={{
                 backgroundImage: `url(${bgImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundSize: isLeftRightLayout ? 'cover' : 'cover',
+                backgroundPosition: isLeftRightLayout ? 'left center' : 'center',
                 backgroundRepeat: 'no-repeat',
                 zIndex: 0,
               }}
