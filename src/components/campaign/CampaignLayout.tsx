@@ -56,9 +56,8 @@ export const CampaignLayout = ({
 
   return (
     <div 
-      className={`flex flex-col`}
+      className={`flex flex-col ${config.minHeight === 'screen' ? 'min-h-screen' : ''}`}
       style={{ 
-        minHeight: config.minHeight === 'screen' ? 'calc(100vh + 80px)' : undefined,
         backgroundColor: config.backgroundColor,
         backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : undefined,
         backgroundSize: 'cover',
