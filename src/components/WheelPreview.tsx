@@ -1548,9 +1548,9 @@ export const WheelPreview = ({
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
-          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px'),
-          minHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
-          maxHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
+          height: isMobileResponsive ? '100vh' : (viewMode === 'desktop' ? '100vh' : '100vh'),
+          minHeight: isMobileResponsive ? undefined : '100vh',
+          maxHeight: isMobileResponsive ? undefined : '100vh',
         }}
       >
         {/* Background image from config settings - doit être AVANT le header dans le DOM */}
@@ -1613,8 +1613,8 @@ export const WheelPreview = ({
           </div>
         )}
 
-        {/* Contenu principal avec flex-1 pour prendre l'espace restant */}
-        <div className="flex-1 relative overflow-auto z-10 min-h-0">
+        {/* Contenu principal sans scroll interne, la page gère le scroll */}
+        <div className="flex-1 relative z-10 min-h-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
