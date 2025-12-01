@@ -332,7 +332,7 @@ export const ParticipationService = {
           .from('campaign_analytics')
           .insert({
             campaign_id: data.campaignId,
-            total_views: 1,
+            total_views: 0, // Les vues sont trackées séparément par étape
             total_participations: 1,
             total_completions: isWin ? 1 : 0,
             last_participation_at: new Date().toISOString(),
@@ -345,7 +345,7 @@ export const ParticipationService = {
         const { error: updateAnalyticsError } = await supabase
           .from('campaign_analytics')
           .update({
-            total_views: (existingAnalytics.total_views || 0) + 1,
+            // Ne plus incrémenter total_views ici - c'est géré par AnalyticsTrackingService
             total_participations: (existingAnalytics.total_participations || 0) + 1,
             total_completions: (existingAnalytics.total_completions || 0) + (isWin ? 1 : 0),
             last_participation_at: new Date().toISOString(),

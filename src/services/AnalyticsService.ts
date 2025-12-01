@@ -41,6 +41,18 @@ export interface GlobalStats {
 export const AnalyticsService = {
   
   async getGlobalStats(): Promise<GlobalStats> {
+    // Récupérer la somme de toutes les vues depuis campaign_analytics
+    const { data: analyticsData, error: analyticsError } = await supabase
+      .from('campaign_analytics')
+      .select('total_views, avg_time_spent');
+
+    if (analyticsError) {
+      console.error('Error fetching analytics:', analyticsError);
+    }
+
+    const globalViews = (analyticsData || []).reduce((sum, item: any) => sum + (item.total_views || 0), 0);
+    const avgTimeSpent = (analyticsData || []).reduce((sum, item: any) => sum + (item.avg_time_spent || 0), 0) / Math.max((analyticsData || []).length, 1);
+
     // Utiliser les participations comme source de vérité
     const { data: participants, error: participantsError } = await supabase
       .from('campaign_participants')
@@ -57,7 +69,6 @@ export const AnalyticsService = {
 
     const totals = (participants || []).reduce(
       (acc, participant: any) => {
-        acc.total_views += 1; // 1 vue par participation (simplifié)
         acc.total_participations += 1;
 
         const isWin =
@@ -71,10 +82,8 @@ export const AnalyticsService = {
         return acc;
       },
       {
-        total_views: 0,
         total_participations: 0,
         total_completions: 0,
-        avg_time_spent: 0,
       }
     );
 
@@ -82,15 +91,14 @@ export const AnalyticsService = {
       ? (totals.total_completions / totals.total_participations) * 100
       : 0;
 
-    // Pour l'instant nous ne traquons pas le temps passé précisément
-    const avg_time_spent = 0;
-
     return {
-      ...totals,
+      total_views: globalViews, // Maintenant depuis campaign_analytics
+      total_participations: totals.total_participations,
+      total_completions: totals.total_completions,
       total_campaigns: campaignCount || 0,
       total_winners: totals.total_completions,
       conversion_rate: Math.round(conversion_rate),
-      avg_time_spent,
+      avg_time_spent: Math.round(avgTimeSpent),
     };
   },
   
@@ -102,15 +110,32 @@ export const AnalyticsService = {
 
     if (campaignsError) throw campaignsError;
 
+    // Récupérer les analytics de toutes les campagnes
+    const { data: analyticsData, error: analyticsError } = await supabase
+      .from('campaign_analytics')
+      .select('campaign_id, total_views, avg_time_spent');
+
+    if (analyticsError) {
+      console.error('Error fetching campaign analytics:', analyticsError);
+    }
+
+    // Créer une map pour accès rapide aux analytics
+    const analyticsMap = new Map<string, { total_views: number; avg_time_spent: number }>();
+    (analyticsData || []).forEach((analytics: any) => {
+      analyticsMap.set(analytics.campaign_id, {
+        total_views: analytics.total_views || 0,
+        avg_time_spent: analytics.avg_time_spent || 0,
+      });
+    });
+
     // Récupérer toutes les participations
     const { data: participants, error: participantsError } = await supabase
       .from('campaign_participants')
-      .select('campaign_id, completed_at, participation_data');
+      .select('campaign_id, completed_at, participation_data, created_at');
 
     if (participantsError) throw participantsError;
 
     const statsByCampaign = new Map<string, {
-      total_views: number;
       total_participations: number;
       total_completions: number;
       last_participation_at: string | null;
@@ -119,13 +144,11 @@ export const AnalyticsService = {
     (participants || []).forEach((participant: any) => {
       const id = participant.campaign_id as string;
       const current = statsByCampaign.get(id) || {
-        total_views: 0,
         total_participations: 0,
         total_completions: 0,
         last_participation_at: null,
       };
 
-      current.total_views += 1;
       current.total_participations += 1;
 
       const isWin =
@@ -136,7 +159,7 @@ export const AnalyticsService = {
         current.total_completions += 1;
       }
 
-      const createdAt = (participant as any).created_at as string | undefined;
+      const createdAt = participant.created_at as string | undefined;
       if (createdAt && (!current.last_participation_at || createdAt > current.last_participation_at)) {
         current.last_participation_at = createdAt;
       }
@@ -146,10 +169,14 @@ export const AnalyticsService = {
 
     return (campaigns || []).map(campaign => {
       const stats = statsByCampaign.get(campaign.id) || {
-        total_views: 0,
         total_participations: 0,
         total_completions: 0,
         last_participation_at: null,
+      };
+
+      const analytics = analyticsMap.get(campaign.id) || {
+        total_views: 0,
+        avg_time_spent: 0,
       };
 
       const conversion_rate = stats.total_participations > 0
@@ -160,11 +187,11 @@ export const AnalyticsService = {
         campaign_id: campaign.id,
         campaign_name: (campaign as any).name || 'Sans nom',
         campaign_type: (campaign as any).type || 'unknown',
-        total_views: stats.total_views,
+        total_views: analytics.total_views, // Maintenant depuis campaign_analytics
         total_participations: stats.total_participations,
         total_completions: stats.total_completions,
         conversion_rate,
-        avg_time_spent: 0,
+        avg_time_spent: analytics.avg_time_spent,
         last_participation_at: stats.last_participation_at,
       };
     });
@@ -183,6 +210,19 @@ export const AnalyticsService = {
       return null;
     }
 
+    // Récupérer les analytics de cette campagne
+    const { data: analyticsData, error: analyticsError } = await supabase
+      .from('campaign_analytics')
+      .select('total_views, avg_time_spent')
+      .eq('campaign_id', campaignId)
+      .maybeSingle();
+
+    if (analyticsError) {
+      console.error('Error fetching campaign analytics:', analyticsError);
+    }
+
+    const analytics = analyticsData || { total_views: 0, avg_time_spent: 0 };
+
     // Récupérer les participations de cette campagne
     const { data: participants, error: participantsError } = await supabase
       .from('campaign_participants')
@@ -196,7 +236,6 @@ export const AnalyticsService = {
 
     const totals = (participants || []).reduce(
       (acc, participant: any) => {
-        acc.total_views += 1;
         acc.total_participations += 1;
 
         const isWin =
@@ -215,7 +254,6 @@ export const AnalyticsService = {
         return acc;
       },
       {
-        total_views: 0,
         total_participations: 0,
         total_completions: 0,
         last_participation_at: null as string | null,
@@ -230,11 +268,11 @@ export const AnalyticsService = {
       campaign_id: campaign.id,
       campaign_name: (campaign as any).name || 'Sans nom',
       campaign_type: (campaign as any).type || 'unknown',
-      total_views: totals.total_views,
+      total_views: analytics.total_views, // Maintenant depuis campaign_analytics
       total_participations: totals.total_participations,
       total_completions: totals.total_completions,
       conversion_rate,
-      avg_time_spent: 0,
+      avg_time_spent: analytics.avg_time_spent,
       last_participation_at: totals.last_participation_at,
     };
   },
