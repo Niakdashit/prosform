@@ -51,6 +51,7 @@ export const ScratchPreview = ({
   const [showVariableMenu, setShowVariableMenu] = useState(false);
   const [variableTarget, setVariableTarget] = useState<'title' | 'subtitle' | null>(null);
   const [menuView, setMenuView] = useState<'main' | 'variables'>('main');
+  const [startedCardIndex, setStartedCardIndex] = useState<number | null>(null);
   // Utiliser l'image de la config si disponible
   const [uploadedImage, setUploadedImage] = useState<string | null>(config.welcomeScreen.image || null);
   const [imageRotation, setImageRotation] = useState(config.welcomeScreen.imageSettings?.rotation || 0);
@@ -124,6 +125,11 @@ export const ScratchPreview = ({
     // Détecter si on vient d'entrer dans la vue scratch
     const justEnteredScratch = activeView === 'scratch' && previousViewRef.current !== 'scratch';
     previousViewRef.current = activeView;
+    
+    // Reset startedCardIndex when entering scratch view
+    if (justEnteredScratch) {
+      setStartedCardIndex(null);
+    }
     
     if (justEnteredScratch && prizes.length > 0) {
       hasDrawnRef.current = true;
@@ -1216,7 +1222,7 @@ export const ScratchPreview = ({
                       return (
                         <div
                           key={index}
-                          className={`flex items-center justify-center ${isLastInThree ? 'col-span-2' : ''}`}
+                          className={`flex items-center justify-center ${isLastInThree ? 'col-span-2' : ''} ${startedCardIndex !== null && startedCardIndex !== index ? 'opacity-40 pointer-events-none' : ''}`}
                           style={{ 
                             width:
                               viewMode === 'desktop'
@@ -1265,6 +1271,12 @@ export const ScratchPreview = ({
                               brushSize={config.scratchScreen.brushSize}
                               revealText={finalRevealText}
                               revealImage={finalRevealImage}
+                              disabled={startedCardIndex !== null && startedCardIndex !== index}
+                              onStart={() => {
+                                if (startedCardIndex === null) {
+                                  setStartedCardIndex(index);
+                                }
+                              }}
                               onComplete={() => {
                                 console.log('🎫 [ScratchPreview] Carte grattée, résultat:', drawResult);
                                 
