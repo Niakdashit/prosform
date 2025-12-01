@@ -221,6 +221,30 @@ const Stats = () => {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div 
+          className="flex flex-col items-center justify-center h-[calc(100vh-200px)]"
+          style={{ fontFamily: "'DM Sans', sans-serif" }}
+        >
+          <div className="relative">
+            <div 
+              className="w-16 h-16 rounded-full animate-spin"
+              style={{
+                border: '3px solid rgba(245, 202, 60, 0.2)',
+                borderTopColor: colors.gold,
+              }}
+            />
+          </div>
+          <p className="mt-6 text-sm" style={{ color: colors.muted }}>
+            Chargement des statistiques...
+          </p>
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
