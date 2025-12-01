@@ -56,12 +56,13 @@ export const CampaignLayout = ({
 
   return (
     <div 
-      className={`flex flex-col ${config.minHeight === 'screen' ? 'min-h-screen' : ''}`}
+      className={`flex flex-col`}
       style={{ 
         backgroundColor: config.backgroundColor,
         backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        minHeight: '100vh',
       }}
     >
       {/* Overlay si image de fond */}
@@ -81,14 +82,14 @@ export const CampaignLayout = ({
         onConfigChange={onHeaderChange}
       />
 
-      {/* Contenu principal - avec min-height pour forcer le footer à dépasser */}
-      <main className={`flex-grow flex flex-col items-center ${paddingClass} relative z-10`} style={{ minHeight: 'calc(100vh - 60px)' }}>
+      {/* Contenu principal - prend au moins la hauteur viewport moins header/première ligne footer */}
+      <main className={`flex-grow flex flex-col items-center ${paddingClass} relative z-10`} style={{ minHeight: 'calc(100vh - 120px)' }}>
         <div className={`w-full ${maxWidthClass}`}>
           {children}
         </div>
       </main>
 
-      {/* Footer - ne sera jamais compressé */}
+      {/* Footer - s'étend naturellement et pousse en dehors de l'écran */}
       <CampaignFooter 
         config={config.footer} 
         isPreview={isPreview}
