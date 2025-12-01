@@ -140,6 +140,7 @@ export interface ScratchConfig {
     backgroundImage?: string;
     backgroundImageMobile?: string;
     scratchColor: string;
+    scratchImage?: string;
     cardWidth: number;
     cardHeight: number;
     threshold: number;

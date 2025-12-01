@@ -504,24 +504,85 @@ export const ScratchSettingsPanel = ({
         return (
           <div className="space-y-4">
             <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Couleur de grattage</Label>
-              <div className="flex gap-2">
-                <Input 
-                  type="color" 
-                  value={config.scratchScreen.scratchColor}
-                  onChange={(e) => onUpdateConfig({
-                    scratchScreen: { ...config.scratchScreen, scratchColor: e.target.value }
-                  })}
-                  className="h-8 w-16" 
-                />
-                <Input 
-                  type="text" 
-                  value={config.scratchScreen.scratchColor}
-                  onChange={(e) => onUpdateConfig({
-                    scratchScreen: { ...config.scratchScreen, scratchColor: e.target.value }
-                  })}
-                  className="h-8 text-xs flex-1" 
-                />
+              <Label className="text-xs text-muted-foreground mb-2 block">Surface de grattage</Label>
+              
+              {/* Color option */}
+              <div className="space-y-2">
+                <Label className="text-[11px] text-muted-foreground">Couleur</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    type="color" 
+                    value={config.scratchScreen.scratchColor}
+                    onChange={(e) => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, scratchColor: e.target.value }
+                    })}
+                    className="h-8 w-16" 
+                  />
+                  <Input 
+                    type="text" 
+                    value={config.scratchScreen.scratchColor}
+                    onChange={(e) => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, scratchColor: e.target.value }
+                    })}
+                    className="h-8 text-xs flex-1" 
+                  />
+                </div>
+              </div>
+
+              {/* Image option */}
+              <div className="mt-3">
+                <Label className="text-[11px] text-muted-foreground mb-2 block">Ou image</Label>
+                <div className="flex gap-2 items-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            onUpdateConfig({
+                              scratchScreen: { 
+                                ...config.scratchScreen, 
+                                scratchImage: event.target?.result as string 
+                              }
+                            });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      };
+                      input.click();
+                    }}
+                    className="h-8 text-xs"
+                  >
+                    Upload image
+                  </Button>
+                  {config.scratchScreen.scratchImage && (
+                    <>
+                      <img 
+                        src={config.scratchScreen.scratchImage} 
+                        alt="Scratch surface" 
+                        className="w-12 h-8 object-cover rounded border"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onUpdateConfig({
+                          scratchScreen: { ...config.scratchScreen, scratchImage: undefined }
+                        })}
+                        className="h-8 text-xs"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             
