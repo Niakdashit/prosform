@@ -158,7 +158,7 @@ export const ScratchSettingsPanel = ({
                     onMobileLayoutChange={(layout) => onUpdateConfig({
                       contactForm: { ...scratchConfig.contactForm, mobileLayout: layout }
                     })}
-                    excludeDesktopLayouts={['desktop-split']}
+                    excludeDesktopLayouts={['desktop-split', 'desktop-right-left', 'desktop-centered']}
                     excludeMobileLayouts={['mobile-centered', 'mobile-minimal']}
                   />
                 </div>

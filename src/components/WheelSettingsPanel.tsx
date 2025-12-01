@@ -219,7 +219,7 @@ export const WheelSettingsPanel = ({
                     onMobileLayoutChange={(layout) => onUpdateConfig({
                       contactForm: { ...config.contactForm, mobileLayout: layout }
                     })}
-                    excludeDesktopLayouts={['desktop-split']}
+                    excludeDesktopLayouts={['desktop-split', 'desktop-right-left', 'desktop-centered']}
                     excludeMobileLayouts={['mobile-centered', 'mobile-minimal']}
                   />
                 </div>
