@@ -49,6 +49,9 @@ const defaultScratchConfig: ScratchConfig = {
     scratchColor: "#C0C0C0",
     cardWidth: 300,
     cardHeight: 200,
+    cardBorderRadius: 16,
+    cardBorderWidth: 0,
+    cardBorderColor: "#000000",
     threshold: 50,
     brushSize: 40
   },

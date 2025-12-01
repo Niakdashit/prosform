@@ -16,6 +16,8 @@ interface SmartScratchProps {
   disabled?: boolean;
   showProgress?: boolean;
   borderRadius?: number;
+  borderWidth?: number;
+  borderColor?: string;
 }
 
 export const SmartScratch: React.FC<SmartScratchProps> = ({
@@ -32,7 +34,9 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
   brushSize = 30,
   disabled = false,
   showProgress = false,
-  borderRadius = 16
+  borderRadius = 16,
+  borderWidth = 0,
+  borderColor = '#000000'
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScratching, setIsScratching] = useState(false);
@@ -195,11 +199,12 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
       style={{ 
         width, 
         height,
-        borderRadius
+        borderRadius,
+        border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none'
       }}
     >
       {/* Contenu révélé */}
-      <div className="reveal-content">
+      <div className="reveal-content" style={{ borderRadius }}>
         {revealContent || (
           revealImage ? (
             <img src={revealImage} alt="Prize" className="reveal-image" />

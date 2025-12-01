@@ -143,6 +143,9 @@ export interface ScratchConfig {
     scratchImage?: string;
     cardWidth: number;
     cardHeight: number;
+    cardBorderRadius: number;
+    cardBorderWidth: number;
+    cardBorderColor: string;
     threshold: number;
     brushSize: number;
   };
@@ -219,6 +222,9 @@ const defaultScratchConfig: ScratchConfig = {
     scratchColor: "#C0C0C0",
     cardWidth: 200,
     cardHeight: 220,
+    cardBorderRadius: 16,
+    cardBorderWidth: 0,
+    cardBorderColor: "#000000",
     threshold: 70,
     brushSize: 40
   },

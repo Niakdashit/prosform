@@ -177,6 +177,9 @@ const ArticleScratchPreview = () => {
               height={config.scratchScreen.cardHeight}
               scratchColor={config.scratchScreen.scratchColor}
               scratchImage={config.scratchScreen.scratchImage}
+              borderRadius={config.scratchScreen.cardBorderRadius}
+              borderWidth={config.scratchScreen.cardBorderWidth}
+              borderColor={config.scratchScreen.cardBorderColor}
               revealText="🎉 Félicitations !"
               threshold={config.scratchScreen.threshold}
               brushSize={config.scratchScreen.brushSize}

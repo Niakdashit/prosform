@@ -184,6 +184,9 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
               height={config.scratchScreen.cardHeight || 200}
               scratchColor={config.scratchScreen.scratchColor || "#C0C0C0"}
               scratchImage={config.scratchScreen.scratchImage}
+              borderRadius={config.scratchScreen.cardBorderRadius || 16}
+              borderWidth={config.scratchScreen.cardBorderWidth || 0}
+              borderColor={config.scratchScreen.cardBorderColor || "#000000"}
               revealContent={
                 <div className="w-full h-full flex items-center justify-center text-2xl font-bold p-4">
                   {selectedCard.revealText}

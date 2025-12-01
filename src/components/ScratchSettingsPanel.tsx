@@ -624,6 +624,64 @@ export const ScratchSettingsPanel = ({
             
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">
+                Arrondi des angles: {config.scratchScreen.cardBorderRadius}px
+              </Label>
+              <Slider
+                value={[config.scratchScreen.cardBorderRadius]}
+                onValueChange={([value]) => onUpdateConfig({
+                  scratchScreen: { ...config.scratchScreen, cardBorderRadius: value }
+                })}
+                min={0}
+                max={50}
+                step={2}
+                className="w-full"
+              />
+            </div>
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Épaisseur bordure: {config.scratchScreen.cardBorderWidth}px
+              </Label>
+              <Slider
+                value={[config.scratchScreen.cardBorderWidth]}
+                onValueChange={([value]) => onUpdateConfig({
+                  scratchScreen: { ...config.scratchScreen, cardBorderWidth: value }
+                })}
+                min={0}
+                max={20}
+                step={1}
+                className="w-full"
+              />
+            </div>
+            
+            {config.scratchScreen.cardBorderWidth > 0 && (
+              <div>
+                <Label className="text-xs text-muted-foreground mb-2 block">Couleur de bordure</Label>
+                <div className="flex gap-2">
+                  <Input 
+                    type="color" 
+                    value={config.scratchScreen.cardBorderColor}
+                    onChange={(e) => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, cardBorderColor: e.target.value }
+                    })}
+                    className="h-8 w-16" 
+                  />
+                  <Input 
+                    type="text" 
+                    value={config.scratchScreen.cardBorderColor}
+                    onChange={(e) => onUpdateConfig({
+                      scratchScreen: { ...config.scratchScreen, cardBorderColor: e.target.value }
+                    })}
+                    className="h-8 text-xs flex-1" 
+                  />
+                </div>
+              </div>
+            )}
+            
+            <Separator />
+            
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
                 Seuil de révélation: {config.scratchScreen.threshold}%
               </Label>
               <Slider
