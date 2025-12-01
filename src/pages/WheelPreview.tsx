@@ -31,6 +31,16 @@ const WheelPreviewContent = () => {
     }
   }, []);
 
+  // Sécurité : ne jamais laisser l'overlay plus de 700ms
+  useEffect(() => {
+    if (activeView !== 'wheel') return;
+    setAssetsReady(false);
+    const timeout = setTimeout(() => {
+      setAssetsReady(true);
+    }, 700);
+    return () => clearTimeout(timeout);
+  }, [activeView]);
+
   if (!config) {
     return <div className="fixed inset-0 bg-background" />;
   }
