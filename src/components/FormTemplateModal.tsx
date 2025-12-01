@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, Sparkles } from 'lucide-react';
 import { useFormTemplates } from '@/hooks/useFormTemplates';
 import type { SavedForm } from '@/services/FormTemplateService';
+import { createExampleForm } from '@/utils/createExampleForm';
 
 interface FormTemplateModalProps {
   open: boolean;
@@ -33,6 +34,7 @@ export function FormTemplateModal({
   const [formName, setFormName] = useState('');
   const [updateExisting, setUpdateExisting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCreatingExample, setIsCreatingExample] = useState(false);
 
   useEffect(() => {
     if (mode === 'load') {
@@ -73,6 +75,19 @@ export function FormTemplateModal({
     }
   };
 
+  const handleCreateExample = async () => {
+    setIsCreatingExample(true);
+    try {
+      await createExampleForm();
+      // Rafraîchir la liste
+      window.location.reload();
+    } catch (error) {
+      console.error('Error creating example form:', error);
+    } finally {
+      setIsCreatingExample(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -84,14 +99,34 @@ export function FormTemplateModal({
 
         {mode === 'load' ? (
           <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Chercher un questionnaire existant"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Chercher un questionnaire existant"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleCreateExample}
+                disabled={isCreatingExample}
+                className="shrink-0"
+              >
+                {isCreatingExample ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Création...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Créer exemple
+                  </>
+                )}
+              </Button>
             </div>
 
             {isLoading ? (
