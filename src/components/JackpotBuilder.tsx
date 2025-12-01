@@ -418,6 +418,20 @@ export const JackpotBuilder = () => {
       <JackpotTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
+
+          // Si la campagne est déjà sauvegardée, on passe par l'ID (aucune limite de taille)
+          if (campaignId && campaign?.id) {
+            try {
+              localStorage.setItem('jackpot-viewMode', targetViewMode);
+              localStorage.setItem('jackpot-theme', JSON.stringify(theme));
+            } catch (e) {
+              console.warn('Unable to store preview settings in localStorage:', e);
+            }
+            window.open(`/jackpot-preview?id=${campaign.id}`, '_blank');
+            return;
+          }
+
+          // Sinon, fallback localStorage comme avant (campagne non encore sauvegardée)
           // Clear old data first to make room
           localStorage.removeItem('jackpot-config');
           localStorage.removeItem('jackpot-viewMode');
