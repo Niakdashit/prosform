@@ -96,6 +96,43 @@ export const useSmartWheelRenderer = ({
   // Cache pour les anneaux (templates) de bordure pattern (ex: or/argent)
   const ringImageCacheRef = useRef<Map<string, { img: HTMLImageElement; ready: boolean; loading: boolean; failed?: boolean }>>(new Map());
   
+  // Précharger les images de bordure gold et silver dès le montage
+  useEffect(() => {
+    const borderImages = [
+      '/assets/wheel/ring-gold.png',
+      '/assets/wheel/ring-silver.png'
+    ];
+    
+    borderImages.forEach(src => {
+      const cache = ringImageCacheRef.current;
+      if (!cache.has(src)) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        const entry = { img, ready: false, loading: true };
+        cache.set(src, entry);
+        
+        img.onload = () => {
+          const e = cache.get(src);
+          if (e) { 
+            e.ready = true; 
+            e.loading = false;
+          }
+        };
+        
+        img.onerror = () => {
+          const e = cache.get(src);
+          if (e) { 
+            e.ready = false; 
+            e.loading = false; 
+            e.failed = true;
+          }
+        };
+        
+        img.src = src;
+      }
+    });
+  }, []); // Exécuté une seule fois au montage
+  
   // Initialize with default wheel state if not provided
   const safeWheelState: WheelState = useMemo(() => ({
     isSpinning: false,
