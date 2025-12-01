@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Trophy, Calendar, Users, Gift, Filter, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { externalSupabase } from "@/integrations/supabase/externalClient";
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 import { ExportService } from "@/services/ExportService";
 
@@ -158,7 +158,7 @@ export default function InstantWins() {
     setLoading(true);
     try {
       // Charger le nom de la campagne
-      const { data: campaign } = await externalSupabase
+      const { data: campaign } = await supabase
         .from('campaigns')
         .select('app_title')
         .eq('id', campaignId)
@@ -167,7 +167,7 @@ export default function InstantWins() {
       if (campaign) setCampaignName(campaign.app_title);
 
       // Charger les lots
-      const { data: prizesData } = await externalSupabase
+      const { data: prizesData } = await supabase
         .from('instant_win_prizes')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -176,7 +176,7 @@ export default function InstantWins() {
       setPrizes(prizesData || []);
 
       // Charger les gagnants
-      const { data: winnersData } = await externalSupabase
+      const { data: winnersData } = await supabase
         .from('campaign_participants')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -186,7 +186,7 @@ export default function InstantWins() {
       setWinners(winnersData || []);
 
       // Charger toutes les participations
-      const { data: allPartData } = await externalSupabase
+      const { data: allPartData } = await supabase
         .from('campaign_participants')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -204,7 +204,7 @@ export default function InstantWins() {
       }
 
       // Charger les participations uniques (1 par IP)
-      const { data: uniquePartData } = await externalSupabase
+      const { data: uniquePartData } = await supabase
         .from('campaign_participants')
         .select('*')
         .eq('campaign_id', campaignId)
@@ -234,7 +234,7 @@ export default function InstantWins() {
   const loadOptIns = async () => {
     try {
       // Récupérer toutes les participations avec leurs données
-      const { data: participations } = await externalSupabase
+      const { data: participations } = await supabase
         .from('campaign_participants')
         .select('participation_data')
         .eq('campaign_id', campaignId)
@@ -273,7 +273,7 @@ export default function InstantWins() {
 
   const loadOptInParticipants = async (optIn: OptIn) => {
     try {
-      const { data: participants } = await externalSupabase
+      const { data: participants } = await supabase
         .from('campaign_participants')
         .select('*')
         .eq('campaign_id', campaignId)
