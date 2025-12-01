@@ -161,14 +161,12 @@ export const WelcomeLayouts = ({
     switch (layout as DesktopLayoutType) {
       case 'desktop-left-right':
         return (
-          <div className="grid grid-cols-2 h-full">
-            {/* Left column - empty to show background image */}
-            <div className="relative" />
-            {/* Right column - content */}
+          <>
             <div className="flex items-center justify-center p-12">
               {renderContent()}
             </div>
-          </div>
+            {renderVisual()}
+          </>
         );
 
       case 'desktop-right-left':

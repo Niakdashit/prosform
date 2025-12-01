@@ -1219,108 +1219,87 @@ export const WheelPreview = ({
         );
 
       case 'wheel':
-        // Adapter les segments pour SmartWheel
-        const adaptedSegments = config.segments.map(seg => ({
-          ...seg,
-          value: seg.label
-        }));
-
-        // Wheel size calculation
-        const wheelSizePercent = config.wheelScreen.wheelSize || 100;
-        const baseWheelSize = viewMode === 'desktop' ? 380 : 280;
-        const scaledWheelSize = Math.round(baseWheelSize * (wheelSizePercent / 100));
-
-        const wheelNode = (
-          <div className="flex items-center justify-center">
-            <SmartWheel
-              key="wheel-instance"
-              segments={adaptedSegments}
-              disabled={wheelDisabled}
-              onBeforeSpin={handleSpinStart}
-              onComplete={(winnerSegment, winnerSegmentId) => {
-                setIsSpinning(false);
-                setWheelDisabled(true);
-                
-                const result = globalDrawResult;
-                
-                console.log('🎰 [WheelPreview] onComplete appelé');
-                console.log('🎰 [WheelPreview] winnerSegment:', winnerSegment);
-                console.log('🎰 [WheelPreview] winnerSegmentId:', winnerSegmentId);
-                console.log('🎰 [WheelPreview] globalDrawResult:', result);
-                
-                if (result && result.won && result.prize) {
-                  console.log('🎰 [WheelPreview] ✅ Gain confirmé:', result.prize.name);
-                  setWonPrize(result.prize.name);
-                  if (onUpdatePrize) {
-                    onUpdatePrize(consumePrize(result.prize) as Prize);
-                  }
-                  setTimeout(() => {
-                    setWheelDisabled(false);
-                    resetGlobalWheelRotation();
-                    if (onGoToEnding) onGoToEnding(true);
-                    else onNext();
-                  }, 1500);
-                } else {
-                  console.log('🎰 [WheelPreview] ❌ Pas de gain - result:', result);
-                  setWonPrize(null);
-                  setTimeout(() => {
-                    setWheelDisabled(false);
-                    resetGlobalWheelRotation();
-                    if (onGoToEnding) onGoToEnding(false);
-                    else onNext();
-                  }, 1500);
-                }
-                
-                globalDrawResult = null;
-              }}
-              brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-              size={scaledWheelSize}
-              borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
-              customBorderColor={
-                theme.wheelBorderStyle === 'custom'
-                  ? theme.wheelBorderCustomColor
-                  : undefined
-              }
-              showBulbs={true}
-              onAssetsReady={onAssetsReady}
-            />
-          </div>
-        );
-
-        // Render layout-specific structure
-        if (viewMode === 'desktop' && currentLayout === 'desktop-left-right') {
-          return (
-            <div className="grid grid-cols-2 h-full">
-              {/* Left column - empty to show background image */}
-              <div className="relative" />
-              {/* Right column - content and wheel */}
-              <div className="flex items-center justify-center p-12">
-                <div className="flex flex-col items-center space-y-8">
-                  <div className="text-center w-full max-w-[700px]">
-                    <h1 
-                      className="text-4xl md:text-5xl font-bold mb-4"
-                      style={{ color: theme.textColor }}
-                    >
-                      {config.wheelScreen.title}
-                    </h1>
-                    <p 
-                      className="text-lg md:text-xl mb-8"
-                      style={{ color: theme.textColor, opacity: 0.9 }}
-                    >
-                      {config.wheelScreen.subtitle}
-                    </p>
-                  </div>
-                  {wheelNode}
-                </div>
-              </div>
-            </div>
-          );
-        }
-
-        // Default centered layout for other cases
         return (
           <div className="flex w-full h-full items-center justify-center">
-            {wheelNode}
+            {(() => {
+              // Adapter les segments pour SmartWheel
+              const adaptedSegments = config.segments.map(seg => ({
+                ...seg,
+                value: seg.label
+              }));
+
+              // Wheel size calculation
+              const wheelSizePercent = config.wheelScreen.wheelSize || 100;
+              const baseWheelSize = viewMode === 'desktop' ? 380 : 280;
+              const scaledWheelSize = Math.round(baseWheelSize * (wheelSizePercent / 100));
+              const containerSize = viewMode === 'desktop' ? 450 : 320;
+              const scaledContainerSize = Math.round(containerSize * (wheelSizePercent / 100));
+
+              return (
+                <div
+                  className="flex items-center justify-center"
+                  style={{ 
+                    width: `${scaledContainerSize}px`,
+                    height: `${scaledContainerSize}px`,
+                    maxWidth: '100%',
+                    flexShrink: 0
+                  }}
+                >
+                  <SmartWheel
+                    key="wheel-instance"
+                    segments={adaptedSegments}
+                    disabled={wheelDisabled}
+                    onBeforeSpin={handleSpinStart}
+                    onComplete={(winnerSegment, winnerSegmentId) => {
+                      setIsSpinning(false);
+                      setWheelDisabled(true);
+                      
+                      const result = globalDrawResult;
+                      
+                      console.log('🎰 [WheelPreview] onComplete appelé');
+                      console.log('🎰 [WheelPreview] winnerSegment:', winnerSegment);
+                      console.log('🎰 [WheelPreview] winnerSegmentId:', winnerSegmentId);
+                      console.log('🎰 [WheelPreview] globalDrawResult:', result);
+                      
+                      if (result && result.won && result.prize) {
+                        console.log('🎰 [WheelPreview] ✅ Gain confirmé:', result.prize.name);
+                        setWonPrize(result.prize.name);
+                        if (onUpdatePrize) {
+                          onUpdatePrize(consumePrize(result.prize) as Prize);
+                        }
+                        setTimeout(() => {
+                          setWheelDisabled(false);
+                          resetGlobalWheelRotation();
+                          if (onGoToEnding) onGoToEnding(true);
+                          else onNext();
+                        }, 1500);
+                      } else {
+                        console.log('🎰 [WheelPreview] ❌ Pas de gain - result:', result);
+                        setWonPrize(null);
+                        setTimeout(() => {
+                          setWheelDisabled(false);
+                          resetGlobalWheelRotation();
+                          if (onGoToEnding) onGoToEnding(false);
+                          else onNext();
+                        }, 1500);
+                      }
+                      
+                      globalDrawResult = null;
+                    }}
+                    brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
+                    size={scaledWheelSize}
+                    borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
+                    customBorderColor={
+                      theme.wheelBorderStyle === 'custom'
+                        ? theme.wheelBorderCustomColor
+                        : undefined
+                    }
+                    showBulbs={true}
+                    onAssetsReady={onAssetsReady}
+                  />
+                </div>
+              );
+            })()}
           </div>
         );
 
@@ -1493,7 +1472,26 @@ export const WheelPreview = ({
         key={`preview-container-${viewMode}`}
         className="relative overflow-hidden transition-all duration-300 flex-shrink-0 flex flex-col" 
         style={{ 
-          backgroundColor: theme.backgroundColor,
+          backgroundColor: (() => {
+            // Si un background image est défini, on utilise transparent pour laisser l'image visible
+            const hasBackgroundImage = (() => {
+              const applyToAll = config.welcomeScreen.applyBackgroundToAll;
+              const welcomeDesktop = config.welcomeScreen.backgroundImage;
+              const welcomeMobile = config.welcomeScreen.backgroundImageMobile;
+              
+              if (applyToAll && (welcomeDesktop || welcomeMobile)) return true;
+              
+              switch (activeView) {
+                case 'welcome': return !!(welcomeDesktop || welcomeMobile);
+                case 'contact': return !!(config.contactForm.backgroundImage || config.contactForm.backgroundImageMobile);
+                case 'wheel': return !!(config.wheelScreen.backgroundImage || config.wheelScreen.backgroundImageMobile);
+                case 'ending-win': return !!(config.endingWin.backgroundImage || config.endingWin.backgroundImageMobile);
+                case 'ending-lose': return !!(config.endingLose.backgroundImage || config.endingLose.backgroundImageMobile);
+                default: return false;
+              }
+            })();
+            return hasBackgroundImage ? 'transparent' : theme.backgroundColor;
+          })(),
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
@@ -1502,7 +1500,7 @@ export const WheelPreview = ({
           maxHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
         }}
       >
-        {/* Background image from config settings */}
+        {/* Background image from config settings - doit être AVANT le header dans le DOM */}
         {(() => {
           const getScreenBackground = () => {
             const applyToAll = config.welcomeScreen.applyBackgroundToAll;
@@ -1541,50 +1539,15 @@ export const WheelPreview = ({
           
           if (!bgImage) return null;
           
-          // Détecter si on est en layout left-right pour adapter le positionnement
-          const isLeftRightLayout = (() => {
-            if (viewMode === 'mobile') return false;
-            switch (activeView) {
-              case 'welcome': return config.welcomeScreen.desktopLayout === 'desktop-left-right';
-              case 'contact': return config.contactForm.desktopLayout === 'desktop-left-right';
-              case 'wheel': return config.wheelScreen.desktopLayout === 'desktop-left-right';
-              default: return false;
-            }
-          })();
-          
-          // Hauteur du header pour que l'image commence en dessous
-          const headerHeight = config.layout?.header?.enabled ? (config.layout.header.height || 64) : 0;
-          
-          const commonStyles = {
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: 'cover' as const,
-            backgroundRepeat: 'no-repeat' as const,
-            zIndex: 0 as const,
-          };
-          
-          // En desktop-left-right, on limite l'image à la colonne de gauche
-          if (isLeftRightLayout && viewMode === 'desktop') {
-            return (
-              <div 
-                className="absolute left-0 bottom-0"
-                style={{
-                  top: `${headerHeight}px`,
-                  width: '50%',
-                  backgroundPosition: 'left center',
-                  ...commonStyles,
-                }}
-              />
-            );
-          }
-          
-          // Autres layouts : image sur toute la largeur mais sous le header
           return (
             <div 
-              className="absolute left-0 right-0 bottom-0"
+              className="absolute inset-0"
               style={{
-                top: `${headerHeight}px`,
+                backgroundImage: `url(${bgImage})`,
+                backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                ...commonStyles,
+                backgroundRepeat: 'no-repeat',
+                zIndex: 0,
               }}
             />
           );

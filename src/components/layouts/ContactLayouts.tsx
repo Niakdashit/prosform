@@ -364,14 +364,12 @@ export const ContactLayouts = ({
     switch (layout as DesktopLayoutType) {
       case 'desktop-left-right':
         return (
-          <div className="grid grid-cols-2 h-full">
-            {/* Left column - empty to show background image */}
-            <div className="relative" />
-            {/* Right column - form */}
+          <>
             <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
               {renderForm()}
             </div>
-          </div>
+            {renderVisual()}
+          </>
         );
 
       case 'desktop-right-left':
