@@ -65,10 +65,12 @@ export interface WheelSegment {
 
 export interface ContactField {
   id: string; // Identifiant unique du champ (ex: 'civilite', 'prenom', 'nom')
-  type: 'text' | 'email' | 'phone' | 'select'; // Type de champ
+  type: 'text' | 'email' | 'phone' | 'tel' | 'select' | 'textarea' | 'checkbox'; // Type de champ
   required: boolean;
   label: string;
+  placeholder?: string; // Placeholder pour les champs de texte
   options?: string[]; // Pour les champs select
+  helpText?: string; // Texte d'aide pour les checkboxes (opt-ins)
 }
 
 export interface TextStyle {

@@ -132,11 +132,50 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
                 );
               }
               
+              if (field.type === 'textarea') {
+                return (
+                  <textarea
+                    key={index}
+                    placeholder={field.placeholder || field.label}
+                    className="w-full px-4 py-3 rounded-lg border-2 transition-colors min-h-[100px] resize-none"
+                    style={{ 
+                      borderColor: theme.accentColor + '40',
+                      backgroundColor: theme.backgroundColor,
+                      color: theme.textColor
+                    }}
+                    onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
+                    required={field.required}
+                  />
+                );
+              }
+
+              if (field.type === 'checkbox') {
+                return (
+                  <label key={index} className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="mt-1 w-5 h-5 rounded border-2 transition-colors flex-shrink-0"
+                      style={{ 
+                        accentColor: theme.accentColor
+                      }}
+                      onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.checked ? 'true' : 'false' }))}
+                      required={field.required}
+                    />
+                    <span className="text-sm" style={{ color: theme.textColor }}>
+                      {field.label}
+                      {field.helpText && (
+                        <span className="block text-xs opacity-70 mt-1">{field.helpText}</span>
+                      )}
+                    </span>
+                  </label>
+                );
+              }
+              
               return (
                 <input
                   key={index}
-                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-                  placeholder={field.label}
+                  type={field.type === 'email' ? 'email' : (field.type === 'phone' || field.type === 'tel') ? 'tel' : 'text'}
+                  placeholder={field.placeholder || field.label}
                   className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
                   style={{ 
                     borderColor: theme.accentColor + '40',
