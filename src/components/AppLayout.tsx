@@ -50,7 +50,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div
-      className="min-h-screen w-full flex overflow-x-hidden"
+      className="min-h-screen flex"
       style={{
         fontFamily: "'DM Sans', sans-serif",
         // Palette 1++ : Blanc cassé / Gris perle (encore un peu plus foncé)
@@ -133,9 +133,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           zIndex: 2,
         }}
       >
-        {/* Top header - Sticky */}
+        {/* Top header */}
         <header
-          className="h-[56px] flex items-center justify-between px-6 sticky top-0 z-50 backdrop-blur-4xl flex-shrink-0"
+          className="h-[56px] flex items-center justify-between px-6 sticky top-0 z-20 backdrop-blur-4xl"
           style={{
             background:
               "linear-gradient(90deg, rgba(39, 7, 54, 0.98) 0%, rgba(30, 15, 60, 0.98) 40%, rgba(25, 20, 70, 0.98) 100%)",
@@ -183,10 +183,8 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </header>
 
-        {/* Content area - No scroll */}
-        <div className="flex-1 overflow-hidden">
-          {/* Page content with rounded liquid glass frame */}
-          <main className="p-4 h-full">
+        {/* Page content with rounded liquid glass frame */}
+        <main className="flex-1 p-4 overflow-auto">
           <div
             className="min-h-full rounded-[28px] p-6 relative"
             style={{
@@ -201,6 +199,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 inset 0 -1px 1px rgba(0, 0, 0, 0.02)
               `,
               zIndex: 3,
+              marginLeft: "-2%",
             }}
           >
             {/* Top highlight line - liquid glass signature */}
@@ -217,10 +216,11 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 background: 'radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.6) 0%, transparent 60%)',
               }}
             />
+            <div className="relative z-10">
               {children}
             </div>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );
