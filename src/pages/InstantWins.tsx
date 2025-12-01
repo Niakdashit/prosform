@@ -96,6 +96,13 @@ export default function InstantWins() {
   const extractFormFields = (participations: Participation[]) => {
     const fieldsSet = new Set<string>();
     
+    // Fields already displayed as fixed columns
+    const fixedFields = [
+      'email', 'ip_address', 'device_type', 'browser', 'os', 
+      'utm_source', 'utm_medium', 'utm_campaign', 'referrer',
+      'city', 'country', 'user_agent', 'created_at', 'completed_at'
+    ];
+    
     participations.forEach(part => {
       if (part.participation_data) {
         const data = part.participation_data;
@@ -103,12 +110,13 @@ export default function InstantWins() {
         // Check if data is an object
         if (typeof data === 'object' && data !== null) {
           Object.keys(data).forEach(key => {
-            // Exclude internal fields but keep all form fields
+            // Exclude internal fields, fixed fields, and already displayed data
             const excludedPrefixes = ['prize_', 'segment_', 'timestamp', 'device_fingerprint'];
             const isExcluded = excludedPrefixes.some(prefix => key.startsWith(prefix));
+            const isFixedField = fixedFields.includes(key.toLowerCase());
             
-            // Include all user-facing form fields and opt-ins
-            if (!isExcluded && key !== 'prizeWon' && key !== 'hasPlayed') {
+            // Include all user-facing form fields that aren't already shown
+            if (!isExcluded && !isFixedField && key !== 'prizeWon' && key !== 'hasPlayed') {
               fieldsSet.add(key);
             }
           });
@@ -117,7 +125,7 @@ export default function InstantWins() {
     });
     
     const fields = Array.from(fieldsSet).sort();
-    console.log('Extracted form fields:', fields);
+    console.log('Extracted form fields (excluding fixed columns):', fields);
     return fields;
   };
 
