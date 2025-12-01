@@ -1495,7 +1495,7 @@ export const WheelPreview = ({
   };
 
   return (
-    <div className={isMobileResponsive ? "w-full min-h-screen relative" : "flex items-center justify-center relative overflow-hidden"}>
+    <div className={isMobileResponsive ? "w-full h-full relative overflow-hidden" : "flex items-center justify-center relative overflow-hidden"}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -1548,8 +1548,8 @@ export const WheelPreview = ({
           width: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '1100px' : '375px'), 
           minWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
           maxWidth: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '1100px' : '375px'),
-          height: isMobileResponsive ? 'auto' : (viewMode === 'desktop' ? '620px' : '667px'),
-          minHeight: isMobileResponsive ? '100vh' : (viewMode === 'desktop' ? '620px' : '667px'),
+          height: isMobileResponsive ? '100%' : (viewMode === 'desktop' ? '620px' : '667px'),
+          minHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
           maxHeight: isMobileResponsive ? undefined : (viewMode === 'desktop' ? '620px' : '667px'),
         }}
       >
@@ -1613,8 +1613,8 @@ export const WheelPreview = ({
           </div>
         )}
 
-        {/* Contenu principal occupe la hauteur nécessaire, le scroll se fait sur la page */}
-        <div className="relative z-10">
+        {/* Contenu principal avec flex-1 pour prendre l'espace restant */}
+        <div className="flex-1 relative overflow-auto z-10 min-h-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
@@ -1622,7 +1622,7 @@ export const WheelPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="w-full relative z-10"
+              className="w-full h-full relative z-10"
               onClick={(e) => {
                 // Ne pas blur si on clique sur un input, textarea ou button
                 const target = e.target as HTMLElement;

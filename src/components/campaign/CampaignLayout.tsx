@@ -56,7 +56,7 @@ export const CampaignLayout = ({
 
   return (
     <div 
-      className="flex flex-col"
+      className={`flex flex-col ${config.minHeight === 'screen' ? 'min-h-screen' : ''}`}
       style={{ 
         backgroundColor: config.backgroundColor,
         backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : undefined,
@@ -81,21 +81,19 @@ export const CampaignLayout = ({
         onConfigChange={onHeaderChange}
       />
 
-      {/* Contenu principal : occupe au minimum toute la hauteur de l'écran, le footer vient ensuite */}
-      <main className={`flex flex-col items-center ${paddingClass} relative z-10 min-h-screen`}>
+      {/* Contenu principal - flex-grow au lieu de flex-1 pour permettre au footer de pousser */}
+      <main className={`flex-grow flex flex-col items-center ${paddingClass} relative z-10`}>
         <div className={`w-full ${maxWidthClass}`}>
           {children}
         </div>
       </main>
 
-      {/* Footer - placé sous la ligne de flottaison, visible uniquement après scroll */}
-      <div style={{ marginTop: '100vh' }}>
-        <CampaignFooter 
-          config={config.footer} 
-          isPreview={isPreview}
-          onConfigChange={onFooterChange}
-        />
-      </div>
+      {/* Footer - ne sera jamais compressé */}
+      <CampaignFooter 
+        config={config.footer} 
+        isPreview={isPreview}
+        onConfigChange={onFooterChange}
+      />
     </div>
   );
 };
