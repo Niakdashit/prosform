@@ -495,7 +495,6 @@ export const WheelBuilder = () => {
               localStorage.setItem('wheel-viewMode', targetViewMode);
               localStorage.setItem('wheel-theme', JSON.stringify(theme));
               window.open('/wheel-preview', '_blank');
-              toast.warning('Preview ouverte sans images (images trop volumineuses)');
             } catch (e2) {
               toast.error('Impossible d\'ouvrir la preview - données trop volumineuses');
             }

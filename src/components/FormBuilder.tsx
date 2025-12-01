@@ -418,9 +418,8 @@ export const FormBuilder = () => {
               localStorage.setItem('preview-viewMode', targetViewMode);
               localStorage.setItem('preview-theme', JSON.stringify(theme));
               window.open('/preview', '_blank');
-              toast.warning('Preview opened without images (images too large)');
             } catch (e2) {
-              toast.error('Unable to open preview - data too large');
+              toast.error('Impossible d\'ouvrir la preview - données trop volumineuses');
             }
           }
         }}
