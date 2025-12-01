@@ -11,6 +11,8 @@ import Stats from "./pages/Stats";
 import Contacts from "./pages/Contacts";
 import Media from "./pages/Media";
 import SettingsPage from "./pages/SettingsPage";
+import InstantWins from "./pages/InstantWins";
+import PrizeDraws from "./pages/PrizeDraws";
 import Wheel from "./pages/Wheel";
 import ArticleWheel from "./pages/ArticleWheel";
 import ArticleWheelPreview from "./pages/ArticleWheelPreview";
@@ -46,6 +48,8 @@ const App = () => (
             <Route path="/contacts" element={<Contacts />} />
             <Route path="/media" element={<Media />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/instant-wins" element={<InstantWins />} />
+            <Route path="/prize-draws" element={<PrizeDraws />} />
             <Route path="/form" element={<Index />} />
             <Route path="/preview" element={<Preview />} />
             <Route path="/wheel" element={<Wheel />} />

@@ -23,7 +23,9 @@ import {
   Mail,
   Scale,
   Handshake,
-  FileDown
+  FileDown,
+  Trophy,
+  Ticket
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
@@ -593,6 +595,14 @@ const Campaigns = () => {
                       <DropdownMenuItem onClick={() => handleViewStats(campaign.id)}>
                         <BarChart2 className="w-4 h-4 mr-2" />
                         Statistiques
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate(`/instant-wins?id=${campaign.id}`)}>
+                        <Trophy className="w-4 h-4 mr-2" />
+                        Instants gagnants
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate(`/prize-draws?id=${campaign.id}`)}>
+                        <Ticket className="w-4 h-4 mr-2" />
+                        Tirages au sort
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDuplicate(campaign.id)}>
                         <Copy className="w-4 h-4 mr-2" />
