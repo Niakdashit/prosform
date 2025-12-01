@@ -260,7 +260,7 @@ export const QuizSettingsPanel = ({
                       contactScreen: { ...config.contactScreen, mobileLayout: layout }
                     })}
                     excludeDesktopLayouts={['desktop-split', 'desktop-right-left', 'desktop-centered']}
-                    excludeMobileLayouts={['mobile-centered', 'mobile-minimal']}
+                    excludeMobileLayouts={['mobile-minimal']}
                   />
                 </div>
                 
