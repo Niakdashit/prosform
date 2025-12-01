@@ -107,7 +107,7 @@ export const WheelLayouts = ({
         }}
         borderStyle={resolveBorderStyle(theme.wheelBorderStyle as any) as any}
         customBorderColor={
-          theme.wheelBorderStyle === 'classic'
+          theme.wheelBorderStyle === 'classic' || theme.wheelBorderStyle === 'custom'
             ? theme.wheelBorderCustomColor
             : undefined
         }
