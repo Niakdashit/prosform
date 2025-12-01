@@ -50,7 +50,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div
-      className="min-h-screen flex"
+      className="min-h-screen flex overflow-x-hidden"
       style={{
         fontFamily: "'DM Sans', sans-serif",
         // Palette 1++ : Blanc cassé / Gris perle (encore un peu plus foncé)
@@ -127,7 +127,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main content area */}
       <div
-        className="flex-1 ml-24 flex flex-col backdrop-blur-4xl relative"
+        className="flex-1 ml-24 flex flex-col backdrop-blur-4xl relative overflow-x-hidden"
         style={{
           backgroundColor: "rgba(226, 232, 240, 0.12)",
           zIndex: 2,
@@ -184,9 +184,9 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
         </header>
 
         {/* Page content with rounded liquid glass frame */}
-        <main className="flex-1 p-4 overflow-auto">
+        <main className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
           <div
-            className="min-h-full rounded-[28px] p-6 relative"
+            className="min-h-full rounded-[28px] p-6 relative overflow-x-auto"
             style={{
               background: 'rgba(255, 255, 255, 0.35)',
               backdropFilter: 'blur(24px)',
