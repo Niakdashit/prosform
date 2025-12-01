@@ -201,7 +201,6 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
                 inset 0 -1px 1px rgba(0, 0, 0, 0.02)
               `,
               zIndex: 3,
-              marginLeft: "-2%",
             }}
           >
             {/* Top highlight line - liquid glass signature */}
