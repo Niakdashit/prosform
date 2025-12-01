@@ -10,6 +10,7 @@ interface SmartScratchProps {
   revealImage?: string;
   revealText?: string;
   onComplete?: (percentage: number) => void;
+  onStart?: () => void;
   threshold?: number;
   brushSize?: number;
   disabled?: boolean;
@@ -26,6 +27,7 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
   revealImage,
   revealText = '🎉 Gagné !',
   onComplete,
+  onStart,
   threshold = 70,
   brushSize = 30,
   disabled = false,
@@ -126,6 +128,9 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (disabled || isCompleted) return;
+    if (!hasStarted) {
+      onStart?.();
+    }
     setIsScratching(true);
     setHasStarted(true);
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -135,7 +140,7 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
         y: e.clientY - rect.top
       };
     }
-  }, [disabled, isCompleted]);
+  }, [disabled, isCompleted, hasStarted, onStart]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isScratching || disabled || isCompleted) return;
@@ -153,6 +158,9 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (disabled || isCompleted) return;
     e.preventDefault();
+    if (!hasStarted) {
+      onStart?.();
+    }
     setIsScratching(true);
     setHasStarted(true);
     const touch = e.touches[0];
@@ -163,7 +171,7 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
         y: touch.clientY - rect.top
       };
     }
-  }, [disabled, isCompleted]);
+  }, [disabled, isCompleted, hasStarted, onStart]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!isScratching || disabled || isCompleted) return;
