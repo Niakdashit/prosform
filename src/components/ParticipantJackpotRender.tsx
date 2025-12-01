@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { JackpotConfig } from "./JackpotBuilder";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import SmartJackpot from "./SmartJackpot/SmartJackpot";
 import { ParticipationService } from "@/services/ParticipationService";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 
 interface ParticipantJackpotRenderProps {
   config: JackpotConfig;
@@ -18,15 +19,23 @@ export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJack
   const { theme } = useTheme();
   const buttonStyles = getButtonStyles(theme);
 
+  // Track initial welcome view
+  useEffect(() => {
+    AnalyticsTrackingService.trackStepView(campaignId, 'welcome');
+  }, [campaignId]);
+
   const handleNext = () => {
     if (activeView === 'welcome') {
       if (config.contactForm?.enabled) {
         setActiveView('contact');
+        AnalyticsTrackingService.trackStepView(campaignId, 'contact');
       } else {
         setActiveView('jackpot');
+        AnalyticsTrackingService.trackStepView(campaignId, 'game');
       }
     } else if (activeView === 'contact') {
       setActiveView('jackpot');
+      AnalyticsTrackingService.trackStepView(campaignId, 'game');
     }
   };
 
@@ -45,6 +54,7 @@ export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJack
     
     setTimeout(() => {
       setActiveView(isWin ? 'ending-win' : 'ending-lose');
+      AnalyticsTrackingService.trackStepView(campaignId, 'ending');
     }, 1500);
   };
 

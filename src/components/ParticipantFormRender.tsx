@@ -1,16 +1,18 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Question } from "./FormBuilder";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Star, Heart, ThumbsUp, Smile, Meh, Frown } from "lucide-react";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 
 interface ParticipantFormRenderProps {
   questions: Question[];
+  campaignId?: string;
 }
 
-export const ParticipantFormRender = ({ questions }: ParticipantFormRenderProps) => {
+export const ParticipantFormRender = ({ questions, campaignId }: ParticipantFormRenderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, string | string[]>>({});
   const [isComplete, setIsComplete] = useState(false);
@@ -20,6 +22,20 @@ export const ParticipantFormRender = ({ questions }: ParticipantFormRenderProps)
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
+
+  // Track each question view (each question is a step)
+  useEffect(() => {
+    if (campaignId && currentQuestion) {
+      // Track welcome for first question, game for others, ending for completion
+      if (currentIndex === 0) {
+        AnalyticsTrackingService.trackStepView(campaignId, 'welcome');
+      } else if (isComplete) {
+        AnalyticsTrackingService.trackStepView(campaignId, 'ending');
+      } else {
+        AnalyticsTrackingService.trackStepView(campaignId, 'game');
+      }
+    }
+  }, [currentIndex, isComplete, campaignId, currentQuestion]);
 
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {

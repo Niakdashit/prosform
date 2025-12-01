@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { QuizConfig, QuizAnswer } from "./QuizBuilder";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ParticipationService } from "@/services/ParticipationService";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 
 interface ParticipantQuizRenderProps {
   config: QuizConfig;
@@ -23,15 +24,23 @@ export const ParticipantQuizRender = ({ config, campaignId }: ParticipantQuizRen
   const currentQuestion = config.questions[activeQuestionIndex];
   const totalQuestions = config.questions.length;
 
+  // Track initial welcome view
+  useEffect(() => {
+    AnalyticsTrackingService.trackStepView(campaignId, 'welcome');
+  }, [campaignId]);
+
   const handleNext = async () => {
     if (activeView === 'welcome') {
       if (config.contactScreen?.enabled) {
         setActiveView('contact');
+        AnalyticsTrackingService.trackStepView(campaignId, 'contact');
       } else {
         setActiveView('question');
+        AnalyticsTrackingService.trackStepView(campaignId, 'game');
       }
     } else if (activeView === 'contact') {
       setActiveView('question');
+      AnalyticsTrackingService.trackStepView(campaignId, 'game');
     } else if (activeView === 'question') {
       // Calculate score for current question - find if selected answer is correct
       if (currentQuestion) {
@@ -58,6 +67,7 @@ export const ParticipantQuizRender = ({ config, campaignId }: ParticipantQuizRen
         });
         
         setActiveView('result');
+        AnalyticsTrackingService.trackStepView(campaignId, 'ending');
       }
     }
   };

@@ -65,7 +65,7 @@ export function PublicCampaignRenderer({ campaign }: PublicCampaignRendererProps
     
     case 'form':
       // Le formulaire attend questions directement
-      return <ParticipantFormRender questions={config.questions || []} />;
+      return <ParticipantFormRender questions={config.questions || []} campaignId={campaign.id} />;
     
     default:
       return (
