@@ -7,6 +7,9 @@ import { Separator } from "@/components/ui/separator";
 import { LayoutSelector } from "./LayoutSelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
+import { SettingsSection } from "./ui/SettingsSection";
+import { SettingsField } from "./ui/SettingsField";
+import { Layout, FileText } from "lucide-react";
 
 interface JackpotSettingsPanelProps {
   config: JackpotConfig;
@@ -123,9 +126,13 @@ export const JackpotSettingsPanel = ({
 
       case 'contact':
         return (
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+          <div className="space-y-6">
+            {/* Layout Section */}
+            <SettingsSection 
+              title="Layout" 
+              icon={<Layout className="w-4 h-4" />}
+              defaultCollapsed={true}
+            >
               <LayoutSelector
                 desktopLayout={config.contactForm.desktopLayout}
                 mobileLayout={config.contactForm.mobileLayout}
@@ -136,31 +143,37 @@ export const JackpotSettingsPanel = ({
                   contactForm: { ...config.contactForm, mobileLayout: layout }
                 })}
               />
-            </div>
-            
-            <Separator />
-            
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.contactForm.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.contactForm.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  contactForm: { ...config.contactForm, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            </SettingsSection>
 
             <Separator />
 
-            {/* Background Image - only show if not applying from Welcome */}
+            {/* Spacing Section */}
+            <SettingsSection 
+              title="Spacing" 
+              icon={<FileText className="w-4 h-4" />}
+            >
+              <SettingsField
+                label={`Block spacing: ${config.contactForm.blockSpacing}x`}
+                help="Adjust vertical spacing between elements"
+              >
+                <Slider
+                  value={[config.contactForm.blockSpacing]}
+                  onValueChange={([value]) => onUpdateConfig({
+                    contactForm: { ...config.contactForm, blockSpacing: value }
+                  })}
+                  min={0.5}
+                  max={3}
+                  step={0.25}
+                  className="w-full"
+                />
+              </SettingsField>
+            </SettingsSection>
+
+            <Separator />
+
+            {/* Background Section */}
             {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
+              <div className="text-xs text-muted-foreground italic p-3 rounded-lg bg-muted/50">
                 Background appliqué depuis Welcome Screen
               </div>
             ) : (

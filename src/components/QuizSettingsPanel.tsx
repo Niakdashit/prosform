@@ -9,11 +9,13 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutSelector } from "./LayoutSelector";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Plus, Trash2, Check, AlignCenter, Image, Split } from "lucide-react";
+import { Upload, X, Plus, Trash2, Check, AlignCenter, Image, Split, Layout, FileText } from "lucide-react";
 import { WallpaperUploadModal } from "./WallpaperUploadModal";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
+import { SettingsSection } from "./ui/SettingsSection";
+import { SettingsField } from "./ui/SettingsField";
 
 interface QuizSettingsPanelProps {
   config: QuizConfig;
@@ -235,67 +237,94 @@ export const QuizSettingsPanel = ({
 
       case 'contact':
         return (
-          <div className="space-y-4">
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Titre</Label>
-              <Input
-                type="text"
-                value={config.contactScreen.title}
-                onChange={(e) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, title: e.target.value }
+          <div className="space-y-6">
+            {/* Layout Section */}
+            <SettingsSection 
+              title="Layout" 
+              icon={<Layout className="w-4 h-4" />}
+              defaultCollapsed={true}
+            >
+              <LayoutSelector
+                desktopLayout={config.contactScreen.desktopLayout}
+                mobileLayout={config.contactScreen.mobileLayout}
+                onDesktopLayoutChange={(layout) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, desktopLayout: layout }
                 })}
-                className="text-xs h-8"
-              />
-            </div>
-
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Sous-titre</Label>
-              <Textarea
-                value={config.contactScreen.subtitle}
-                onChange={(e) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, subtitle: e.target.value }
+                onMobileLayoutChange={(layout) => onUpdateConfig({
+                  contactScreen: { ...config.contactScreen, mobileLayout: layout }
                 })}
-                className="text-xs min-h-[70px]"
               />
-            </div>
+            </SettingsSection>
 
             <Separator />
 
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Texte du bouton</Label>
-              <Input
-                type="text"
-                value={config.contactScreen.buttonText}
-                onChange={(e) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, buttonText: e.target.value }
-                })}
-                className="text-xs h-8"
-              />
-            </div>
+            {/* Content Section */}
+            <SettingsSection 
+              title="Content" 
+              icon={<FileText className="w-4 h-4" />}
+            >
+              <SettingsField label="Title">
+                <Input
+                  type="text"
+                  value={config.contactScreen.title}
+                  onChange={(e) => onUpdateConfig({
+                    contactScreen: { ...config.contactScreen, title: e.target.value }
+                  })}
+                  className="h-9"
+                />
+              </SettingsField>
+
+              <SettingsField label="Subtitle">
+                <Textarea
+                  value={config.contactScreen.subtitle}
+                  onChange={(e) => onUpdateConfig({
+                    contactScreen: { ...config.contactScreen, subtitle: e.target.value }
+                  })}
+                  className="min-h-[70px]"
+                />
+              </SettingsField>
+
+              <SettingsField label="Button text">
+                <Input
+                  type="text"
+                  value={config.contactScreen.buttonText}
+                  onChange={(e) => onUpdateConfig({
+                    contactScreen: { ...config.contactScreen, buttonText: e.target.value }
+                  })}
+                  className="h-9"
+                />
+              </SettingsField>
+            </SettingsSection>
 
             <Separator />
 
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">
-                Block spacing: {config.contactScreen.blockSpacing}x
-              </Label>
-              <Slider
-                value={[config.contactScreen.blockSpacing]}
-                onValueChange={([value]) => onUpdateConfig({
-                  contactScreen: { ...config.contactScreen, blockSpacing: value }
-                })}
-                min={0.5}
-                max={3}
-                step={0.25}
-                className="w-full"
-              />
-            </div>
+            {/* Spacing Section */}
+            <SettingsSection 
+              title="Spacing" 
+              icon={<FileText className="w-4 h-4" />}
+            >
+              <SettingsField
+                label={`Block spacing: ${config.contactScreen.blockSpacing}x`}
+                help="Adjust vertical spacing between elements"
+              >
+                <Slider
+                  value={[config.contactScreen.blockSpacing]}
+                  onValueChange={([value]) => onUpdateConfig({
+                    contactScreen: { ...config.contactScreen, blockSpacing: value }
+                  })}
+                  min={0.5}
+                  max={3}
+                  step={0.25}
+                  className="w-full"
+                />
+              </SettingsField>
+            </SettingsSection>
 
             <Separator />
 
-            {/* Background Image */}
+            {/* Background Section */}
             {config.welcomeScreen.applyBackgroundToAll ? (
-              <div className="text-xs text-muted-foreground italic">
+              <div className="text-xs text-muted-foreground italic p-3 rounded-lg bg-muted/50">
                 Background appliqué depuis Welcome Screen
               </div>
             ) : (
