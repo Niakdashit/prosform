@@ -88,12 +88,14 @@ export const CampaignLayout = ({
         </div>
       </main>
 
-      {/* Footer - ne sera jamais compressé */}
-      <CampaignFooter 
-        config={config.footer} 
-        isPreview={isPreview}
-        onConfigChange={onFooterChange}
-      />
+      {/* Footer - placé sous la ligne de flottaison, visible uniquement après scroll */}
+      <div style={{ marginTop: '100vh' }}>
+        <CampaignFooter 
+          config={config.footer} 
+          isPreview={isPreview}
+          onConfigChange={onFooterChange}
+        />
+      </div>
     </div>
   );
 };
