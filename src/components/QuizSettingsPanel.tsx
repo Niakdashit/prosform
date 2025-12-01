@@ -1,4 +1,5 @@
 import { QuizConfig, QuizQuestion, QuizAnswer } from "./QuizBuilder";
+import type { ContactField } from "./WheelBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -9,11 +10,13 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LayoutSelector } from "./LayoutSelector";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Plus, Trash2, Check, AlignCenter, Image, Split } from "lucide-react";
+import { Upload, X, Plus, Trash2, Check, AlignCenter, Image, Split, FolderOpen, Save } from "lucide-react";
 import { WallpaperUploadModal } from "./WallpaperUploadModal";
+import { FormTemplateModal } from "./FormTemplateModal";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface QuizSettingsPanelProps {
   config: QuizConfig;
@@ -22,6 +25,8 @@ interface QuizSettingsPanelProps {
   onUpdateConfig: (updates: Partial<QuizConfig>) => void;
   onUpdateQuestion: (index: number, updates: Partial<QuizQuestion>) => void;
   onViewModeChange?: (mode: 'desktop' | 'mobile') => void;
+  hideSpacingAndBackground?: boolean;
+  hideLayoutAndAlignment?: boolean;
 }
 
 export const QuizSettingsPanel = ({ 
@@ -29,10 +34,15 @@ export const QuizSettingsPanel = ({
   activeView,
   activeQuestionIndex,
   onUpdateConfig,
-  onUpdateQuestion
+  onUpdateQuestion,
+  hideSpacingAndBackground = false,
+  hideLayoutAndAlignment = false
 }: QuizSettingsPanelProps) => {
   const [wallpaperModalOpen, setWallpaperModalOpen] = useState(false);
   const [activeWallpaperSection, setActiveWallpaperSection] = useState<'welcome' | 'result'>('welcome');
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [templateModalMode, setTemplateModalMode] = useState<'load' | 'save'>('load');
+  const quizConfig = { ...config, contactForm: config.contactScreen };
   
   const handleWallpaperSelect = (imageUrl: string) => {
     switch (activeWallpaperSection) {
@@ -236,26 +246,8 @@ export const QuizSettingsPanel = ({
       case 'contact':
         return (
           <div className="space-y-4">
-            {/* Form Settings */}
-            <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
-              <div>
-                <div className="text-sm font-medium">Contact Form</div>
-                <div className="text-xs text-muted-foreground">
-                  {config.contactScreen.enabled ? 'Enabled' : 'Disabled'}
-                </div>
-              </div>
-              <Switch 
-                checked={config.contactScreen.enabled}
-                onCheckedChange={(checked) => onUpdateConfig({ 
-                  contactScreen: { ...config.contactScreen, enabled: checked } 
-                })}
-              />
-            </div>
-
-            {config.contactScreen.enabled && (
+            {!hideLayoutAndAlignment && (
               <>
-                <Separator />
-
                 <div className="space-y-3">
                   <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
                   <LayoutSelector
@@ -271,114 +263,333 @@ export const QuizSettingsPanel = ({
                 </div>
                 
                 <Separator />
+              </>
+            )}
+            
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-normal">Enable contact form</Label>
+              <Switch 
+                checked={config.contactScreen.enabled}
+                onCheckedChange={(checked) => onUpdateConfig({ 
+                  contactScreen: { ...config.contactScreen, enabled: checked } 
+                })}
+                className="scale-90" 
+              />
+            </div>
 
-                {/* Content Section */}
-                <div className="space-y-3">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Content</Label>
-                  
-                  <div>
-                    <Label className="text-xs mb-1.5 block">Form title</Label>
-                    <Input 
-                      type="text" 
-                      value={config.contactScreen.title}
-                      onChange={(e) => onUpdateConfig({ 
-                        contactScreen: { ...config.contactScreen, title: e.target.value } 
-                      })}
-                      className="h-9"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-xs mb-1.5 block">Subtitle</Label>
-                    <Input 
-                      type="text" 
-                      value={config.contactScreen.subtitle}
-                      onChange={(e) => onUpdateConfig({ 
-                        contactScreen: { ...config.contactScreen, subtitle: e.target.value } 
-                      })}
-                      className="h-9"
-                    />
-                  </div>
+            {config.contactScreen.enabled && (
+              <>
+                <Separator />
+                
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Form title</Label>
+                  <Input 
+                    type="text" 
+                    value={config.contactScreen.title}
+                    onChange={(e) => onUpdateConfig({ 
+                      contactScreen: { ...config.contactScreen, title: e.target.value } 
+                    })}
+                    className="text-xs h-8"
+                  />
                 </div>
 
-                <Separator />
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
+                  <Input 
+                    type="text" 
+                    value={config.contactScreen.subtitle}
+                    onChange={(e) => onUpdateConfig({ 
+                      contactScreen: { ...config.contactScreen, subtitle: e.target.value } 
+                    })}
+                    className="text-xs h-8"
+                  />
+                </div>
 
-                {/* Fields Section */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Fields ({config.contactScreen.fields.length})</Label>
-                  <div className="space-y-2">
-                    {config.contactScreen.fields.map((field, index) => (
-                      <div 
-                        key={field.type} 
-                        className="flex items-center justify-between p-2 rounded-md border bg-card"
-                      >
+                {!hideSpacingAndBackground && (
+                  <>
+                    <Separator />
+                    
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-2 block">
+                        Block spacing: {config.contactScreen.blockSpacing}x
+                      </Label>
+                      <Slider
+                        value={[config.contactScreen.blockSpacing]}
+                        onValueChange={([value]) => onUpdateConfig({
+                          contactScreen: { ...config.contactScreen, blockSpacing: value }
+                        })}
+                        min={0.5}
+                        max={3}
+                        step={0.25}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <Separator />
+
+                    {/* Background Image */}
+                    {config.welcomeScreen.applyBackgroundToAll ? (
+                      <div className="text-xs text-muted-foreground italic">
+                        Background appliqué depuis Welcome Screen
+                      </div>
+                    ) : (
+                      <BackgroundUploader
+                        desktopImage={config.contactScreen.backgroundImage}
+                        mobileImage={config.contactScreen.backgroundImageMobile}
+                        onDesktopImageChange={(image) => onUpdateConfig({
+                          contactScreen: { ...config.contactScreen, backgroundImage: image }
+                        })}
+                        onDesktopImageRemove={() => onUpdateConfig({
+                          contactScreen: { ...config.contactScreen, backgroundImage: undefined }
+                        })}
+                        onMobileImageChange={(image) => onUpdateConfig({
+                          contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
+                        })}
+                        onMobileImageRemove={() => onUpdateConfig({
+                          contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
+                        })}
+                      />
+                    )}
+
+                    <Separator />
+                  </>
+                )}
+
+                {/* Form Template Actions */}
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="templates" className="border-none">
+                    <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline py-2">
+                      Gérer les templates
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-3 space-y-4">
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTemplateModalMode('load');
+                            setTemplateModalOpen(true);
+                          }}
+                          className="flex-1"
+                        >
+                          <FolderOpen className="w-4 h-4 mr-2" />
+                          Charger
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTemplateModalMode('save');
+                            setTemplateModalOpen(true);
+                          }}
+                          className="flex-1"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          Sauvegarder
+                        </Button>
+                      </div>
+                
+                      <Separator />
+
+                      {/* Fields Manager */}
+                      <div className="space-y-3">
+                        {config.contactScreen.fields.map((field, index) => (
+                    <div key={field.type} className="border border-gray-200 rounded-lg p-3 bg-white">
+                      {/* Field Header */}
+                      <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${field.required ? 'bg-primary' : 'bg-muted-foreground'}`} />
-                          <span className="text-sm capitalize">{field.label}</span>
+                          <span className="text-gray-400 cursor-move">⊕</span>
+                          <span className="text-gray-400">▢</span>
+                          <span className="font-medium text-sm text-gray-800">{field.label}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            {field.required ? 'Required' : 'Optional'}
-                          </span>
-                          <Switch 
-                            checked={field.required}
-                            onCheckedChange={(checked) => {
+                        <button 
+                          onClick={() => {
+                            const newFields = config.contactScreen.fields.filter((_, i) => i !== index);
+                            onUpdateConfig({ 
+                              contactScreen: { ...config.contactScreen, fields: newFields } 
+                            });
+                          }}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      {/* Field Settings */}
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                          <Label className="text-xs text-gray-500 mb-1 block">Label du champ</Label>
+                          <Input 
+                            type="text" 
+                            value={field.label}
+                            onChange={(e) => {
                               const newFields = [...config.contactScreen.fields];
-                              newFields[index] = { ...field, required: checked };
+                              newFields[index] = { ...field, label: e.target.value };
                               onUpdateConfig({ 
                                 contactScreen: { ...config.contactScreen, fields: newFields } 
                               });
                             }}
+                            className="text-xs h-8"
                           />
                         </div>
+                        <div>
+                          <Label className="text-xs text-gray-500 mb-1 block">Type de champ</Label>
+                          <Select
+                            value={field.type}
+                            onValueChange={(value) => {
+                              const newFields = [...config.contactScreen.fields];
+                              newFields[index] = { ...field, type: value as any };
+                              onUpdateConfig({ 
+                                contactScreen: { ...config.contactScreen, fields: newFields } 
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="text">Texte</SelectItem>
+                              <SelectItem value="email">Email</SelectItem>
+                              <SelectItem value="tel">Téléphone</SelectItem>
+                              <SelectItem value="select">Liste déroulante</SelectItem>
+                              <SelectItem value="textarea">Zone de texte</SelectItem>
+                              <SelectItem value="checkbox">Case à cocher (opt-in)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    ))}
+
+                      {/* Placeholder for text, email, tel, textarea */}
+                      {['text', 'email', 'tel', 'textarea'].includes(field.type) && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Placeholder</Label>
+                          <Input 
+                            type="text" 
+                            value={field.placeholder || ''}
+                            placeholder="Texte indicatif..."
+                            onChange={(e) => {
+                              const newFields = [...config.contactScreen.fields];
+                              newFields[index] = { ...field, placeholder: e.target.value };
+                              onUpdateConfig({ 
+                                contactScreen: { ...config.contactScreen, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                      )}
+
+                      {/* Help text for checkbox */}
+                      {field.type === 'checkbox' && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Texte d'aide (RGPD)</Label>
+                          <Input 
+                            type="text" 
+                            value={field.helpText || ''}
+                            placeholder="Ex: Vous pouvez vous désabonner à tout moment"
+                            onChange={(e) => {
+                              const newFields = [...config.contactScreen.fields];
+                              newFields[index] = { ...field, helpText: e.target.value };
+                              onUpdateConfig({ 
+                                contactScreen: { ...config.contactScreen, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                      )}
+
+                      {/* Options for select */}
+                      {field.type === 'select' && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Options (une par ligne)</Label>
+                          <textarea
+                            value={(field.options || []).join('\n')}
+                            onChange={(e) => {
+                              const newFields = [...config.contactScreen.fields];
+                              newFields[index] = { 
+                                ...field, 
+                                options: e.target.value.split('\n').filter(o => o.trim()) 
+                              };
+                              onUpdateConfig({ 
+                                contactScreen: { ...config.contactScreen, fields: newFields } 
+                              });
+                            }}
+                            className="w-full px-2 py-1 text-xs border rounded min-h-[60px]"
+                            placeholder="Option 1&#10;Option 2&#10;Option 3"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Required Checkbox */}
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox"
+                          checked={field.required}
+                          onChange={(e) => {
+                            const newFields = [...config.contactScreen.fields];
+                            newFields[index] = { ...field, required: e.target.checked };
+                            onUpdateConfig({ 
+                              contactScreen: { ...config.contactScreen, fields: newFields } 
+                            });
+                          }}
+                          className="w-4 h-4 rounded border-gray-300 text-[#3d3731] focus:ring-[#3d3731]"
+                        />
+                        <Label className="text-xs text-gray-600">Champ obligatoire</Label>
+                      </div>
+                    </div>
+                  ))}
+                  
+                   {/* Add Field Button */}
+                  <div className="flex flex-col gap-2 pt-2">
+                    <Button
+                      onClick={() => {
+                        const newField: ContactField = {
+                          id: 'field_' + Date.now(),
+                          type: 'text',
+                          label: 'Nouveau champ',
+                          placeholder: '',
+                          required: false
+                        };
+                        onUpdateConfig({ 
+                          contactScreen: { 
+                            ...config.contactScreen, 
+                            fields: [...config.contactScreen.fields, newField] 
+                          } 
+                        });
+                      }}
+                      className="h-9 bg-[#3d3731] hover:bg-[#2d2721] text-white text-xs"
+                    >
+                      + Ajouter un champ
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const newField: ContactField = {
+                          id: 'optin_' + Date.now(),
+                          type: 'checkbox',
+                          label: 'J\'accepte de recevoir des communications marketing',
+                          helpText: 'Conformément au RGPD, vous pouvez vous désabonner à tout moment',
+                          required: true
+                        };
+                        onUpdateConfig({ 
+                          contactScreen: { 
+                            ...config.contactScreen, 
+                            fields: [...config.contactScreen.fields, newField] 
+                          } 
+                        });
+                      }}
+                      variant="outline"
+                      className="h-9 text-xs"
+                    >
+                      + Ajouter un opt-in RGPD
+                    </Button>
                   </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-2 block">
-                    Block spacing: {config.contactScreen.blockSpacing}x
-                  </Label>
-                  <Slider
-                    value={[config.contactScreen.blockSpacing]}
-                    onValueChange={([value]) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, blockSpacing: value }
-                    })}
-                    min={0.5}
-                    max={3}
-                    step={0.25}
-                    className="w-full"
-                  />
-                </div>
-
-                <Separator />
-
-                {/* Background Image */}
-                {config.welcomeScreen.applyBackgroundToAll ? (
-                  <div className="text-xs text-muted-foreground italic">
-                    Background appliqué depuis Welcome Screen
-                  </div>
-                ) : (
-                  <BackgroundUploader
-                    desktopImage={config.contactScreen.backgroundImage}
-                    mobileImage={config.contactScreen.backgroundImageMobile}
-                    onDesktopImageChange={(image) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImage: image }
-                    })}
-                    onDesktopImageRemove={() => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImage: undefined }
-                    })}
-                    onMobileImageChange={(image) => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImageMobile: image }
-                    })}
-                    onMobileImageRemove={() => onUpdateConfig({
-                      contactScreen: { ...config.contactScreen, backgroundImageMobile: undefined }
-                    })}
-                  />
-                )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </>
             )}
           </div>
@@ -602,6 +813,22 @@ export const QuizSettingsPanel = ({
         open={wallpaperModalOpen}
         onOpenChange={setWallpaperModalOpen}
         onImageSelect={handleWallpaperSelect}
+      />
+      
+      <FormTemplateModal
+        open={templateModalOpen}
+        onOpenChange={setTemplateModalOpen}
+        mode={templateModalMode}
+        currentFields={config.contactScreen.fields || []}
+        onLoad={(fields) => {
+          onUpdateConfig({ 
+            contactScreen: { 
+              ...config.contactScreen, 
+              fields: fields as ContactField[] 
+            } 
+          });
+        }}
+        onSave={() => {}}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { ScratchConfig } from "./ScratchBuilder";
+import { ScratchConfig, ContactField } from "./ScratchBuilder";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { LayoutSelector } from "./LayoutSelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
+import { Button } from "@/components/ui/button";
+import { X, FolderOpen, Save } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { FormTemplateModal } from "./FormTemplateModal";
+import { useState } from "react";
 
 interface ScratchSettingsPanelProps {
   config: ScratchConfig;
@@ -25,6 +30,9 @@ export const ScratchSettingsPanel = ({
   hideSpacingAndBackground = false,
   hideLayoutAndAlignment = false
 }: ScratchSettingsPanelProps) => {
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [templateModalMode, setTemplateModalMode] = useState<'load' | 'save'>('load');
+  const scratchConfig = config;
   
   const renderSettings = () => {
     switch (activeView) {
@@ -137,122 +145,77 @@ export const ScratchSettingsPanel = ({
       case 'contact':
         return (
           <div className="space-y-4">
-            {/* Form Settings */}
-            <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
-              <div>
-                <div className="text-sm font-medium">Contact Form</div>
-                <div className="text-xs text-muted-foreground">
-                  {config.contactForm.enabled ? 'Enabled' : 'Disabled'}
+            {!hideLayoutAndAlignment && (
+              <>
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
+                  <LayoutSelector
+                    desktopLayout={scratchConfig.contactForm.desktopLayout}
+                    mobileLayout={scratchConfig.contactForm.mobileLayout}
+                    onDesktopLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...scratchConfig.contactForm, desktopLayout: layout }
+                    })}
+                    onMobileLayoutChange={(layout) => onUpdateConfig({
+                      contactForm: { ...scratchConfig.contactForm, mobileLayout: layout }
+                    })}
+                  />
                 </div>
-              </div>
+                
+                <Separator />
+              </>
+            )}
+            
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-normal">Enable contact form</Label>
               <Switch 
-                checked={config.contactForm.enabled}
+                checked={scratchConfig.contactForm.enabled}
                 onCheckedChange={(checked) => onUpdateConfig({ 
-                  contactForm: { ...config.contactForm, enabled: checked } 
+                  contactForm: { ...scratchConfig.contactForm, enabled: checked } 
                 })}
+                className="scale-90" 
               />
             </div>
 
-            {config.contactForm.enabled && (
+            {scratchConfig.contactForm.enabled && (
               <>
                 <Separator />
-
-                {!hideLayoutAndAlignment && (
-                  <>
-                    <div className="space-y-3">
-                      <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
-                      <LayoutSelector
-                        desktopLayout={config.contactForm.desktopLayout}
-                        mobileLayout={config.contactForm.mobileLayout}
-                        onDesktopLayoutChange={(layout) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, desktopLayout: layout }
-                        })}
-                        onMobileLayoutChange={(layout) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, mobileLayout: layout }
-                        })}
-                      />
-                    </div>
-                    
-                    <Separator />
-                  </>
-                )}
-
-                {/* Content Section */}
-                <div className="space-y-3">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Content</Label>
-                  
-                  <div>
-                    <Label className="text-xs mb-1.5 block">Form title</Label>
-                    <Input 
-                      type="text" 
-                      value={config.contactForm.title}
-                      onChange={(e) => onUpdateConfig({ 
-                        contactForm: { ...config.contactForm, title: e.target.value } 
-                      })}
-                      className="h-9"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-xs mb-1.5 block">Subtitle</Label>
-                    <Input 
-                      type="text" 
-                      value={config.contactForm.subtitle}
-                      onChange={(e) => onUpdateConfig({ 
-                        contactForm: { ...config.contactForm, subtitle: e.target.value } 
-                      })}
-                      className="h-9"
-                    />
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Fields Section */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground mb-2 block">Fields ({config.contactForm.fields.length})</Label>
-                  <div className="space-y-2">
-                    {config.contactForm.fields.map((field, index) => (
-                      <div 
-                        key={field.type} 
-                        className="flex items-center justify-between p-2 rounded-md border bg-card"
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${field.required ? 'bg-primary' : 'bg-muted-foreground'}`} />
-                          <span className="text-sm capitalize">{field.label}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            {field.required ? 'Required' : 'Optional'}
-                          </span>
-                          <Switch 
-                            checked={field.required}
-                            onCheckedChange={(checked) => {
-                              const newFields = [...config.contactForm.fields];
-                              newFields[index] = { ...field, required: checked };
-                              onUpdateConfig({ 
-                                contactForm: { ...config.contactForm, fields: newFields } 
-                              });
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
                 
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Form title</Label>
+                  <Input 
+                    type="text" 
+                    value={scratchConfig.contactForm.title}
+                    onChange={(e) => onUpdateConfig({ 
+                      contactForm: { ...scratchConfig.contactForm, title: e.target.value } 
+                    })}
+                    className="text-xs h-8"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Subtitle</Label>
+                  <Input 
+                    type="text" 
+                    value={scratchConfig.contactForm.subtitle}
+                    onChange={(e) => onUpdateConfig({ 
+                      contactForm: { ...scratchConfig.contactForm, subtitle: e.target.value } 
+                    })}
+                    className="text-xs h-8"
+                  />
+                </div>
+
                 {!hideSpacingAndBackground && (
                   <>
                     <Separator />
-
+                    
                     <div>
                       <Label className="text-xs text-muted-foreground mb-2 block">
-                        Block spacing: {config.contactForm.blockSpacing}x
+                        Block spacing: {scratchConfig.contactForm.blockSpacing}x
                       </Label>
                       <Slider
-                        value={[config.contactForm.blockSpacing]}
+                        value={[scratchConfig.contactForm.blockSpacing]}
                         onValueChange={([value]) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, blockSpacing: value }
+                          contactForm: { ...scratchConfig.contactForm, blockSpacing: value }
                         })}
                         min={0.5}
                         max={3}
@@ -264,30 +227,268 @@ export const ScratchSettingsPanel = ({
                     <Separator />
 
                     {/* Background Image */}
-                    {config.welcomeScreen.applyBackgroundToAll ? (
+                    {scratchConfig.welcomeScreen.applyBackgroundToAll ? (
                       <div className="text-xs text-muted-foreground italic">
                         Background appliqué depuis Welcome Screen
                       </div>
                     ) : (
                       <BackgroundUploader
-                        desktopImage={config.contactForm.backgroundImage}
-                        mobileImage={config.contactForm.backgroundImageMobile}
+                        desktopImage={scratchConfig.contactForm.backgroundImage}
+                        mobileImage={scratchConfig.contactForm.backgroundImageMobile}
                         onDesktopImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImage: image }
+                          contactForm: { ...scratchConfig.contactForm, backgroundImage: image }
                         })}
                         onDesktopImageRemove={() => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImage: undefined }
+                          contactForm: { ...scratchConfig.contactForm, backgroundImage: undefined }
                         })}
                         onMobileImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImageMobile: image }
+                          contactForm: { ...scratchConfig.contactForm, backgroundImageMobile: image }
                         })}
                         onMobileImageRemove={() => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
+                          contactForm: { ...scratchConfig.contactForm, backgroundImageMobile: undefined }
                         })}
                       />
                     )}
+
+                    <Separator />
                   </>
                 )}
+
+                {/* Form Template Actions */}
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="templates" className="border-none">
+                    <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline py-2">
+                      Gérer les templates
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-3 space-y-4">
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTemplateModalMode('load');
+                            setTemplateModalOpen(true);
+                          }}
+                          className="flex-1"
+                        >
+                          <FolderOpen className="w-4 h-4 mr-2" />
+                          Charger
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTemplateModalMode('save');
+                            setTemplateModalOpen(true);
+                          }}
+                          className="flex-1"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          Sauvegarder
+                        </Button>
+                      </div>
+                
+                      <Separator />
+
+                      {/* Fields Manager */}
+                      <div className="space-y-3">
+                        {scratchConfig.contactForm.fields.map((field, index) => (
+                    <div key={field.type} className="border border-gray-200 rounded-lg p-3 bg-white">
+                      {/* Field Header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400 cursor-move">⊕</span>
+                          <span className="text-gray-400">▢</span>
+                          <span className="font-medium text-sm text-gray-800">{field.label}</span>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            const newFields = scratchConfig.contactForm.fields.filter((_, i) => i !== index);
+                            onUpdateConfig({ 
+                              contactForm: { ...scratchConfig.contactForm, fields: newFields } 
+                            });
+                          }}
+                          className="text-red-500 hover:text-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      
+                      {/* Field Settings */}
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                          <Label className="text-xs text-gray-500 mb-1 block">Label du champ</Label>
+                          <Input 
+                            type="text" 
+                            value={field.label}
+                            onChange={(e) => {
+                              const newFields = [...scratchConfig.contactForm.fields];
+                              newFields[index] = { ...field, label: e.target.value };
+                              onUpdateConfig({ 
+                                contactForm: { ...scratchConfig.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-500 mb-1 block">Type de champ</Label>
+                          <Select
+                            value={field.type}
+                            onValueChange={(value) => {
+                              const newFields = [...scratchConfig.contactForm.fields];
+                              newFields[index] = { ...field, type: value as any };
+                              onUpdateConfig({ 
+                                contactForm: { ...scratchConfig.contactForm, fields: newFields } 
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="h-8 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="text">Texte</SelectItem>
+                              <SelectItem value="email">Email</SelectItem>
+                              <SelectItem value="tel">Téléphone</SelectItem>
+                              <SelectItem value="select">Liste déroulante</SelectItem>
+                              <SelectItem value="textarea">Zone de texte</SelectItem>
+                              <SelectItem value="checkbox">Case à cocher (opt-in)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* Placeholder for text, email, tel, textarea */}
+                      {['text', 'email', 'tel', 'textarea'].includes(field.type) && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Placeholder</Label>
+                          <Input 
+                            type="text" 
+                            value={field.placeholder || ''}
+                            placeholder="Texte indicatif..."
+                            onChange={(e) => {
+                              const newFields = [...scratchConfig.contactForm.fields];
+                              newFields[index] = { ...field, placeholder: e.target.value };
+                              onUpdateConfig({ 
+                                contactForm: { ...scratchConfig.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                      )}
+
+                      {/* Help text for checkbox */}
+                      {field.type === 'checkbox' && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Texte d'aide (RGPD)</Label>
+                          <Input 
+                            type="text" 
+                            value={field.helpText || ''}
+                            placeholder="Ex: Vous pouvez vous désabonner à tout moment"
+                            onChange={(e) => {
+                              const newFields = [...scratchConfig.contactForm.fields];
+                              newFields[index] = { ...field, helpText: e.target.value };
+                              onUpdateConfig({ 
+                                contactForm: { ...scratchConfig.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                      )}
+
+                      {/* Options for select */}
+                      {field.type === 'select' && (
+                        <div className="mb-3">
+                          <Label className="text-xs text-gray-500 mb-1 block">Options (une par ligne)</Label>
+                          <textarea
+                            value={(field.options || []).join('\n')}
+                            onChange={(e) => {
+                              const newFields = [...scratchConfig.contactForm.fields];
+                              newFields[index] = { 
+                                ...field, 
+                                options: e.target.value.split('\n').filter(o => o.trim()) 
+                              };
+                              onUpdateConfig({ 
+                                contactForm: { ...scratchConfig.contactForm, fields: newFields } 
+                              });
+                            }}
+                            className="w-full px-2 py-1 text-xs border rounded min-h-[60px]"
+                            placeholder="Option 1&#10;Option 2&#10;Option 3"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Required Checkbox */}
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox"
+                          checked={field.required}
+                          onChange={(e) => {
+                            const newFields = [...scratchConfig.contactForm.fields];
+                            newFields[index] = { ...field, required: e.target.checked };
+                            onUpdateConfig({ 
+                              contactForm: { ...scratchConfig.contactForm, fields: newFields } 
+                            });
+                          }}
+                          className="w-4 h-4 rounded border-gray-300 text-[#3d3731] focus:ring-[#3d3731]"
+                        />
+                        <Label className="text-xs text-gray-600">Champ obligatoire</Label>
+                      </div>
+                    </div>
+                  ))}
+                  
+                   {/* Add Field Button */}
+                  <div className="flex flex-col gap-2 pt-2">
+                    <Button
+                      onClick={() => {
+                        const newField: ContactField = {
+                          id: 'field_' + Date.now(),
+                          type: 'text',
+                          label: 'Nouveau champ',
+                          placeholder: '',
+                          required: false
+                        };
+                        onUpdateConfig({ 
+                          contactForm: { 
+                            ...scratchConfig.contactForm, 
+                            fields: [...scratchConfig.contactForm.fields, newField] 
+                          } 
+                        });
+                      }}
+                      className="h-9 bg-[#3d3731] hover:bg-[#2d2721] text-white text-xs"
+                    >
+                      + Ajouter un champ
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const newField: ContactField = {
+                          id: 'optin_' + Date.now(),
+                          type: 'checkbox',
+                          label: 'J\'accepte de recevoir des communications marketing',
+                          helpText: 'Conformément au RGPD, vous pouvez vous désabonner à tout moment',
+                          required: true
+                        };
+                        onUpdateConfig({ 
+                          contactForm: { 
+                            ...scratchConfig.contactForm, 
+                            fields: [...scratchConfig.contactForm.fields, newField] 
+                          } 
+                        });
+                      }}
+                      variant="outline"
+                      className="h-9 text-xs"
+                    >
+                      + Ajouter un opt-in RGPD
+                    </Button>
+                  </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </>
             )}
           </div>
@@ -607,16 +808,34 @@ export const ScratchSettingsPanel = ({
   };
 
   return (
-    <div className="w-[280px] bg-background border-l border-border flex flex-col">
-      <div className="p-3 border-b border-border">
-        <h3 className="font-semibold text-sm">Settings</h3>
-        <p className="text-xs text-muted-foreground">{getViewTitle()}</p>
-      </div>
-      <ScrollArea className="flex-1">
-        <div className="p-3">
-          {renderSettings()}
+    <>
+      <div className="w-[280px] bg-background border-l border-border flex flex-col">
+        <div className="p-3 border-b border-border">
+          <h3 className="font-semibold text-sm">Settings</h3>
+          <p className="text-xs text-muted-foreground">{getViewTitle()}</p>
         </div>
-      </ScrollArea>
-    </div>
+        <ScrollArea className="flex-1">
+          <div className="p-3">
+            {renderSettings()}
+          </div>
+        </ScrollArea>
+      </div>
+      
+      <FormTemplateModal
+        open={templateModalOpen}
+        onOpenChange={setTemplateModalOpen}
+        mode={templateModalMode}
+        currentFields={scratchConfig.contactForm.fields || []}
+        onLoad={(fields) => {
+          onUpdateConfig({ 
+            contactForm: { 
+              ...scratchConfig.contactForm, 
+              fields: fields as ContactField[] 
+            } 
+          });
+        }}
+        onSave={() => {}}
+      />
+    </>
   );
 };
