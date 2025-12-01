@@ -316,34 +316,43 @@ export const WheelSettingsPanel = ({
                 )}
 
                 {/* Form Template Actions */}
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setTemplateModalMode('load');
-                      setTemplateModalOpen(true);
-                    }}
-                    className="flex-1"
-                  >
-                    <FolderOpen className="w-4 h-4 mr-2" />
-                    Charger
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setTemplateModalMode('save');
-                      setTemplateModalOpen(true);
-                    }}
-                    className="flex-1"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Sauvegarder
-                  </Button>
-                </div>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="templates" className="border-none">
+                    <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline py-2">
+                      Gérer les templates
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-3">
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTemplateModalMode('load');
+                            setTemplateModalOpen(true);
+                          }}
+                          className="flex-1"
+                        >
+                          <FolderOpen className="w-4 h-4 mr-2" />
+                          Charger
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTemplateModalMode('save');
+                            setTemplateModalOpen(true);
+                          }}
+                          className="flex-1"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          Sauvegarder
+                        </Button>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
                 
                 <Separator />
 
