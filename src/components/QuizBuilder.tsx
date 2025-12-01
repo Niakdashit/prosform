@@ -387,10 +387,30 @@ export const QuizBuilder = () => {
       <QuizTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
-          localStorage.setItem('quiz-config', JSON.stringify(config));
-          localStorage.setItem('quiz-viewMode', targetViewMode);
-          localStorage.setItem('quiz-theme', JSON.stringify(theme));
-          window.open('/quiz-preview', '_blank');
+          
+          // Si la campagne est déjà sauvegardée, on passe par l'ID (aucune limite de taille)
+          if (campaignId && campaign?.id) {
+            try {
+              localStorage.setItem('quiz-viewMode', targetViewMode);
+              localStorage.setItem('quiz-theme', JSON.stringify(theme));
+            } catch (e) {
+              console.warn('Unable to store preview settings in localStorage:', e);
+            }
+            window.open(`/quiz-preview?id=${campaign.id}`, '_blank');
+            return;
+          }
+          
+          // Sinon, on utilise localStorage (fallback pour nouvelles campagnes)
+          try {
+            localStorage.setItem('quiz-config', JSON.stringify(config));
+            localStorage.setItem('quiz-viewMode', targetViewMode);
+            localStorage.setItem('quiz-theme', JSON.stringify(theme));
+            window.open('/quiz-preview', '_blank');
+          } catch (e) {
+            console.error('Impossible de stocker dans localStorage:', e);
+            // Ouvrir quand même la preview (potentiellement sans config)
+            window.open('/quiz-preview', '_blank');
+          }
         }}
         onSave={handleSave}
         onPublish={handlePublish}
