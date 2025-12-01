@@ -104,7 +104,6 @@ export const CampaignService = {
       throw error;
     }
 
-    console.log('✅ [CampaignService] Campaign created:', data.id);
     return transformCampaign(data);
   },
 
@@ -130,7 +129,6 @@ export const CampaignService = {
       throw error;
     }
 
-    console.log('✅ [CampaignService] Campaign updated:', id);
     return transformCampaign(data);
   },
 
@@ -168,7 +166,6 @@ export const CampaignService = {
       throw error;
     }
 
-    console.log('✅ [CampaignService] Campaign deleted:', id);
   },
 
   /**

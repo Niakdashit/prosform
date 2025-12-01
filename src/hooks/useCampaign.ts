@@ -75,15 +75,12 @@ export function useCampaign(
           // Merge deep: defaultConfig + data.config pour garder les valeurs par défaut
           const mergedConfig = deepMerge(defaultConfig, data.config || {});
           setConfigState(mergedConfig);
-          console.log('✅ Config loaded:', mergedConfig);
-          console.log('✅ Background image:', mergedConfig.welcomeScreen?.backgroundImage ? 'Present' : 'Missing');
           setPrizesState(data.prizes || []);
           setName(data.name);
           
           // Restore theme if saved and themeContext provided
           if (data.theme && Object.keys(data.theme).length > 0 && themeContext) {
             themeContext.updateTheme(data.theme);
-            console.log('✅ Theme restored:', Object.keys(data.theme).length, 'properties');
           }
           
           // Restore dates
@@ -98,7 +95,6 @@ export function useCampaign(
             setEndTime(endDateTime.toTimeString().slice(0, 5));
           }
           
-          console.log('✅ Campaign loaded:', data.id);
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Erreur de chargement';

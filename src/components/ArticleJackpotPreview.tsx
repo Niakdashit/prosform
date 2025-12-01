@@ -192,7 +192,7 @@ export const ArticleJackpotPreview: React.FC<ArticleJackpotPreviewProps> = ({
         );
 
       case 'ending-win':
-      case 'ending-lose':
+      case 'ending-lose': {
         const isWin = activeView === 'ending-win';
         const endingConfig = isWin ? config.endingWin : config.endingLose;
         const endingKey = isWin ? 'endingWin' : 'endingLose';
@@ -264,6 +264,7 @@ export const ArticleJackpotPreview: React.FC<ArticleJackpotPreviewProps> = ({
             />
           </div>
         );
+      }
 
       default:
         return null;

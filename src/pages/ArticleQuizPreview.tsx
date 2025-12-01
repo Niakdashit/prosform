@@ -158,7 +158,7 @@ const ArticleQuizPreview = () => {
           </div>
         );
 
-      case 'question':
+      case 'question': {
         const currentQuestion = config.questions[currentQuestionIndex];
         
         return (
@@ -210,8 +210,9 @@ const ArticleQuizPreview = () => {
             )}
           </div>
         );
+      }
 
-      case 'result':
+      case 'result': {
         const totalPoints = config.questions.reduce((sum, q) => sum + q.points, 0);
         const percentage = Math.round((score / totalPoints) * 100);
         
@@ -241,6 +242,7 @@ const ArticleQuizPreview = () => {
             )}
           </div>
         );
+      }
 
       default:
         return null;

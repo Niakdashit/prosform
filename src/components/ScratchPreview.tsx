@@ -27,6 +27,7 @@ interface ScratchPreviewProps {
   isReadOnly?: boolean;
   onNext: () => void;
   onGoToEnding?: (isWin: boolean) => void;
+  onContactDataChange?: (data: Record<string, string>) => void;
   prizes?: ScratchPrize[];
   onUpdatePrize?: (prize: ScratchPrize) => void;
 }
@@ -41,11 +42,23 @@ export const ScratchPreview = ({
   isReadOnly = false,
   onNext,
   onGoToEnding,
+  onContactDataChange,
   prizes = [],
   onUpdatePrize
 }: ScratchPreviewProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
-  const [contactData, setContactData] = useState({ name: '', email: '', phone: '' });
+  const [contactData, setContactDataInternal] = useState<Record<string, string>>({ name: '', email: '', phone: '' });
+  
+  // Wrapper pour mettre à jour le contactData et notifier le parent
+  const setContactData = (updater: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) => {
+    setContactDataInternal(prev => {
+      const newData = typeof updater === 'function' ? updater(prev) : updater;
+      if (onContactDataChange) {
+        onContactDataChange(newData);
+      }
+      return newData;
+    });
+  };
   const [isSpinning, setIsSpinning] = useState(false);
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const [showVariableMenu, setShowVariableMenu] = useState(false);
@@ -147,7 +160,7 @@ export const ScratchPreview = ({
         assignedSegments: [] as string[], // Scratch n'utilise pas de segments assignés
       }));
 
-      console.log('🎫 [ScratchPreview] Début du tirage avec', prizesForDraw.length, 'lots');
+      
       console.log('🎫 [ScratchPreview] Lots:', prizesForDraw.map(p => ({
         name: p.name,
         method: p.attributionMethod,
@@ -1302,7 +1315,7 @@ export const ScratchPreview = ({
                                     else onNext();
                                   }, 1000);
                                 } else {
-                                  console.log('🎫 [ScratchPreview] ❌ Pas de gain');
+                                  
                                   setWonPrize(null);
                                   setTimeout(() => {
                                     globalScratchDrawResult = null;

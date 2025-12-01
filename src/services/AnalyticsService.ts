@@ -41,24 +41,20 @@ export interface GlobalStats {
 export const AnalyticsService = {
   
   async getGlobalStats(): Promise<GlobalStats> {
-    // Récupérer la somme de toutes les vues depuis campaign_analytics (backend externe)
+    // Récupérer les stats agrégées depuis campaign_analytics (backend externe)
     const { data: analyticsData, error: analyticsError } = await supabase
       .from('campaign_analytics')
-      .select('total_views, avg_time_spent');
+      .select('total_views, total_completions, total_participations, avg_time_spent');
 
     if (analyticsError) {
       console.error('Error fetching analytics:', analyticsError);
     }
 
+    // Agréger les stats de toutes les campagnes
     const globalViews = (analyticsData || []).reduce((sum, item: any) => sum + (item.total_views || 0), 0);
+    const globalCompletions = (analyticsData || []).reduce((sum, item: any) => sum + (item.total_completions || 0), 0);
+    const globalParticipations = (analyticsData || []).reduce((sum, item: any) => sum + (item.total_participations || 0), 0);
     const avgTimeSpent = (analyticsData || []).reduce((sum, item: any) => sum + (item.avg_time_spent || 0), 0) / Math.max((analyticsData || []).length, 1);
-
-    // Utiliser les participations comme source de vérité
-    const { data: participants, error: participantsError } = await supabase
-      .from('campaign_participants')
-      .select('completed_at, participation_data');
-
-    if (participantsError) throw participantsError;
 
     // Compter les campagnes
     const { count: campaignCount, error: campaignError } = await supabase
@@ -67,36 +63,25 @@ export const AnalyticsService = {
 
     if (campaignError) throw campaignError;
 
-    const totals = (participants || []).reduce(
-      (acc, participant: any) => {
-        acc.total_participations += 1;
+    // Compter les gagnants depuis les participants (pour total_winners)
+    const { data: winners, error: winnersError } = await supabase
+      .from('campaign_participants')
+      .select('id')
+      .not('participation_data->result->type', 'neq', 'win');
 
-        const isWin =
-          !!participant.completed_at ||
-          participant.participation_data?.result?.type === 'win';
+    const totalWinners = winners?.length || 0;
 
-        if (isWin) {
-          acc.total_completions += 1;
-        }
-
-        return acc;
-      },
-      {
-        total_participations: 0,
-        total_completions: 0,
-      }
-    );
-
-    const conversion_rate = totals.total_participations > 0
-      ? (totals.total_completions / totals.total_participations) * 100
+    // Taux de conversion = completions / vues
+    const conversion_rate = globalViews > 0
+      ? (globalCompletions / globalViews) * 100
       : 0;
 
     return {
-      total_views: globalViews, // Maintenant depuis campaign_analytics
-      total_participations: totals.total_participations,
-      total_completions: totals.total_completions,
+      total_views: globalViews,
+      total_participations: globalParticipations,
+      total_completions: globalCompletions,
       total_campaigns: campaignCount || 0,
-      total_winners: totals.total_completions,
+      total_winners: totalWinners,
       conversion_rate: Math.round(conversion_rate),
       avg_time_spent: Math.round(avgTimeSpent),
     };
@@ -111,88 +96,57 @@ export const AnalyticsService = {
     if (campaignsError) throw campaignsError;
 
     // Récupérer les analytics de toutes les campagnes (backend externe)
+    // total_views, total_completions, total_participations viennent de campaign_analytics
     const { data: analyticsData, error: analyticsError } = await supabase
       .from('campaign_analytics')
-      .select('campaign_id, total_views, avg_time_spent');
+      .select('campaign_id, total_views, total_completions, total_participations, avg_time_spent, last_participation_at');
 
     if (analyticsError) {
       console.error('Error fetching campaign analytics:', analyticsError);
     }
 
     // Créer une map pour accès rapide aux analytics
-    const analyticsMap = new Map<string, { total_views: number; avg_time_spent: number }>();
+    const analyticsMap = new Map<string, { 
+      total_views: number; 
+      total_completions: number;
+      total_participations: number;
+      avg_time_spent: number;
+      last_participation_at: string | null;
+    }>();
     (analyticsData || []).forEach((analytics: any) => {
       analyticsMap.set(analytics.campaign_id, {
         total_views: analytics.total_views || 0,
+        total_completions: analytics.total_completions || 0,
+        total_participations: analytics.total_participations || 0,
         avg_time_spent: analytics.avg_time_spent || 0,
+        last_participation_at: analytics.last_participation_at || null,
       });
     });
 
-    // Récupérer toutes les participations
-    const { data: participants, error: participantsError } = await supabase
-      .from('campaign_participants')
-      .select('campaign_id, completed_at, participation_data, created_at');
-
-    if (participantsError) throw participantsError;
-
-    const statsByCampaign = new Map<string, {
-      total_participations: number;
-      total_completions: number;
-      last_participation_at: string | null;
-    }>();
-
-    (participants || []).forEach((participant: any) => {
-      const id = participant.campaign_id as string;
-      const current = statsByCampaign.get(id) || {
-        total_participations: 0,
-        total_completions: 0,
-        last_participation_at: null,
-      };
-
-      current.total_participations += 1;
-
-      const isWin =
-        !!participant.completed_at ||
-        participant.participation_data?.result?.type === 'win';
-
-      if (isWin) {
-        current.total_completions += 1;
-      }
-
-      const createdAt = participant.created_at as string | undefined;
-      if (createdAt && (!current.last_participation_at || createdAt > current.last_participation_at)) {
-        current.last_participation_at = createdAt;
-      }
-
-      statsByCampaign.set(id, current);
-    });
-
     return (campaigns || []).map(campaign => {
-      const stats = statsByCampaign.get(campaign.id) || {
-        total_participations: 0,
-        total_completions: 0,
-        last_participation_at: null,
-      };
-
       const analytics = analyticsMap.get(campaign.id) || {
         total_views: 0,
+        total_completions: 0,
+        total_participations: 0,
         avg_time_spent: 0,
+        last_participation_at: null,
       };
 
-      const conversion_rate = stats.total_participations > 0
-        ? Math.round((stats.total_completions / stats.total_participations) * 100)
+      // Taux de conversion = completions / vues
+      const conversion_rate = analytics.total_views > 0
+        ? Math.round((analytics.total_completions / analytics.total_views) * 100)
         : 0;
 
       return {
         campaign_id: campaign.id,
         campaign_name: (campaign as any).name || 'Sans nom',
         campaign_type: (campaign as any).type || 'unknown',
-        total_views: analytics.total_views, // Maintenant depuis campaign_analytics
-        total_participations: stats.total_participations,
-        total_completions: stats.total_completions,
+        total_views: analytics.total_views,
+        total_participations: analytics.total_participations,
+        total_completions: analytics.total_completions,
         conversion_rate,
         avg_time_spent: analytics.avg_time_spent,
-        last_participation_at: stats.last_participation_at,
+        last_participation_at: analytics.last_participation_at,
       };
     });
   },
@@ -211,9 +165,10 @@ export const AnalyticsService = {
     }
 
     // Récupérer les analytics de cette campagne (backend externe)
+    // total_views et total_completions viennent de campaign_analytics (trackés par étape)
     const { data: analyticsData, error: analyticsError } = await supabase
       .from('campaign_analytics')
-      .select('total_views, avg_time_spent')
+      .select('total_views, total_completions, avg_time_spent')
       .eq('campaign_id', campaignId)
       .maybeSingle();
 
@@ -221,12 +176,12 @@ export const AnalyticsService = {
       console.error('Error fetching campaign analytics:', analyticsError);
     }
 
-    const analytics = analyticsData || { total_views: 0, avg_time_spent: 0 };
+    const analytics = analyticsData || { total_views: 0, total_completions: 0, avg_time_spent: 0 };
 
-    // Récupérer les participations de cette campagne
+    // Récupérer les participations de cette campagne pour total_participations
     const { data: participants, error: participantsError } = await supabase
       .from('campaign_participants')
-      .select('created_at, completed_at, participation_data')
+      .select('created_at')
       .eq('campaign_id', campaignId);
 
     if (participantsError) {
@@ -234,67 +189,50 @@ export const AnalyticsService = {
       return null;
     }
 
-    const totals = (participants || []).reduce(
-      (acc, participant: any) => {
-        acc.total_participations += 1;
+    const total_participations = participants?.length || 0;
+    const last_participation_at = participants?.length 
+      ? participants.reduce((latest, p) => {
+          const createdAt = p.created_at as string;
+          return !latest || createdAt > latest ? createdAt : latest;
+        }, '' as string)
+      : null;
 
-        const isWin =
-          !!participant.completed_at ||
-          participant.participation_data?.result?.type === 'win';
-
-        if (isWin) {
-          acc.total_completions += 1;
-        }
-
-        const createdAt = participant.created_at as string | undefined;
-        if (createdAt && (!acc.last_participation_at || createdAt > acc.last_participation_at)) {
-          acc.last_participation_at = createdAt;
-        }
-
-        return acc;
-      },
-      {
-        total_participations: 0,
-        total_completions: 0,
-        last_participation_at: null as string | null,
-      }
-    );
-
-    const conversion_rate = totals.total_participations > 0
-      ? Math.round((totals.total_completions / totals.total_participations) * 100)
+    // Taux de conversion = completions / vues (pas participations)
+    const conversion_rate = analytics.total_views > 0
+      ? Math.round((analytics.total_completions / analytics.total_views) * 100)
       : 0;
 
     return {
       campaign_id: campaign.id,
       campaign_name: (campaign as any).name || 'Sans nom',
       campaign_type: (campaign as any).type || 'unknown',
-      total_views: analytics.total_views, // Maintenant depuis campaign_analytics
-      total_participations: totals.total_participations,
-      total_completions: totals.total_completions,
+      total_views: analytics.total_views,
+      total_participations,
+      total_completions: analytics.total_completions, // Maintenant depuis campaign_analytics
       conversion_rate,
       avg_time_spent: analytics.avg_time_spent,
-      last_participation_at: totals.last_participation_at,
+      last_participation_at,
     };
   },
   
   /**
-   * Récupère les données de séries temporelles (7 derniers jours)
+   * Récupère les données de séries temporelles globales
+   * Utilise daily_analytics si disponible, sinon fallback sur les estimations
    */
   async getTimeSeriesData(days: number = 7): Promise<TimeSeriesData[]> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+    const startDateStr = startDate.toISOString().split('T')[0];
     
-    const { data, error } = await supabase
-      .from('campaign_participants')
-      .select('created_at, completed_at')
-      .gte('created_at', startDate.toISOString());
-    
-    if (error) throw error;
-    
-    // Grouper par jour
-    const groupedByDay = new Map<string, { views: number; participations: number; conversions: number }>();
+    // Essayer d'abord daily_analytics pour les vraies données
+    const { data: dailyData, error: dailyError } = await supabase
+      .from('daily_analytics')
+      .select('date, views, participations, completions')
+      .gte('date', startDateStr)
+      .order('date', { ascending: true });
     
     // Initialiser tous les jours
+    const groupedByDay = new Map<string, { views: number; participations: number; conversions: number }>();
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
@@ -302,20 +240,39 @@ export const AnalyticsService = {
       groupedByDay.set(dateKey, { views: 0, participations: 0, conversions: 0 });
     }
     
-    // Remplir avec les vraies données
-    (data || []).forEach(participant => {
-      const dateKey = participant.created_at.split('T')[0];
-      const dayData = groupedByDay.get(dateKey);
-      
-      if (dayData) {
-        dayData.participations += 1;
-        if (participant.completed_at) {
-          dayData.conversions += 1;
+    // Si daily_analytics a des données, les utiliser
+    if (!dailyError && dailyData && dailyData.length > 0) {
+      dailyData.forEach(day => {
+        const existing = groupedByDay.get(day.date);
+        if (existing) {
+          existing.views += day.views || 0;
+          existing.participations += day.participations || 0;
+          existing.conversions += day.completions || 0;
         }
-        // Pour l'instant, views = participations * 2.5 (estimation)
-        dayData.views = Math.round(dayData.participations * 2.5);
+      });
+    } else {
+      // Fallback: utiliser campaign_participants avec estimation
+      const { data, error } = await supabase
+        .from('campaign_participants')
+        .select('created_at, completed_at')
+        .gte('created_at', startDate.toISOString());
+      
+      if (!error && data) {
+        data.forEach(participant => {
+          const dateKey = participant.created_at.split('T')[0];
+          const dayData = groupedByDay.get(dateKey);
+          
+          if (dayData) {
+            dayData.participations += 1;
+            if (participant.completed_at) {
+              dayData.conversions += 1;
+            }
+            // Estimation basée sur le funnel moyen (4 étapes)
+            dayData.views = Math.round(dayData.participations * 4);
+          }
+        });
       }
-    });
+    }
     
     return Array.from(groupedByDay.entries()).map(([date, data]) => ({
       date,
@@ -325,52 +282,74 @@ export const AnalyticsService = {
 
   /**
    * Récupère les données de séries temporelles pour une campagne spécifique
+   * Utilise daily_analytics si disponible, sinon fallback sur les estimations
    */
   async getTimeSeriesDataByCampaign(campaignId: string, days: number = 7): Promise<TimeSeriesData[]> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+    const startDateStr = startDate.toISOString().split('T')[0];
     
-    const { data, error } = await supabase
-      .from('campaign_participants')
-      .select('created_at, completed_at')
-      .eq('campaign_id', campaignId)
-      .gte('created_at', startDate.toISOString());
-    
-    if (error) {
-      console.error('Error fetching time series data:', error);
-      return [];
-    }
-    
-    // Grouper par jour
-    const groupedByDay = new Map<string, { views: number; participations: number; conversions: number }>();
-    
-    // Initialiser tous les jours
+    // Initialiser tous les jours avec le format d'affichage
+    const groupedByDay = new Map<string, { views: number; participations: number; conversions: number; isoDate: string }>();
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const dateKey = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-      groupedByDay.set(dateKey, { views: 0, participations: 0, conversions: 0 });
+      const isoDate = date.toISOString().split('T')[0];
+      const displayDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      groupedByDay.set(displayDate, { views: 0, participations: 0, conversions: 0, isoDate });
     }
     
-    // Remplir avec les vraies données
-    (data || []).forEach(participant => {
-      const date = new Date(participant.created_at);
-      const dateKey = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-      const dayData = groupedByDay.get(dateKey);
-      
-      if (dayData) {
-        dayData.participations += 1;
-        if (participant.completed_at) {
-          dayData.conversions += 1;
+    // Essayer d'abord daily_analytics pour les vraies données
+    const { data: dailyData, error: dailyError } = await supabase
+      .from('daily_analytics')
+      .select('date, views, participations, completions')
+      .eq('campaign_id', campaignId)
+      .gte('date', startDateStr)
+      .order('date', { ascending: true });
+    
+    // Si daily_analytics a des données, les utiliser
+    if (!dailyError && dailyData && dailyData.length > 0) {
+      dailyData.forEach(day => {
+        const date = new Date(day.date);
+        const displayDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        const existing = groupedByDay.get(displayDate);
+        if (existing) {
+          existing.views = day.views || 0;
+          existing.participations = day.participations || 0;
+          existing.conversions = day.completions || 0;
         }
-        // Pour l'instant, views = participations * 2.5 (estimation)
-        dayData.views = Math.round(dayData.participations * 2.5);
+      });
+    } else {
+      // Fallback: utiliser campaign_participants avec estimation
+      const { data, error } = await supabase
+        .from('campaign_participants')
+        .select('created_at, completed_at')
+        .eq('campaign_id', campaignId)
+        .gte('created_at', startDate.toISOString());
+      
+      if (!error && data) {
+        data.forEach(participant => {
+          const date = new Date(participant.created_at);
+          const displayDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+          const dayData = groupedByDay.get(displayDate);
+          
+          if (dayData) {
+            dayData.participations += 1;
+            if (participant.completed_at) {
+              dayData.conversions += 1;
+            }
+            // Estimation basée sur le funnel moyen (4 étapes)
+            dayData.views = Math.round(dayData.participations * 4);
+          }
+        });
       }
-    });
+    }
     
     return Array.from(groupedByDay.entries()).map(([date, data]) => ({
       date,
-      ...data,
+      views: data.views,
+      participations: data.participations,
+      conversions: data.conversions,
     }));
   },
   

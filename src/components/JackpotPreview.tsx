@@ -27,6 +27,7 @@ interface JackpotPreviewProps {
   isReadOnly?: boolean;
   onNext: () => void;
   onGoToEnding?: (isWin: boolean) => void;
+  onContactDataChange?: (data: Record<string, string>) => void;
   prizes?: JackpotPrize[];
   onUpdatePrize?: (prize: JackpotPrize) => void;
 }
@@ -41,11 +42,23 @@ export const JackpotPreview = ({
   isReadOnly = false,
   onNext,
   onGoToEnding,
+  onContactDataChange,
   prizes = [],
   onUpdatePrize
 }: JackpotPreviewProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
-  const [contactData, setContactData] = useState({ name: '', email: '', phone: '' });
+  const [contactData, setContactDataInternal] = useState<Record<string, string>>({ name: '', email: '', phone: '' });
+  
+  // Wrapper pour mettre à jour le contactData et notifier le parent
+  const setContactData = (updater: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) => {
+    setContactDataInternal(prev => {
+      const newData = typeof updater === 'function' ? updater(prev) : updater;
+      if (onContactDataChange) {
+        onContactDataChange(newData);
+      }
+      return newData;
+    });
+  };
   const [isSpinning, setIsSpinning] = useState(false);
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const [showVariableMenu, setShowVariableMenu] = useState(false);
@@ -159,7 +172,7 @@ export const JackpotPreview = ({
         forceSymbol: winSymbolEmoji
       };
     } else {
-      console.log('🎰 [JackpotPreview] Pas de gain');
+      
       return {
         forceWin: false
       };
@@ -1234,7 +1247,7 @@ export const JackpotPreview = ({
                       else onNext();
                     }, 1500);
                   } else {
-                    console.log('🎰 [JackpotPreview] ❌ Pas de gain');
+                    
                     setWonPrize(null);
                     setTimeout(() => {
                       globalJackpotDrawResult = null;

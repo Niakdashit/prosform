@@ -141,7 +141,6 @@ export default function InstantWins() {
     });
     
     const fields = Array.from(fieldsSet).sort();
-    console.log('Extracted form fields:', fields);
     return fields;
   };
 
@@ -196,10 +195,7 @@ export default function InstantWins() {
       
       // Extract form fields from participations
       if (allPartData) {
-        console.log('Sample participation data:', allPartData[0]);
-        console.log('First participation_data:', allPartData[0]?.participation_data);
         const fields = extractFormFields(allPartData as Participation[]);
-        console.log('Final form fields:', fields);
         setFormFields(fields);
       }
 

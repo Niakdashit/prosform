@@ -5,6 +5,7 @@ import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ParticipationService } from "@/services/ParticipationService";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantQuizRenderProps {
@@ -317,6 +318,8 @@ export const ParticipantQuizRender = ({ config, campaignId }: ParticipantQuizRen
 
           <button
             onClick={() => {
+              // Reset session tracking pour permettre un nouveau comptage
+              AnalyticsTrackingService.resetSessionTracking(campaignId);
               setActiveView('welcome');
               setActiveQuestionIndex(0);
               setSelectedAnswers({});

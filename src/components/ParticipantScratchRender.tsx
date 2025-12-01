@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { SmartScratch } from "./SmartScratch/SmartScratch";
 import { ParticipationService } from "@/services/ParticipationService";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantScratchRenderProps {
@@ -252,6 +253,8 @@ export const ParticipantScratchRender = ({ config, campaignId }: ParticipantScra
 
           <button
             onClick={() => {
+              // Reset session tracking pour permettre un nouveau comptage
+              AnalyticsTrackingService.resetSessionTracking(campaignId);
               setActiveView('welcome');
               setWonPrize(null);
               setHasScratched(false);

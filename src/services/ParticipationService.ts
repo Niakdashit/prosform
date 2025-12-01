@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { emailSchema, phoneSchema, nameSchema } from '@/schemas/participation.schema';
 import { ExternalBackendAnalyticsService, CampaignSettings } from './ExternalBackendAnalyticsService';
 import { StepDurationStorage } from '@/utils/stepDurationStorage';
+import { AnalyticsTrackingService } from './AnalyticsTrackingService';
 import { z } from 'zod';
 
 export interface ParticipationData {
@@ -13,7 +14,7 @@ export interface ParticipationData {
     phone?: string;
   };
   result: {
-    type: 'win' | 'lose';
+    type: 'win' | 'lose' | 'pending'; // pending = participation enregistrée au spin, résultat pas encore connu
     prize?: string;
     score?: number;
     answers?: any;
@@ -143,7 +144,7 @@ export const ParticipationService = {
           realIpAddress = ipResponse.data.ip_address;
         }
       } catch (ipError) {
-        console.log('Could not fetch IP address:', ipError);
+        // Silently ignore IP fetch errors
       }
 
       // ===== VÉRIFICATIONS ANTI-SPAM AVEC CONFIGURATION PAR CAMPAGNE =====
@@ -162,7 +163,6 @@ export const ParticipationService = {
         block_duration_hours: 24,
       };
 
-      console.log('⚙️ Using rate limit config for campaign:', rateLimitConfig);
       
       // 1. Vérifier si le participant est bloqué
       const isBlocked = await ExternalBackendAnalyticsService.isParticipantBlocked(
@@ -239,7 +239,7 @@ export const ParticipationService = {
           stepDurations = JSON.parse(stored);
         }
       } catch (e) {
-        console.log('Could not retrieve step durations:', e);
+        // Silently ignore sessionStorage errors
       }
 
       // Données de base (toujours présentes)
@@ -327,9 +327,11 @@ export const ParticipationService = {
       }
 
       // Mettre à jour les analytics de la campagne (table campaign_analytics sur backend externe)
+      // Note: total_views et total_completions sont gérés par AnalyticsTrackingService.trackStepView()
+      // Ici on ne met à jour que total_participations et last_participation_at
       const { data: existingAnalytics, error: fetchError } = await supabase
         .from('campaign_analytics')
-        .select('id, total_views, total_participations, total_completions')
+        .select('id, total_participations')
         .eq('campaign_id', data.campaignId)
         .maybeSingle();
 
@@ -338,17 +340,16 @@ export const ParticipationService = {
         return;
       }
 
-      const isWin = data.result.type === 'win';
-
       if (!existingAnalytics) {
+        // Créer une entrée si elle n'existe pas encore
+        // (normalement elle devrait déjà exister grâce à trackStepView)
         const { error: insertAnalyticsError } = await supabase
           .from('campaign_analytics')
           .insert({
             campaign_id: data.campaignId,
-            // Ne pas toucher total_views ici - c'est géré par trackStepView
-            total_views: 0,
+            total_views: 0, // Sera mis à jour par trackStepView
             total_participations: 1,
-            total_completions: isWin ? 1 : 0,
+            total_completions: 0, // Sera mis à jour par trackStepView quand ending est vu
             last_participation_at: new Date().toISOString(),
           });
 
@@ -356,12 +357,11 @@ export const ParticipationService = {
           console.error('Error inserting campaign analytics (external):', insertAnalyticsError);
         }
       } else {
+        // Incrémenter uniquement total_participations
         const { error: updateAnalyticsError } = await supabase
           .from('campaign_analytics')
           .update({
-            // Ne pas toucher total_views ici - c'est géré par trackStepView
             total_participations: (existingAnalytics.total_participations || 0) + 1,
-            total_completions: (existingAnalytics.total_completions || 0) + (isWin ? 1 : 0),
             last_participation_at: new Date().toISOString(),
           })
           .eq('id', existingAnalytics.id);
@@ -370,6 +370,11 @@ export const ParticipationService = {
           console.error('Error updating campaign analytics (external):', updateAnalyticsError);
         }
       }
+      
+      // Mettre à jour daily_analytics pour les séries temporelles réelles
+      await AnalyticsTrackingService.updateDailyAnalytics(data.campaignId, {
+        participations: 1,
+      });
 
       // Nettoyer les durées stockées maintenant que la participation est enregistrée
       StepDurationStorage.clearStepDurations(data.campaignId);

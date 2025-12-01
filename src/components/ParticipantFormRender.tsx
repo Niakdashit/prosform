@@ -5,6 +5,7 @@ import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Star, Heart, ThumbsUp, Smile, Meh, Frown } from "lucide-react";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantFormRenderProps {
@@ -167,7 +168,7 @@ export const ParticipantFormRender = ({ questions, campaignId }: ParticipantForm
           </div>
         );
 
-      case 'rating':
+      case 'rating': {
         const ratingCount = currentQuestion.ratingCount || 5;
         const ratingType = currentQuestion.ratingType || 'star';
         const currentRating = Number(responses[currentQuestion.id]) || 0;
@@ -244,6 +245,7 @@ export const ParticipantFormRender = ({ questions, campaignId }: ParticipantForm
             ))}
           </div>
         );
+      }
 
       case 'ending':
         return (
@@ -256,6 +258,10 @@ export const ParticipantFormRender = ({ questions, campaignId }: ParticipantForm
             </div>
             <button
               onClick={() => {
+                // Reset session tracking pour permettre un nouveau comptage
+                if (campaignId) {
+                  AnalyticsTrackingService.resetSessionTracking(campaignId);
+                }
                 setCurrentIndex(0);
                 setResponses({});
                 setIsComplete(false);

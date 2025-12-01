@@ -24,6 +24,7 @@ interface QuizPreviewProps {
   isMobileResponsive?: boolean;
   isReadOnly?: boolean;
   onNext: () => void;
+  onContactDataChange?: (data: Record<string, string>) => void;
 }
 
 export const QuizPreview = ({ 
@@ -35,7 +36,8 @@ export const QuizPreview = ({
   onToggleViewMode, 
   isMobileResponsive = false,
   isReadOnly = false,
-  onNext 
+  onNext,
+  onContactDataChange
 }: QuizPreviewProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string }>({});
@@ -49,7 +51,18 @@ export const QuizPreview = ({
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [imageRotation, setImageRotation] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
+  const [contactData, setContactDataInternal] = useState<Record<string, string>>({ name: "", email: "", phone: "" });
+  
+  // Wrapper pour mettre à jour le contactData et notifier le parent
+  const setContactData = (updater: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) => {
+    setContactDataInternal(prev => {
+      const newData = typeof updater === 'function' ? updater(prev) : updater;
+      if (onContactDataChange) {
+        onContactDataChange(newData);
+      }
+      return newData;
+    });
+  };
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme, viewMode);
 

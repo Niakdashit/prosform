@@ -1020,7 +1020,7 @@ export const useSmartWheelRenderer = ({
     const overflow = Math.max(0, desiredPointerHeight - maxHeightBase);
     const tipY = tipYBase + overflow; // push down to keep full pointer visible
     const maxHeight = tipY - 2;
-    let pointerHeight = Math.min(desiredPointerHeight, Math.max(10, maxHeight));
+    const pointerHeight = Math.min(desiredPointerHeight, Math.max(10, maxHeight));
     const pointerWidth = Math.max(10, pointerHeight * 0.6);
 
     ctx.save();

@@ -59,18 +59,19 @@ const getActionDescription = (action: AIAction): { icon: React.ReactNode; label:
       return { icon: <ImagePlus className="w-3 h-3" />, label: 'Image fond', detail: action.view || '' };
     case 'update_prizes':
       return { icon: <Sparkles className="w-3 h-3" />, label: 'Prix', detail: `${Array.isArray(action.value) ? action.value.length : 0} prix configurés` };
-    case 'full_config':
-      const config = action.value as any;
-      const parts = [];
+    case 'full_config': {
+      const config = action.value as Record<string, unknown>;
+      const parts: string[] = [];
       if (config?.template) parts.push(`Style ${config.template}`);
-      if (config?.segments) parts.push(`${config.segments.length} segments`);
-      if (config?.prizes) parts.push(`${config.prizes.length} prix`);
-      if (config?.questions) parts.push(`${config.questions.length} questions`);
+      if (Array.isArray(config?.segments)) parts.push(`${config.segments.length} segments`);
+      if (Array.isArray(config?.prizes)) parts.push(`${config.prizes.length} prix`);
+      if (Array.isArray(config?.questions)) parts.push(`${config.questions.length} questions`);
       return { 
         icon: <Sparkles className="w-3 h-3" />, 
         label: 'Campagne complète', 
         detail: parts.length > 0 ? parts.join(', ') : 'configuration personnalisée'
       };
+    }
     default:
       return { icon: null, label: action.type, detail: '' };
   }

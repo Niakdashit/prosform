@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { SmartWheel } from "./SmartWheel";
 import { ParticipationService } from "@/services/ParticipationService";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantWheelRenderProps {
@@ -297,6 +298,8 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
 
           <button
             onClick={() => {
+              // Reset session tracking pour permettre un nouveau comptage
+              AnalyticsTrackingService.resetSessionTracking(campaignId);
               setActiveView('welcome');
               setWonPrize(null);
               setIsSpinning(false);

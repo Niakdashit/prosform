@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import SmartJackpot from "./SmartJackpot/SmartJackpot";
 import { ParticipationService } from "@/services/ParticipationService";
+import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 import { useStepTracking } from "@/hooks/useStepTracking";
 
 interface ParticipantJackpotRenderProps {
@@ -154,6 +155,25 @@ export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJack
     );
   };
 
+  const handleJackpotResult = async (isWin: boolean, result?: string[]) => {
+    const prize = result ? result.join(' ') : null;
+    setWonPrize(prize);
+    
+    // Enregistrer la participation
+    await ParticipationService.recordParticipation({
+      campaignId,
+      contactData,
+      result: {
+        type: isWin ? 'win' : 'lose',
+        prize: isWin ? prize || undefined : undefined,
+      },
+    });
+    
+    setTimeout(() => {
+      setActiveView(isWin ? 'ending-win' : 'ending-lose');
+    }, 1500);
+  };
+
   const renderJackpot = () => {
     // Convert symbols to string array for SmartJackpot
     const symbolEmojis = config.symbols.map(s => s.emoji);
@@ -183,13 +203,8 @@ export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJack
               symbols={symbolEmojis}
               template={config.jackpotScreen.template}
               spinDuration={config.jackpotScreen.spinDuration}
-              onWin={(result) => {
-                setWonPrize(result.join(' '));
-                setTimeout(() => setActiveView('ending-win'), 1500);
-              }}
-              onLose={() => {
-                setTimeout(() => setActiveView('ending-lose'), 1500);
-              }}
+              onWin={(result) => handleJackpotResult(true, result)}
+              onLose={() => handleJackpotResult(false)}
             />
           </div>
         </div>
@@ -228,6 +243,8 @@ export const ParticipantJackpotRender = ({ config, campaignId }: ParticipantJack
 
           <button
             onClick={() => {
+              // Reset session tracking pour permettre un nouveau comptage
+              AnalyticsTrackingService.resetSessionTracking(campaignId);
               setActiveView('welcome');
               setWonPrize(null);
               setHasPlayed(false);

@@ -397,9 +397,11 @@ export const AdvancedAnalyticsService = {
         }
       });
 
-      const total_fraud = duplicate_ips + duplicate_fingerprints + duplicate_emails;
+      // Le taux de fraude = nombre de participations en doublon / total
+      // On prend le max des doublons (pas la somme) pour éviter de dépasser 100%
+      const max_duplicates = Math.max(duplicate_ips, duplicate_fingerprints, duplicate_emails);
       const fraud_rate = total_participations > 0
-        ? (total_fraud / total_participations) * 100
+        ? (max_duplicates / total_participations) * 100
         : 0;
 
       return {
@@ -454,25 +456,52 @@ export const AdvancedAnalyticsService = {
     }
   },
 
-  // Nouveaux participants (uniques dans la période)
+  // Nouveaux participants (qui n'avaient jamais participé avant la période)
   async getNewParticipantsCount(campaignId?: string, dateRange?: { from: Date | undefined; to: Date | undefined }): Promise<number> {
     try {
-      let query = supabase
+      // Si pas de date range, on considère les 7 derniers jours par défaut
+      const periodStart = dateRange?.from || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const periodEnd = dateRange?.to || new Date();
+
+      // Helper pour extraire l'email d'un participant (colonne email ou participation_data)
+      const extractEmail = (p: any): string | null => {
+        if (p.email) return p.email;
+        const pData = p.participation_data as any;
+        if (pData?.contactData?.email) return pData.contactData.email;
+        return null;
+      };
+
+      // 1. Récupérer les emails qui ont participé AVANT la période (anciens participants)
+      let oldParticipantsQuery = supabase
         .from('campaign_participants')
-        .select('email', { count: 'exact', head: false });
+        .select('email, participation_data')
+        .lt('created_at', periodStart.toISOString());
 
-      if (campaignId) query = query.eq('campaign_id', campaignId);
-      if (dateRange && dateRange.from && dateRange.to) {
-        query = query
-          .gte('created_at', dateRange.from.toISOString())
-          .lte('created_at', dateRange.to.toISOString());
-      }
+      if (campaignId) oldParticipantsQuery = oldParticipantsQuery.eq('campaign_id', campaignId);
 
-      const { data } = await query;
-      const emails = data?.map(p => p.email).filter(Boolean) || [];
-      
-      const uniqueEmails = new Set(emails);
-      return uniqueEmails.size;
+      const { data: oldData } = await oldParticipantsQuery;
+      const oldEmails = new Set(
+        (oldData || []).map(extractEmail).filter(Boolean) as string[]
+      );
+
+      // 2. Récupérer les emails qui ont participé PENDANT la période
+      let periodQuery = supabase
+        .from('campaign_participants')
+        .select('email, participation_data')
+        .gte('created_at', periodStart.toISOString())
+        .lte('created_at', periodEnd.toISOString());
+
+      if (campaignId) periodQuery = periodQuery.eq('campaign_id', campaignId);
+
+      const { data: periodData } = await periodQuery;
+      const periodEmails = (periodData || []).map(extractEmail).filter(Boolean) as string[];
+
+      // 3. Compter les emails de la période qui ne sont PAS dans les anciens
+      const newEmails = new Set(
+        periodEmails.filter(email => !oldEmails.has(email))
+      );
+
+      return newEmails.size;
     } catch (error) {
       console.error('Error fetching new participants count:', error);
       return 0;

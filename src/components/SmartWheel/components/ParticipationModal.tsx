@@ -192,7 +192,7 @@ const ParticipationModal: React.FC<ParticipationModalProps> = ({
     );
   } catch (e) {
     // Log enough context to debug without crashing the whole app
-    // eslint-disable-next-line no-console
+     
     console.error('[ParticipationModal] Failed to render fields', {
       error: e,
       safeFields,

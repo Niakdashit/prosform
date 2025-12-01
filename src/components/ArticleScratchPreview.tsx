@@ -273,7 +273,7 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
         );
 
       case 'ending-win':
-      case 'ending-lose':
+      case 'ending-lose': {
         const isWin = activeView === 'ending-win';
         const endingConfig = isWin ? config.endingWin : config.endingLose;
         const endingKey = isWin ? 'endingWin' : 'endingLose';
@@ -371,6 +371,7 @@ export const ArticleScratchPreview: React.FC<ArticleScratchPreviewProps> = ({
             />
           </div>
         );
+      }
 
       default:
         return null;

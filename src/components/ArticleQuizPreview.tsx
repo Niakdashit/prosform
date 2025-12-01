@@ -189,7 +189,7 @@ export const ArticleQuizPreview: React.FC<ArticleQuizPreviewProps> = ({
           </div>
         );
 
-      case 'question':
+      case 'question': {
         const currentQuestion = config.questions[currentQuestionIndex];
         
         return (
@@ -275,6 +275,7 @@ export const ArticleQuizPreview: React.FC<ArticleQuizPreviewProps> = ({
             )}
           </div>
         );
+      }
 
       case 'result':
         return (

@@ -263,7 +263,7 @@ export const ArticleWheelPreview: React.FC<ArticleWheelPreviewProps> = ({
           </div>
         );
 
-      case 'wheel':
+      case 'wheel': {
         // Adapt segments for SmartWheel
         const adaptedSegments = config.segments.map(seg => ({
           ...seg,
@@ -302,9 +302,10 @@ export const ArticleWheelPreview: React.FC<ArticleWheelPreviewProps> = ({
             </div>
           </div>
         );
+      }
 
       case 'ending-win':
-      case 'ending-lose':
+      case 'ending-lose': {
         const isWin = activeView === 'ending-win';
         const endingConfig = isWin ? config.endingWin : config.endingLose;
         const endingKey = isWin ? 'endingWin' : 'endingLose';
@@ -402,6 +403,7 @@ export const ArticleWheelPreview: React.FC<ArticleWheelPreviewProps> = ({
             />
           </div>
         );
+      }
 
       default:
         return null;

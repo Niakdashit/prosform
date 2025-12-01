@@ -12,7 +12,7 @@ import { determineWinningSegment, consumePrize, DrawResult } from "@/utils/prize
 // Variable globale pour stocker le résultat du tirage (persiste entre les re-renders)
 let globalDrawResult: DrawResult | null = null;
 // Variable globale pour stocker la rotation finale de la roue
-let globalFinalRotation: number | null = null;
+const globalFinalRotation: number | null = null;
 import { WelcomeLayouts } from "./layouts/WelcomeLayouts";
 import { ContactLayouts } from "./layouts/ContactLayouts";
 import { WheelLayouts } from "./layouts/WheelLayouts";
@@ -35,6 +35,8 @@ interface WheelPreviewProps {
   isReadOnly?: boolean;
   onNext: () => void;
   onGoToEnding?: (isWin: boolean) => void;
+  onSpin?: () => void; // Appelé quand l'utilisateur clique sur "Faire tourner"
+  onContactDataChange?: (data: Record<string, string>) => void; // Appelé quand les données de contact changent
   prizes?: Prize[];
   onUpdatePrize?: (prize: Prize) => void;
   onAssetsReady?: () => void;
@@ -50,19 +52,38 @@ export const WheelPreview = ({
   isReadOnly = false,
   onNext,
   onGoToEnding,
+  onSpin,
+  onContactDataChange,
   prizes = [],
   onUpdatePrize,
   onAssetsReady
 }: WheelPreviewProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
-  const [contactData, setContactData] = useState({ name: '', email: '', phone: '' });
+  const [contactData, setContactDataInternal] = useState<Record<string, string>>({ name: '', email: '', phone: '' });
   const [isSpinning, setIsSpinning] = useState(false);
+  
+  // Wrapper pour mettre à jour le contactData et notifier le parent
+  const setContactData = (updater: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) => {
+    setContactDataInternal(prev => {
+      const newData = typeof updater === 'function' ? updater(prev) : updater;
+      // Notifier le parent du changement
+      if (onContactDataChange) {
+        onContactDataChange(newData);
+      }
+      return newData;
+    });
+  };
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const [wheelDisabled, setWheelDisabled] = useState(false); // Bloquer la roue après le spin
   const [showVariableMenu, setShowVariableMenu] = useState(false);
   
   // Fonction pour effectuer le tirage (appelée par SmartWheel via onBeforeSpin)
   const handleSpinStart = () => {
+    // Notifier le parent que l'utilisateur a cliqué sur "Faire tourner"
+    if (onSpin) {
+      onSpin();
+    }
+    
     // Convertir les segments pour le tirage
     const drawSegments = config.segments.map(seg => {
       const label = seg.label.toLowerCase();

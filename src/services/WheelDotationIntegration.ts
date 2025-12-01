@@ -11,7 +11,6 @@ export const wheelDotationIntegration = {
     shouldWin?: boolean;
     reason?: string;
   }> => {
-    console.log('🎯 [WheelDotationIntegration] determineWheelSpin called (stub)', params);
     
     // Retourner un résultat aléatoire par défaut
     return {

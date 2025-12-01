@@ -166,7 +166,7 @@ const ArticleWheelPreview = () => {
           </div>
         );
 
-      case 'wheel':
+      case 'wheel': {
         // Adapt segments for SmartWheel
         const adaptedSegments = config.segments.map(seg => ({
           ...seg,
@@ -205,13 +205,13 @@ const ArticleWheelPreview = () => {
                 }
                 showBulbs={true}
                 onAssetsReady={() => {
-                  console.log('🎨 Article wheel assets ready');
                   setAssetsReady(true);
                 }}
               />
             </div>
           </div>
         );
+      }
 
       case 'ending-win':
         return (

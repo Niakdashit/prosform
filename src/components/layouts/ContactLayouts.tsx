@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { ContactField } from "@/components/WheelBuilder";
 import { Sparkles } from "lucide-react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { EditableTextBlock } from "../EditableTextBlock";
+import { toast } from "sonner";
 
 interface TextStyle {
   fontFamily?: string;
@@ -24,7 +25,7 @@ interface ContactLayoutProps {
   title: string;
   subtitle: string;
   fields: ContactField[];
-  contactData: { name: string; email: string; phone: string };
+  contactData: Record<string, string>;
   onFieldChange: (type: string, value: string) => void;
   onSubmit: () => void;
   backgroundColor: string;
@@ -87,6 +88,39 @@ export const ContactLayouts = ({
 }: ContactLayoutProps) => {
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme);
+  const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
+
+  // Validation des champs obligatoires
+  const validateForm = (): boolean => {
+    const errors: Record<string, boolean> = {};
+    let isValid = true;
+
+    fields.forEach(field => {
+      if (field.required) {
+        const fieldKey = field.id || field.type;
+        const value = contactData[fieldKey];
+        
+        if (!value || value.trim() === '' || value === 'false') {
+          errors[fieldKey] = true;
+          isValid = false;
+        }
+      }
+    });
+
+    setValidationErrors(errors);
+    
+    if (!isValid) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
+    }
+    
+    return isValid;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      onSubmit();
+    }
+  };
 
   const getTitleStyles = (): React.CSSProperties => ({
     color: titleStyle?.textColor || textColor,
@@ -177,6 +211,9 @@ export const ContactLayouts = ({
 
           // Select type
           if (field.type === 'select' && field.options) {
+            const selectKey = field.id || field.type;
+            const selectHasError = validationErrors[selectKey];
+            
             return (
               <div key={index} className="text-left">
                 <label 
@@ -184,17 +221,24 @@ export const ContactLayouts = ({
                   style={{ color: textColor }}
                 >
                   {field.label}
+                  {field.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
                 <Select
-                  onValueChange={(value) => onFieldChange(field.id || field.type, value)}
+                  onValueChange={(value) => {
+                    onFieldChange(selectKey, value);
+                    if (selectHasError) {
+                      setValidationErrors(prev => ({ ...prev, [selectKey]: false }));
+                    }
+                  }}
+                  required={field.required}
                 >
                   <SelectTrigger 
                     className="h-10 text-sm pointer-events-auto"
                     style={{
-                      backgroundColor: backgroundColor,
-                      borderColor: textColor,
-                      borderWidth: '1px',
-                      color: textColor,
+                      backgroundColor: '#ffffff',
+                      borderColor: selectHasError ? '#ef4444' : textColor,
+                      borderWidth: selectHasError ? '2px' : '1px',
+                      color: '#333333',
                       borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
                     }}
                   >
@@ -203,7 +247,7 @@ export const ContactLayouts = ({
                   <SelectContent 
                     className="pointer-events-auto z-[100]"
                     style={{
-                      backgroundColor: backgroundColor,
+                      backgroundColor: '#ffffff',
                       borderColor: textColor,
                     }}
                   >
@@ -211,7 +255,7 @@ export const ContactLayouts = ({
                       <SelectItem 
                         key={i} 
                         value={opt}
-                        style={{ color: textColor }}
+                        style={{ color: '#333333' }}
                       >
                         {opt}
                       </SelectItem>
@@ -224,6 +268,9 @@ export const ContactLayouts = ({
 
           // Textarea type
           if (field.type === 'textarea') {
+            const textareaKey = field.id || field.type;
+            const textareaHasError = validationErrors[textareaKey];
+            
             return (
               <div key={index} className="text-left">
                 <label 
@@ -231,18 +278,24 @@ export const ContactLayouts = ({
                   style={{ color: textColor }}
                 >
                   {field.label}
+                  {field.required && <span className="text-red-500 ml-1">*</span>}
                 </label>
                 <textarea
                   className="w-full text-sm px-3 py-2 min-h-[80px] resize-none"
                   style={{
-                    backgroundColor: backgroundColor,
-                    borderColor: textColor,
-                    borderWidth: '1px',
+                    backgroundColor: '#ffffff',
+                    borderColor: textareaHasError ? '#ef4444' : textColor,
+                    borderWidth: textareaHasError ? '2px' : '1px',
                     borderStyle: 'solid',
-                    color: textColor,
+                    color: '#333333',
                     borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
                   }}
-                  onChange={(e) => onFieldChange(field.id || field.type, e.target.value)}
+                  onChange={(e) => {
+                    onFieldChange(textareaKey, e.target.value);
+                    if (textareaHasError) {
+                      setValidationErrors(prev => ({ ...prev, [textareaKey]: false }));
+                    }
+                  }}
                   required={field.required}
                 />
               </div>
@@ -250,6 +303,9 @@ export const ContactLayouts = ({
           }
 
           // Default: text, email, tel, date inputs
+          const fieldKey = field.id || field.type;
+          const hasError = validationErrors[fieldKey];
+          
           return (
             <div key={index} className="text-left">
               <label 
@@ -257,20 +313,27 @@ export const ContactLayouts = ({
                 style={{ color: textColor }}
               >
                 {field.label}
+                {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
               <Input
                 type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : field.type === 'date' ? 'date' : 'text'}
-                value={contactData[field.type as keyof typeof contactData]}
-                onChange={(e) => onFieldChange(field.id || field.type, e.target.value)}
+                value={contactData[fieldKey] || ''}
+                onChange={(e) => {
+                  onFieldChange(fieldKey, e.target.value);
+                  // Clear error when user types
+                  if (hasError) {
+                    setValidationErrors(prev => ({ ...prev, [fieldKey]: false }));
+                  }
+                }}
                 placeholder={field.placeholder}
                 required={field.required}
                 className="h-10 text-sm"
                 style={{
-                  backgroundColor: backgroundColor,
-                  borderColor: textColor,
-                  borderWidth: '1px',
+                  backgroundColor: '#ffffff',
+                  borderColor: hasError ? '#ef4444' : textColor,
+                  borderWidth: hasError ? '2px' : '1px',
                   borderStyle: 'solid',
-                  color: textColor,
+                  color: '#333333',
                   borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
                 }}
               />
@@ -279,7 +342,7 @@ export const ContactLayouts = ({
         })}
         
         <button 
-          onClick={onSubmit}
+          onClick={handleSubmit}
           className="w-full flex items-center justify-center font-medium transition-all hover:opacity-90"
           style={unifiedButtonStyles}
         >
@@ -363,27 +426,27 @@ export const ContactLayouts = ({
         return renderForm();
     }
   } else {
+    // Pour mobile, on utilise un wrapper scrollable qui permet de voir tout le formulaire
+    const mobileWrapper = (content: React.ReactNode, padding: string = 'py-6') => (
+      <div 
+        className={`flex flex-col w-full h-full items-center ${padding} overflow-y-auto`} 
+        style={{ paddingLeft: '7%', paddingRight: '7%' }}
+      >
+        <div className="w-full flex-shrink-0">
+          {content}
+        </div>
+      </div>
+    );
+
     switch (layout as MobileLayoutType) {
       case 'mobile-vertical':
-        return (
-          <div className="flex flex-col h-full items-center justify-center py-8 overflow-y-auto min-h-full" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderForm()}
-          </div>
-        );
+        return mobileWrapper(renderForm(), 'py-6');
 
       case 'mobile-centered':
-        return (
-          <div className="flex items-center justify-center py-8 overflow-y-auto min-h-full" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderForm()}
-          </div>
-        );
+        return mobileWrapper(renderForm(), 'py-6');
 
       case 'mobile-minimal':
-        return (
-          <div className="flex flex-col items-center justify-center py-6 overflow-y-auto min-h-full" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-            {renderForm()}
-          </div>
-        );
+        return mobileWrapper(renderForm(), 'py-4');
 
       default:
         return renderForm();

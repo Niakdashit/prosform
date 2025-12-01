@@ -130,7 +130,16 @@ export const FormPreview = ({
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const titleContainerRef = useRef<HTMLDivElement>(null);
+  const subtitleContainerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
+  
+  // Template layout state
+  const [templateSelectedChoices, setTemplateSelectedChoices] = useState<string[]>([]);
+  
+  // Resizing state
+  const [isResizingTitle, setIsResizingTitle] = useState(false);
+  const [isResizingSubtitle, setIsResizingSubtitle] = useState(false);
 
   // Load Google Fonts when template changes
   useEffect(() => {
@@ -362,7 +371,6 @@ export const FormPreview = ({
 
   // Template layout rendering
   const currentQuestionIndex = allQuestions.findIndex(q => q.id === question?.id);
-  const [templateSelectedChoices, setTemplateSelectedChoices] = useState<string[]>([]);
 
   const handleTemplateChoiceSelect = (choice: string) => {
     if (question?.variant === "checkbox") {
@@ -451,12 +459,6 @@ export const FormPreview = ({
 
   // Get unified button styles from theme
   const unifiedButtonStyles = getButtonStyles(theme);
-
-  // State for resizing
-  const [isResizingTitle, setIsResizingTitle] = useState(false);
-  const [isResizingSubtitle, setIsResizingSubtitle] = useState(false);
-  const titleContainerRef = useRef<HTMLDivElement>(null);
-  const subtitleContainerRef = useRef<HTMLDivElement>(null);
 
   // Handle title resize - using preview container width
   const handleTitleResizeStart = (e: React.MouseEvent, side: 'left' | 'right') => {
