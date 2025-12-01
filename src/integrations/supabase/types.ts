@@ -114,6 +114,9 @@ export type Database = {
           ip_address: string | null
           os: string | null
           participation_data: Json | null
+          prize_claimed: boolean | null
+          prize_claimed_at: string | null
+          prize_won: Json | null
           referrer: string | null
           user_agent: string | null
           utm_campaign: string | null
@@ -134,6 +137,9 @@ export type Database = {
           ip_address?: string | null
           os?: string | null
           participation_data?: Json | null
+          prize_claimed?: boolean | null
+          prize_claimed_at?: string | null
+          prize_won?: Json | null
           referrer?: string | null
           user_agent?: string | null
           utm_campaign?: string | null
@@ -154,6 +160,9 @@ export type Database = {
           ip_address?: string | null
           os?: string | null
           participation_data?: Json | null
+          prize_claimed?: boolean | null
+          prize_claimed_at?: string | null
+          prize_won?: Json | null
           referrer?: string | null
           user_agent?: string | null
           utm_campaign?: string | null
@@ -266,6 +275,118 @@ export type Database = {
         }
         Relationships: []
       }
+      instant_win_prizes: {
+        Row: {
+          active_from: string | null
+          active_until: string | null
+          campaign_id: string
+          created_at: string
+          display_order: number | null
+          id: string
+          is_active: boolean
+          prize_description: string | null
+          prize_image_url: string | null
+          prize_name: string
+          prize_value: number | null
+          remaining_quantity: number
+          total_quantity: number
+          updated_at: string
+          win_probability: number | null
+        }
+        Insert: {
+          active_from?: string | null
+          active_until?: string | null
+          campaign_id: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          prize_description?: string | null
+          prize_image_url?: string | null
+          prize_name: string
+          prize_value?: number | null
+          remaining_quantity?: number
+          total_quantity?: number
+          updated_at?: string
+          win_probability?: number | null
+        }
+        Update: {
+          active_from?: string | null
+          active_until?: string | null
+          campaign_id?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          prize_description?: string | null
+          prize_image_url?: string | null
+          prize_name?: string
+          prize_value?: number | null
+          remaining_quantity?: number
+          total_quantity?: number
+          updated_at?: string
+          win_probability?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instant_win_prizes_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prize_draws: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          created_by: string | null
+          draw_date: string
+          draw_name: string
+          id: string
+          notes: string | null
+          selection_criteria: Json | null
+          total_participants: number
+          winners: Json
+          winners_count: number
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          created_by?: string | null
+          draw_date?: string
+          draw_name: string
+          id?: string
+          notes?: string | null
+          selection_criteria?: Json | null
+          total_participants?: number
+          winners?: Json
+          winners_count: number
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          created_by?: string | null
+          draw_date?: string
+          draw_name?: string
+          id?: string
+          notes?: string | null
+          selection_criteria?: Json | null
+          total_participants?: number
+          winners?: Json
+          winners_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prize_draws_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -369,6 +490,18 @@ export type Database = {
       generate_campaign_slug: {
         Args: { campaign_id: string; campaign_title: string }
         Returns: string
+      }
+      get_campaign_prize_stats: {
+        Args: { p_campaign_id: string }
+        Returns: Json
+      }
+      get_prize_timeline: {
+        Args: { p_campaign_id: string; p_days?: number }
+        Returns: {
+          date: string
+          total_prize_value: number
+          winners_count: number
+        }[]
       }
       has_role: {
         Args: {
