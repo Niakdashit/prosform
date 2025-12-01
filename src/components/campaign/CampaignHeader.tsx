@@ -75,7 +75,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
         borderBottom: config.borderBottom ? `1px solid ${config.borderColor || '#e5e7eb'}` : 'none',
       }}
     >
-      <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+      <div className={`h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center ${config.showNavigation ? 'justify-between' : 'justify-start'}`}>
         {/* Navigation gauche (si logo centré) */}
         {config.showNavigation && config.logoPosition === 'center' && (
           <nav className="hidden md:flex items-center gap-6 flex-1">
