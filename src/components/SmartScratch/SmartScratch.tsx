@@ -5,6 +5,7 @@ interface SmartScratchProps {
   width?: number;
   height?: number;
   scratchColor?: string;
+  scratchImage?: string;
   revealContent?: React.ReactNode;
   revealImage?: string;
   revealText?: string;
@@ -20,6 +21,7 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
   width = 300,
   height = 200,
   scratchColor = '#C0C0C0',
+  scratchImage,
   revealContent,
   revealImage,
   revealText = '🎉 Gagné !',
@@ -45,20 +47,29 @@ export const SmartScratch: React.FC<SmartScratchProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Remplir avec la couleur de grattage
-    ctx.fillStyle = scratchColor;
-    ctx.fillRect(0, 0, width, height);
+    // Si une image est fournie, l'utiliser
+    if (scratchImage) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, width, height);
+      };
+      img.src = scratchImage;
+    } else {
+      // Sinon, utiliser la couleur
+      ctx.fillStyle = scratchColor;
+      ctx.fillRect(0, 0, width, height);
 
-    // Ajouter un pattern de texture
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    for (let i = 0; i < width; i += 4) {
-      for (let j = 0; j < height; j += 4) {
-        if (Math.random() > 0.5) {
-          ctx.fillRect(i, j, 2, 2);
+      // Ajouter un pattern de texture
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      for (let i = 0; i < width; i += 4) {
+        for (let j = 0; j < height; j += 4) {
+          if (Math.random() > 0.5) {
+            ctx.fillRect(i, j, 2, 2);
+          }
         }
       }
     }
-  }, [width, height, scratchColor]);
+  }, [width, height, scratchColor, scratchImage]);
 
   const calculateProgress = useCallback(() => {
     const canvas = canvasRef.current;

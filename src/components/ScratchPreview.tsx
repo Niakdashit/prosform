@@ -1260,6 +1260,7 @@ export const ScratchPreview = ({
                               width={config.scratchScreen.cardWidth}
                               height={config.scratchScreen.cardHeight}
                               scratchColor={config.scratchScreen.scratchColor}
+                              scratchImage={config.scratchScreen.scratchImage}
                               threshold={config.scratchScreen.threshold}
                               brushSize={config.scratchScreen.brushSize}
                               revealText={finalRevealText}
