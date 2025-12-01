@@ -66,6 +66,9 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
   // État pour bloquer la roue après le premier spin
   const [hasSpun, setHasSpun] = useState(false);
   
+  // État de chargement initial pour masquer la roue
+  const [isInitializing, setIsInitializing] = useState(true);
+  
   // Utiliser forcedSegmentId de la prop ou l'état interne
   const effectiveForcedSegmentId = forcedSegmentId !== undefined ? forcedSegmentId : internalForcedSegmentId;
 
@@ -246,6 +249,15 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
     disablePointerAnimation,
     brandColors
   });
+  
+  // Désactiver l'état d'initialisation après le premier rendu
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 100); // Court délai pour laisser le canvas se charger
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   const handleSpin = async () => {
     // Bloquer si la roue a déjà été lancée
@@ -443,12 +455,23 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
           width: actualSize,
           height: actualSize
         }}>
+          {/* Masque de chargement */}
+          {isInitializing && (
+            <div 
+              className="absolute inset-0 flex items-center justify-center bg-transparent z-50"
+              style={{ width: actualSize, height: actualSize }}
+            >
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+          
           <canvas
             ref={canvasRef}
             className={`rounded-full relative ${centerImgReady ? 'z-40 pointer-events-none' : 'z-0'}`}
             style={{
               filter: wheelState.isSpinning ? 'brightness(1.1) saturate(1.2)' : 'none',
-              transition: 'filter 0.3s ease'
+              transition: 'filter 0.3s ease, opacity 0.3s ease',
+              opacity: isInitializing ? 0 : 1
             }}
           />
           
