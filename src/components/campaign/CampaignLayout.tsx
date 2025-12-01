@@ -81,8 +81,8 @@ export const CampaignLayout = ({
         onConfigChange={onHeaderChange}
       />
 
-      {/* Contenu principal */}
-      <main className={`flex flex-col items-center ${paddingClass} relative z-10 ${config.minHeight === 'screen' ? 'min-h-screen' : ''}`}>
+      {/* Contenu principal : occupe au minimum toute la hauteur de l'écran, le footer vient ensuite */}
+      <main className={`flex flex-col items-center ${paddingClass} relative z-10 min-h-screen`}>
         <div className={`w-full ${maxWidthClass}`}>
           {children}
         </div>
