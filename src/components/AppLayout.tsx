@@ -50,7 +50,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div
-      className="min-h-screen flex"
+      className="min-h-screen w-full flex overflow-x-hidden"
       style={{
         fontFamily: "'DM Sans', sans-serif",
         // Palette 1++ : Blanc cassé / Gris perle (encore un peu plus foncé)
