@@ -162,8 +162,8 @@ export const useSmartWheelRenderer = ({
       console.log('🔍 Assets check:', { pointerReady, centerReady, borderReady, allReady, borderStyle });
       
       if (allReady && !assetsReadyNotifiedRef.current) {
-        console.log('✅ All assets ready, allowing render after 200ms delay');
-        // Attendre 200ms supplémentaires pour s'assurer que tout est bien chargé
+        console.log('✅ All assets ready, allowing render after 100ms delay');
+        // Attendre 100ms supplémentaires pour s'assurer que tout est bien chargé
         setTimeout(() => {
           setAssetsReady(true);
           setShouldRender(true);
@@ -171,7 +171,7 @@ export const useSmartWheelRenderer = ({
           if (onAssetsReady) {
             onAssetsReady();
           }
-        }, 200);
+        }, 100);
       }
     };
     
