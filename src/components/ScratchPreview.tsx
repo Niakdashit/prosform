@@ -1269,6 +1269,9 @@ export const ScratchPreview = ({
                               scratchImage={config.scratchScreen.scratchImage}
                               threshold={config.scratchScreen.threshold}
                               brushSize={config.scratchScreen.brushSize}
+                              borderRadius={config.scratchScreen.cardBorderRadius}
+                              borderWidth={config.scratchScreen.cardBorderWidth}
+                              borderColor={config.scratchScreen.cardBorderColor}
                               revealText={finalRevealText}
                               revealImage={finalRevealImage}
                               disabled={startedCardIndex !== null && startedCardIndex !== index}
