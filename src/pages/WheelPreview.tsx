@@ -150,7 +150,7 @@ const WheelPreviewContent = () => {
   };
   
   return (
-    <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+    <div className="min-h-screen w-screen">
       <WheelPreview
         config={config}
         activeView={activeView}
@@ -166,7 +166,6 @@ const WheelPreviewContent = () => {
         prizes={[]}
         onAssetsReady={() => setAssetsReady(true)}
       />
-      
       {/* Overlay blanc tant que les assets ne sont pas chargés - au-dessus de tout */}
       {activeView === 'wheel' && !assetsReady && (
         <div className="fixed inset-0 bg-background z-[9999]" />
