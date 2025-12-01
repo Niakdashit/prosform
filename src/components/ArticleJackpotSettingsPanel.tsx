@@ -83,6 +83,31 @@ export const ArticleJackpotSettingsPanel: React.FC<ArticleJackpotSettingsPanelPr
               <p className="text-sm text-gray-600">Image d'en-tête</p>
             </div>
             <input id="header-upload" type="file" accept="image/*" onChange={handleImageUpload('headerImage')} className="hidden" />
+            
+            {/* Fit options */}
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => onUpdateArticleConfig({ headerFitMode: 'fill' })}
+                className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
+                  (articleConfig.headerFitMode || 'fill') === 'fill' 
+                    ? 'bg-gray-800 text-white' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Remplir
+              </button>
+              <button
+                onClick={() => onUpdateArticleConfig({ headerFitMode: 'fit' })}
+                className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
+                  articleConfig.headerFitMode === 'fit' 
+                    ? 'bg-gray-800 text-white' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Adapté
+              </button>
+            </div>
+            
             {articleConfig.headerImage && (
               <div className="flex items-center gap-3 mt-3">
                 <img src={articleConfig.headerImage} alt="Header" className="w-12 h-12 object-cover rounded border" />
@@ -106,6 +131,31 @@ export const ArticleJackpotSettingsPanel: React.FC<ArticleJackpotSettingsPanelPr
               <p className="text-sm text-gray-600">Image de pied de page</p>
             </div>
             <input id="footer-upload" type="file" accept="image/*" onChange={handleImageUpload('footerImage')} className="hidden" />
+            
+            {/* Fit options */}
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => onUpdateArticleConfig({ footerFitMode: 'fill' })}
+                className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
+                  (articleConfig.footerFitMode || 'fill') === 'fill' 
+                    ? 'bg-gray-800 text-white' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Remplir
+              </button>
+              <button
+                onClick={() => onUpdateArticleConfig({ footerFitMode: 'fit' })}
+                className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
+                  articleConfig.footerFitMode === 'fit' 
+                    ? 'bg-gray-800 text-white' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Adapté
+              </button>
+            </div>
+            
             {articleConfig.footerImage && (
               <div className="flex items-center gap-3 mt-3">
                 <img src={articleConfig.footerImage} alt="Footer" className="w-12 h-12 object-cover rounded border" />
