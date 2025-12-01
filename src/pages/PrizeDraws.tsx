@@ -630,27 +630,33 @@ export default function PrizeDraws() {
                         <TableHead>Navigateur</TableHead>
                         <TableHead>OS</TableHead>
                         <TableHead>Localisation</TableHead>
-                        <TableHead>Données</TableHead>
+                        {formFields.map(field => (
+                          <TableHead key={field} className="capitalize">{field}</TableHead>
+                        ))}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {optInParticipants.map((part) => (
-                        <TableRow key={part.id}>
-                          <TableCell>{part.email || '-'}</TableCell>
-                          <TableCell className="text-xs">
-                            {new Date(part.created_at).toLocaleString('fr-FR')}
-                          </TableCell>
-                          <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.browser || '-'}</TableCell>
-                          <TableCell className="text-xs">{part.os || '-'}</TableCell>
-                          <TableCell className="text-xs">
-                            {part.city && part.country ? `${part.city}, ${part.country}` : part.country || '-'}
-                          </TableCell>
-                          <TableCell className="text-xs max-w-xs truncate">
-                            {part.participation_data ? JSON.stringify(part.participation_data).substring(0, 50) + '...' : '-'}
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {optInParticipants.map((part) => {
+                        const formData = part.participation_data || {};
+                        
+                        return (
+                          <TableRow key={part.id}>
+                            <TableCell>{part.email || '-'}</TableCell>
+                            <TableCell className="text-xs">
+                              {new Date(part.created_at).toLocaleString('fr-FR')}
+                            </TableCell>
+                            <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
+                            <TableCell className="text-xs">{part.browser || '-'}</TableCell>
+                            <TableCell className="text-xs">{part.os || '-'}</TableCell>
+                            <TableCell className="text-xs">
+                              {part.city && part.country ? `${part.city}, ${part.country}` : part.country || '-'}
+                            </TableCell>
+                            {formFields.map(field => (
+                              <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
+                            ))}
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </>
