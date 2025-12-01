@@ -267,13 +267,22 @@ export const ExternalBackendAnalyticsService = {
    */
   async debugLogCampaignAnalyticsRow(campaignId: string): Promise<void> {
     try {
+      console.error('🔍 [DEBUG START] Fetching campaign_analytics for:', campaignId);
+      
       const { data, error } = await externalSupabase
         .from('campaign_analytics')
         .select('*')
         .eq('campaign_id', campaignId)
         .maybeSingle();
 
-      console.log('\n🔍 [DEBUG] campaign_analytics row for campaign', campaignId, '\ndata =', data, '\nerror =', error);
+      console.error('🔍 [DEBUG] campaign_analytics row:', {
+        campaignId,
+        data,
+        error,
+        total_views: data?.total_views,
+        total_participations: data?.total_participations,
+        total_completions: data?.total_completions,
+      });
     } catch (error) {
       console.error('[DEBUG] Error reading campaign_analytics row:', error);
     }
