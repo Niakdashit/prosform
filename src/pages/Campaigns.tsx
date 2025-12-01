@@ -477,7 +477,7 @@ const Campaigns = () => {
         {/* Campaigns - List or Grid view */}
         {viewMode === 'list' ? (
           <div 
-            className="relative overflow-x-auto"
+            className="relative"
             style={{ 
               background: 'rgba(255, 255, 255, 0.25)',
               backdropFilter: 'blur(20px)',
@@ -802,7 +802,7 @@ const Campaigns = () => {
 
       {/* Campaign Statistics Modal */}
       <Dialog open={statsModalOpen} onOpenChange={setStatsModalOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh]">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="flex items-center gap-2">
