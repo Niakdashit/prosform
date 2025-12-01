@@ -179,51 +179,6 @@ export type Database = {
           },
         ]
       }
-      campaign_settings: {
-        Row: {
-          auto_block_enabled: boolean
-          block_duration_hours: number
-          campaign_id: string | null
-          created_at: string
-          device_max_attempts: number
-          device_window_minutes: number
-          email_max_attempts: number
-          email_window_minutes: number
-          id: string
-          ip_max_attempts: number
-          ip_window_minutes: number
-          updated_at: string
-        }
-        Insert: {
-          auto_block_enabled?: boolean
-          block_duration_hours?: number
-          campaign_id?: string | null
-          created_at?: string
-          device_max_attempts?: number
-          device_window_minutes?: number
-          email_max_attempts?: number
-          email_window_minutes?: number
-          id?: string
-          ip_max_attempts?: number
-          ip_window_minutes?: number
-          updated_at?: string
-        }
-        Update: {
-          auto_block_enabled?: boolean
-          block_duration_hours?: number
-          campaign_id?: string | null
-          created_at?: string
-          device_max_attempts?: number
-          device_window_minutes?: number
-          email_max_attempts?: number
-          email_window_minutes?: number
-          id?: string
-          ip_max_attempts?: number
-          ip_window_minutes?: number
-          updated_at?: string
-        }
-        Relationships: []
-      }
       campaigns: {
         Row: {
           app_title: string
@@ -559,39 +514,6 @@ export type Database = {
       }
     }
     Functions: {
-      _get_effective_campaign_settings: {
-        Args: { p_campaign_id: string }
-        Returns: {
-          auto_block_enabled: boolean
-          block_duration_hours: number
-          campaign_id: string | null
-          created_at: string
-          device_max_attempts: number
-          device_window_minutes: number
-          email_max_attempts: number
-          email_window_minutes: number
-          id: string
-          ip_max_attempts: number
-          ip_window_minutes: number
-          updated_at: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "campaign_settings"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      check_rate_limit: {
-        Args: {
-          p_campaign_id: string
-          p_identifier: string
-          p_identifier_type: string
-          p_max_attempts: number
-          p_window_minutes: number
-        }
-        Returns: Json
-      }
       generate_campaign_slug: {
         Args: { campaign_id: string; campaign_title: string }
         Returns: string
@@ -599,40 +521,6 @@ export type Database = {
       get_campaign_prize_stats: {
         Args: { p_campaign_id: string }
         Returns: Json
-      }
-      get_campaign_settings: {
-        Args: { p_campaign_id: string }
-        Returns: {
-          auto_block_enabled: boolean
-          block_duration_hours: number
-          campaign_id: string | null
-          created_at: string
-          device_max_attempts: number
-          device_window_minutes: number
-          email_max_attempts: number
-          email_window_minutes: number
-          id: string
-          ip_max_attempts: number
-          ip_window_minutes: number
-          updated_at: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "campaign_settings"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      get_campaign_stats: { Args: { p_campaign_id: string }; Returns: Json }
-      get_conversion_funnel: { Args: { p_campaign_id: string }; Returns: Json }
-      get_participations_by_day: {
-        Args: { p_campaign_id: string; p_days?: number }
-        Returns: {
-          completions: number
-          date: string
-          participations: number
-          unique_emails: number
-        }[]
       }
       get_prize_timeline: {
         Args: { p_campaign_id: string; p_days?: number }
@@ -648,48 +536,6 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
-      }
-      is_participant_blocked: {
-        Args: {
-          p_campaign_id: string
-          p_device_fingerprint?: string
-          p_email?: string
-          p_ip_address?: string
-        }
-        Returns: boolean
-      }
-      upsert_campaign_settings: {
-        Args: {
-          p_auto_block_enabled?: boolean
-          p_block_duration_hours?: number
-          p_campaign_id: string
-          p_device_max_attempts?: number
-          p_device_window_minutes?: number
-          p_email_max_attempts?: number
-          p_email_window_minutes?: number
-          p_ip_max_attempts?: number
-          p_ip_window_minutes?: number
-        }
-        Returns: {
-          auto_block_enabled: boolean
-          block_duration_hours: number
-          campaign_id: string | null
-          created_at: string
-          device_max_attempts: number
-          device_window_minutes: number
-          email_max_attempts: number
-          email_window_minutes: number
-          id: string
-          ip_max_attempts: number
-          ip_window_minutes: number
-          updated_at: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "campaign_settings"
-          isOneToOne: true
-          isSetofReturn: false
-        }
       }
     }
     Enums: {
