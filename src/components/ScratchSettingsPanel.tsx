@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
 import { SettingsSection } from "./ui/SettingsSection";
 import { SettingsField } from "./ui/SettingsField";
+import { Switch } from "@/components/ui/switch";
 import { Layout, FileText } from "lucide-react";
 
 interface ScratchSettingsPanelProps {
@@ -139,8 +140,31 @@ export const ScratchSettingsPanel = ({
       case 'contact':
         return (
           <div className="space-y-6">
-            {!hideLayoutAndAlignment && (
+            {/* Form Settings */}
+            <SettingsSection 
+              title="Form Settings" 
+              icon={<FileText className="w-4 h-4" />}
+            >
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-card">
+                <div>
+                  <div className="text-sm font-medium">Contact Form</div>
+                  <div className="text-xs text-muted-foreground">
+                    {config.contactForm.enabled ? 'Enabled' : 'Disabled'}
+                  </div>
+                </div>
+                <Switch 
+                  checked={config.contactForm.enabled}
+                  onCheckedChange={(checked) => onUpdateConfig({ 
+                    contactForm: { ...config.contactForm, enabled: checked } 
+                  })}
+                />
+              </div>
+            </SettingsSection>
+
+            {config.contactForm.enabled && (
               <>
+                <Separator />
+
                 {/* Layout Section */}
                 <SettingsSection 
                   title="Layout" 
@@ -160,88 +184,72 @@ export const ScratchSettingsPanel = ({
                 </SettingsSection>
 
                 <Separator />
-              </>
-            )}
 
-            {/* Content Section */}
-            <SettingsSection 
-              title="Content" 
-              icon={<FileText className="w-4 h-4" />}
-            >
-              <SettingsField label="Title">
-                <Input 
-                  type="text" 
-                  value={config.contactForm.title}
-                  onChange={(e) => onUpdateConfig({ 
-                    contactForm: { ...config.contactForm, title: e.target.value } 
-                  })}
-                  className="h-9"
-                />
-              </SettingsField>
-
-              <SettingsField label="Subtitle">
-                <Input 
-                  type="text" 
-                  value={config.contactForm.subtitle}
-                  onChange={(e) => onUpdateConfig({ 
-                    contactForm: { ...config.contactForm, subtitle: e.target.value } 
-                  })}
-                  className="h-9"
-                />
-              </SettingsField>
-            </SettingsSection>
-
-            <Separator />
-            
-            {!hideSpacingAndBackground && (
-              <>
-                {/* Spacing Section */}
+                {/* Content Section */}
                 <SettingsSection 
-                  title="Spacing" 
+                  title="Content" 
                   icon={<FileText className="w-4 h-4" />}
                 >
-                  <SettingsField
-                    label={`Block spacing: ${config.contactForm.blockSpacing}x`}
-                    help="Adjust vertical spacing between elements"
-                  >
-                    <Slider
-                      value={[config.contactForm.blockSpacing]}
-                      onValueChange={([value]) => onUpdateConfig({
-                        contactForm: { ...config.contactForm, blockSpacing: value }
+                  <SettingsField label="Form title">
+                    <Input 
+                      type="text" 
+                      value={config.contactForm.title}
+                      onChange={(e) => onUpdateConfig({ 
+                        contactForm: { ...config.contactForm, title: e.target.value } 
                       })}
-                      min={0.5}
-                      max={3}
-                      step={0.25}
-                      className="w-full"
+                      className="h-9"
+                    />
+                  </SettingsField>
+
+                  <SettingsField label="Subtitle">
+                    <Input 
+                      type="text" 
+                      value={config.contactForm.subtitle}
+                      onChange={(e) => onUpdateConfig({ 
+                        contactForm: { ...config.contactForm, subtitle: e.target.value } 
+                      })}
+                      className="h-9"
                     />
                   </SettingsField>
                 </SettingsSection>
 
                 <Separator />
 
-                {/* Background Section */}
-                {config.welcomeScreen.applyBackgroundToAll ? (
-                  <div className="text-xs text-muted-foreground italic p-3 rounded-lg bg-muted/50">
-                    Background appliqué depuis Welcome Screen
+                {/* Fields Section */}
+                <SettingsSection 
+                  title="Fields" 
+                  icon={<FileText className="w-4 h-4" />}
+                  badge={config.contactForm.fields.length}
+                >
+                  <div className="space-y-2">
+                    {config.contactForm.fields.map((field, index) => (
+                      <div 
+                        key={field.id} 
+                        className="flex items-center justify-between p-2 rounded-md border bg-card"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${field.required ? 'bg-primary' : 'bg-muted-foreground'}`} />
+                          <span className="text-sm capitalize">{field.label}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            {field.required ? 'Required' : 'Optional'}
+                          </span>
+                          <Switch 
+                            checked={field.required}
+                            onCheckedChange={(checked) => {
+                              const newFields = [...config.contactForm.fields];
+                              newFields[index] = { ...field, required: checked };
+                              onUpdateConfig({ 
+                                contactForm: { ...config.contactForm, fields: newFields } 
+                              });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <BackgroundUploader
-                    desktopImage={config.contactForm.backgroundImage}
-                    mobileImage={config.contactForm.backgroundImageMobile}
-                    onDesktopImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: image }
-                    })}
-                    onDesktopImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImage: undefined }
-                    })}
-                    onMobileImageChange={(image) => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: image }
-                    })}
-                    onMobileImageRemove={() => onUpdateConfig({
-                      contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
-                    })}
-                  />
-                )}
+                </SettingsSection>
               </>
             )}
           </div>
