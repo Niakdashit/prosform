@@ -8,6 +8,7 @@ const WheelPreviewContent = () => {
   const [config, setConfig] = useState<WheelConfig | null>(null);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
+  const [assetsReady, setAssetsReady] = useState(false);
 
   useEffect(() => {
     const savedConfig = localStorage.getItem('wheel-config');
@@ -64,8 +65,14 @@ const WheelPreviewContent = () => {
       }
     }
   };
+  
   return (
     <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+      {/* Overlay blanc tant que les assets ne sont pas chargés */}
+      {activeView === 'wheel' && !assetsReady && (
+        <div className="fixed inset-0 bg-background z-50" />
+      )}
+      
       <WheelPreview
         config={config}
         activeView={activeView}
@@ -77,6 +84,7 @@ const WheelPreviewContent = () => {
         onNext={handleNext}
         onGoToEnding={handleGoToEnding}
         prizes={[]}
+        onAssetsReady={() => setAssetsReady(true)}
       />
     </div>
   );

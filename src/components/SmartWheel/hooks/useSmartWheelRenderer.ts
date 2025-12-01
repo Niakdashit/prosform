@@ -18,6 +18,7 @@ interface UseSmartWheelRendererProps {
     secondary: string;
     accent?: string;
   };
+  onAssetsReady?: () => void;
 }
 
 export const useSmartWheelRenderer = ({
@@ -31,7 +32,7 @@ export const useSmartWheelRenderer = ({
   showBulbs,
   disablePointerAnimation,
   brandColors,
-
+  onAssetsReady,
 }: UseSmartWheelRendererProps) => {
   // Central bulb count used for visuals and pointer collisions
   const BULB_COUNT = 15;
@@ -88,6 +89,10 @@ export const useSmartWheelRenderer = ({
   const centerImgReadyRef = useRef(false);
   const [centerImgReady, setCenterImgReady] = useState(false);
   const centerLoadingRef = useRef(true);
+  
+  // État pour suivre si tous les assets critiques sont chargés
+  const [assetsReady, setAssetsReady] = useState(false);
+  const assetsReadyNotifiedRef = useRef(false);
 
   // (Removed) Image-based ring cache eliminated to avoid any deferred loading
   
@@ -131,7 +136,46 @@ export const useSmartWheelRenderer = ({
         img.src = src;
       }
     });
-  }, []); // Exécuté une seule fois au montage
+  }, []);
+  
+  // Vérifier si tous les assets critiques sont chargés
+  useEffect(() => {
+    const checkAssets = () => {
+      // Vérifier le pointer
+      const pointerReady = pointerImgReadyRef.current || !pointerLoadingRef.current;
+      
+      // Vérifier le centre
+      const centerReady = centerImgReadyRef.current || !centerLoadingRef.current;
+      
+      // Vérifier les images de bordure si nécessaire
+      let borderReady = true;
+      if (borderStyle === 'goldRing' || borderStyle === 'silverRing') {
+        const src = borderStyle === 'goldRing' 
+          ? '/assets/wheel/ring-gold.png' 
+          : '/assets/wheel/ring-silver.png';
+        const entry = ringImageCacheRef.current.get(src);
+        borderReady = entry ? (entry.ready || entry.failed || !entry.loading) : false;
+      }
+      
+      const allReady = pointerReady && centerReady && borderReady;
+      
+      if (allReady && !assetsReadyNotifiedRef.current) {
+        setAssetsReady(true);
+        assetsReadyNotifiedRef.current = true;
+        if (onAssetsReady) {
+          onAssetsReady();
+        }
+      }
+    };
+    
+    // Vérifier immédiatement
+    checkAssets();
+    
+    // Vérifier périodiquement pendant le chargement
+    const interval = setInterval(checkAssets, 100);
+    
+    return () => clearInterval(interval);
+  }, [borderStyle, onAssetsReady]);
   
   // Initialize with default wheel state if not provided
   const safeWheelState: WheelState = useMemo(() => ({
@@ -1121,7 +1165,7 @@ export const useSmartWheelRenderer = ({
     }
   };
 
-  return { canvasRef, centerImgReady };
+  return { canvasRef, centerImgReady, assetsReady };
 };
 
 // Utilitaires de couleur

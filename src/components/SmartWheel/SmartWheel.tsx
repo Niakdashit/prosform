@@ -19,6 +19,7 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
   onResult,
   onComplete,
   onShowParticipationModal,
+  onAssetsReady,
   brandColors,
   customButton,
   borderStyle = 'classic',
@@ -234,7 +235,7 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
   }), [isSpinning, rotation, targetRotation, currentSegment]);
 
   // Rendu Canvas - Utiliser currentBorderStyle au lieu de borderStyle
-  const { canvasRef, centerImgReady } = useSmartWheelRenderer({
+  const { canvasRef, centerImgReady, assetsReady } = useSmartWheelRenderer({
     segments: updatedSegments,
     theme: resolvedTheme,
     wheelState,
@@ -244,7 +245,8 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
     customBorderWidth,
     showBulbs,
     disablePointerAnimation,
-    brandColors
+    brandColors,
+    onAssetsReady
   });
   
   const handleSpin = async () => {
