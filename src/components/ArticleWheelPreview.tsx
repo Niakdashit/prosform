@@ -291,7 +291,7 @@ export const ArticleWheelPreview: React.FC<ArticleWheelPreviewProps> = ({
                   textColor: theme.buttonTextColor,
                 }}
                 size={350}
-                borderStyle={theme.wheelBorderStyle}
+                borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
                 customBorderColor={
                   theme.wheelBorderStyle === 'custom'
                     ? theme.wheelBorderCustomColor

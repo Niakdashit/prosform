@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { WheelConfig, WheelSegment } from "./WheelBuilder";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
 import { SmartWheel } from "./SmartWheel";
 import { ParticipationService } from "@/services/ParticipationService";
@@ -15,22 +15,8 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
   const [contactData, setContactData] = useState<Record<string, string>>({});
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [isWheelReady, setIsWheelReady] = useState(false);
   const { theme } = useTheme();
   const buttonStyles = getButtonStyles(theme);
-
-  // Délai d'affichage de la roue pour laisser charger les assets en arrière-plan
-  useEffect(() => {
-    if (activeView === 'wheel') {
-      setIsWheelReady(false);
-      const timer = setTimeout(() => {
-        setIsWheelReady(true);
-      }, 400); // 400ms de délai
-      return () => clearTimeout(timer);
-    } else {
-      setIsWheelReady(false);
-    }
-  }, [activeView]);
 
   const handleNext = () => {
     if (activeView === 'welcome') {
@@ -235,16 +221,6 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
   };
 
   const renderWheel = () => {
-    // Ne rien afficher tant que le délai n'est pas écoulé
-    if (!isWheelReady) {
-      return (
-        <div 
-          className="w-full h-full flex flex-col items-center justify-center p-8"
-          style={{ backgroundColor: theme.backgroundColor }}
-        />
-      );
-    }
-
     return (
       <div 
         className="w-full h-full flex flex-col items-center justify-center p-8"
