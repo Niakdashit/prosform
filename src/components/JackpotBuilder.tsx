@@ -465,9 +465,8 @@ export const JackpotBuilder = () => {
               localStorage.setItem('jackpot-viewMode', targetViewMode);
               localStorage.setItem('jackpot-theme', JSON.stringify(theme));
               window.open('/jackpot-preview', '_blank');
-              toast.warning('Preview opened without background images (images too large)');
             } catch (e2) {
-              toast.error('Unable to open preview - data too large');
+              toast.error('Impossible d\'ouvrir la preview - données trop volumineuses');
             }
           }
         }}

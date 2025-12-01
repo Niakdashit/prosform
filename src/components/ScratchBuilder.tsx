@@ -437,9 +437,8 @@ export const ScratchBuilder = () => {
               localStorage.setItem('scratch-viewMode', targetViewMode);
               localStorage.setItem('scratch-theme', JSON.stringify(theme));
               window.open('/scratch-preview', '_blank');
-              toast.warning('Preview opened without images (images too large)');
             } catch (e2) {
-              toast.error('Unable to open preview - data too large');
+              toast.error('Impossible d\'ouvrir la preview - données trop volumineuses');
             }
           }
         }}
