@@ -174,11 +174,11 @@ const ArticleWheelPreview = () => {
         }));
         
         return (
-          <div className="p-6 flex flex-col items-center justify-center min-h-[400px]">
+          <div className="relative p-6 flex flex-col items-center justify-center min-h-[400px]">
             {/* Overlay blanc tant que les assets ne sont pas chargés */}
             {!assetsReady && (
               <div 
-                className="absolute inset-0 z-50"
+                className="absolute inset-0 z-[9999]"
                 style={{ backgroundColor: articleConfig.frameColor }}
               />
             )}
@@ -204,7 +204,10 @@ const ArticleWheelPreview = () => {
                     : undefined
                 }
                 showBulbs={true}
-                onAssetsReady={() => setAssetsReady(true)}
+                onAssetsReady={() => {
+                  console.log('🎨 Article wheel assets ready');
+                  setAssetsReady(true);
+                }}
               />
             </div>
           </div>
