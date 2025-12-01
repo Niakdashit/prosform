@@ -478,7 +478,8 @@ export const JackpotBuilder = () => {
               localStorage.setItem('jackpot-theme', JSON.stringify(theme));
               window.open('/jackpot-preview', '_blank');
             } catch (e2) {
-              toast.error('Impossible d\'ouvrir la preview - données trop volumineuses');
+              console.warn('Unable to persist jackpot preview data, opening preview without local config:', e2);
+              window.open('/jackpot-preview', '_blank');
             }
           }
         }}
