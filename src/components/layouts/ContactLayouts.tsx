@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ContactField } from "@/components/WheelBuilder";
 import { Sparkles } from "lucide-react";
 import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
@@ -182,24 +183,39 @@ export const ContactLayouts = ({
                 >
                   {field.label}
                 </label>
-                <select
-                  className="w-full h-14 text-base px-4"
-                  style={{
-                    backgroundColor: backgroundColor,
-                    borderColor: textColor,
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    color: textColor,
-                    borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
-                  }}
-                  onChange={(e) => onFieldChange(field.id || field.type, e.target.value)}
-                  required={field.required}
+                <Select
+                  onValueChange={(value) => onFieldChange(field.id || field.type, value)}
                 >
-                  <option value="">Sélectionnez une option</option>
-                  {field.options.map((opt, i) => (
-                    <option key={i} value={opt}>{opt}</option>
-                  ))}
-                </select>
+                  <SelectTrigger 
+                    className="h-14 text-base pointer-events-auto"
+                    style={{
+                      backgroundColor: backgroundColor,
+                      borderColor: textColor,
+                      borderWidth: '1px',
+                      color: textColor,
+                      borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
+                    }}
+                  >
+                    <SelectValue placeholder="Sélectionnez une option" />
+                  </SelectTrigger>
+                  <SelectContent 
+                    className="pointer-events-auto z-[100]"
+                    style={{
+                      backgroundColor: backgroundColor,
+                      borderColor: textColor,
+                    }}
+                  >
+                    {field.options.map((opt, i) => (
+                      <SelectItem 
+                        key={i} 
+                        value={opt}
+                        style={{ color: textColor }}
+                      >
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             );
           }
