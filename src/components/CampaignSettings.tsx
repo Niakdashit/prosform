@@ -93,13 +93,13 @@ export const CampaignSettings = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="border-b">
-        <div className="px-6 py-4">
+    <div className="flex flex-col h-full w-full bg-background">
+      <div className="border-b w-full">
+        <div className="px-6 py-4 w-full max-w-7xl mx-auto">
           <h2 className="text-2xl font-semibold">Paramètres de la campagne</h2>
         </div>
         
-        <div className="px-6">
+        <div className="px-6 w-full max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="bg-transparent border-0 h-auto p-0 gap-6">
               <TabsTrigger 
@@ -134,8 +134,8 @@ export const CampaignSettings = ({
               </TabsTrigger>
             </TabsList>
 
-            <ScrollArea className="h-[calc(100vh-200px)]">
-              <div className="py-6 space-y-6">
+            <ScrollArea className="h-[calc(100vh-200px)] w-full">
+              <div className="py-6 space-y-6 w-full max-w-7xl mx-auto px-6">
                 <TabsContent value="canaux" className="mt-0 space-y-6">
                   <div className="space-y-4 bg-card border rounded-lg p-6">
                     <h3 className="font-semibold text-lg">Campagne</h3>
