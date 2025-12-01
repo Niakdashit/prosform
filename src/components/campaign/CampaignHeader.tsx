@@ -75,7 +75,37 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
         borderBottom: config.borderBottom ? `1px solid ${config.borderColor || '#e5e7eb'}` : 'none',
       }}
     >
-      <div className={`h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center ${config.showNavigation ? 'justify-between' : 'justify-start'}`}>
+      <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
+        {/* Logo à gauche */}
+        {(config.logoPosition === 'left' || !config.logoPosition) && (
+          <div className="flex items-center shrink-0">
+            {config.logo ? (
+              <img
+                src={config.logo}
+                alt="Logo"
+                style={{ 
+                  height: config.logoSize || 120,
+                  width: 'auto',
+                  objectFit: 'contain'
+                }}
+                className="cursor-pointer"
+              />
+            ) : (
+              <div 
+                className="flex items-center justify-center rounded-lg border-2 border-dashed"
+                style={{ 
+                  width: config.logoSize || 120,
+                  height: Math.min(config.logoSize || 40, (config.height || 64) - 24),
+                  borderColor: config.textColor + '40',
+                  color: config.textColor + '80',
+                }}
+              >
+                <span className="text-xs">Logo</span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Navigation gauche (si logo centré) */}
         {config.showNavigation && config.logoPosition === 'center' && (
           <nav className="hidden md:flex items-center gap-6 flex-1">
@@ -92,38 +122,40 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
           </nav>
         )}
 
-        {/* Logo */}
-        <div className={`flex items-center ${config.showNavigation && config.logoPosition === 'center' ? 'flex-1' : ''} ${logoPositionClass}`}>
-          {config.logo ? (
-            <img
-              src={config.logo}
-              alt="Logo"
-              style={{ 
-                height: config.logoSize || 120,
-                width: 'auto',
-                objectFit: 'contain'
-              }}
-              className="cursor-pointer"
-            />
-          ) : (
-            <div 
-              className="flex items-center justify-center rounded-lg border-2 border-dashed"
-              style={{ 
-                width: config.logoSize || 120,
-                height: Math.min(config.logoSize || 40, (config.height || 64) - 24),
-                borderColor: config.textColor + '40',
-                color: config.textColor + '80',
-              }}
-            >
-              <span className="text-xs">Logo</span>
-            </div>
-          )}
-        </div>
+        {/* Logo au centre */}
+        {config.logoPosition === 'center' && (
+          <div className="flex items-center justify-center flex-1">
+            {config.logo ? (
+              <img
+                src={config.logo}
+                alt="Logo"
+                style={{ 
+                  height: config.logoSize || 120,
+                  width: 'auto',
+                  objectFit: 'contain'
+                }}
+                className="cursor-pointer"
+              />
+            ) : (
+              <div 
+                className="flex items-center justify-center rounded-lg border-2 border-dashed"
+                style={{ 
+                  width: config.logoSize || 120,
+                  height: Math.min(config.logoSize || 40, (config.height || 64) - 24),
+                  borderColor: config.textColor + '40',
+                  color: config.textColor + '80',
+                }}
+              >
+                <span className="text-xs">Logo</span>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Navigation droite (si logo centré) ou navigation complète */}
+        {/* Navigation */}
         {config.showNavigation && (
           <>
-            <nav className="hidden md:flex items-center gap-6 flex-1 justify-end">
+            <nav className={`hidden md:flex items-center gap-6 ${config.logoPosition !== 'center' ? 'flex-1' : ''} ${config.logoPosition === 'right' ? '' : 'justify-end'}`}>
               {(config.logoPosition === 'center' 
                 ? config.navigationLinks?.slice(Math.ceil((config.navigationLinks?.length || 0) / 2))
                 : config.navigationLinks
@@ -141,13 +173,43 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
 
             {/* Menu mobile */}
             <button
-              className="md:hidden p-2"
+              className="md:hidden ml-auto p-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{ color: config.textColor }}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </>
+        )}
+
+        {/* Logo à droite */}
+        {config.logoPosition === 'right' && (
+          <div className="flex items-center justify-end flex-1 shrink-0">
+            {config.logo ? (
+              <img
+                src={config.logo}
+                alt="Logo"
+                style={{ 
+                  height: config.logoSize || 120,
+                  width: 'auto',
+                  objectFit: 'contain'
+                }}
+                className="cursor-pointer"
+              />
+            ) : (
+              <div 
+                className="flex items-center justify-center rounded-lg border-2 border-dashed"
+                style={{ 
+                  width: config.logoSize || 120,
+                  height: Math.min(config.logoSize || 40, (config.height || 64) - 24),
+                  borderColor: config.textColor + '40',
+                  color: config.textColor + '80',
+                }}
+              >
+                <span className="text-xs">Logo</span>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
