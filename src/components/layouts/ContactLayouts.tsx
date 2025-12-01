@@ -300,7 +300,7 @@ export const ContactLayouts = ({
       case 'desktop-left-right':
         return (
           <>
-            <div className="flex items-center justify-start p-12 overflow-y-auto">
+            <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
               {renderForm()}
             </div>
             {renderVisual()}
@@ -311,7 +311,7 @@ export const ContactLayouts = ({
         return (
           <>
             {renderVisual()}
-            <div className="flex items-center justify-start p-12 overflow-y-auto">
+            <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
               {renderForm()}
             </div>
           </>
@@ -319,7 +319,7 @@ export const ContactLayouts = ({
 
       case 'desktop-centered':
         return (
-          <div className="flex items-center justify-start p-12 overflow-y-auto">
+          <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
             {renderForm()}
           </div>
         );
@@ -327,7 +327,7 @@ export const ContactLayouts = ({
       case 'desktop-card':
         return (
           <div 
-            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12 overflow-y-auto"
+            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12 overflow-y-auto my-auto"
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
           >
             {renderForm()}
@@ -338,7 +338,7 @@ export const ContactLayouts = ({
         return (
           <>
             <div 
-              className="flex items-center justify-start p-12 overflow-y-auto"
+              className="flex items-center justify-center p-12 overflow-y-auto min-h-full"
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
             >
               {renderForm()}
@@ -351,7 +351,7 @@ export const ContactLayouts = ({
         return (
           <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
-            <div className="flex items-center justify-start p-12 overflow-y-auto">
+            <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
               {renderForm()}
             </div>
           </>
@@ -364,21 +364,21 @@ export const ContactLayouts = ({
     switch (layout as MobileLayoutType) {
       case 'mobile-vertical':
         return (
-          <div className="flex flex-col h-full items-center justify-start py-8 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+          <div className="flex flex-col h-full items-center justify-center py-8 overflow-y-auto min-h-full" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderForm()}
           </div>
         );
 
       case 'mobile-centered':
         return (
-          <div className="flex items-center justify-start py-8 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+          <div className="flex items-center justify-center py-8 overflow-y-auto min-h-full" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderForm()}
           </div>
         );
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-start py-6 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+          <div className="flex flex-col items-center justify-center py-6 overflow-y-auto min-h-full" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderForm()}
           </div>
         );
