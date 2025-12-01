@@ -615,20 +615,30 @@ export const JackpotPreview = ({
                             />
                             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                               <button
-                                onClick={() => setShowUploadModal(true)}
-                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                title="Change image"
-                              >
-                                <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                              </button>
-                              <button
                                 onClick={() => setShowEditorModal(true)}
                                 className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                 style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                 title="Edit image"
                               >
                                 <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setUploadedImage(null);
+                                  setHardcodedImageHidden(true);
+                                  onUpdateConfig({
+                                    welcomeScreen: {
+                                      ...config.welcomeScreen,
+                                      image: undefined,
+                                      imageSettings: undefined,
+                                    }
+                                  });
+                                }}
+                                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                style={{ backgroundColor: 'rgba(220, 38, 38, 0.85)' }}
+                                title="Delete image"
+                              >
+                                <X className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                               </button>
                             </div>
                           </>
@@ -666,20 +676,30 @@ export const JackpotPreview = ({
                               />
                               <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                                 <button
-                                  onClick={() => setShowUploadModal(true)}
-                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                                  title="Change image"
-                                >
-                                  <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                                </button>
-                                <button
                                   onClick={() => setShowEditorModal(true)}
                                   className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                                   style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                                   title="Edit image"
                                 >
                                   <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setUploadedImage(null);
+                                    setHardcodedImageHidden(true);
+                                    onUpdateConfig({
+                                      welcomeScreen: {
+                                        ...config.welcomeScreen,
+                                        image: undefined,
+                                        imageSettings: undefined,
+                                      }
+                                    });
+                                  }}
+                                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                                  style={{ backgroundColor: 'rgba(220, 38, 38, 0.85)' }}
+                                  title="Delete image"
+                                >
+                                  <X className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                                 </button>
                               </div>
                             </>
@@ -733,20 +753,30 @@ export const JackpotPreview = ({
                           />
                           <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                             <button
-                              onClick={() => setShowUploadModal(true)}
-                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                              style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                              title="Change image"
-                            >
-                              <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                            </button>
-                            <button
                               onClick={() => setShowEditorModal(true)}
                               className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                               style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                               title="Edit image"
                             >
                               <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setUploadedImage(null);
+                                setHardcodedImageHidden(true);
+                                onUpdateConfig({
+                                  welcomeScreen: {
+                                    ...config.welcomeScreen,
+                                    image: undefined,
+                                    imageSettings: undefined,
+                                  }
+                                });
+                              }}
+                              className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                              style={{ backgroundColor: 'rgba(220, 38, 38, 0.85)' }}
+                              title="Delete image"
+                            >
+                              <X className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                             </button>
                           </div>
                         </>
@@ -985,20 +1015,28 @@ export const JackpotPreview = ({
                     {!isReadOnly && (
                       <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                         <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Change image"
-                        >
-                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
-                        <button
                           onClick={() => setShowEditorModal(true)}
                           className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                           style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                           title="Edit image"
                         >
                           <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <button
+                          onClick={() => {
+                            onUpdateConfig({
+                              contactForm: {
+                                ...config.contactForm,
+                                backgroundImageMobile: undefined,
+                                backgroundImage: undefined,
+                              }
+                            });
+                          }}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(220, 38, 38, 0.85)' }}
+                          title="Delete image"
+                        >
+                          <X className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                         </button>
                       </div>
                     )}
@@ -1049,20 +1087,27 @@ export const JackpotPreview = ({
                     {!isReadOnly && (
                       <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                         <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Change image"
-                        >
-                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
-                        <button
                           onClick={() => setShowEditorModal(true)}
                           className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                           style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                           title="Edit image"
                         >
                           <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <button
+                          onClick={() => {
+                            onUpdateConfig({
+                              contactForm: {
+                                ...config.contactForm,
+                                backgroundImage: undefined,
+                              }
+                            });
+                          }}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(220, 38, 38, 0.85)' }}
+                          title="Delete image"
+                        >
+                          <X className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                         </button>
                       </div>
                     )}
@@ -1103,20 +1148,27 @@ export const JackpotPreview = ({
                     {!isReadOnly && (
                       <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
                         <button
-                          onClick={() => setShowUploadModal(true)}
-                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
-                          title="Change image"
-                        >
-                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
-                        </button>
-                        <button
                           onClick={() => setShowEditorModal(true)}
                           className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
                           style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
                           title="Edit image"
                         >
                           <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <button
+                          onClick={() => {
+                            onUpdateConfig({
+                              contactForm: {
+                                ...config.contactForm,
+                                backgroundImage: undefined,
+                              }
+                            });
+                          }}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(220, 38, 38, 0.85)' }}
+                          title="Delete image"
+                        >
+                          <X className="w-5 h-5" style={{ color: '#FFFFFF' }} />
                         </button>
                       </div>
                     )}
