@@ -95,16 +95,30 @@ export default function InstantWins() {
   // Extract unique form fields from all participations
   const extractFormFields = (participations: Participation[]) => {
     const fieldsSet = new Set<string>();
+    
     participations.forEach(part => {
       if (part.participation_data) {
-        Object.keys(part.participation_data).forEach(key => {
-          if (!key.startsWith('prize') && !key.startsWith('optin_')) {
-            fieldsSet.add(key);
-          }
-        });
+        const data = part.participation_data;
+        
+        // Check if data is an object
+        if (typeof data === 'object' && data !== null) {
+          Object.keys(data).forEach(key => {
+            // Exclude internal fields but keep all form fields
+            const excludedPrefixes = ['prize_', 'segment_', 'timestamp', 'device_fingerprint'];
+            const isExcluded = excludedPrefixes.some(prefix => key.startsWith(prefix));
+            
+            // Include all user-facing form fields and opt-ins
+            if (!isExcluded && key !== 'prizeWon' && key !== 'hasPlayed') {
+              fieldsSet.add(key);
+            }
+          });
+        }
       }
     });
-    return Array.from(fieldsSet).sort();
+    
+    const fields = Array.from(fieldsSet).sort();
+    console.log('Extracted form fields:', fields);
+    return fields;
   };
 
   useEffect(() => {
@@ -154,11 +168,15 @@ export default function InstantWins() {
         .eq('campaign_id', campaignId)
         .order('created_at', { ascending: false });
       
+      console.log('All participations loaded:', allPartData?.length);
+      console.log('Sample participation:', allPartData?.[0]);
+      
       setAllParticipations(allPartData || []);
       
       // Extract form fields from participations
       if (allPartData) {
         const fields = extractFormFields(allPartData as Participation[]);
+        console.log('Form fields extracted:', fields);
         setFormFields(fields);
       }
 
@@ -670,7 +688,18 @@ export default function InstantWins() {
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
                           {formFields.map(field => {
                             const value = formData[field];
-                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            let displayValue = '-';
+                            
+                            if (value != null) {
+                              if (typeof value === 'object') {
+                                displayValue = JSON.stringify(value);
+                              } else if (typeof value === 'boolean') {
+                                displayValue = value ? 'Oui' : 'Non';
+                              } else {
+                                displayValue = String(value);
+                              }
+                            }
+                            
                             return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
                           })}
                           <TableCell className="text-xs">{part.prize_won?.name || '-'}</TableCell>
@@ -737,7 +766,18 @@ export default function InstantWins() {
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
                           {formFields.map(field => {
                             const value = formData[field];
-                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            let displayValue = '-';
+                            
+                            if (value != null) {
+                              if (typeof value === 'object') {
+                                displayValue = JSON.stringify(value);
+                              } else if (typeof value === 'boolean') {
+                                displayValue = value ? 'Oui' : 'Non';
+                              } else {
+                                displayValue = String(value);
+                              }
+                            }
+                            
                             return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
                           })}
                         </TableRow>
