@@ -147,31 +147,117 @@ export const ContactLayouts = ({
       />
       
       <div className="space-y-4">
-        {fields.map(field => (
-          <div key={field.type} className="text-left">
-            <label 
-              className="block mb-2 text-base font-normal"
-              style={{ color: textColor }}
-            >
-              {field.label}
-            </label>
-            <Input
-              type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-              value={contactData[field.type as keyof typeof contactData]}
-              onChange={(e) => onFieldChange(field.type, e.target.value)}
-              required={field.required}
-              className="h-14 text-base"
-              style={{
-                backgroundColor: backgroundColor,
-                borderColor: textColor,
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                color: textColor,
-                borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
-              }}
-            />
-          </div>
-        ))}
+        {fields.map((field, index) => {
+          // Checkbox type
+          if (field.type === 'checkbox') {
+            return (
+              <label key={index} className="flex items-start gap-3 cursor-pointer text-left">
+                <input
+                  type="checkbox"
+                  className="mt-1 w-5 h-5 rounded border-2 transition-colors flex-shrink-0"
+                  style={{ 
+                    accentColor: buttonColor,
+                    borderColor: textColor
+                  }}
+                  onChange={(e) => onFieldChange(field.id || field.type, e.target.checked ? 'true' : 'false')}
+                  required={field.required}
+                />
+                <span className="text-sm" style={{ color: textColor }}>
+                  {field.label}
+                  {field.helpText && (
+                    <span className="block text-xs opacity-70 mt-1">{field.helpText}</span>
+                  )}
+                </span>
+              </label>
+            );
+          }
+
+          // Select type
+          if (field.type === 'select' && field.options) {
+            return (
+              <div key={index} className="text-left">
+                <label 
+                  className="block mb-2 text-base font-normal"
+                  style={{ color: textColor }}
+                >
+                  {field.label}
+                </label>
+                <select
+                  className="w-full h-14 text-base px-4"
+                  style={{
+                    backgroundColor: backgroundColor,
+                    borderColor: textColor,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    color: textColor,
+                    borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
+                  }}
+                  onChange={(e) => onFieldChange(field.id || field.type, e.target.value)}
+                  required={field.required}
+                >
+                  <option value="">Sélectionnez une option</option>
+                  {field.options.map((opt, i) => (
+                    <option key={i} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            );
+          }
+
+          // Textarea type
+          if (field.type === 'textarea') {
+            return (
+              <div key={index} className="text-left">
+                <label 
+                  className="block mb-2 text-base font-normal"
+                  style={{ color: textColor }}
+                >
+                  {field.label}
+                </label>
+                <textarea
+                  className="w-full text-base px-4 py-3 min-h-[100px] resize-none"
+                  style={{
+                    backgroundColor: backgroundColor,
+                    borderColor: textColor,
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    color: textColor,
+                    borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
+                  }}
+                  onChange={(e) => onFieldChange(field.id || field.type, e.target.value)}
+                  required={field.required}
+                />
+              </div>
+            );
+          }
+
+          // Default: text, email, tel inputs
+          return (
+            <div key={index} className="text-left">
+              <label 
+                className="block mb-2 text-base font-normal"
+                style={{ color: textColor }}
+              >
+                {field.label}
+              </label>
+              <Input
+                type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
+                value={contactData[field.type as keyof typeof contactData]}
+                onChange={(e) => onFieldChange(field.type, e.target.value)}
+                required={field.required}
+                className="h-14 text-base"
+                style={{
+                  backgroundColor: backgroundColor,
+                  borderColor: textColor,
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  color: textColor,
+                  borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
+                }}
+              />
+            </div>
+          );
+        })}
         
         <button 
           onClick={onSubmit}
