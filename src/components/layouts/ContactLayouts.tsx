@@ -148,10 +148,15 @@ export const ContactLayouts = ({
       
       <div className="space-y-4">
         {fields.map(field => (
-          <div key={field.type}>
+          <div key={field.type} className="text-left">
+            <label 
+              className="block mb-2 text-base font-normal"
+              style={{ color: textColor }}
+            >
+              {field.label}
+            </label>
             <Input
               type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-              placeholder={field.label}
               value={contactData[field.type as keyof typeof contactData]}
               onChange={(e) => onFieldChange(field.type, e.target.value)}
               required={field.required}
