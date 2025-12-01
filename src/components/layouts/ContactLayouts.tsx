@@ -373,48 +373,8 @@ export const ContactLayouts = ({
 
       case 'mobile-centered':
         return (
-          <div className="flex flex-col h-full overflow-y-auto">
-            {/* Bannière en haut */}
-            <div 
-              className="w-full h-32 flex items-center justify-center relative overflow-hidden flex-shrink-0"
-              style={{
-                backgroundColor: backgroundImage ? 'transparent' : 'rgba(255, 255, 255, 0.1)',
-                backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
-              {!backgroundImage && (
-                <div className="flex flex-col items-center gap-2">
-                  <svg 
-                    className="w-10 h-10 opacity-60" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                    style={{ color: textColor }}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  <span 
-                    className="text-sm font-medium opacity-70"
-                    style={{ color: textColor }}
-                  >
-                    Upload Banner
-                  </span>
-                  <span 
-                    className="text-xs opacity-50"
-                    style={{ color: textColor }}
-                  >
-                    Click to browse
-                  </span>
-                </div>
-              )}
-            </div>
-            
-            {/* Formulaire en dessous */}
-            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
-              {renderForm()}
-            </div>
+          <div className="flex items-center justify-center py-8 overflow-y-auto min-h-full" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+            {renderForm()}
           </div>
         );
 
