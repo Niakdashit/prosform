@@ -127,10 +127,15 @@ export const WheelLayouts = ({
     switch (layout as DesktopLayoutType) {
       case 'desktop-left-right':
         return (
-          <div className="flex items-center justify-center p-12">
-            <div className="flex flex-col items-center space-y-8">
-              {renderContent()}
-              {renderWheel()}
+          <div className="grid grid-cols-2 h-full">
+            {/* Left column - empty to show background image */}
+            <div className="relative" />
+            {/* Right column - content and wheel */}
+            <div className="flex items-center justify-center p-12">
+              <div className="flex flex-col items-center space-y-8">
+                {renderContent()}
+                {renderWheel()}
+              </div>
             </div>
           </div>
         );
