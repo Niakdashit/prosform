@@ -118,7 +118,7 @@ export interface ThemeSettings {
   // ═══════════════════════════════════════════════════════════
   // GAME-SPECIFIC (Wheel, Jackpot, etc.)
   // ═══════════════════════════════════════════════════════════
-  wheelBorderStyle: 'classic' | 'gold' | 'silver' | 'neonBlue' | 'neonPink' | 'rainbow' | 'royalRoulette' | 'custom';
+  wheelBorderStyle: 'gold' | 'silver' | 'neonBlue' | 'neonPink' | 'rainbow' | 'custom';
   wheelBorderCustomColor?: string;
   jackpotTemplate: 'jackpot-1' | 'jackpot-2' | 'jackpot-3' | 'jackpot-4' | 'jackpot-5' | 'jackpot-6' | 'jackpot-7' | 'jackpot-8' | 'jackpot-9' | 'jackpot-10' | 'jackpot-11';
   customJackpotFrame?: string;

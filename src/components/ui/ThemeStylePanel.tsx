@@ -25,13 +25,11 @@ const GAME_TEMPLATES = [
 
 // Styles de bordures pour les éléments de jeu
 const BORDER_STYLES = [
-  { id: 'classic', name: 'Classic', preview: 'border-4 border-yellow-500' },
   { id: 'gold', name: 'Gold', preview: 'border-4 border-yellow-400 shadow-lg' },
   { id: 'silver', name: 'Silver', preview: 'border-4 border-gray-300' },
   { id: 'neonBlue', name: 'Neon Blue', preview: 'border-4 border-cyan-400 shadow-cyan-400/50' },
   { id: 'neonPink', name: 'Neon Pink', preview: 'border-4 border-pink-500 shadow-pink-500/50' },
   { id: 'rainbow', name: 'Rainbow', preview: 'border-4 border-gradient' },
-  { id: 'royalRoulette', name: 'Royal Roulette', preview: 'border-4 border-amber-600' },
   { id: 'custom', name: 'Custom', preview: 'border-4 border-dashed' },
 ];
 

@@ -9,11 +9,6 @@ const BORDER_STYLES: Array<{
   isTemplate?: boolean;
 }> = [
   {
-    id: "classic",
-    label: "Classique",
-    colors: ["#d4d4d8", "#f9fafb"],
-  },
-  {
     id: "gold",
     label: "Or (Template)",
     colors: ["#facc15", "#fef3c7"],
@@ -51,6 +46,11 @@ const BORDER_STYLES: Array<{
       "#ec4899",
     ],
     accentDots: ["#facc15", "#ec4899"],
+  },
+  {
+    id: "custom",
+    label: "Personnalisée",
+    colors: ["#1F2937"],
   },
 ];
 

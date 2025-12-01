@@ -1267,7 +1267,7 @@ export const WheelPreview = ({
                     size={scaledWheelSize}
                     borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
                     customBorderColor={
-                      theme.wheelBorderStyle === 'classic' || theme.wheelBorderStyle === 'custom'
+                      theme.wheelBorderStyle === 'custom'
                         ? theme.wheelBorderCustomColor
                         : undefined
                     }

@@ -194,7 +194,7 @@ const ArticleWheelPreview = () => {
                 size={350}
                 borderStyle={theme?.wheelBorderStyle === 'gold' ? 'goldRing' : theme?.wheelBorderStyle === 'silver' ? 'silverRing' : theme?.wheelBorderStyle || 'classic'}
                 customBorderColor={
-                  theme?.wheelBorderStyle === 'classic' || theme?.wheelBorderStyle === 'custom'
+                  theme?.wheelBorderStyle === 'custom'
                     ? theme?.wheelBorderCustomColor
                     : undefined
                 }
