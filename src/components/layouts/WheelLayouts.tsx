@@ -16,6 +16,7 @@ interface WheelLayoutProps {
   backgroundColor: string;
   textColor: string;
   buttonColor: string;
+  logoPosition?: 'left' | 'center' | 'right';
 }
 
 export const WheelLayouts = ({
@@ -30,11 +31,21 @@ export const WheelLayouts = ({
   onComplete,
   backgroundColor,
   textColor,
-  buttonColor
+  buttonColor,
+  logoPosition = 'left'
 }: WheelLayoutProps) => {
 
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme);
+
+  // Inverser le layout si le logo est positionné à droite
+  const effectiveLayout = (() => {
+    if (viewMode === 'desktop' && logoPosition === 'right') {
+      if (layout === 'desktop-left-right') return 'desktop-right-left';
+      if (layout === 'desktop-right-left') return 'desktop-left-right';
+    }
+    return layout;
+  })();
 
   const resolveBorderStyle = (style: typeof theme.wheelBorderStyle) => {
     if (style === 'gold') return 'goldRing';
@@ -124,7 +135,7 @@ export const WheelLayouts = ({
 
 
   if (viewMode === 'desktop') {
-    switch (layout as DesktopLayoutType) {
+    switch (effectiveLayout as DesktopLayoutType) {
       case 'desktop-left-right':
         return (
           <div className="flex items-center justify-center p-12">
@@ -207,7 +218,7 @@ export const WheelLayouts = ({
         );
     }
   } else {
-    switch (layout as MobileLayoutType) {
+    switch (effectiveLayout as MobileLayoutType) {
       case 'mobile-vertical':
         return (
           <div className="flex flex-col h-full">
