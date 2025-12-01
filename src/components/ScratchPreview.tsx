@@ -809,6 +809,7 @@ export const ScratchPreview = ({
             backgroundColor={theme.backgroundColor}
             textColor={theme.textColor}
             buttonColor={theme.buttonColor}
+            backgroundImage={viewMode === 'desktop' ? config.contactForm.backgroundImage : config.contactForm.backgroundImageMobile}
             editingField={editingField}
             isReadOnly={isReadOnly}
             onFocusTitle={() => !isReadOnly && setEditingField('contact-title')}
