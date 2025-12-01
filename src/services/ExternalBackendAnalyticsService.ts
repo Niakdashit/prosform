@@ -262,6 +262,24 @@ export const ExternalBackendAnalyticsService = {
   },
 
   /**
+   * DEBUG: lit directement la ligne de campaign_analytics pour une campagne
+   * et la loggue dans la console pour comparaison avec l'UI
+   */
+  async debugLogCampaignAnalyticsRow(campaignId: string): Promise<void> {
+    try {
+      const { data, error } = await externalSupabase
+        .from('campaign_analytics')
+        .select('*')
+        .eq('campaign_id', campaignId)
+        .maybeSingle();
+
+      console.log('\n🔍 [DEBUG] campaign_analytics row for campaign', campaignId, '\ndata =', data, '\nerror =', error);
+    } catch (error) {
+      console.error('[DEBUG] Error reading campaign_analytics row:', error);
+    }
+  },
+
+  /**
    * Récupère les settings de rate limiting pour une campagne
    * Si campaignId est null, récupère les paramètres par défaut globaux
    */

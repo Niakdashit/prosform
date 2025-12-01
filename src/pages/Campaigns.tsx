@@ -59,6 +59,7 @@ import { AnalyticsService } from "@/services/AnalyticsService";
 import { AdvancedAnalyticsService } from "@/services/AdvancedAnalyticsService";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Button } from "@/components/ui/button";
+import { ExternalBackendAnalyticsService } from "@/services/ExternalBackendAnalyticsService";
 
 // Couleurs DA - harmonisées avec /form
 const colors = {
@@ -229,7 +230,7 @@ const Campaigns = () => {
     setSelectedCampaignForStats(campaignId);
     setStatsModalOpen(true);
     setLoadingStats(true);
-    
+
     try {
       const [stats, timeSeries, uniqueParticipants, newParticipants, emailStats] = await Promise.all([
         AnalyticsService.getCampaignAnalyticsById(campaignId),
@@ -238,7 +239,10 @@ const Campaigns = () => {
         AdvancedAnalyticsService.getNewParticipantsCount(campaignId),
         AdvancedAnalyticsService.getEmailCollectionStats(campaignId),
       ]);
-      
+
+      // DEBUG : lire la ligne de campaign_analytics sur le backend externe
+      ExternalBackendAnalyticsService.debugLogCampaignAnalyticsRow(campaignId);
+
       setCampaignStats({ 
         ...stats, 
         timeSeries,
