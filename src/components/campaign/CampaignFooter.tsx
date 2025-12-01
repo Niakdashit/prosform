@@ -249,10 +249,10 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
 
   return (
     <footer
-      className={`w-full ${paddingClass} flex-shrink-0 overflow-y-auto`}
+      className={`w-full ${paddingClass} flex-shrink-0 overflow-y-auto relative group`}
       style={{ 
         backgroundColor: config.backgroundColor,
-        maxHeight: '60px', // Hauteur approximative d'une ligne
+        maxHeight: '60px',
       }}
     >
       <div className="max-w-7xl mx-auto px-4">
@@ -260,6 +260,13 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
         {config.layout === 'centered' && renderCenteredLayout()}
         {config.layout === 'columns' && renderColumnsLayout()}
       </div>
+      {/* Indicateur de scroll */}
+      <div 
+        className="absolute bottom-0 left-0 right-0 h-3 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{
+          background: `linear-gradient(to bottom, transparent, ${config.backgroundColor})`
+        }}
+      />
     </footer>
   );
 };
