@@ -758,7 +758,7 @@ export const ScratchPreview = ({
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 flex items-start justify-center pt-6 pb-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+                    <div className="flex-1 flex items-start justify-center pt-6 pb-24" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                       <div className="w-full max-w-[700px]">
                         <TextContent />
                       </div>
@@ -1009,7 +1009,7 @@ export const ScratchPreview = ({
                   </div>
                 )}
               </div>
-              <div className="flex-1 flex items-start justify-center pt-6 pb-8 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+              <div className="flex-1 flex items-start justify-center pt-6 pb-24 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px]">
                   <ContactForm />
                 </div>
