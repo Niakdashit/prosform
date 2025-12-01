@@ -321,7 +321,7 @@ export const WheelSettingsPanel = ({
                     <AccordionTrigger className="text-xs text-muted-foreground hover:no-underline py-2">
                       Gérer les templates
                     </AccordionTrigger>
-                    <AccordionContent className="pt-3">
+                    <AccordionContent className="pt-3 space-y-4">
                       <div className="flex gap-2">
                         <Button
                           type="button"
@@ -350,15 +350,12 @@ export const WheelSettingsPanel = ({
                           Sauvegarder
                         </Button>
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
                 
-                <Separator />
+                      <Separator />
 
-                {/* Fields Manager */}
-                <div className="space-y-3">
-                  {config.contactForm.fields.map((field, index) => (
+                      {/* Fields Manager */}
+                      <div className="space-y-3">
+                        {config.contactForm.fields.map((field, index) => (
                     <div key={field.type} className="border border-gray-200 rounded-lg p-3 bg-white">
                       {/* Field Header */}
                       <div className="flex items-center justify-between mb-3">
@@ -549,7 +546,10 @@ export const WheelSettingsPanel = ({
                       + Ajouter un opt-in RGPD
                     </Button>
                   </div>
-                </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </>
             )}
           </div>
