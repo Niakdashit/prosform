@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { externalSupabase } from '@/integrations/supabase/externalClient';
 import type { Campaign } from '@/types/campaign';
 import { Loader2 } from 'lucide-react';
 import { PublicCampaignRenderer } from '@/components/PublicCampaignRenderer';
@@ -26,13 +26,49 @@ export default function PublicCampaign() {
     loadCampaign(slug);
   }, [slug]);
 
+  const trackCampaignView = async (campaignId: string) => {
+    try {
+      // Vérifier si une entrée existe déjà pour cette campagne
+      const { data: existing } = await externalSupabase
+        .from('campaign_analytics')
+        .select('id, total_views')
+        .eq('campaign_id', campaignId)
+        .single();
+
+      if (existing) {
+        // Incrémenter le compteur de vues
+        await externalSupabase
+          .from('campaign_analytics')
+          .update({
+            total_views: (existing.total_views || 0) + 1,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id);
+      } else {
+        // Créer une nouvelle entrée
+        await externalSupabase
+          .from('campaign_analytics')
+          .insert({
+            campaign_id: campaignId,
+            total_views: 1,
+            total_participations: 0,
+            total_completions: 0,
+            avg_time_spent: 0,
+          });
+      }
+    } catch (error) {
+      // Ne pas bloquer l'affichage en cas d'erreur de tracking
+      console.error('Error tracking view:', error);
+    }
+  };
+
   const loadCampaign = async (campaignSlug: string) => {
     try {
       setLoading(true);
       setError(null);
 
       // Charger la campagne depuis le slug public
-      const { data, error: supabaseError } = await supabase
+      const { data, error: supabaseError } = await externalSupabase
         .from('campaigns')
         .select('*')
         .eq('public_url_slug', campaignSlug)
@@ -85,7 +121,8 @@ export default function PublicCampaign() {
 
       setCampaign(transformedCampaign);
       
-      // TODO Phase 3: Enregistrer une vue dans campaign_analytics
+      // Phase 3: Enregistrer une vue dans campaign_analytics
+      await trackCampaignView(data.id);
       
     } catch (err) {
       console.error('Unexpected error:', err);
