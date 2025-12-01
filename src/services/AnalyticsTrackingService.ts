@@ -28,25 +28,25 @@ export const AnalyticsTrackingService = {
       }
 
       if (existing) {
-        // On ne touche plus au compteur de vues ici pour éviter les écarts :
-        // les "pages vues" sont dérivées des participations complètes côté ParticipationService.
+        // Incrémenter total_views à chaque étape vue
         const { error } = await supabase
           .from('campaign_analytics')
           .update({
+            total_views: (existing.total_views || 0) + 1,
             updated_at: new Date().toISOString(),
           })
           .eq('id', existing.id);
 
         if (error) {
-          console.error('Error updating analytics timestamp:', error);
+          console.error('Error updating view count:', error);
         }
       } else {
-        // Si aucune ligne n'existe encore, on en crée une sans incrémenter total_views
+        // Créer une nouvelle entrée avec 1 vue
         const { error } = await supabase
           .from('campaign_analytics')
           .insert({
             campaign_id: campaignId,
-            total_views: 0,
+            total_views: 1,
             total_participations: 0,
             total_completions: 0,
             avg_time_spent: 0,
