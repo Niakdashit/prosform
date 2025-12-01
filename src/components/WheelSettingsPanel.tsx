@@ -287,28 +287,32 @@ export const WheelSettingsPanel = ({
 
                     <Separator />
 
-                    {/* Background Image */}
+                    {/* Background Image - masqué pour mobile-centered, desktop-panel, desktop-card */}
                     {config.welcomeScreen.applyBackgroundToAll ? (
                       <div className="text-xs text-muted-foreground italic">
                         Background appliqué depuis Welcome Screen
                       </div>
                     ) : (
-                      <BackgroundUploader
-                        desktopImage={config.contactForm.backgroundImage}
-                        mobileImage={config.contactForm.backgroundImageMobile}
-                        onDesktopImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImage: image }
-                        })}
-                        onDesktopImageRemove={() => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImage: undefined }
-                        })}
-                        onMobileImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImageMobile: image }
-                        })}
-                        onMobileImageRemove={() => onUpdateConfig({
-                          contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
-                        })}
-                      />
+                      (config.contactForm.desktopLayout !== 'desktop-panel' && 
+                       config.contactForm.desktopLayout !== 'desktop-card' &&
+                       config.contactForm.mobileLayout !== 'mobile-centered') && (
+                        <BackgroundUploader
+                          desktopImage={config.contactForm.backgroundImage}
+                          mobileImage={config.contactForm.backgroundImageMobile}
+                          onDesktopImageChange={(image) => onUpdateConfig({
+                            contactForm: { ...config.contactForm, backgroundImage: image }
+                          })}
+                          onDesktopImageRemove={() => onUpdateConfig({
+                            contactForm: { ...config.contactForm, backgroundImage: undefined }
+                          })}
+                          onMobileImageChange={(image) => onUpdateConfig({
+                            contactForm: { ...config.contactForm, backgroundImageMobile: image }
+                          })}
+                          onMobileImageRemove={() => onUpdateConfig({
+                            contactForm: { ...config.contactForm, backgroundImageMobile: undefined }
+                          })}
+                        />
+                      )
                     )}
 
                     <Separator />

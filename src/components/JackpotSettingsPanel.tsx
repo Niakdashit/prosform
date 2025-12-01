@@ -218,28 +218,32 @@ export const JackpotSettingsPanel = ({
 
                     <Separator />
 
-                    {/* Background Image */}
+                    {/* Background Image - masqué pour mobile-centered, desktop-panel, desktop-card */}
                     {jackpotConfig.welcomeScreen.applyBackgroundToAll ? (
                       <div className="text-xs text-muted-foreground italic">
                         Background appliqué depuis Welcome Screen
                       </div>
                     ) : (
-                      <BackgroundUploader
-                        desktopImage={jackpotConfig.contactForm.backgroundImage}
-                        mobileImage={jackpotConfig.contactForm.backgroundImageMobile}
-                        onDesktopImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...jackpotConfig.contactForm, backgroundImage: image }
-                        })}
-                        onDesktopImageRemove={() => onUpdateConfig({
-                          contactForm: { ...jackpotConfig.contactForm, backgroundImage: undefined }
-                        })}
-                        onMobileImageChange={(image) => onUpdateConfig({
-                          contactForm: { ...jackpotConfig.contactForm, backgroundImageMobile: image }
-                        })}
-                        onMobileImageRemove={() => onUpdateConfig({
-                          contactForm: { ...jackpotConfig.contactForm, backgroundImageMobile: undefined }
-                        })}
-                      />
+                      (jackpotConfig.contactForm.desktopLayout !== 'desktop-panel' && 
+                       jackpotConfig.contactForm.desktopLayout !== 'desktop-card' &&
+                       jackpotConfig.contactForm.mobileLayout !== 'mobile-centered') && (
+                        <BackgroundUploader
+                          desktopImage={jackpotConfig.contactForm.backgroundImage}
+                          mobileImage={jackpotConfig.contactForm.backgroundImageMobile}
+                          onDesktopImageChange={(image) => onUpdateConfig({
+                            contactForm: { ...jackpotConfig.contactForm, backgroundImage: image }
+                          })}
+                          onDesktopImageRemove={() => onUpdateConfig({
+                            contactForm: { ...jackpotConfig.contactForm, backgroundImage: undefined }
+                          })}
+                          onMobileImageChange={(image) => onUpdateConfig({
+                            contactForm: { ...jackpotConfig.contactForm, backgroundImageMobile: image }
+                          })}
+                          onMobileImageRemove={() => onUpdateConfig({
+                            contactForm: { ...jackpotConfig.contactForm, backgroundImageMobile: undefined }
+                          })}
+                        />
+                      )
                     )}
 
                     <Separator />
