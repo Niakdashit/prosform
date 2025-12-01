@@ -75,7 +75,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
         borderBottom: config.borderBottom ? `1px solid ${config.borderColor || '#e5e7eb'}` : 'none',
       }}
     >
-      <div className="h-full max-w-7xl mx-auto px-4 flex items-center">
+      <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         {/* Navigation gauche (si logo centré) */}
         {config.showNavigation && config.logoPosition === 'center' && (
           <nav className="hidden md:flex items-center gap-6 flex-1">
@@ -93,13 +93,14 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
         )}
 
         {/* Logo */}
-        <div className={`flex items-center flex-1 ${logoPositionClass}`}>
+        <div className={`flex items-center ${config.showNavigation && config.logoPosition === 'center' ? 'flex-1' : ''} ${logoPositionClass}`}>
           {config.logo ? (
             <img
               src={config.logo}
               alt="Logo"
               style={{ 
                 height: config.logoSize || 120,
+                width: 'auto',
                 objectFit: 'contain'
               }}
               className="cursor-pointer"
