@@ -628,147 +628,117 @@ export const QuizPreview = ({
         const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
         const currentLayout = config.contactScreen[layoutKey];
         
-        // Mobile-centered layout avec bannière (même système que Welcome)
-        if (viewMode === 'mobile' && currentLayout === 'mobile-centered') {
-          const contactBannerImage = config.contactScreen.backgroundImageMobile || config.contactScreen.backgroundImage;
-          
-          const ContactForm = () => (
-            <div className="w-full max-w-md text-center px-4">
-              <EditableTextBlock
-                value={config.contactScreen.title}
-                onChange={(value, html) => onUpdateConfig({ contactScreen: { ...config.contactScreen, title: value, titleHtml: html } })}
-                onClear={() => onUpdateConfig({ contactScreen: { ...config.contactScreen, title: '', titleHtml: '' } })}
-                onSparklesClick={() => {
-                  setVariableTarget('title');
-                  setShowVariableMenu(prev => !prev);
-                  setMenuView('main');
-                }}
-                className="font-bold"
-                style={{
-                  color: config.contactScreen.titleStyle?.textColor || theme.textColor,
-                  fontFamily: config.contactScreen.titleStyle?.fontFamily || 'inherit',
-                  fontSize: '28px',
-                  lineHeight: '1.2',
-                }}
-                isEditing={!isReadOnly && editingField === 'contact-title'}
-                isReadOnly={isReadOnly}
-                onFocus={() => !isReadOnly && setEditingField('contact-title')}
-                onBlur={() => handleTitleBlur('contact-title', config.contactScreen.title)}
-                fieldType="title"
-                marginBottom="16px"
-              />
-              
-              <EditableTextBlock
-                value={config.contactScreen.subtitle}
-                onChange={(value, html) => onUpdateConfig({ contactScreen: { ...config.contactScreen, subtitle: value, subtitleHtml: html } })}
-                onClear={() => onUpdateConfig({ contactScreen: { ...config.contactScreen, subtitle: '', subtitleHtml: '' } })}
-                onSparklesClick={() => {
-                  setVariableTarget('subtitle');
-                  setShowVariableMenu(prev => !prev);
-                  setMenuView('main');
-                }}
-                className=""
-                style={{
-                  color: config.contactScreen.subtitleStyle?.textColor || theme.textColor,
-                  fontFamily: config.contactScreen.subtitleStyle?.fontFamily || 'inherit',
-                  fontSize: '14px',
-                  lineHeight: '1.4',
-                  opacity: 0.8,
-                }}
-                isEditing={!isReadOnly && editingField === 'contact-subtitle'}
-                isReadOnly={isReadOnly}
-                onFocus={() => !isReadOnly && setEditingField('contact-subtitle')}
-                onBlur={() => handleSubtitleBlur('contact-subtitle', config.contactScreen.subtitle)}
-                fieldType="subtitle"
-                marginBottom="32px"
-              />
-              
-              <div className="space-y-4">
-                {config.contactScreen.fields.map((field, index) => {
-                  if (field.type === 'checkbox') {
-                    return (
-                      <label key={index} className="flex items-start gap-3 cursor-pointer text-left">
-                        <input
-                          type="checkbox"
-                          className="mt-1 w-5 h-5 rounded border-2 transition-colors flex-shrink-0"
-                          style={{ 
-                            accentColor: theme.buttonColor,
-                            borderColor: theme.textColor
-                          }}
-                          onChange={(e) => setContactData(prev => ({ ...prev, [field.id || field.type]: e.target.checked ? 'true' : 'false' }))}
-                          required={field.required}
-                        />
-                        <span className="text-sm" style={{ color: theme.textColor }}>
-                          {field.label}
-                          {field.helpText && (
-                            <span className="block text-xs opacity-70 mt-1">{field.helpText}</span>
-                          )}
-                        </span>
-                      </label>
-                    );
-                  }
+        // Définir ContactForm une seule fois pour être accessible à tous les layouts
+        const ContactForm = () => (
+          <div className="w-full max-w-md text-center px-4">
+            <EditableTextBlock
+              value={config.contactScreen.title}
+              onChange={(value, html) => onUpdateConfig({ contactScreen: { ...config.contactScreen, title: value, titleHtml: html } })}
+              onClear={() => onUpdateConfig({ contactScreen: { ...config.contactScreen, title: '', titleHtml: '' } })}
+              onSparklesClick={() => {
+                setVariableTarget('title');
+                setShowVariableMenu(prev => !prev);
+                setMenuView('main');
+              }}
+              className="font-bold"
+              style={{
+                color: config.contactScreen.titleStyle?.textColor || theme.textColor,
+                fontFamily: config.contactScreen.titleStyle?.fontFamily || 'inherit',
+                fontSize: viewMode === 'mobile' ? '28px' : '42px',
+                lineHeight: '1.2',
+              }}
+              isEditing={!isReadOnly && editingField === 'contact-title'}
+              isReadOnly={isReadOnly}
+              onFocus={() => !isReadOnly && setEditingField('contact-title')}
+              onBlur={() => handleTitleBlur('contact-title', config.contactScreen.title)}
+              fieldType="title"
+              marginBottom="16px"
+            />
+            
+            <EditableTextBlock
+              value={config.contactScreen.subtitle}
+              onChange={(value, html) => onUpdateConfig({ contactScreen: { ...config.contactScreen, subtitle: value, titleHtml: html } })}
+              onClear={() => onUpdateConfig({ contactScreen: { ...config.contactScreen, subtitle: '', subtitleHtml: '' } })}
+              onSparklesClick={() => {
+                setVariableTarget('subtitle');
+                setShowVariableMenu(prev => !prev);
+                setMenuView('main');
+              }}
+              className=""
+              style={{
+                color: config.contactScreen.subtitleStyle?.textColor || theme.textColor,
+                fontFamily: config.contactScreen.subtitleStyle?.fontFamily || 'inherit',
+                fontSize: viewMode === 'mobile' ? '14px' : '18px',
+                lineHeight: '1.4',
+                opacity: 0.8,
+              }}
+              isEditing={!isReadOnly && editingField === 'contact-subtitle'}
+              isReadOnly={isReadOnly}
+              onFocus={() => !isReadOnly && setEditingField('contact-subtitle')}
+              onBlur={() => handleSubtitleBlur('contact-subtitle', config.contactScreen.subtitle)}
+              fieldType="subtitle"
+              marginBottom="32px"
+            />
+            
+            <div className="space-y-4">
+              {config.contactScreen.fields.map((field, index) => {
+                if (field.type === 'checkbox') {
+                  return (
+                    <label key={index} className="flex items-start gap-3 cursor-pointer text-left">
+                      <input
+                        type="checkbox"
+                        className="mt-1 w-5 h-5 rounded border-2 transition-colors flex-shrink-0"
+                        style={{ 
+                          accentColor: theme.buttonColor,
+                          borderColor: theme.textColor
+                        }}
+                        onChange={(e) => setContactData(prev => ({ ...prev, [field.id || field.type]: e.target.checked ? 'true' : 'false' }))}
+                        required={field.required}
+                      />
+                      <span className="text-sm" style={{ color: theme.textColor }}>
+                        {field.label}
+                        {field.helpText && (
+                          <span className="block text-xs opacity-70 mt-1">{field.helpText}</span>
+                        )}
+                      </span>
+                    </label>
+                  );
+                }
 
-                  if (field.type === 'select' && field.options) {
-                    return (
-                      <div key={index} className="text-left">
-                        <label className="block mb-2 text-sm font-normal" style={{ color: theme.textColor }}>
-                          {field.label}
-                        </label>
-                        <select
-                          onChange={(e) => setContactData(prev => ({ ...prev, [field.id || field.type]: e.target.value }))}
-                          className="w-full h-10 text-sm px-3"
-                          style={{
-                            backgroundColor: theme.backgroundColor,
-                            borderColor: theme.textColor,
-                            borderWidth: '1px',
-                            color: theme.textColor,
-                            borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
-                          }}
-                        >
-                          <option value="">Sélectionnez une option</option>
-                          {field.options.map((opt, i) => (
-                            <option key={i} value={opt}>{opt}</option>
-                          ))}
-                        </select>
-                      </div>
-                    );
-                  }
-
-                  if (field.type === 'textarea') {
-                    return (
-                      <div key={index} className="text-left">
-                        <label className="block mb-2 text-sm font-normal" style={{ color: theme.textColor }}>
-                          {field.label}
-                        </label>
-                        <textarea
-                          className="w-full text-sm px-3 py-2 min-h-[80px] resize-none"
-                          style={{
-                            backgroundColor: theme.backgroundColor,
-                            borderColor: theme.textColor,
-                            borderWidth: '1px',
-                            borderStyle: 'solid',
-                            color: theme.textColor,
-                            borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
-                          }}
-                          onChange={(e) => setContactData(prev => ({ ...prev, [field.id || field.type]: e.target.value }))}
-                          required={field.required}
-                        />
-                      </div>
-                    );
-                  }
-
+                if (field.type === 'select' && field.options) {
                   return (
                     <div key={index} className="text-left">
                       <label className="block mb-2 text-sm font-normal" style={{ color: theme.textColor }}>
                         {field.label}
                       </label>
-                      <Input
-                        type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : field.type === 'date' ? 'date' : 'text'}
-                        value={contactData[field.type as keyof typeof contactData] || ''}
+                      <select
                         onChange={(e) => setContactData(prev => ({ ...prev, [field.id || field.type]: e.target.value }))}
-                        placeholder={field.placeholder}
-                        required={field.required}
-                        className="h-10 text-sm"
+                        className="w-full h-10 text-sm px-3"
+                        style={{
+                          backgroundColor: theme.backgroundColor,
+                          borderColor: theme.textColor,
+                          borderWidth: '1px',
+                          color: theme.textColor,
+                          borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
+                        }}
+                      >
+                        <option value="">Sélectionnez une option</option>
+                        {field.options.map((opt, i) => (
+                          <option key={i} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                }
+
+                if (field.type === 'textarea') {
+                  return (
+                    <div key={index} className="text-left">
+                      <label className="block mb-2 text-sm font-normal" style={{ color: theme.textColor }}>
+                        {field.label}
+                      </label>
+                      <textarea
+                        className="w-full text-sm px-3 py-2 min-h-[80px] resize-none"
                         style={{
                           backgroundColor: theme.backgroundColor,
                           borderColor: theme.textColor,
@@ -777,21 +747,52 @@ export const QuizPreview = ({
                           color: theme.textColor,
                           borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
                         }}
+                        onChange={(e) => setContactData(prev => ({ ...prev, [field.id || field.type]: e.target.value }))}
+                        required={field.required}
                       />
                     </div>
                   );
-                })}
-                
-                <button 
-                  onClick={onNext}
-                  className="w-full flex items-center justify-center font-medium transition-all hover:opacity-90"
-                  style={unifiedButtonStyles}
-                >
-                  Continuer
-                </button>
-              </div>
+                }
+
+                return (
+                  <div key={index} className="text-left">
+                    <label className="block mb-2 text-sm font-normal" style={{ color: theme.textColor }}>
+                      {field.label}
+                    </label>
+                    <Input
+                      type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : field.type === 'date' ? 'date' : 'text'}
+                      value={contactData[field.type as keyof typeof contactData] || ''}
+                      onChange={(e) => setContactData(prev => ({ ...prev, [field.id || field.type]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      required={field.required}
+                      className="h-10 text-sm"
+                      style={{
+                        backgroundColor: theme.backgroundColor,
+                        borderColor: theme.textColor,
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                        color: theme.textColor,
+                        borderRadius: theme.buttonStyle === 'square' ? '0px' : '8px',
+                      }}
+                    />
+                  </div>
+                );
+              })}
+              
+              <button 
+                onClick={onNext}
+                className="w-full flex items-center justify-center font-medium transition-all hover:opacity-90"
+                style={unifiedButtonStyles}
+              >
+                Continuer
+              </button>
             </div>
-          );
+          </div>
+        );
+        
+        // Mobile-centered layout avec bannière (même système que Welcome)
+        if (viewMode === 'mobile' && currentLayout === 'mobile-centered') {
+          const contactBannerImage = config.contactScreen.backgroundImageMobile || config.contactScreen.backgroundImage;
           
           return (
             <div className="flex flex-col w-full h-full">
@@ -841,6 +842,124 @@ export const QuizPreview = ({
               </div>
               <div className="flex-1 flex items-start justify-center pt-6 pb-8 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px]">
+                  <ContactForm />
+                </div>
+              </div>
+            </div>
+          );
+        }
+        
+        // Desktop-card (Split right) layout avec image
+        if (viewMode === 'desktop' && currentLayout === 'desktop-card') {
+          const contactImageDesktop = config.contactScreen.backgroundImage;
+          
+          return (
+            <div className="relative w-full h-full flex">
+              <div className="w-1/2 flex items-center justify-center px-24 z-10">
+                <div className="max-w-[500px]">
+                  <ContactForm />
+                </div>
+              </div>
+              <div className="absolute right-0 top-0 w-1/2 h-full group">
+                {contactImageDesktop ? (
+                  <>
+                    <img
+                      src={contactImageDesktop}
+                      alt="Contact illustration"
+                      className="w-full h-full object-cover"
+                    />
+                    {!isReadOnly && (
+                      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                        <button
+                          onClick={() => setShowUploadModal(true)}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                          title="Change image"
+                        >
+                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <button
+                          onClick={() => setShowEditorModal(true)}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                          title="Edit image"
+                        >
+                          <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div
+                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                  >
+                    <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                    <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                      Upload Image
+                    </p>
+                    <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                      Click to browse
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
+        
+        // Desktop-panel (Split left) layout avec image
+        if (viewMode === 'desktop' && currentLayout === 'desktop-panel') {
+          const contactImageDesktop = config.contactScreen.backgroundImage;
+          
+          return (
+            <div className="relative w-full h-full flex">
+              <div className="absolute left-0 top-0 w-1/2 h-full group">
+                {contactImageDesktop ? (
+                  <>
+                    <img
+                      src={contactImageDesktop}
+                      alt="Contact illustration"
+                      className="w-full h-full object-cover"
+                    />
+                    {!isReadOnly && (
+                      <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 z-10">
+                        <button
+                          onClick={() => setShowUploadModal(true)}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                          title="Change image"
+                        >
+                          <ImagePlus className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <button
+                          onClick={() => setShowEditorModal(true)}
+                          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
+                          style={{ backgroundColor: 'rgba(61, 55, 49, 0.85)' }}
+                          title="Edit image"
+                        >
+                          <Edit3 className="w-5 h-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div
+                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
+                  >
+                    <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
+                    <p className="text-lg font-medium" style={{ color: '#F5B800' }}>
+                      Upload Image
+                    </p>
+                    <p className="text-sm mt-2" style={{ color: '#A89A8A' }}>
+                      Click to browse
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
+                <div className="max-w-[500px]">
                   <ContactForm />
                 </div>
               </div>
