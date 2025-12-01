@@ -5,6 +5,7 @@ import { QuizSidebar } from "./QuizSidebar";
 import { QuizPreview } from "./QuizPreview";
 import { QuizSettingsPanel } from "./QuizSettingsPanel";
 import { QuizTopToolbar } from "./QuizTopToolbar";
+import { CampaignSettings } from "./CampaignSettings";
 import { FloatingToolbar } from "./FloatingToolbar";
 import { ChatToCreate } from "./ChatToCreate";
 import { createAIActionHandler } from "@/utils/aiActionHandler";
@@ -257,6 +258,8 @@ export const QuizBuilder = () => {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
+  const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
 
   useEffect(() => {
     if (isMobile) {
@@ -416,9 +419,36 @@ export const QuizBuilder = () => {
         onPublish={handlePublish}
         isSaving={isSaving}
         hasUnsavedChanges={hasUnsavedChanges}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
         
-      <div className="flex flex-1 overflow-hidden relative">
+      {activeTab === 'campaign' ? (
+        <CampaignSettings 
+          defaultTab={campaignDefaultTab}
+          prizes={[]}
+          onSavePrize={() => {}}
+          onDeletePrize={() => {}}
+          gameType="wheel"
+          segments={[]}
+          campaignName={campaignName}
+          onCampaignNameChange={setName}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          startTime={startTime}
+          onStartTimeChange={setStartTime}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          endTime={endTime}
+          onEndTimeChange={setEndTime}
+          campaignUrl={campaign?.published_url || ''}
+        />
+      ) : activeTab === 'templates' ? (
+        <div className="flex items-center justify-center h-full">
+          <p className="text-muted-foreground">Templates à venir...</p>
+        </div>
+      ) : (
+        <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
@@ -612,7 +642,8 @@ export const QuizBuilder = () => {
             />
           </>
         )}
-      </div>
+        </div>
+      )}
       <FloatingToolbar />
     </div>
   );

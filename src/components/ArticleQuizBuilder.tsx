@@ -253,6 +253,10 @@ export const ArticleQuizBuilder = () => {
         onPublish={handlePublish}
         isSaving={isSaving}
         hasUnsavedChanges={hasUnsavedChanges}
+        activeTab="design"
+        onTabChange={() => {}}
+      />
+      />
       />
         
       <div className="flex flex-1 overflow-hidden relative">
