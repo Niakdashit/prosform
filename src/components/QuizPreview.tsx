@@ -587,7 +587,7 @@ export const QuizPreview = ({
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1 flex items-start justify-center px-5 pt-6 pb-8">
+                <div className="flex-1 flex items-start justify-center px-5 pt-6 pb-24">
                   <div className="w-full max-w-[500px]">
                     <TextContent centered />
                   </div>
@@ -840,7 +840,7 @@ export const QuizPreview = ({
                   </div>
                 )}
               </div>
-              <div className="flex-1 flex items-start justify-center pt-6 pb-8 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+              <div className="flex-1 flex items-start justify-center pt-6 pb-24 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px]">
                   <ContactForm />
                 </div>
