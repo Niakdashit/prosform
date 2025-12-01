@@ -46,6 +46,7 @@ interface Participation {
   utm_source: string;
   utm_medium: string;
   utm_campaign: string;
+  participation_data: any;
 }
 
 interface PrizeDraw {
@@ -304,24 +305,25 @@ export default function PrizeDraws() {
 
   const handleExportAll = async () => {
     try {
-      const data = allParticipations.map(p => ({
-        participant_id: p.id,
-        campaign_id: campaignId || '',
-        campaign_title: campaignName,
-        email: p.email,
-        created_at: p.created_at,
-        completed_at: p.completed_at,
-        device_type: p.device_type,
-        browser: p.browser,
-        os: p.os,
-        country: null,
-        city: null,
-        utm_source: p.utm_source,
-        utm_medium: p.utm_medium,
-        utm_campaign: p.utm_campaign,
-        referrer: p.referrer,
-        participation_data: { ip: p.ip_address }
-      }));
+      const data = allParticipations.map(p => {
+        const formData = p.participation_data || {};
+        return {
+          participant_id: p.id,
+          campaign_id: campaignId || '',
+          campaign_title: campaignName,
+          date_heure: new Date(p.created_at).toLocaleString('fr-FR'),
+          ip_address: p.ip_address,
+          email: p.email,
+          device_type: p.device_type,
+          browser: p.browser,
+          os: p.os,
+          utm_source: p.utm_source,
+          utm_medium: p.utm_medium,
+          utm_campaign: p.utm_campaign,
+          referrer: p.referrer,
+          ...formData
+        };
+      });
       const csvContent = ExportService.convertToCSV(data);
       ExportService.downloadCSV(`participations_completes_${campaignName}_${Date.now()}.csv`, csvContent);
       toast.success('Export réussi');
@@ -332,24 +334,25 @@ export default function PrizeDraws() {
 
   const handleExportUnique = async () => {
     try {
-      const data = uniqueParticipations.map(p => ({
-        participant_id: p.id,
-        campaign_id: campaignId || '',
-        campaign_title: campaignName,
-        email: p.email,
-        created_at: p.created_at,
-        completed_at: p.completed_at,
-        device_type: p.device_type,
-        browser: p.browser,
-        os: p.os,
-        country: null,
-        city: null,
-        utm_source: p.utm_source,
-        utm_medium: p.utm_medium,
-        utm_campaign: p.utm_campaign,
-        referrer: p.referrer,
-        participation_data: { ip: p.ip_address }
-      }));
+      const data = uniqueParticipations.map(p => {
+        const formData = p.participation_data || {};
+        return {
+          participant_id: p.id,
+          campaign_id: campaignId || '',
+          campaign_title: campaignName,
+          date_heure: new Date(p.created_at).toLocaleString('fr-FR'),
+          ip_address: p.ip_address,
+          email: p.email,
+          device_type: p.device_type,
+          browser: p.browser,
+          os: p.os,
+          utm_source: p.utm_source,
+          utm_medium: p.utm_medium,
+          utm_campaign: p.utm_campaign,
+          referrer: p.referrer,
+          ...formData
+        };
+      });
       const csvContent = ExportService.convertToCSV(data);
       ExportService.downloadCSV(`participations_uniques_${campaignName}_${Date.now()}.csv`, csvContent);
       toast.success('Export réussi');
@@ -643,30 +646,54 @@ export default function PrizeDraws() {
                   Exporter
                 </Button>
               </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>IP</TableHead>
-                    <TableHead>Appareil</TableHead>
-                    <TableHead>Navigateur</TableHead>
-                    <TableHead>UTM Source</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {allParticipations.slice(0, 100).map((part) => (
-                    <TableRow key={part.id}>
-                      <TableCell>{part.email || '-'}</TableCell>
-                      <TableCell className="text-xs">{new Date(part.created_at).toLocaleString('fr-FR')}</TableCell>
-                      <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
-                      <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
-                      <TableCell className="text-xs">{part.browser || '-'}</TableCell>
-                      <TableCell className="text-xs">{part.utm_source || '-'}</TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date & Heure</TableHead>
+                      <TableHead>IP</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Appareil</TableHead>
+                      <TableHead>Navigateur</TableHead>
+                      <TableHead>OS</TableHead>
+                      <TableHead>UTM Source</TableHead>
+                      <TableHead>UTM Medium</TableHead>
+                      <TableHead>UTM Campaign</TableHead>
+                      <TableHead>Referrer</TableHead>
+                      <TableHead>Données formulaire</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {allParticipations.slice(0, 100).map((part) => {
+                      const formData = part.participation_data || {};
+                      const formFields = Object.entries(formData)
+                        .filter(([key]) => !key.startsWith('prize') && !key.startsWith('optin_'))
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(', ');
+                      
+                      return (
+                        <TableRow key={part.id}>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            {new Date(part.created_at).toLocaleString('fr-FR')}
+                          </TableCell>
+                          <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.email || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.browser || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.os || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.utm_source || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
+                          <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
+                          <TableCell className="text-xs max-w-xs truncate">
+                            {formFields || '-'}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
               {allParticipations.length > 100 && (
                 <p className="text-xs text-center mt-4" style={{ color: colors.muted }}>
                   Affichage des 100 premières participations. Exportez pour voir toutes les données.
@@ -685,30 +712,54 @@ export default function PrizeDraws() {
                   Exporter
                 </Button>
               </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>IP</TableHead>
-                    <TableHead>Appareil</TableHead>
-                    <TableHead>Navigateur</TableHead>
-                    <TableHead>OS</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {uniqueParticipations.slice(0, 100).map((part) => (
-                    <TableRow key={part.id}>
-                      <TableCell>{part.email || '-'}</TableCell>
-                      <TableCell className="text-xs">{new Date(part.created_at).toLocaleString('fr-FR')}</TableCell>
-                      <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
-                      <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
-                      <TableCell className="text-xs">{part.browser || '-'}</TableCell>
-                      <TableCell className="text-xs">{part.os || '-'}</TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date & Heure</TableHead>
+                      <TableHead>IP</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Appareil</TableHead>
+                      <TableHead>Navigateur</TableHead>
+                      <TableHead>OS</TableHead>
+                      <TableHead>UTM Source</TableHead>
+                      <TableHead>UTM Medium</TableHead>
+                      <TableHead>UTM Campaign</TableHead>
+                      <TableHead>Referrer</TableHead>
+                      <TableHead>Données formulaire</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {uniqueParticipations.slice(0, 100).map((part) => {
+                      const formData = part.participation_data || {};
+                      const formFields = Object.entries(formData)
+                        .filter(([key]) => !key.startsWith('prize') && !key.startsWith('optin_'))
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(', ');
+                      
+                      return (
+                        <TableRow key={part.id}>
+                          <TableCell className="text-xs whitespace-nowrap">
+                            {new Date(part.created_at).toLocaleString('fr-FR')}
+                          </TableCell>
+                          <TableCell className="text-xs">{part.ip_address || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.email || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.browser || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.os || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.utm_source || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
+                          <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
+                          <TableCell className="text-xs max-w-xs truncate">
+                            {formFields || '-'}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
