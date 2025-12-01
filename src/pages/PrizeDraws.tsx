@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Dices, History, Filter, Users, Calendar } from "lucide-react";
+import { ArrowLeft, Download, Dices, History, Filter, Users, Calendar, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { externalSupabase } from "@/integrations/supabase/externalClient";
@@ -422,6 +422,28 @@ export default function PrizeDraws() {
       toast.error('Erreur lors de l\'export');
     }
   };
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <div 
+          className="flex flex-col items-center justify-center"
+          style={{ 
+            fontFamily: "'DM Sans', sans-serif",
+            minHeight: 'calc(100vh - 120px)',
+          }}
+        >
+          <Loader2 
+            className="w-10 h-10 animate-spin mb-4" 
+            style={{ color: colors.gold }} 
+          />
+          <p className="text-sm" style={{ color: colors.muted }}>
+            Chargement des données...
+          </p>
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
