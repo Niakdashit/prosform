@@ -651,9 +651,11 @@ export default function PrizeDraws() {
                             <TableCell className="text-xs">
                               {part.city && part.country ? `${part.city}, ${part.country}` : part.country || '-'}
                             </TableCell>
-                            {formFields.map(field => (
-                              <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
-                            ))}
+                            {formFields.map(field => {
+                              const value = formData[field];
+                              const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                              return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
+                            })}
                           </TableRow>
                         );
                       })}
@@ -711,9 +713,11 @@ export default function PrizeDraws() {
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
-                          {formFields.map(field => (
-                            <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
-                          ))}
+                          {formFields.map(field => {
+                            const value = formData[field];
+                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
+                          })}
                         </TableRow>
                       );
                     })}
@@ -775,9 +779,11 @@ export default function PrizeDraws() {
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
-                          {formFields.map(field => (
-                            <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
-                          ))}
+                          {formFields.map(field => {
+                            const value = formData[field];
+                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
+                          })}
                         </TableRow>
                       );
                     })}
