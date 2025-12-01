@@ -150,6 +150,8 @@ export const JackpotSettingsPanel = ({
                     onMobileLayoutChange={(layout) => onUpdateConfig({
                       contactForm: { ...jackpotConfig.contactForm, mobileLayout: layout }
                     })}
+                    excludeDesktopLayouts={['desktop-split']}
+                    excludeMobileLayouts={['mobile-centered', 'mobile-minimal']}
                   />
                 </div>
                 
