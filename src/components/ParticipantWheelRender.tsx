@@ -12,7 +12,7 @@ interface ParticipantWheelRenderProps {
 
 export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelRenderProps) => {
   const [activeView, setActiveView] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
-  const [contactData, setContactData] = useState({ name: "", email: "", phone: "" });
+  const [contactData, setContactData] = useState<Record<string, string>>({});
   const [wonPrize, setWonPrize] = useState<string | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const { theme } = useTheme();
@@ -110,20 +110,44 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
           </p>
           
           <div className="space-y-4">
-            {config.contactForm.fields?.map((field, index) => (
-              <input
-                key={index}
-                type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
-                placeholder={field.label}
-                className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
-                style={{ 
-                  borderColor: theme.accentColor + '40',
-                  backgroundColor: theme.backgroundColor,
-                  color: theme.textColor
-                }}
-                onChange={(e) => setContactData(prev => ({ ...prev, [field.type]: e.target.value }))}
-              />
-            ))}
+            {config.contactForm.fields?.map((field, index) => {
+              if (field.type === 'select' && field.options) {
+                return (
+                  <select
+                    key={index}
+                    className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
+                    style={{ 
+                      borderColor: theme.accentColor + '40',
+                      backgroundColor: theme.backgroundColor,
+                      color: theme.textColor
+                    }}
+                    onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
+                    required={field.required}
+                  >
+                    <option value="">{field.label}</option>
+                    {field.options.map((opt, i) => (
+                      <option key={i} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                );
+              }
+              
+              return (
+                <input
+                  key={index}
+                  type={field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : 'text'}
+                  placeholder={field.label}
+                  className="w-full px-4 py-3 rounded-lg border-2 transition-colors"
+                  style={{ 
+                    borderColor: theme.accentColor + '40',
+                    backgroundColor: theme.backgroundColor,
+                    color: theme.textColor
+                  }}
+                  onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
+                  required={field.required}
+                />
+              );
+            })}
           </div>
           
           <button

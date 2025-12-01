@@ -400,7 +400,8 @@ export const WheelSettingsPanel = ({
                     <Button
                       onClick={() => {
                         const newField: ContactField = {
-                          type: 'name',
+                          id: 'field_' + Date.now(),
+                          type: 'text',
                           label: 'Nouveau champ',
                           required: false
                         };
