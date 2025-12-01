@@ -90,9 +90,9 @@ export const useSmartWheelRenderer = ({
   const [centerImgReady, setCenterImgReady] = useState(false);
   const centerLoadingRef = useRef(true);
   
-  // État pour suivre si tous les assets critiques sont chargés
   const [assetsReady, setAssetsReady] = useState(false);
   const assetsReadyNotifiedRef = useRef(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
   // (Removed) Image-based ring cache eliminated to avoid any deferred loading
   
@@ -159,12 +159,19 @@ export const useSmartWheelRenderer = ({
       
       const allReady = pointerReady && centerReady && borderReady;
       
+      console.log('🔍 Assets check:', { pointerReady, centerReady, borderReady, allReady, borderStyle });
+      
       if (allReady && !assetsReadyNotifiedRef.current) {
-        setAssetsReady(true);
-        assetsReadyNotifiedRef.current = true;
-        if (onAssetsReady) {
-          onAssetsReady();
-        }
+        console.log('✅ All assets ready, allowing render after 300ms delay');
+        // Attendre 300ms supplémentaires pour s'assurer que tout est bien chargé
+        setTimeout(() => {
+          setAssetsReady(true);
+          setShouldRender(true);
+          assetsReadyNotifiedRef.current = true;
+          if (onAssetsReady) {
+            onAssetsReady();
+          }
+        }, 300);
       }
     };
     
@@ -172,7 +179,7 @@ export const useSmartWheelRenderer = ({
     checkAssets();
     
     // Vérifier périodiquement pendant le chargement
-    const interval = setInterval(checkAssets, 100);
+    const interval = setInterval(checkAssets, 50);
     
     return () => clearInterval(interval);
   }, [borderStyle, onAssetsReady]);
@@ -405,7 +412,11 @@ export const useSmartWheelRenderer = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-
+    // Ne pas dessiner tant que les assets ne sont pas prêts
+    if (!shouldRender) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
 
     // Configurer le canvas
     const devicePixelRatio = window.devicePixelRatio || 1;
@@ -459,7 +470,7 @@ export const useSmartWheelRenderer = ({
     // Dessiner le pointeur
     drawPointer(ctx, centerX, centerY, maxRadius);
 
-  }, [segments, theme, safeWheelState, size, borderStyle, animationTime, showBulbs, customBorderWidth]);
+  }, [segments, theme, safeWheelState, size, borderStyle, animationTime, showBulbs, customBorderWidth, shouldRender]);
 
 
 
