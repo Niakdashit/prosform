@@ -95,16 +95,25 @@ export default function InstantWins() {
   // Extract unique form fields from all participations
   const extractFormFields = (participations: Participation[]) => {
     const fieldsSet = new Set<string>();
+    const excludedFields = ['prize', 'prizeWon', 'prize_won', 'prize_name'];
+    
     participations.forEach(part => {
-      if (part.participation_data) {
+      if (part.participation_data && typeof part.participation_data === 'object') {
         Object.keys(part.participation_data).forEach(key => {
-          if (!key.startsWith('prize') && !key.startsWith('optin_')) {
+          // Exclure les champs liés aux prix et les opt-ins
+          if (!key.startsWith('prize') && 
+              !key.startsWith('optin_') && 
+              !key.includes('optin') &&
+              !excludedFields.includes(key)) {
             fieldsSet.add(key);
           }
         });
       }
     });
-    return Array.from(fieldsSet).sort();
+    
+    const fields = Array.from(fieldsSet).sort();
+    console.log('Extracted form fields:', fields);
+    return fields;
   };
 
   useEffect(() => {
@@ -158,7 +167,10 @@ export default function InstantWins() {
       
       // Extract form fields from participations
       if (allPartData) {
+        console.log('Sample participation data:', allPartData[0]);
+        console.log('First participation_data:', allPartData[0]?.participation_data);
         const fields = extractFormFields(allPartData as Participation[]);
+        console.log('Final form fields:', fields);
         setFormFields(fields);
       }
 
