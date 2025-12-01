@@ -59,6 +59,24 @@ interface PrizeDraw {
   selection_criteria: any;
 }
 
+interface OptIn {
+  id: string;
+  label: string;
+  count: number;
+}
+
+interface OptInParticipant {
+  id: string;
+  email: string;
+  created_at: string;
+  participation_data: any;
+  device_type: string;
+  browser: string;
+  os: string;
+  city: string;
+  country: string;
+}
+
 export default function PrizeDraws() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -67,6 +85,9 @@ export default function PrizeDraws() {
   const [allParticipations, setAllParticipations] = useState<Participation[]>([]);
   const [uniqueParticipations, setUniqueParticipations] = useState<Participation[]>([]);
   const [prizeDraws, setPrizeDraws] = useState<PrizeDraw[]>([]);
+  const [optIns, setOptIns] = useState<OptIn[]>([]);
+  const [selectedOptIn, setSelectedOptIn] = useState<OptIn | null>(null);
+  const [optInParticipants, setOptInParticipants] = useState<OptInParticipant[]>([]);
   const [loading, setLoading] = useState(true);
   const [campaignName, setCampaignName] = useState('');
   const [drawDialogOpen, setDrawDialogOpen] = useState(false);
@@ -124,11 +145,104 @@ export default function PrizeDraws() {
       
       setPrizeDraws(drawsData || []);
 
+      // Charger les opt-ins
+      loadOptIns();
+
     } catch (error) {
       console.error('Error loading data:', error);
       toast.error('Erreur lors du chargement des données');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadOptIns = async () => {
+    try {
+      // Récupérer toutes les participations avec leurs données
+      const { data: participations } = await externalSupabase
+        .from('campaign_participants')
+        .select('participation_data')
+        .eq('campaign_id', campaignId)
+        .not('participation_data', 'is', null);
+
+      // Extraire tous les opt-ins uniques
+      const optInsMap = new Map<string, number>();
+      
+      participations?.forEach((part) => {
+        const data = part.participation_data;
+        if (data && typeof data === 'object') {
+          Object.keys(data).forEach((key) => {
+            // Chercher les champs qui sont des opt-ins (boolean true ou string "on")
+            if (key.startsWith('optin_') || key.includes('accepte') || key.includes('consent')) {
+              const value = data[key];
+              if (value === true || value === 'on' || value === 'yes' || value === 'oui') {
+                const label = key.replace('optin_', '').replace(/_/g, ' ');
+                optInsMap.set(key, (optInsMap.get(key) || 0) + 1);
+              }
+            }
+          });
+        }
+      });
+
+      const optInsList: OptIn[] = Array.from(optInsMap.entries()).map(([key, count]) => ({
+        id: key,
+        label: key.replace('optin_', '').replace(/_/g, ' '),
+        count
+      }));
+
+      setOptIns(optInsList);
+    } catch (error) {
+      console.error('Error loading opt-ins:', error);
+    }
+  };
+
+  const loadOptInParticipants = async (optIn: OptIn) => {
+    try {
+      const { data: participants } = await externalSupabase
+        .from('campaign_participants')
+        .select('*')
+        .eq('campaign_id', campaignId)
+        .not('participation_data', 'is', null);
+
+      // Filtrer les participants qui ont accepté cet opt-in
+      const filtered = participants?.filter((part) => {
+        const data = part.participation_data;
+        if (data && typeof data === 'object') {
+          const value = data[optIn.id];
+          return value === true || value === 'on' || value === 'yes' || value === 'oui';
+        }
+        return false;
+      }) || [];
+
+      setOptInParticipants(filtered as OptInParticipant[]);
+      setSelectedOptIn(optIn);
+    } catch (error) {
+      console.error('Error loading opt-in participants:', error);
+      toast.error('Erreur lors du chargement des participants');
+    }
+  };
+
+  const handleExportOptIn = async () => {
+    if (!selectedOptIn) return;
+    try {
+      const data = optInParticipants.map(p => ({
+        participant_id: p.id,
+        campaign_id: campaignId || '',
+        campaign_title: campaignName,
+        email: p.email,
+        created_at: p.created_at,
+        device_type: p.device_type,
+        browser: p.browser,
+        os: p.os,
+        country: p.country,
+        city: p.city,
+        ...p.participation_data
+      }));
+      const csvContent = ExportService.convertToCSV(data);
+      ExportService.downloadCSV(`optin_${selectedOptIn.label}_${campaignName}_${Date.now()}.csv`, csvContent);
+      toast.success('Export réussi');
+    } catch (error) {
+      toast.error('Erreur lors de l\'export');
     }
   };
 
@@ -329,6 +443,7 @@ export default function PrizeDraws() {
           <TabsList>
             <TabsTrigger value="draw">Nouveau tirage</TabsTrigger>
             <TabsTrigger value="history">Historique</TabsTrigger>
+            <TabsTrigger value="optins">Opt-ins</TabsTrigger>
             <TabsTrigger value="all">Toutes participations</TabsTrigger>
             <TabsTrigger value="unique">Participations uniques</TabsTrigger>
           </TabsList>
@@ -415,6 +530,106 @@ export default function PrizeDraws() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          </TabsContent>
+
+          {/* Opt-ins */}
+          <TabsContent value="optins" className="mt-4">
+            <div className="bg-white rounded-lg border p-4" style={{ borderColor: colors.border }}>
+              {!selectedOptIn ? (
+                <>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-semibold">Liste des opt-ins ({optIns.length})</h3>
+                  </div>
+                  <div className="grid gap-3">
+                    {optIns.map((optIn) => (
+                      <div
+                        key={optIn.id}
+                        onClick={() => loadOptInParticipants(optIn)}
+                        className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                        style={{ borderColor: colors.border }}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h4 className="font-medium capitalize" style={{ color: colors.dark }}>
+                              {optIn.label}
+                            </h4>
+                            <p className="text-sm mt-1" style={{ color: colors.muted }}>
+                              {optIn.count} participant{optIn.count > 1 ? 's' : ''} ont accepté
+                            </p>
+                          </div>
+                          <div className="text-2xl font-semibold" style={{ color: colors.gold }}>
+                            {optIn.count}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {optIns.length === 0 && (
+                      <p className="text-center py-8" style={{ color: colors.muted }}>
+                        Aucun opt-in trouvé dans les participations
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex items-center gap-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedOptIn(null)}
+                        className="gap-2"
+                      >
+                        <ArrowLeft className="w-4 h-4" />
+                        Retour
+                      </Button>
+                      <div>
+                        <h3 className="font-semibold capitalize">{selectedOptIn.label}</h3>
+                        <p className="text-sm" style={{ color: colors.muted }}>
+                          {optInParticipants.length} participant{optInParticipants.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <Button onClick={handleExportOptIn} size="sm" className="gap-2">
+                      <Download className="w-4 h-4" />
+                      Exporter
+                    </Button>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Appareil</TableHead>
+                        <TableHead>Navigateur</TableHead>
+                        <TableHead>OS</TableHead>
+                        <TableHead>Localisation</TableHead>
+                        <TableHead>Données</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {optInParticipants.map((part) => (
+                        <TableRow key={part.id}>
+                          <TableCell>{part.email || '-'}</TableCell>
+                          <TableCell className="text-xs">
+                            {new Date(part.created_at).toLocaleString('fr-FR')}
+                          </TableCell>
+                          <TableCell className="text-xs">{part.device_type || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.browser || '-'}</TableCell>
+                          <TableCell className="text-xs">{part.os || '-'}</TableCell>
+                          <TableCell className="text-xs">
+                            {part.city && part.country ? `${part.city}, ${part.country}` : part.country || '-'}
+                          </TableCell>
+                          <TableCell className="text-xs max-w-xs truncate">
+                            {part.participation_data ? JSON.stringify(part.participation_data).substring(0, 50) + '...' : '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </>
+              )}
             </div>
           </TabsContent>
 
