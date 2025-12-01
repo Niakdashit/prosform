@@ -30,11 +30,7 @@ const PreviewContent = () => {
   }, []);
 
   if (questions.length === 0) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
-        <p className="text-white">Chargement...</p>
-      </div>
-    );
+    return <div className="fixed inset-0 bg-background" />;
   }
 
   const handleNext = () => {
@@ -72,11 +68,7 @@ const Preview = () => {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ backgroundColor: '#1a1a2e' }}>
-        <p className="text-white">Chargement...</p>
-      </div>
-    );
+    return <div className="fixed inset-0 bg-background" />;
   }
 
   return (
