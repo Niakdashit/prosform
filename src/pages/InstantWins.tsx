@@ -499,9 +499,11 @@ export default function InstantWins() {
                         <TableCell>{winner.email}</TableCell>
                         <TableCell className="font-medium">{winner.prize_won?.name || 'N/A'}</TableCell>
                         <TableCell>{new Date(winner.completed_at).toLocaleString('fr-FR')}</TableCell>
-                        {formFields.map(field => (
-                          <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
-                        ))}
+                        {formFields.map(field => {
+                          const value = formData[field];
+                          const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                          return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
+                        })}
                       </TableRow>
                     );
                   })}
@@ -603,9 +605,11 @@ export default function InstantWins() {
                             <TableCell className="text-xs">
                               {part.city && part.country ? `${part.city}, ${part.country}` : part.country || '-'}
                             </TableCell>
-                            {formFields.map(field => (
-                              <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
-                            ))}
+                            {formFields.map(field => {
+                              const value = formData[field];
+                              const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                              return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
+                            })}
                           </TableRow>
                         );
                       })}
@@ -664,9 +668,11 @@ export default function InstantWins() {
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
-                          {formFields.map(field => (
-                            <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
-                          ))}
+                          {formFields.map(field => {
+                            const value = formData[field];
+                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
+                          })}
                           <TableCell className="text-xs">{part.prize_won?.name || '-'}</TableCell>
                         </TableRow>
                       );
@@ -729,9 +735,11 @@ export default function InstantWins() {
                           <TableCell className="text-xs">{part.utm_medium || '-'}</TableCell>
                           <TableCell className="text-xs">{part.utm_campaign || '-'}</TableCell>
                           <TableCell className="text-xs max-w-xs truncate">{part.referrer || '-'}</TableCell>
-                          {formFields.map(field => (
-                            <TableCell key={field} className="text-xs">{formData[field] || '-'}</TableCell>
-                          ))}
+                          {formFields.map(field => {
+                            const value = formData[field];
+                            const displayValue = value != null ? (typeof value === 'object' ? JSON.stringify(value) : String(value)) : '-';
+                            return <TableCell key={field} className="text-xs">{displayValue}</TableCell>;
+                          })}
                         </TableRow>
                       );
                     })}
