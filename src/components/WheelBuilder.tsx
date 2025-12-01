@@ -58,6 +58,7 @@ export interface WheelSegment {
   id: string;
   label: string;
   color: string;
+  textColor?: string;
   probability?: number;
   icon?: string;
   prizeId?: string;
@@ -223,10 +224,12 @@ const defaultWheelConfig: WheelConfig = {
     desktopLayout: "desktop-centered"
   },
   segments: [
-    { id: '1', label: 'Segment 1', color: '#1F2937', probability: 25 },
-    { id: '2', label: 'Segment 2', color: '#FFFFFF', probability: 25 },
-    { id: '3', label: 'Segment 3', color: '#1F2937', probability: 25 },
-    { id: '4', label: 'Segment 4', color: '#FFFFFF', probability: 25 }
+    { id: '1', label: 'Segment 1', color: '#1F2937', probability: 16.67 },
+    { id: '2', label: 'Segment 2', color: '#FFFFFF', textColor: '#1F2937', probability: 16.67 },
+    { id: '3', label: 'Segment 3', color: '#1F2937', probability: 16.67 },
+    { id: '4', label: 'Segment 4', color: '#FFFFFF', textColor: '#1F2937', probability: 16.67 },
+    { id: '5', label: 'Segment 5', color: '#1F2937', probability: 16.67 },
+    { id: '6', label: 'Segment 6', color: '#FFFFFF', textColor: '#1F2937', probability: 16.65 }
   ],
   endingWin: {
     title: "Félicitations !",
