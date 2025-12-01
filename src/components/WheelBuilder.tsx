@@ -65,7 +65,7 @@ export interface WheelSegment {
 
 export interface ContactField {
   id: string; // Identifiant unique du champ (ex: 'civilite', 'prenom', 'nom')
-  type: 'text' | 'email' | 'phone' | 'tel' | 'select' | 'textarea' | 'checkbox'; // Type de champ
+  type: 'text' | 'email' | 'phone' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'date'; // Type de champ
   required: boolean;
   label: string;
   placeholder?: string; // Placeholder pour les champs de texte

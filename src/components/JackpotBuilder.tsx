@@ -57,7 +57,7 @@ export interface JackpotSymbol {
 
 export interface ContactField {
   id: string; // Identifiant unique du champ (ex: 'civilite', 'prenom', 'nom')
-  type: 'text' | 'email' | 'phone' | 'select'; // Type de champ
+  type: 'text' | 'email' | 'phone' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'date'; // Type de champ
   required: boolean;
   label: string;
   options?: string[]; // Pour les champs select

@@ -55,10 +55,9 @@ export const exampleFormData: ContactField[] = [
   },
   {
     id: 'date_naissance',
-    type: 'text',
+    type: 'date',
     label: 'Date de naissance',
     required: true,
-    placeholder: 'JJ/MM/AAAA',
   },
   {
     id: 'reglement',
