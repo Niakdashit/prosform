@@ -185,7 +185,7 @@ const ArticleWheelPreview = () => {
             
             <div 
               style={{ 
-                transform: viewMode === 'mobile' ? 'scale(0.6)' : 'scale(0.8)',
+                transform: viewMode === 'mobile' ? `scale(${(theme?.wheelSizeMobile || 320) / 350})` : `scale(${(theme?.wheelSizeDesktop || 400) / 350})`,
                 transformOrigin: 'center center',
               }}
             >

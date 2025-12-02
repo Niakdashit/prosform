@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface WheelSettingsPanelProps {
   config: WheelConfig;
@@ -34,6 +35,7 @@ export const WheelSettingsPanel = ({
   hideSpacingAndBackground = false,
   hideLayoutAndAlignment = false
 }: WheelSettingsPanelProps) => {
+  const { theme, updateTheme } = useTheme();
   const [wallpaperModalOpen, setWallpaperModalOpen] = useState(false);
   const [activeWallpaperSection, setActiveWallpaperSection] = useState<'welcome' | 'contact' | 'wheel' | 'ending-win' | 'ending-lose'>('welcome');
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
@@ -566,16 +568,28 @@ export const WheelSettingsPanel = ({
           <div className="space-y-4">
             <div>
               <Label className="text-xs text-muted-foreground mb-2 block">
-                Taille de la roue: {config.wheelScreen.wheelSize || 100}%
+                Taille roue Desktop: {theme.wheelSizeDesktop}px
               </Label>
               <Slider
-                value={[config.wheelScreen.wheelSize || 100]}
-                onValueChange={([value]) => onUpdateConfig({
-                  wheelScreen: { ...config.wheelScreen, wheelSize: value }
-                })}
-                min={50}
-                max={150}
-                step={5}
+                value={[theme.wheelSizeDesktop]}
+                onValueChange={([value]) => updateTheme({ wheelSizeDesktop: value })}
+                min={200}
+                max={600}
+                step={10}
+                className="w-full"
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground mb-2 block">
+                Taille roue Mobile: {theme.wheelSizeMobile}px
+              </Label>
+              <Slider
+                value={[theme.wheelSizeMobile]}
+                onValueChange={([value]) => updateTheme({ wheelSizeMobile: value })}
+                min={200}
+                max={500}
+                step={10}
                 className="w-full"
               />
             </div>

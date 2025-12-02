@@ -120,6 +120,8 @@ export interface ThemeSettings {
   // ═══════════════════════════════════════════════════════════
   wheelBorderStyle: 'gold' | 'silver' | 'neonBlue' | 'neonPink' | 'rainbow' | 'custom';
   wheelBorderCustomColor?: string;
+  wheelSizeDesktop: number;
+  wheelSizeMobile: number;
   jackpotTemplate: 'jackpot-1' | 'jackpot-2' | 'jackpot-3' | 'jackpot-4' | 'jackpot-5' | 'jackpot-6' | 'jackpot-7' | 'jackpot-8' | 'jackpot-9' | 'jackpot-10' | 'jackpot-11';
   customJackpotFrame?: string;
   modernJackpotFrameColor: string;
@@ -166,7 +168,7 @@ const defaultTheme: ThemeSettings = {
   gradientEndColor: '#1F2937',
   
   // Buttons
-  buttonStyle: 'rounded',
+  buttonStyle: 'square',
   buttonSize: 'medium',
   buttonBorderWidth: 0,
   buttonShadow: 'none',
@@ -194,6 +196,8 @@ const defaultTheme: ThemeSettings = {
   // Game-specific
   wheelBorderStyle: 'custom',
   wheelBorderCustomColor: '#1F2937',
+  wheelSizeDesktop: 400,
+  wheelSizeMobile: 320,
   jackpotTemplate: 'jackpot-3',
   customJackpotFrame: undefined,
   modernJackpotFrameColor: '#F59E0B',

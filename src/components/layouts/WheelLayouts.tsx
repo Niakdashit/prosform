@@ -55,9 +55,9 @@ export const WheelLayouts = ({
 
   const getWheelSize = () => {
     if (viewMode === 'mobile') {
-      return layout === 'mobile-minimal' ? 280 : 320;
+      return theme.wheelSizeMobile || 320;
     }
-    return layout === 'desktop-panel' ? 350 : 400;
+    return theme.wheelSizeDesktop || 400;
   };
 
   const renderContent = () => (
