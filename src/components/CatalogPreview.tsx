@@ -217,7 +217,10 @@ export const CatalogPreview = ({
           className="flex-1 flex items-start justify-center"
           style={{ padding: `${theme.pageMargins}px` }}
         >
-          <div className={`${containerClass} rounded-2xl overflow-hidden`}>
+          <div 
+            className={`${containerClass} rounded-2xl overflow-hidden mx-auto`}
+            style={{ width: `${config.containerWidth || 100}%` }}
+          >
             <div style={{ padding: `${theme.cardPadding}px` }}>
               {/* Catalog Header */}
               <div className="mb-8">
