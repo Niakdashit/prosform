@@ -1,63 +1,137 @@
-import { Monitor, Smartphone, Globe } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { SaveIndicator } from "@/components/ui/SaveIndicator";
+import { Eye, Save, Globe, Palette, Gift, Loader2, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface CatalogTopToolbarProps {
-  viewMode: "desktop" | "mobile";
-  onViewModeChange: (mode: "desktop" | "mobile") => void;
-  status: 'idle' | 'saving' | 'saved' | 'error';
-  onPublish: () => void;
+  onPreview: () => void;
+  onSave?: () => void;
+  onPublish?: () => void;
+  isSaving?: boolean;
+  hasUnsavedChanges?: boolean;
+  activeTab: 'design' | 'campaign' | 'templates';
+  onTabChange: (tab: 'design' | 'campaign' | 'templates') => void;
 }
 
-export const CatalogTopToolbar = ({
-  viewMode,
-  onViewModeChange,
-  status,
-  onPublish,
-}: CatalogTopToolbarProps) => {
-  return (
-    <div className="h-14 border-b bg-background flex items-center justify-between px-4">
-      <div className="flex items-center gap-3">
-        <h1 className="text-lg font-semibold text-foreground">Créateur de Catalogue</h1>
-        <SaveIndicator status={status} />
-      </div>
+export const CatalogTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsavedChanges, activeTab, onTabChange }: CatalogTopToolbarProps) => {
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [showExitDialog, setShowExitDialog] = useState(false);
 
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
-          <button
-            onClick={() => onViewModeChange("desktop")}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-              viewMode === "desktop"
-                ? "bg-background text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+  const handleClose = () => {
+    if (hasUnsavedChanges) {
+      setShowExitDialog(true);
+    } else {
+      navigate('/campaigns');
+    }
+  };
+
+  const handleConfirmExit = () => {
+    setShowExitDialog(false);
+    navigate('/campaigns');
+  };
+
+  return (
+    <>
+      <div className={`h-12 bg-card border-b border-border flex items-center ${isMobile ? 'overflow-x-auto px-3' : 'justify-center px-3'}`}>
+        <div className={`flex items-center gap-1.5 ${isMobile ? 'flex-shrink-0' : ''}`}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`gap-1.5 h-8 text-xs px-2.5 ${activeTab === 'design' ? 'bg-accent' : ''}`}
+            onClick={() => onTabChange('design')}
           >
-            <Monitor className="w-4 h-4" />
-            <span className="text-sm font-medium">Desktop</span>
-          </button>
-          <button
-            onClick={() => onViewModeChange("mobile")}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-              viewMode === "mobile"
-                ? "bg-background text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            <Palette className="w-3.5 h-3.5" />
+            Catalogue
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`gap-1.5 h-8 text-xs px-2.5 ${activeTab === 'campaign' ? 'bg-accent' : ''}`}
+            onClick={() => onTabChange('campaign')}
           >
-            <Smartphone className="w-4 h-4" />
-            <span className="text-sm font-medium">Mobile</span>
-          </button>
+            <Gift className="w-3.5 h-3.5" />
+            Paramètres
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className={`gap-1.5 h-8 text-xs px-2.5 ${activeTab === 'templates' ? 'bg-accent' : ''}`}
+            onClick={() => onTabChange('templates')}
+          >
+            <Palette className="w-3.5 h-3.5" />
+            Templates
+          </Button>
         </div>
 
-        <Button 
-          size="sm" 
-          className="gap-2 h-8 px-4 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
-          onClick={onPublish}
-          disabled={status === 'saving'}
-        >
-          <Globe className="w-4 h-4" />
-          Publier
-        </Button>
+        <div className={`flex items-center gap-2 ${isMobile ? 'flex-shrink-0 ml-2' : 'absolute right-3'}`}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+            onClick={onPreview}
+          >
+            <Eye className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-2 h-8 px-3 text-xs font-medium"
+            onClick={onSave}
+            disabled={isSaving}
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2 h-8 px-3 text-xs font-medium"
+            onClick={handleClose}
+            disabled={isSaving}
+          >
+            <X className="w-4 h-4" />
+            Fermer
+          </Button>
+          <Button 
+            size="sm" 
+            className="gap-2 h-8 px-4 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={onPublish}
+            disabled={isSaving}
+          >
+            <Globe className="w-4 h-4" />
+            Publier
+          </Button>
+        </div>
       </div>
-    </div>
+
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Modifications non sauvegardées</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter sans sauvegarder ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Continuer l'édition</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmExit} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Quitter sans sauvegarder
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };

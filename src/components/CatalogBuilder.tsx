@@ -1,12 +1,25 @@
 import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { CatalogTopToolbar } from "@/components/CatalogTopToolbar";
-import { CatalogSidebar } from "@/components/CatalogSidebar";
-import { CatalogPreview } from "@/components/CatalogPreview";
+import { CatalogSidebar } from "./CatalogSidebar";
+import { CatalogPreview } from "./CatalogPreview";
+import { CatalogSettingsPanel } from "./CatalogSettingsPanel";
+import { CatalogTopToolbar } from "./CatalogTopToolbar";
+import { CampaignSettings } from "./CampaignSettings";
+import { Drawer, DrawerContent } from "./ui/drawer";
+import { Button } from "./ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useAutoSave } from "@/hooks/useAutoSave";
-import { CampaignService } from "@/services/CampaignService";
-import { toast } from "sonner";
+import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
+import { useCampaign } from "@/hooks/useCampaign";
+import { 
+  HeaderConfig, 
+  FooterConfig, 
+  defaultHeaderConfig, 
+  defaultFooterConfig,
+} from "./campaign";
+import { TemplateLibrary } from "./templates";
 
 export interface CatalogItem {
   id: string;
@@ -19,18 +32,24 @@ export interface CatalogItem {
   comingSoonDate?: string;
 }
 
-const CatalogBuilder = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const campaignId = searchParams.get("id");
-  
-  const { theme, updateTheme } = useTheme();
-  const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
-  const [catalogTitle, setCatalogTitle] = useState("Inspiration, astuces, concours...");
-  const [catalogSubtitle, setCatalogSubtitle] = useState("...et de nombreux prix à gagner !");
-  const [items, setItems] = useState<CatalogItem[]>([
+export interface CatalogConfig {
+  catalogTitle: string;
+  catalogSubtitle: string;
+  items: CatalogItem[];
+  mobileLayout: MobileLayoutType;
+  desktopLayout: DesktopLayoutType;
+  layout: {
+    header: HeaderConfig;
+    footer: FooterConfig;
+  };
+}
+
+const defaultCatalogConfig: CatalogConfig = {
+  catalogTitle: "Inspiration, astuces, concours...",
+  catalogSubtitle: "...et de nombreux prix à gagner !",
+  items: [
     {
-      id: "1",
+      id: '1',
       title: "Exemple de campagne 1",
       description: "Participez et tentez votre chance !",
       image: "",
@@ -39,7 +58,7 @@ const CatalogBuilder = () => {
       isComingSoon: false,
     },
     {
-      id: "2",
+      id: '2',
       title: "Exemple de campagne 2",
       description: "Découvrez nos offres exclusives",
       image: "",
@@ -48,7 +67,7 @@ const CatalogBuilder = () => {
       isComingSoon: false,
     },
     {
-      id: "3",
+      id: '3',
       title: "Prochainement...",
       description: "Bientôt disponible",
       image: "",
@@ -57,106 +76,271 @@ const CatalogBuilder = () => {
       isComingSoon: true,
       comingSoonDate: "1er Mars",
     },
-  ]);
+  ],
+  mobileLayout: "mobile-vertical",
+  desktopLayout: "desktop-centered",
+  layout: {
+    header: { ...defaultHeaderConfig, enabled: false },
+    footer: { ...defaultFooterConfig, enabled: false },
+  }
+};
+
+export const CatalogBuilder = () => {
+  const isMobile = useIsMobile();
+  const themeContext = useTheme();
+  const { theme } = themeContext;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const campaignId = searchParams.get('id');
+
+  // Hook de persistance Supabase
+  const {
+    config,
+    prizes,
+    name: campaignName,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    isLoading,
+    isSaving,
+    hasUnsavedChanges,
+    setConfig,
+    setPrizes,
+    save,
+    publish,
+    setName,
+    setStartDate,
+    setStartTime,
+    setEndDate,
+    setEndTime,
+  } = useCampaign(
+    { campaignId, type: 'catalog', defaultName: 'Nouveau catalogue' },
+    defaultCatalogConfig,
+    themeContext
+  );
+
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [leftDrawerOpen, setLeftDrawerOpen] = useState(false);
+  const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'design' | 'campaign' | 'templates'>('design');
+  const [campaignDefaultTab, setCampaignDefaultTab] = useState<string>('canaux');
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode('mobile');
+    }
+  }, [isMobile]);
 
   const handleSave = async () => {
-    const campaignData = {
-      name: catalogTitle || "Catalogue",
-      app_title: catalogTitle || "Catalogue",
-      type: "catalog" as const,
-      mode: "fullscreen" as const,
-      status: "draft" as const,
-      is_published: false,
-      user_id: "", // Will be set by the service
-      config: {
-        catalogTitle,
-        catalogSubtitle,
-        items,
-      } as Record<string, unknown>,
-      theme: theme as Record<string, unknown>,
-      prizes: [],
-    };
-
-    try {
-      if (campaignId) {
-        await CampaignService.update(campaignId, campaignData);
-      } else {
-        const newCampaign = await CampaignService.create(campaignData);
-        if (newCampaign?.id) {
-          navigate(`/catalog?id=${newCampaign.id}`, { replace: true });
-        }
-      }
-    } catch (error) {
-      console.error("Save error:", error);
-      toast.error("Erreur lors de la sauvegarde");
+    const saved = await save();
+    if (saved && !campaignId) {
+      navigate(`/catalog?id=${saved.id}`, { replace: true });
     }
   };
 
-  const { status } = useAutoSave({
-    data: { catalogTitle, catalogSubtitle, items, theme },
-    onSave: handleSave,
-  });
-
-  useEffect(() => {
-    const loadCampaign = async () => {
-      if (!campaignId) return;
-
-      try {
-        const campaign = await CampaignService.getById(campaignId);
-        if (campaign?.config) {
-          const config = campaign.config as any;
-          setCatalogTitle(config.catalogTitle || catalogTitle);
-          setCatalogSubtitle(config.catalogSubtitle || catalogSubtitle);
-          setItems(config.items || items);
-        }
-        if (campaign?.theme) {
-          Object.entries(campaign.theme).forEach(([key, value]) => {
-            updateTheme(key as any, value);
-          });
-        }
-      } catch (error) {
-        console.error("Error loading campaign:", error);
-        toast.error("Erreur lors du chargement");
-      }
-    };
-
-    loadCampaign();
-  }, [campaignId]);
-
-  const handlePublish = () => {
-    navigate(`/catalog-preview?id=${campaignId}`);
+  const handlePublish = async () => {
+    const published = await publish();
+    if (published && !campaignId) {
+      navigate(`/catalog?id=${published.id}`, { replace: true });
+    }
   };
 
+  const handlePreview = () => {
+    const targetViewMode = isMobile ? 'mobile' : 'desktop';
+    try {
+      localStorage.removeItem('catalog-config');
+      localStorage.removeItem('catalog-viewMode');
+      localStorage.removeItem('catalog-theme');
+    } catch (e) {
+      // Ignore cleanup errors
+    }
+    
+    try {
+      localStorage.setItem('catalog-config', JSON.stringify(config));
+      localStorage.setItem('catalog-viewMode', targetViewMode);
+      localStorage.setItem('catalog-theme', JSON.stringify(theme));
+      window.open('/catalog-preview', '_blank');
+    } catch (e) {
+      console.error('Preview error:', e);
+    }
+  };
+
+  const updateConfig = (updates: Partial<CatalogConfig>) => {
+    setConfig(prev => ({ ...prev, ...updates }));
+  };
+
+  const updateItem = (id: string, updates: Partial<CatalogItem>) => {
+    setConfig(prev => ({
+      ...prev,
+      items: prev.items.map(item => 
+        item.id === id ? { ...item, ...updates } : item
+      )
+    }));
+  };
+
+  if (isLoading && campaignId) {
+    return (
+      <div 
+        className="flex flex-col items-center justify-center h-screen"
+        style={{ 
+          fontFamily: "'DM Sans', sans-serif",
+          backgroundColor: '#f3f4f6',
+        }}
+      >
+        <Loader2 
+          className="w-10 h-10 animate-spin mb-4" 
+          style={{ color: '#f5ca3c' }} 
+        />
+        <p className="text-sm" style={{ color: '#6b7280' }}>
+          Chargement du catalogue...
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen flex flex-col bg-background">
-      <CatalogTopToolbar
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        status={status}
+    <div className="flex flex-col h-screen bg-muted overflow-hidden">
+      <CatalogTopToolbar 
+        onPreview={handlePreview}
+        onSave={handleSave}
         onPublish={handlePublish}
+        isSaving={isSaving}
+        hasUnsavedChanges={hasUnsavedChanges}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
-      <div className="flex-1 flex overflow-hidden">
-        <CatalogSidebar
-          items={items}
-          onItemsChange={setItems}
-          catalogTitle={catalogTitle}
-          onCatalogTitleChange={setCatalogTitle}
-          catalogSubtitle={catalogSubtitle}
-          onCatalogSubtitleChange={setCatalogSubtitle}
-        />
-
-        <div className="flex-1 overflow-auto bg-muted/30">
-          <CatalogPreview
-            viewMode={viewMode}
-            catalogTitle={catalogTitle}
-            catalogSubtitle={catalogSubtitle}
-            items={items}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Left Sidebar (Desktop only) */}
+        {!isMobile && activeTab === 'design' && (
+          <CatalogSidebar
+            config={config}
+            onUpdateConfig={updateConfig}
+            selectedItemId={selectedItemId}
+            onSelectItem={setSelectedItemId}
           />
+        )}
+
+        {/* Mobile Left Drawer */}
+        {isMobile && (
+          <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
+            <DrawerContent className="w-[280px] p-0">
+              <CatalogSidebar
+                config={config}
+                onUpdateConfig={updateConfig}
+                selectedItemId={selectedItemId}
+                onSelectItem={setSelectedItemId}
+              />
+            </DrawerContent>
+          </Drawer>
+        )}
+
+        {/* Preview Area */}
+        <div className="flex-1 overflow-auto bg-muted/30 relative">
+          {activeTab === 'design' ? (
+            <CatalogPreview
+              config={config}
+              onUpdateConfig={updateConfig}
+              viewMode={viewMode}
+              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+              selectedItemId={selectedItemId}
+              onSelectItem={setSelectedItemId}
+              onUpdateItem={updateItem}
+            />
+          ) : activeTab === 'campaign' ? (
+            <CampaignSettings
+              campaignName={campaignName}
+              onCampaignNameChange={setName}
+              prizes={prizes}
+              onSavePrize={(prize) => {
+                const existing = prizes.find(p => p.id === prize.id);
+                if (existing) {
+                  setPrizes(prizes.map(p => p.id === prize.id ? prize : p));
+                } else {
+                  setPrizes([...prizes, prize]);
+                }
+              }}
+              onDeletePrize={(id) => setPrizes(prizes.filter(p => p.id !== id))}
+              startDate={startDate}
+              onStartDateChange={setStartDate}
+              startTime={startTime}
+              onStartTimeChange={setStartTime}
+              endDate={endDate}
+              onEndDateChange={setEndDate}
+              endTime={endTime}
+              onEndTimeChange={setEndTime}
+              segments={[]}
+              defaultTab={campaignDefaultTab}
+            />
+          ) : (
+            <TemplateLibrary onSelectTemplate={() => {}} />
+          )}
+
+          {/* Mobile View Mode Toggle */}
+          {isMobile && activeTab === 'design' && (
+            <div className="absolute top-4 right-4 flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="bg-background/95 backdrop-blur-sm"
+                onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+              >
+                {viewMode === 'desktop' ? 'Mobile' : 'Desktop'}
+              </Button>
+            </div>
+          )}
         </div>
+
+        {/* Right Sidebar (Desktop only) */}
+        {!isMobile && activeTab === 'design' && (
+          <CatalogSettingsPanel
+            config={config}
+            selectedItemId={selectedItemId}
+            onUpdateConfig={updateConfig}
+            onUpdateItem={updateItem}
+            viewMode={viewMode}
+          />
+        )}
+
+        {/* Mobile Right Drawer */}
+        {isMobile && (
+          <Drawer open={rightDrawerOpen} onOpenChange={setRightDrawerOpen}>
+            <DrawerContent className="w-[280px] p-0">
+              <CatalogSettingsPanel
+                config={config}
+                selectedItemId={selectedItemId}
+                onUpdateConfig={updateConfig}
+                onUpdateItem={updateItem}
+                viewMode={viewMode}
+              />
+            </DrawerContent>
+          </Drawer>
+        )}
+
+        {/* Mobile Toggle Buttons */}
+        {isMobile && activeTab === 'design' && (
+          <>
+            <Button
+              size="icon"
+              variant="outline"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-16 rounded-r-lg bg-background shadow-md z-10"
+              onClick={() => setLeftDrawerOpen(true)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-16 rounded-l-lg bg-background shadow-md z-10"
+              onClick={() => setRightDrawerOpen(true)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );
 };
-
-export default CatalogBuilder;
