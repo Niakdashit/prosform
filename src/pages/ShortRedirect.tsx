@@ -22,17 +22,29 @@ export default function ShortRedirect() {
 
   const findAndRedirect = async (id: string) => {
     try {
-      // Search for campaign where ID starts with the short ID
+      // Search for campaign where ID starts with the short ID (cast to text for LIKE query)
       const { data, error: supabaseError } = await supabase
         .from('campaigns')
         .select('id, type, is_published, public_url_slug')
-        .ilike('id', `${id}%`)
+        .filter('id::text', 'ilike', `${id}%`)
         .limit(1)
         .maybeSingle();
 
       if (supabaseError) {
         console.error('Error finding campaign:', supabaseError);
-        setError('Erreur lors de la recherche de la campagne');
+        // Fallback: try direct ID match if short ID is a full UUID
+        const { data: directData, error: directError } = await supabase
+          .from('campaigns')
+          .select('id, type, is_published, public_url_slug')
+          .eq('id', id)
+          .maybeSingle();
+        
+        if (directError || !directData) {
+          setError('Erreur lors de la recherche de la campagne');
+          return;
+        }
+        
+        redirectToCampaign(directData);
         return;
       }
 
@@ -41,28 +53,32 @@ export default function ShortRedirect() {
         return;
       }
 
-      // If campaign is published and has a public slug, redirect to public URL
-      if (data.is_published && data.public_url_slug) {
-        navigate(`/p/${data.public_url_slug}`, { replace: true });
-        return;
-      }
-
-      // Otherwise redirect to the preview page based on type
-      const previewRoutes: Record<string, string> = {
-        wheel: '/wheel-preview',
-        jackpot: '/jackpot-preview',
-        quiz: '/quiz-preview',
-        scratch: '/scratch-preview',
-        form: '/preview',
-        catalog: '/catalog-preview'
-      };
-
-      const route = previewRoutes[data.type] || '/preview';
-      navigate(`${route}?id=${data.id}`, { replace: true });
+      redirectToCampaign(data);
     } catch (err) {
       console.error('Unexpected error:', err);
       setError('Une erreur inattendue s\'est produite');
     }
+  };
+
+  const redirectToCampaign = (campaign: { id: string; type: string; is_published: boolean; public_url_slug: string | null }) => {
+    // If campaign is published and has a public slug, redirect to public URL
+    if (campaign.is_published && campaign.public_url_slug) {
+      navigate(`/p/${campaign.public_url_slug}`, { replace: true });
+      return;
+    }
+
+    // Otherwise redirect to the preview page based on type
+    const previewRoutes: Record<string, string> = {
+      wheel: '/wheel-preview',
+      jackpot: '/jackpot-preview',
+      quiz: '/quiz-preview',
+      scratch: '/scratch-preview',
+      form: '/preview',
+      catalog: '/catalog-preview'
+    };
+
+    const route = previewRoutes[campaign.type] || '/preview';
+    navigate(`${route}?id=${campaign.id}`, { replace: true });
   };
 
   if (error) {
