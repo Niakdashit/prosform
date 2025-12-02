@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CatalogConfig, CatalogItem, CatalogCategory } from "./CatalogBuilder";
 import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
 import { CampaignHeader, CampaignFooter } from "./campaign";
@@ -34,6 +34,30 @@ export const CatalogPreview = ({
   const [uploadingImageForItem, setUploadingImageForItem] = useState<string | null>(null);
   const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  
+  // Custom font sizes for inline editing
+  const [customFontSizes, setCustomFontSizes] = useState<Record<string, number>>({});
+
+  // Listen for FloatingToolbar style events
+  useEffect(() => {
+    if (isReadOnly) return;
+
+    const handleToolbarStyle = (e: CustomEvent) => {
+      const { field, updates } = e.detail;
+      
+      if (updates.fontSize) {
+        setCustomFontSizes(prev => ({
+          ...prev,
+          [field]: updates.fontSize
+        }));
+      }
+    };
+
+    document.addEventListener('floatingToolbarStyle', handleToolbarStyle as EventListener);
+    return () => {
+      document.removeEventListener('floatingToolbarStyle', handleToolbarStyle as EventListener);
+    };
+  }, [isReadOnly]);
 
   // Update category title
   const updateCategoryTitle = (categoryId: string, newTitle: string) => {
@@ -296,7 +320,7 @@ export const CatalogPreview = ({
                     showClear={false}
                     style={{
                       fontFamily: getFontFamily(theme.headingFontFamily),
-                      fontSize: `${theme.headingSize}px`,
+                      fontSize: `${customFontSizes['title'] || theme.headingSize}px`,
                       fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : theme.headingWeight === 'semibold' ? 600 : 500,
                       color: theme.primaryColor,
                       lineHeight: theme.lineHeight,
@@ -315,7 +339,7 @@ export const CatalogPreview = ({
                   showSparkles={false}
                   showClear={false}
                   style={{
-                    fontSize: `${theme.subheadingSize}px`,
+                    fontSize: `${customFontSizes['subtitle'] || theme.subheadingSize}px`,
                     color: theme.textSecondaryColor,
                     lineHeight: theme.lineHeight,
                   }}
