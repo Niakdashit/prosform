@@ -38,10 +38,10 @@ export const CatalogPreview = ({
   };
 
   return (
-    <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center overflow-hidden" : "w-full h-full overflow-auto"}>
+    <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center" : "w-full h-full overflow-auto"}>
       <div 
-        className="relative overflow-hidden transition-all duration-300 flex flex-col"
-        style={{ 
+        className="relative overflow-auto transition-all duration-300 flex flex-col"
+        style={{
           backgroundColor: theme.backgroundColor,
           fontFamily: getFontFamily(theme.fontFamily),
           width: viewMode === 'desktop' ? '100%' : '375px',
