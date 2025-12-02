@@ -32,6 +32,7 @@ export const CatalogSidebar = ({
 }: CatalogSidebarProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [dragOverCategoryId, setDragOverCategoryId] = useState<string | null>(null);
 
   const addItem = (categoryId?: string) => {
     const newItem: CatalogItem = {
@@ -107,6 +108,7 @@ export const CatalogSidebar = ({
 
   const handleDragLeave = () => {
     setDragOverIndex(null);
+    setDragOverCategoryId(null);
   };
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
@@ -120,11 +122,32 @@ export const CatalogSidebar = ({
     }
     setDraggedIndex(null);
     setDragOverIndex(null);
+    setDragOverCategoryId(null);
+  };
+
+  const handleCategoryDragOver = (e: React.DragEvent, categoryId: string | null) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverCategoryId(categoryId);
+  };
+
+  const handleCategoryDrop = (e: React.DragEvent, categoryId: string | undefined) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/html'));
+    if (!isNaN(dragIndex) && dragIndex >= 0 && dragIndex < config.items.length) {
+      const newItems = [...config.items];
+      newItems[dragIndex] = { ...newItems[dragIndex], categoryId };
+      onUpdateConfig({ items: newItems });
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    setDragOverCategoryId(null);
   };
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
     setDragOverIndex(null);
+    setDragOverCategoryId(null);
   };
 
   return (
@@ -171,7 +194,16 @@ export const CatalogSidebar = ({
               
               {/* Categories with their items */}
               {grouped.categories.map((cat) => (
-                <div key={cat.id} className="mb-4">
+                <div 
+                  key={cat.id} 
+                  className={cn(
+                    "mb-4 rounded-lg transition-colors",
+                    dragOverCategoryId === cat.id && draggedIndex !== null && "bg-primary/10 ring-2 ring-primary/30"
+                  )}
+                  onDragOver={(e) => handleCategoryDragOver(e, cat.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleCategoryDrop(e, cat.id)}
+                >
                   <div className="flex items-center justify-between mb-2 px-1">
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                       {cat.title}
@@ -185,7 +217,7 @@ export const CatalogSidebar = ({
                     </button>
                   </div>
                   {cat.items.length === 0 ? (
-                    <p className="text-[10px] text-muted-foreground px-2 py-2">Aucune campagne</p>
+                    <p className="text-[10px] text-muted-foreground px-2 py-2">Aucune campagne (glisser ici)</p>
                   ) : (
                     cat.items.map((item) => {
                       const index = config.items.findIndex(i => i.id === item.id);
@@ -238,16 +270,26 @@ export const CatalogSidebar = ({
               ))}
 
               {/* Uncategorized items */}
-              {grouped.uncategorized.length > 0 && (
-                <div className="mb-4">
-                  {grouped.categories.length > 0 && (
-                    <div className="flex items-center justify-between mb-2 px-1">
-                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Sans catégorie
-                      </span>
-                    </div>
-                  )}
-                  {grouped.uncategorized.map((item) => {
+              <div 
+                className={cn(
+                  "mb-4 rounded-lg transition-colors",
+                  dragOverCategoryId === 'uncategorized' && draggedIndex !== null && "bg-primary/10 ring-2 ring-primary/30"
+                )}
+                onDragOver={(e) => handleCategoryDragOver(e, 'uncategorized')}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleCategoryDrop(e, undefined)}
+              >
+                {grouped.categories.length > 0 && (
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                      Sans catégorie
+                    </span>
+                  </div>
+                )}
+                {grouped.uncategorized.length === 0 && grouped.categories.length > 0 ? (
+                  <p className="text-[10px] text-muted-foreground px-2 py-2">Glisser ici pour retirer d'une catégorie</p>
+                ) : (
+                  grouped.uncategorized.map((item) => {
                     const index = config.items.findIndex(i => i.id === item.id);
                     return (
                       <div
@@ -292,9 +334,9 @@ export const CatalogSidebar = ({
                         </DropdownMenu>
                       </div>
                     );
-                  })}
-                </div>
-              )}
+                  })
+                )}
+              </div>
             </div>
           </ScrollArea>
         </TabsContent>
