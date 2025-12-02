@@ -1,10 +1,14 @@
+import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
+import { ImageUploadModal } from "./ImageUploadModal";
+import { ImagePlus, Trash2 } from "lucide-react";
 
 interface CatalogSettingsPanelProps {
   config: CatalogConfig;
@@ -22,6 +26,7 @@ export const CatalogSettingsPanel = ({
   viewMode
 }: CatalogSettingsPanelProps) => {
   const selectedItem = config.items.find(item => item.id === selectedItemId);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   return (
     <div className="w-[280px] bg-background border-l border-border flex flex-col">
@@ -81,6 +86,46 @@ export const CatalogSettingsPanel = ({
                 </div>
 
                 <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Image</Label>
+                  {selectedItem.image ? (
+                    <div className="relative rounded-lg overflow-hidden border border-border">
+                      <img 
+                        src={selectedItem.image} 
+                        alt={selectedItem.title}
+                        className="w-full h-24 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setShowImageModal(true)}
+                        >
+                          <ImagePlus className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => onUpdateItem(selectedItem.id, { image: '' })}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full h-24 border-dashed flex flex-col gap-1"
+                      onClick={() => setShowImageModal(true)}
+                    >
+                      <ImagePlus className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Ajouter une image</span>
+                    </Button>
+                  )}
+                </div>
+
+                <div>
                   <Label className="text-xs text-muted-foreground mb-2 block">Texte du bouton</Label>
                   <Input 
                     type="text" 
@@ -129,6 +174,18 @@ export const CatalogSettingsPanel = ({
           )}
         </div>
       </ScrollArea>
+
+      {/* Image Upload Modal */}
+      {selectedItem && (
+        <ImageUploadModal
+          open={showImageModal}
+          onOpenChange={setShowImageModal}
+          onImageSelect={(imageData) => {
+            onUpdateItem(selectedItem.id, { image: imageData });
+            setShowImageModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };
