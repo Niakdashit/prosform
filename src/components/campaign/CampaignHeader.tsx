@@ -9,7 +9,6 @@ export interface HeaderConfig {
   backgroundColor?: string;
   textColor?: string;
   style?: 'solid' | 'transparent' | 'gradient';
-  sticky?: boolean;
   showNavigation?: boolean;
   navigationLinks?: Array<{
     id: string;
@@ -27,7 +26,6 @@ export const defaultHeaderConfig: HeaderConfig = {
   backgroundColor: '#ffffff',
   textColor: '#1f2937',
   style: 'solid',
-  sticky: false,
   showNavigation: false,
   navigationLinks: [],
   height: 64,
@@ -68,7 +66,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
 
   return (
     <header
-      className={`w-full transition-all ${config.style === 'transparent' ? 'absolute top-0 left-0 right-0 z-50' : ''} ${config.sticky && config.style !== 'transparent' ? 'sticky top-0 z-50' : ''}`}
+      className={`w-full transition-all ${config.style === 'transparent' ? 'absolute top-0 left-0 right-0 z-50' : ''}`}
       style={{
         ...getBackgroundStyle(),
         height: config.height || 64,

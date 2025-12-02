@@ -303,13 +303,6 @@ export const LayoutSettingsPanel = ({ layout, onUpdateLayout }: LayoutSettingsPa
               {/* Options */}
               <div className="space-y-2 pt-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Sticky (fixé en haut)</Label>
-                  <Switch
-                    checked={header.sticky || false}
-                    onCheckedChange={(checked) => updateHeader({ sticky: checked })}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
                   <Label className="text-xs">Bordure en bas</Label>
                   <Switch
                     checked={header.borderBottom !== false}
