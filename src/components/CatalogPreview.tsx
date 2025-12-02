@@ -74,121 +74,111 @@ export const CatalogPreview = ({
           )}
 
           {/* Main Content */}
-          <div className="flex-1 flex items-start justify-center p-6 md:p-12">
-            <div className={`${containerClass}`}>
-              {/* Catalog Header */}
-              <div className="mb-10 text-center">
-                <h1 className="text-3xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
-                  {config.catalogTitle}
-                </h1>
-                <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto">
-                  {config.catalogSubtitle}
-                </p>
-              </div>
+          <div className="flex-1 flex items-start justify-center p-8">
+            <div className={`${containerClass} rounded-2xl overflow-hidden`}>
+              <div className="p-8">
+                {/* Catalog Header */}
+                <div className="mb-8">
+                  <h1 className="text-4xl font-bold mb-2 text-[#4a90e2]">
+                    {config.catalogTitle}
+                  </h1>
+                  <p className="text-lg text-gray-600">
+                    {config.catalogSubtitle}
+                  </p>
+                </div>
 
-              {/* Active campaigns */}
-              <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-5 md:gap-8 mb-14`}>
-                {config.items.filter(item => !item.isComingSoon).map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => !isReadOnly && onSelectItem(item.id)}
-                    className={`group relative bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20 hover:border-white/20 ${
-                      !isReadOnly ? "cursor-pointer" : ""
-                    } ${
-                      selectedItemId === item.id && !isReadOnly ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-transparent" : ""
-                    }`}
-                  >
-                    {/* Image */}
-                    <div className="relative w-full h-44 md:h-52 overflow-hidden">
+                {/* Active campaigns */}
+                <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-6 mb-12`}>
+                  {config.items.filter(item => !item.isComingSoon).map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => !isReadOnly && onSelectItem(item.id)}
+                      className={`bg-white rounded-xl overflow-hidden shadow-md transition-all ${
+                        !isReadOnly ? "cursor-pointer hover:shadow-lg" : ""
+                      } ${
+                        selectedItemId === item.id && !isReadOnly ? "ring-2 ring-[#4a90e2]" : ""
+                      }`}
+                    >
+                      {/* Image */}
                       <div
-                        className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center"
                         style={item.image ? { backgroundImage: `url(${item.image})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
-                      />
-                      {!item.image && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-white/30 text-sm">Image</span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-5 md:p-6">
-                      <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-300 transition-colors">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-white/60 mb-5 leading-relaxed line-clamp-2">
-                        {item.description}
-                      </p>
-
-                      {/* Button */}
-                      <button
-                        className="w-full py-3 px-5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 uppercase text-sm tracking-wide shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5"
                       >
-                        {item.buttonText}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                        {!item.image && (
+                          <span className="text-gray-400 text-sm">Image</span>
+                        )}
+                      </div>
 
-              {/* Coming soon section */}
-              {config.items.some(item => item.isComingSoon) && (
-                <>
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                    <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                      {/* Content */}
+                      <div className="p-5">
+                        <h3 className="text-base font-bold text-gray-900 mb-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                          {item.description}
+                        </p>
+
+                        {/* Button */}
+                        <button
+                          className="w-full py-2.5 px-4 rounded font-bold text-white bg-[#4a90e2] hover:bg-[#357abd] transition-colors uppercase text-sm"
+                        >
+                          {item.buttonText}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Coming soon section */}
+                {config.items.some(item => item.isComingSoon) && (
+                  <>
+                    <h2 className="text-3xl font-bold mb-6 text-[#4a90e2]">
                       Prochainement...
                     </h2>
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-                  </div>
-                  <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-5 md:gap-8`}>
-                    {config.items.filter(item => item.isComingSoon).map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => !isReadOnly && onSelectItem(item.id)}
-                        className={`group relative bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/5 transition-all duration-300 ${
-                          !isReadOnly ? "cursor-pointer hover:bg-white/10" : ""
-                        } ${
-                          selectedItemId === item.id && !isReadOnly ? "ring-2 ring-blue-500/50" : ""
-                        }`}
-                      >
-                        {/* Image */}
-                        <div className="relative w-full h-44 md:h-52 overflow-hidden">
+                    <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-6`}>
+                      {config.items.filter(item => item.isComingSoon).map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => !isReadOnly && onSelectItem(item.id)}
+                          className={`bg-white rounded-xl overflow-hidden shadow-md opacity-60 ${
+                            !isReadOnly ? "cursor-pointer" : ""
+                          } ${
+                            selectedItemId === item.id && !isReadOnly ? "ring-2 ring-[#4a90e2]" : ""
+                          }`}
+                        >
+                          {/* Image */}
                           <div
-                            className="absolute inset-0 bg-gradient-to-br from-gray-600/30 to-gray-800/30 grayscale"
+                            className="w-full h-48 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center grayscale"
                             style={item.image ? { backgroundImage: `url(${item.image})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
-                          />
-                          {!item.image && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-white/20 text-sm">Image</span>
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                        </div>
+                          >
+                            {!item.image && (
+                              <span className="text-gray-500 text-sm">Image</span>
+                            )}
+                          </div>
 
-                        {/* Content */}
-                        <div className="p-5 md:p-6">
-                          <h3 className="text-lg font-semibold text-white/60 mb-2">
-                            {item.title}
-                          </h3>
-                          <p className="text-sm text-white/40 mb-4 leading-relaxed line-clamp-2">
-                            {item.description}
-                          </p>
+                          {/* Content */}
+                          <div className="p-5">
+                            <h3 className="text-base font-bold text-gray-700 mb-2">
+                              {item.title}
+                            </h3>
+                            <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+                              {item.description}
+                            </p>
 
-                          {/* Coming soon date */}
-                          {item.comingSoonDate && (
-                            <div className="flex items-center gap-2 text-sm text-blue-400/80 bg-blue-500/10 rounded-lg px-3 py-2">
-                              <span>📅</span>
-                              <span>Commence le {item.comingSoonDate}</span>
-                            </div>
-                          )}
+                            {/* Coming soon date */}
+                            {item.comingSoonDate && (
+                              <p className="text-sm text-gray-600 flex items-center gap-2">
+                                <span>📅</span>
+                                <span>Commence le {item.comingSoonDate}</span>
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
