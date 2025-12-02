@@ -1,7 +1,6 @@
 import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
-import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
+import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
 import { Monitor, Smartphone } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CampaignHeader, CampaignFooter } from "./campaign";
 
 interface CatalogPreviewProps {
@@ -24,11 +23,23 @@ export const CatalogPreview = ({
   isReadOnly = false,
 }: CatalogPreviewProps) => {
   const { theme } = useTheme();
-  const unifiedButtonStyles = getButtonStyles(theme, viewMode);
+  const buttonStyles = getButtonStyles(theme, viewMode);
 
   const containerClass = viewMode === "desktop"
     ? "w-full max-w-6xl mx-auto"
     : "w-[375px] mx-auto";
+
+  // Font family helper
+  const getFontFamily = (fontValue: string) => {
+    const font = GOOGLE_FONTS.find(f => f.value === fontValue);
+    return font ? `"${font.label}", ${font.category}` : fontValue;
+  };
+
+  // Shadow helper based on intensity
+  const getCardShadow = () => {
+    const intensity = theme.shadowIntensity / 100;
+    return `0 4px 16px rgba(0,0,0,${intensity * 0.15})`;
+  };
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -64,7 +75,10 @@ export const CatalogPreview = ({
       <div className="w-full h-full overflow-auto">
         <div 
           className="min-h-full flex flex-col"
-          style={{ backgroundColor: theme.backgroundColor }}
+          style={{ 
+            backgroundColor: theme.backgroundColor,
+            fontFamily: getFontFamily(theme.fontFamily),
+          }}
         >
           {/* Header */}
           {config.layout?.header?.enabled && (
@@ -74,53 +88,107 @@ export const CatalogPreview = ({
           )}
 
           {/* Main Content */}
-          <div className="flex-1 flex items-start justify-center p-8">
+          <div 
+            className="flex-1 flex items-start justify-center"
+            style={{ padding: `${theme.pageMargins}px` }}
+          >
             <div className={`${containerClass} rounded-2xl overflow-hidden`}>
-              <div className="p-8">
+              <div style={{ padding: `${theme.cardPadding}px` }}>
                 {/* Catalog Header */}
                 <div className="mb-8">
-                  <h1 className="text-4xl font-bold mb-2 text-[#4a90e2]">
+                  <h1 
+                    style={{
+                      fontFamily: getFontFamily(theme.headingFontFamily),
+                      fontSize: `${theme.headingSize}px`,
+                      fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : theme.headingWeight === 'semibold' ? 600 : 500,
+                      color: theme.primaryColor,
+                      marginBottom: '8px',
+                      lineHeight: theme.lineHeight,
+                      letterSpacing: `${theme.letterSpacing}px`,
+                    }}
+                  >
                     {config.catalogTitle}
                   </h1>
-                  <p className="text-lg text-gray-600">
+                  <p 
+                    style={{
+                      fontSize: `${theme.subheadingSize}px`,
+                      color: theme.textSecondaryColor,
+                      lineHeight: theme.lineHeight,
+                    }}
+                  >
                     {config.catalogSubtitle}
                   </p>
                 </div>
 
                 {/* Active campaigns */}
-                <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-6 mb-12`}>
+                <div 
+                  className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} mb-12`}
+                  style={{ gap: `${theme.questionSpacing * 24}px` }}
+                >
                   {config.items.filter(item => !item.isComingSoon).map((item) => (
                     <div
                       key={item.id}
                       onClick={() => !isReadOnly && onSelectItem(item.id)}
-                      className={`bg-white rounded-xl overflow-hidden shadow-md transition-all ${
-                        !isReadOnly ? "cursor-pointer hover:shadow-lg" : ""
-                      } ${
-                        selectedItemId === item.id && !isReadOnly ? "ring-2 ring-[#4a90e2]" : ""
+                      className={`overflow-hidden transition-all ${
+                        !isReadOnly ? "cursor-pointer" : ""
                       }`}
+                      style={{
+                        backgroundColor: theme.surfaceColor,
+                        borderRadius: `${theme.cardRadius}px`,
+                        boxShadow: getCardShadow(),
+                        border: theme.borderWidth > 0 ? `${theme.borderWidth}px solid ${theme.borderColor}` : 'none',
+                        ...(selectedItemId === item.id && !isReadOnly ? {
+                          boxShadow: `0 0 0 2px ${theme.primaryColor}`,
+                        } : {}),
+                      }}
                     >
                       {/* Image */}
                       <div
-                        className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center"
-                        style={item.image ? { backgroundImage: `url(${item.image})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
+                        className="w-full h-48 flex items-center justify-center"
+                        style={{
+                          backgroundColor: theme.backgroundSecondaryColor,
+                          ...(item.image ? { 
+                            backgroundImage: `url(${item.image})`, 
+                            backgroundSize: "cover", 
+                            backgroundPosition: "center" 
+                          } : {}),
+                        }}
                       >
                         {!item.image && (
-                          <span className="text-gray-400 text-sm">Image</span>
+                          <span style={{ color: theme.textMutedColor, fontSize: `${theme.captionSize}px` }}>Image</span>
                         )}
                       </div>
 
                       {/* Content */}
-                      <div className="p-5">
-                        <h3 className="text-base font-bold text-gray-900 mb-2">
+                      <div style={{ padding: `${theme.inputPadding + 8}px` }}>
+                        <h3 
+                          style={{
+                            fontSize: `${theme.bodySize}px`,
+                            fontWeight: 700,
+                            color: theme.textColor,
+                            marginBottom: '8px',
+                          }}
+                        >
                           {item.title}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                        <p 
+                          style={{
+                            fontSize: `${theme.captionSize}px`,
+                            color: theme.textSecondaryColor,
+                            marginBottom: '16px',
+                            lineHeight: theme.lineHeight,
+                          }}
+                        >
                           {item.description}
                         </p>
 
                         {/* Button */}
                         <button
-                          className="w-full py-2.5 px-4 rounded font-bold text-white bg-[#4a90e2] hover:bg-[#357abd] transition-colors uppercase text-sm"
+                          className="w-full uppercase transition-opacity hover:opacity-90"
+                          style={{
+                            ...buttonStyles,
+                            width: '100%',
+                          }}
                         >
                           {item.buttonText}
                         </button>
@@ -132,42 +200,87 @@ export const CatalogPreview = ({
                 {/* Coming soon section */}
                 {config.items.some(item => item.isComingSoon) && (
                   <>
-                    <h2 className="text-3xl font-bold mb-6 text-[#4a90e2]">
+                    <h2 
+                      className="mb-6"
+                      style={{
+                        fontFamily: getFontFamily(theme.headingFontFamily),
+                        fontSize: `${theme.subheadingSize + 8}px`,
+                        fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
+                        color: theme.primaryColor,
+                      }}
+                    >
                       Prochainement...
                     </h2>
-                    <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-6`}>
+                    <div 
+                      className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"}`}
+                      style={{ gap: `${theme.questionSpacing * 24}px` }}
+                    >
                       {config.items.filter(item => item.isComingSoon).map((item) => (
                         <div
                           key={item.id}
                           onClick={() => !isReadOnly && onSelectItem(item.id)}
-                          className={`bg-white rounded-xl overflow-hidden shadow-md opacity-60 ${
+                          className={`overflow-hidden opacity-60 ${
                             !isReadOnly ? "cursor-pointer" : ""
-                          } ${
-                            selectedItemId === item.id && !isReadOnly ? "ring-2 ring-[#4a90e2]" : ""
                           }`}
+                          style={{
+                            backgroundColor: theme.surfaceColor,
+                            borderRadius: `${theme.cardRadius}px`,
+                            boxShadow: getCardShadow(),
+                            border: theme.borderWidth > 0 ? `${theme.borderWidth}px solid ${theme.borderColor}` : 'none',
+                            ...(selectedItemId === item.id && !isReadOnly ? {
+                              boxShadow: `0 0 0 2px ${theme.primaryColor}`,
+                            } : {}),
+                          }}
                         >
                           {/* Image */}
                           <div
-                            className="w-full h-48 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center grayscale"
-                            style={item.image ? { backgroundImage: `url(${item.image})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
+                            className="w-full h-48 flex items-center justify-center grayscale"
+                            style={{
+                              backgroundColor: theme.backgroundSecondaryColor,
+                              ...(item.image ? { 
+                                backgroundImage: `url(${item.image})`, 
+                                backgroundSize: "cover", 
+                                backgroundPosition: "center" 
+                              } : {}),
+                            }}
                           >
                             {!item.image && (
-                              <span className="text-gray-500 text-sm">Image</span>
+                              <span style={{ color: theme.textMutedColor, fontSize: `${theme.captionSize}px` }}>Image</span>
                             )}
                           </div>
 
                           {/* Content */}
-                          <div className="p-5">
-                            <h3 className="text-base font-bold text-gray-700 mb-2">
+                          <div style={{ padding: `${theme.inputPadding + 8}px` }}>
+                            <h3 
+                              style={{
+                                fontSize: `${theme.bodySize}px`,
+                                fontWeight: 700,
+                                color: theme.textSecondaryColor,
+                                marginBottom: '8px',
+                              }}
+                            >
                               {item.title}
                             </h3>
-                            <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+                            <p 
+                              style={{
+                                fontSize: `${theme.captionSize}px`,
+                                color: theme.textMutedColor,
+                                marginBottom: '16px',
+                                lineHeight: theme.lineHeight,
+                              }}
+                            >
                               {item.description}
                             </p>
 
                             {/* Coming soon date */}
                             {item.comingSoonDate && (
-                              <p className="text-sm text-gray-600 flex items-center gap-2">
+                              <p 
+                                className="flex items-center gap-2"
+                                style={{
+                                  fontSize: `${theme.captionSize}px`,
+                                  color: theme.textSecondaryColor,
+                                }}
+                              >
                                 <span>📅</span>
                                 <span>Commence le {item.comingSoonDate}</span>
                               </p>
