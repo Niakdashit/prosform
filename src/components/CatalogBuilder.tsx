@@ -136,7 +136,7 @@ const defaultCatalogConfig: CatalogConfig = {
   ],
   mobileLayout: "mobile-vertical",
   desktopLayout: "desktop-centered",
-  containerWidth: 100,
+  containerWidth: 1200,
   layout: {
     header: { ...defaultHeaderConfig, enabled: false },
     footer: { ...defaultFooterConfig, enabled: false },

@@ -199,14 +199,14 @@ export const CatalogSidebar = ({
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">
-                    Largeur: {config.containerWidth || 100}%
+                    Largeur: {config.containerWidth || 1200}px
                   </Label>
                   <Slider
-                    value={[config.containerWidth || 100]}
+                    value={[config.containerWidth || 1200]}
                     onValueChange={([v]) => onUpdateConfig({ containerWidth: v })}
-                    min={50}
-                    max={100}
-                    step={5}
+                    min={600}
+                    max={1600}
+                    step={50}
                   />
                 </div>
               </div>
