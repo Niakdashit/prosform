@@ -1647,7 +1647,7 @@ export const WheelPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="w-full min-h-full relative z-10 flex flex-col"
+              className={activeView === 'welcome' ? "w-full h-full relative z-10" : "w-full min-h-full relative z-10 flex flex-col"}
               onClick={(e) => {
                 const target = e.target as HTMLElement;
                 if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
@@ -1660,6 +1660,10 @@ export const WheelPreview = ({
               }}
             >
               {(() => {
+                if (activeView === 'welcome') {
+                  return renderContent();
+                }
+                
                 const getCurrentLayout = () => {
                   const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
                   switch (activeView) {
