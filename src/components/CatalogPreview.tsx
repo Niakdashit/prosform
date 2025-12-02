@@ -143,25 +143,29 @@ export const CatalogPreview = ({
         
         {/* Image hover actions */}
         {!isReadOnly && hoveredImageId === item.id && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-2">
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 z-10">
             <button
+              type="button"
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 setUploadingImageForItem(item.id);
               }}
-              className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
+              className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors cursor-pointer pointer-events-auto"
             >
-              <ImagePlus className="w-5 h-5 text-gray-700" />
+              <ImagePlus className="w-5 h-5 text-gray-700 pointer-events-none" />
             </button>
             {item.image && (
               <button
+                type="button"
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   onUpdateItem(item.id, { image: '' });
                 }}
-                className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
+                className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors cursor-pointer pointer-events-auto"
               >
-                <Trash2 className="w-5 h-5 text-red-500" />
+                <Trash2 className="w-5 h-5 text-red-500 pointer-events-none" />
               </button>
             )}
           </div>
