@@ -106,12 +106,7 @@ export const QuizTopToolbar = ({ onPreview, onSave, onPublish, isSaving, hasUnsa
           </Button>
           <Button 
             size="sm" 
-            className="gap-2 h-8 px-4 text-xs font-medium"
-            style={{ 
-              backgroundColor: '#f5ca3c', 
-              color: '#3d3731',
-              border: 'none',
-            }}
+            className="gap-2 h-8 px-4 text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={onPublish}
             disabled={isSaving}
           >
