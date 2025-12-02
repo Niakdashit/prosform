@@ -24,7 +24,7 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
   ];
 
   // Pour compatibilité avec l'ancien schéma, on ne met à jour que ces colonnes
-  const allowedFields = ['name', 'type', 'mode', 'status', 'config'];
+  const allowedFields = ['name', 'type', 'mode', 'status', 'config', 'theme', 'prizes', 'starts_at', 'ends_at', 'is_published', 'published_at', 'public_url_slug', 'published_url', 'thumbnail_url', 'participation_count', 'participation_limit'];
   
   // Si c'est une mise à jour, ne pas modifier user_id
   if (isUpdate) {
