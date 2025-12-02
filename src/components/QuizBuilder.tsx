@@ -429,8 +429,11 @@ export const QuizBuilder = () => {
           prizes={[]}
           onSavePrize={() => {}}
           onDeletePrize={() => {}}
-          gameType="wheel"
+          gameType="quiz"
           segments={[]}
+          campaignId={campaign?.id}
+          campaignSlug={campaign?.public_url_slug}
+          campaignMode={campaign?.mode || 'fullscreen'}
           campaignName={campaignName}
           onCampaignNameChange={setName}
           startDate={startDate}

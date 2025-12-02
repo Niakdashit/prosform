@@ -500,6 +500,9 @@ export const JackpotBuilder = () => {
           gameType="jackpot"
           segments={config.symbols.map(s => ({ id: s.id, label: s.emoji }))}
           symbols={config.symbols}
+          campaignId={campaign?.id}
+          campaignSlug={campaign?.public_url_slug}
+          campaignMode={campaign?.mode || 'fullscreen'}
           campaignName={campaignName}
           onCampaignNameChange={setName}
           startDate={startDate}
@@ -510,6 +513,7 @@ export const JackpotBuilder = () => {
           onEndDateChange={setEndDate}
           endTime={endTime}
           onEndTimeChange={setEndTime}
+          campaignUrl={campaign?.published_url || ''}
           onAddSymbol={(emoji: string) => {
             const newSymbol: JackpotSymbol = {
               id: `symbol-${Date.now()}`,
