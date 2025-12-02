@@ -82,7 +82,7 @@ export const CampaignLayout = ({
       />
 
       {/* Contenu principal */}
-      <main className={`flex-1 flex flex-col items-center ${paddingClass} relative z-10`}>
+      <main className={`flex-1 flex flex-col items-center justify-center ${paddingClass} relative z-10 min-h-screen`}>
         <div className={`w-full ${maxWidthClass}`}>
           {children}
         </div>
