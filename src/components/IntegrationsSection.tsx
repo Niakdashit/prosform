@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Copy, ExternalLink, Download } from "lucide-react";
 
 type CampaignType = 'wheel' | 'jackpot' | 'quiz' | 'scratch' | 'form' | 'catalog';
 type CampaignMode = 'fullscreen' | 'article';
@@ -11,13 +13,15 @@ interface IntegrationsSectionProps {
   campaignId?: string;
   campaignMode?: CampaignMode;
   baseUrl?: string;
+  publicSlug?: string;
 }
 
 export const IntegrationsSection = ({
   campaignType,
   campaignId,
   campaignMode = 'fullscreen',
-  baseUrl = window.location.origin
+  baseUrl = window.location.origin,
+  publicSlug
 }: IntegrationsSectionProps) => {
   const [activeTab, setActiveTab] = useState("javascript");
 
@@ -33,6 +37,30 @@ export const IntegrationsSection = ({
     const path = getEmbedPath();
     const idParam = campaignId ? `?id=${campaignId}` : '';
     return `${baseUrl}${path}${idParam}`;
+  };
+
+  // Get public URL (for published campaigns)
+  const getPublicUrl = () => {
+    if (publicSlug) {
+      return `${baseUrl}/p/${publicSlug}`;
+    }
+    return null;
+  };
+
+  // Get Smart URL (shorter format)
+  const getSmartUrl = () => {
+    if (campaignId) {
+      return `${baseUrl}/c/${campaignId.slice(0, 8)}`;
+    }
+    return null;
+  };
+
+  // Get Short URL
+  const getShortUrl = () => {
+    if (campaignId) {
+      return `${baseUrl}/s/${campaignId.slice(0, 6)}`;
+    }
+    return null;
   };
 
   // Generate container ID based on type
@@ -69,6 +97,9 @@ export const IntegrationsSection = ({
   const embedUrl = getEmbedUrl();
   const containerId = getContainerId();
   const height = getRecommendedHeight();
+  const publicUrl = getPublicUrl();
+  const smartUrl = getSmartUrl();
+  const shortUrl = getShortUrl();
 
   // JavaScript embed code
   const jsCode = `<div id="${containerId}"></div>
@@ -153,6 +184,85 @@ view.addSubview(webView)`;
     </div>
   );
 
+  const renderUrlBlock = (url: string | null, label: string, placeholder: string) => {
+    if (!url) {
+      return (
+        <div className="text-sm text-muted-foreground p-4 bg-muted rounded-md">
+          {placeholder}
+        </div>
+      );
+    }
+    
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Input 
+            value={url} 
+            readOnly 
+            className="flex-1 bg-muted"
+          />
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => copyToClipboard(url, label)}
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => window.open(url, '_blank')}
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderQRCode = () => {
+    const qrUrl = publicUrl || embedUrl;
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl)}`;
+    
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-center">
+          <img 
+            src={qrApiUrl} 
+            alt="QR Code" 
+            className="border rounded-lg p-2 bg-white"
+            width={200}
+            height={200}
+          />
+        </div>
+        <div className="flex justify-center gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = qrApiUrl;
+              link.download = `qrcode-${campaignType}-${campaignId || 'campaign'}.png`;
+              link.click();
+            }}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Télécharger PNG
+          </Button>
+          <Button 
+            variant="outline"
+            onClick={() => copyToClipboard(qrUrl, 'URL du QR Code')}
+          >
+            <Copy className="h-4 w-4 mr-2" />
+            Copier l'URL
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground text-center">
+          Scannez ce QR code pour accéder à la campagne
+        </p>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4 bg-card border rounded-lg p-6">
       <h3 className="font-semibold text-lg">Intégrations</h3>
@@ -185,21 +295,15 @@ view.addSubview(webView)`;
         </TabsContent>
 
         <TabsContent value="smarturl" className="mt-4">
-          <div className="text-sm text-muted-foreground p-4 bg-muted rounded-md">
-            Smart URL sera disponible après publication de la campagne.
-          </div>
+          {renderUrlBlock(smartUrl, 'Smart URL', 'Smart URL sera disponible après sauvegarde de la campagne.')}
         </TabsContent>
 
         <TabsContent value="shorturl" className="mt-4">
-          <div className="text-sm text-muted-foreground p-4 bg-muted rounded-md">
-            Short URL sera disponible après publication de la campagne.
-          </div>
+          {renderUrlBlock(shortUrl, 'Short URL', 'Short URL sera disponible après sauvegarde de la campagne.')}
         </TabsContent>
 
         <TabsContent value="qrcode" className="mt-4">
-          <div className="text-sm text-muted-foreground p-4 bg-muted rounded-md">
-            QR Code sera disponible après publication de la campagne.
-          </div>
+          {renderQRCode()}
         </TabsContent>
       </Tabs>
     </div>

@@ -46,6 +46,7 @@ interface CampaignSettingsProps {
   campaignType?: 'wheel' | 'jackpot' | 'quiz' | 'scratch' | 'form' | 'catalog';
   campaignId?: string;
   campaignMode?: 'fullscreen' | 'article';
+  publicSlug?: string;
 }
 
 export const CampaignSettings = ({ 
@@ -71,6 +72,7 @@ export const CampaignSettings = ({
   campaignType = 'wheel',
   campaignId,
   campaignMode = 'fullscreen',
+  publicSlug,
 }: CampaignSettingsProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [prizeModalOpen, setPrizeModalOpen] = useState(false);
@@ -239,6 +241,7 @@ export const CampaignSettings = ({
                     campaignType={campaignType}
                     campaignId={campaignId}
                     campaignMode={campaignMode}
+                    publicSlug={publicSlug}
                   />
                 </TabsContent>
 
