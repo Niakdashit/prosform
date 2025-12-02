@@ -417,7 +417,7 @@ export const ScratchBuilder = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
+    <div className="flex flex-col h-screen bg-muted overflow-hidden">
       <ScratchTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
@@ -470,7 +470,7 @@ export const ScratchBuilder = () => {
           onEndTimeChange={setEndTime}
         />
       ) : (
-        <div className="flex flex-1 overflow-hidden relative m-4 rounded-2xl backdrop-blur-xl bg-background/40 border border-border/20 shadow-2xl">
+        <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
