@@ -40,7 +40,7 @@ export const CatalogPreview = ({
   return (
     <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center" : "w-full h-full overflow-auto"}>
       <div 
-        className="relative overflow-auto transition-all duration-300 flex flex-col"
+        className="relative overflow-auto transition-all duration-300 flex flex-col scrollbar-hide"
         style={{
           backgroundColor: theme.backgroundColor,
           fontFamily: getFontFamily(theme.fontFamily),
