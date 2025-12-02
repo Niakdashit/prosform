@@ -91,6 +91,20 @@ export const CatalogPreview = ({
     return `0 4px 16px rgba(0,0,0,${intensity * 0.15})`;
   };
 
+  // Card border-radius based on button style
+  const getCardBorderRadius = () => {
+    switch (theme.buttonStyle) {
+      case 'square':
+        return '4px';
+      case 'rounded':
+        return '12px';
+      case 'pill':
+        return '24px';
+      default:
+        return `${theme.cardRadius}px`;
+    }
+  };
+
   // Render catalog item card
   const renderCatalogCard = (item: CatalogItem, isComingSoon: boolean = false) => (
     <div
@@ -101,7 +115,7 @@ export const CatalogPreview = ({
       } ${isComingSoon ? "opacity-60" : ""}`}
       style={{
         backgroundColor: theme.surfaceColor,
-        borderRadius: `${theme.cardRadius}px`,
+        borderRadius: getCardBorderRadius(),
         boxShadow: getCardShadow(),
         border: theme.borderWidth > 0 ? `${theme.borderWidth}px solid ${theme.borderColor}` : 'none',
         ...(selectedItemId === item.id && !isReadOnly ? {
