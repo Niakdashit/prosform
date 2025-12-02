@@ -1665,14 +1665,14 @@ export const WheelPreview = ({
                 };
                 
                 const currentLayout = getCurrentLayout();
-                const needsGrid = viewMode === 'desktop' && (
+                const isContactWithGrid = activeView === 'contact' && viewMode === 'desktop' && (
                   currentLayout === 'desktop-left-right' || 
                   currentLayout === 'desktop-right-left' || 
                   currentLayout === 'desktop-panel' || 
                   currentLayout === 'desktop-card'
                 );
                 
-                return needsGrid 
+                return isContactWithGrid
                   ? "w-full h-full relative z-10 grid grid-cols-2" 
                   : "w-full h-full relative z-10";
               })()}
@@ -1693,7 +1693,7 @@ export const WheelPreview = ({
 
           {/* Footer dans la zone scrollable */}
           {config.layout?.footer?.enabled && (
-            <div className="relative z-10 col-span-full">
+            <div className="relative z-10">
               <CampaignFooter config={config.layout.footer} isPreview />
             </div>
           )}
