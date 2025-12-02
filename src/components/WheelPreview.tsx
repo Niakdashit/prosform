@@ -1309,19 +1309,16 @@ export const WheelPreview = ({
                 value: seg.label
               }));
 
-              // Wheel size calculation
-              const wheelSizePercent = config.wheelScreen.wheelSize || 100;
-              const baseWheelSize = viewMode === 'desktop' ? 380 : 280;
-              const scaledWheelSize = Math.round(baseWheelSize * (wheelSizePercent / 100));
-              const containerSize = viewMode === 'desktop' ? 450 : 320;
-              const scaledContainerSize = Math.round(containerSize * (wheelSizePercent / 100));
+              // Wheel size from theme
+              const wheelSize = viewMode === 'desktop' ? theme.wheelSizeDesktop : theme.wheelSizeMobile;
+              const containerSize = wheelSize + 70; // Add padding for wheel container
 
               return (
                 <div
                   className="flex items-center justify-center"
                   style={{ 
-                    width: `${scaledContainerSize}px`,
-                    height: `${scaledContainerSize}px`,
+                    width: `${containerSize}px`,
+                    height: `${containerSize}px`,
                     maxWidth: '100%',
                     flexShrink: 0
                   }}
@@ -1368,7 +1365,7 @@ export const WheelPreview = ({
                       globalDrawResult = null;
                     }}
                     brandColors={{ primary: theme.systemColor, secondary: theme.accentColor }}
-                    size={scaledWheelSize}
+                    size={wheelSize}
                     borderStyle={theme.wheelBorderStyle === 'gold' ? 'goldRing' : theme.wheelBorderStyle === 'silver' ? 'silverRing' : theme.wheelBorderStyle}
                     customBorderColor={
                       theme.wheelBorderStyle === 'custom'
