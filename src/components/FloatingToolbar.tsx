@@ -783,7 +783,7 @@ export const FloatingToolbar = ({ containerRef }: FloatingToolbarProps) => {
 
               {showSizeMenu && (
                 <div 
-                  className="absolute left-0 p-1 rounded-lg shadow-xl max-h-40 overflow-y-auto"
+                  className="absolute left-0 p-1 rounded-lg shadow-xl max-h-40 overflow-y-auto scrollbar-hide"
                   style={{ 
                     backgroundColor: '#3D3731',
                     border: '1px solid rgba(245, 184, 0, 0.3)',
