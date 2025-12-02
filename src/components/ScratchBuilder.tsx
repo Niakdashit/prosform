@@ -468,6 +468,9 @@ export const ScratchBuilder = () => {
           onEndDateChange={setEndDate}
           endTime={endTime}
           onEndTimeChange={setEndTime}
+          campaignType="scratch"
+          campaignId={campaign?.id}
+          campaignMode="fullscreen"
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

@@ -521,6 +521,9 @@ export const JackpotBuilder = () => {
               symbols: [...prev.symbols, newSymbol]
             }));
           }}
+          campaignType="jackpot"
+          campaignId={campaign?.id}
+          campaignMode="fullscreen"
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
