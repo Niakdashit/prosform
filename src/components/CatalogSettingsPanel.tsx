@@ -136,6 +136,23 @@ export const CatalogSettingsPanel = ({
                   />
                 </div>
 
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-2 block">Largeur de la carte</Label>
+                  <Select
+                    value={String(selectedItem.colSpan || 1)}
+                    onValueChange={(value) => onUpdateItem(selectedItem.id, { colSpan: Number(value) as 1 | 2 | 3 })}
+                  >
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 colonne (petit)</SelectItem>
+                      <SelectItem value="2">2 colonnes (moyen)</SelectItem>
+                      <SelectItem value="3">3 colonnes (large)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Category selector */}
                 {config.categories && config.categories.length > 0 && (
                   <div>
