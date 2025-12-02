@@ -7,6 +7,7 @@ import { ThemeStylePanel } from "@/components/ui/ThemeStylePanel";
 import { LayoutSettingsPanel } from "./campaign";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -198,9 +199,23 @@ export const CatalogSidebar = ({
                   <span className="font-medium text-sm">Conteneur</span>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground">
-                    Largeur: {config.containerWidth || 1200}px
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-muted-foreground">Largeur</Label>
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="number"
+                        value={config.containerWidth || 1200}
+                        onChange={(e) => {
+                          const val = Math.min(1920, Math.max(800, Number(e.target.value) || 800));
+                          onUpdateConfig({ containerWidth: val });
+                        }}
+                        className="w-20 h-7 text-xs text-right"
+                        min={800}
+                        max={1920}
+                      />
+                      <span className="text-xs text-muted-foreground">px</span>
+                    </div>
+                  </div>
                   <Slider
                     value={[config.containerWidth || 1200]}
                     onValueChange={([v]) => onUpdateConfig({ containerWidth: v })}
