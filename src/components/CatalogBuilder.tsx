@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Loader2, ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
+import { toast } from "sonner";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CatalogSidebar } from "./CatalogSidebar";
 import { CatalogPreview } from "./CatalogPreview";
@@ -131,23 +132,34 @@ export const CatalogBuilder = () => {
     }
   };
 
-  const handlePreview = () => {
+  const handlePreview = async () => {
     const targetViewMode = isMobile ? 'mobile' : 'desktop';
-    try {
-      localStorage.removeItem('catalog-config');
-      localStorage.removeItem('catalog-viewMode');
-      localStorage.removeItem('catalog-theme');
-    } catch (e) {
-      // Ignore cleanup errors
-    }
     
-    try {
-      localStorage.setItem('catalog-config', JSON.stringify(config));
+    // If we have a campaign ID, save first and use ID-based preview to avoid localStorage limits
+    if (campaignId) {
+      await save();
       localStorage.setItem('catalog-viewMode', targetViewMode);
       localStorage.setItem('catalog-theme', JSON.stringify(theme));
-      window.open('/catalog-preview', '_blank');
-    } catch (e) {
-      console.error('Preview error:', e);
+      window.open(`/catalog-preview?id=${campaignId}`, '_blank');
+    } else {
+      // Fallback to localStorage for unsaved campaigns
+      try {
+        localStorage.removeItem('catalog-config');
+        localStorage.removeItem('catalog-viewMode');
+        localStorage.removeItem('catalog-theme');
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+      
+      try {
+        localStorage.setItem('catalog-config', JSON.stringify(config));
+        localStorage.setItem('catalog-viewMode', targetViewMode);
+        localStorage.setItem('catalog-theme', JSON.stringify(theme));
+        window.open('/catalog-preview', '_blank');
+      } catch (e) {
+        console.error('Preview error:', e);
+        toast.error('Données trop volumineuses. Sauvegardez d\'abord la campagne.');
+      }
     }
   };
 
