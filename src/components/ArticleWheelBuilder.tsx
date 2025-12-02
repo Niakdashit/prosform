@@ -337,10 +337,6 @@ export const ArticleWheelBuilder = () => {
           onDeletePrize={handleDeletePrize}
           gameType="wheel"
           segments={(config as any).segments?.map((s: any) => ({ id: s.id, label: s.label })) || []}
-          campaignId={campaign?.id}
-          campaignSlug={campaign?.public_url_slug}
-          campaignMode={campaign?.mode || 'article'}
-          campaignUrl={campaign?.published_url || ''}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

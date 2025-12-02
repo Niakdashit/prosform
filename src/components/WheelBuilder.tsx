@@ -516,9 +516,6 @@ export const WheelBuilder = () => {
           onDeletePrize={handleDeletePrize}
           gameType="wheel"
           segments={config.segments.map(s => ({ id: s.id, label: s.label }))}
-          campaignId={campaign?.id}
-          campaignSlug={campaign?.public_url_slug}
-          campaignMode={campaign?.mode || 'fullscreen'}
           campaignName={campaignName}
           onCampaignNameChange={setName}
           startDate={startDate}
@@ -529,7 +526,7 @@ export const WheelBuilder = () => {
           onEndDateChange={setEndDate}
           endTime={endTime}
           onEndTimeChange={setEndTime}
-          campaignUrl={campaign?.published_url || (campaign?.id ? `${window.location.origin}/p/${campaign.public_url_slug || campaign.id}` : '')}
+          campaignUrl={campaign?.id ? `${window.location.origin}/wheel-preview?id=${campaign.id}` : ''}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

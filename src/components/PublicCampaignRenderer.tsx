@@ -46,14 +46,13 @@ export function PublicCampaignRenderer({ campaign }: PublicCampaignRendererProps
     };
   }, [campaign.theme]);
 
-  // Extraire le config et le thème de la campagne
+  // Extraire le config de la campagne
   const config = campaign.config as any;
-  const campaignTheme = campaign.theme as any;
 
   // Afficher le composant approprié selon le type
   switch (campaign.type) {
     case 'wheel':
-      return <ParticipantWheelRender config={config} campaignId={campaign.id} campaignTheme={campaignTheme} />;
+      return <ParticipantWheelRender config={config} campaignId={campaign.id} />;
     
     case 'quiz':
       return <ParticipantQuizRender config={config} campaignId={campaign.id} />;

@@ -31,30 +31,21 @@ export default function PublicCampaign() {
       setLoading(true);
       setError(null);
 
-      // Essayer d'abord par slug public, puis par ID
-      let { data, error: supabaseError } = await supabase
+      // Charger la campagne depuis le slug public
+      const { data, error: supabaseError } = await supabase
         .from('campaigns')
         .select('*')
         .eq('public_url_slug', campaignSlug)
-        .eq('status', 'online')
-        .maybeSingle();
-
-      // Si pas trouvé par slug, essayer par ID
-      if (!data) {
-        const { data: dataById, error: errorById } = await supabase
-          .from('campaigns')
-          .select('*')
-          .eq('id', campaignSlug)
-          .eq('status', 'online')
-          .maybeSingle();
-        
-        data = dataById;
-        supabaseError = errorById;
-      }
+        .eq('is_published', true) // Seulement les campagnes publiées
+        .single();
 
       if (supabaseError) {
         console.error('Error loading campaign:', supabaseError);
-        setError('Erreur lors du chargement de la campagne.');
+        if (supabaseError.code === 'PGRST116') {
+          setError('Cette campagne n\'existe pas ou n\'est plus disponible.');
+        } else {
+          setError('Erreur lors du chargement de la campagne.');
+        }
         setLoading(false);
         return;
       }

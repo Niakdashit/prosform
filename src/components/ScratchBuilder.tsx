@@ -458,9 +458,6 @@ export const ScratchBuilder = () => {
           onDeletePrize={handleDeletePrize}
           gameType="scratch"
           segments={[]}
-          campaignId={campaign?.id}
-          campaignSlug={campaign?.public_url_slug}
-          campaignMode={campaign?.mode || 'fullscreen'}
           campaignName={campaignName}
           onCampaignNameChange={setName}
           startDate={startDate}
@@ -471,7 +468,6 @@ export const ScratchBuilder = () => {
           onEndDateChange={setEndDate}
           endTime={endTime}
           onEndTimeChange={setEndTime}
-          campaignUrl={campaign?.published_url || ''}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
