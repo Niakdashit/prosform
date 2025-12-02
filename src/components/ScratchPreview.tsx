@@ -1669,15 +1669,15 @@ export const ScratchPreview = ({
           );
         })()}
 
+        {/* Header en overlay fixe au-dessus du contenu */}
+        {config.layout?.header?.enabled && (
+          <div className="absolute top-0 left-0 right-0 z-30">
+            <CampaignHeader config={config.layout.header} isPreview />
+          </div>
+        )}
+
         {/* Contenu principal */}
         <div className="flex-1 relative overflow-auto z-10 min-h-0">
-          {/* Header dans la zone scrollable */}
-          {config.layout?.header?.enabled && (
-            <div className="relative z-20">
-              <CampaignHeader config={config.layout.header} isPreview />
-            </div>
-          )}
-
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
