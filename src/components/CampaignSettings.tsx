@@ -12,6 +12,7 @@ import { PrizeModal } from "./PrizeModal";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Prize } from "./WheelBuilder";
+import { IntegrationsSection } from "./IntegrationsSection";
 
 interface JackpotSymbol {
   id: string;
@@ -25,11 +26,14 @@ interface CampaignSettingsProps {
   prizes: Prize[];
   onSavePrize: (prize: Prize) => void;
   onDeletePrize: (id: string) => void;
-  gameType?: 'scratch' | 'wheel' | 'jackpot';
+  gameType?: 'scratch' | 'wheel' | 'jackpot' | 'quiz' | 'form' | 'catalog';
   segments: Array<{ id: string; label: string }>;
   symbols?: JackpotSymbol[]; // Pour Jackpot uniquement
   onAddSymbol?: (emoji: string) => void; // Pour ajouter un symbole depuis le modal
   // Campaign metadata
+  campaignId?: string;
+  campaignSlug?: string;
+  campaignMode?: 'fullscreen' | 'article' | 'embed' | 'popup';
   campaignName?: string;
   onCampaignNameChange?: (name: string) => void;
   startDate?: string;
@@ -52,6 +56,9 @@ export const CampaignSettings = ({
   segments,
   symbols = [],
   onAddSymbol,
+  campaignId,
+  campaignSlug,
+  campaignMode = 'fullscreen',
   campaignName = '',
   onCampaignNameChange,
   startDate = '',
@@ -227,48 +234,12 @@ export const CampaignSettings = ({
                     />
                   </div>
 
-                  <div className="space-y-4 bg-card border rounded-lg p-6">
-                    <h3 className="font-semibold text-lg">Intégrations</h3>
-                    
-                    <Tabs defaultValue="javascript" className="w-full">
-                      <TabsList>
-                        <TabsTrigger value="javascript">Javascript</TabsTrigger>
-                        <TabsTrigger value="html">HTML</TabsTrigger>
-                        <TabsTrigger value="webview">Webview</TabsTrigger>
-                        <TabsTrigger value="oembed">oEmbed</TabsTrigger>
-                        <TabsTrigger value="smarturl">Smart URL</TabsTrigger>
-                        <TabsTrigger value="shorturl">Short URL</TabsTrigger>
-                        <TabsTrigger value="qrcode">QR Code</TabsTrigger>
-                      </TabsList>
-                      
-                      <TabsContent value="javascript" className="mt-4">
-                        <div className="relative">
-                          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
-                            <code>{`<div id="wheel-campaign"></div>
-<script type="text/javascript">
-  (function(w,d,id){
-    var el=d.getElementById(id);
-    if(!el){ return; }
-    var f=d.createElement('iframe');
-    f.src='https://wheel.lovable.app/embed';
-    f.width='100%';
-    f.height='600';
-    f.style.border='none';
-    el.appendChild(f);
-  })(window,document,'wheel-campaign');
-</script>`}</code>
-                          </pre>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="absolute top-2 right-2"
-                          >
-                            Copier
-                          </Button>
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </div>
+                  <IntegrationsSection
+                    campaignId={campaignId}
+                    campaignSlug={campaignSlug}
+                    campaignType={gameType}
+                    campaignMode={campaignMode}
+                  />
                 </TabsContent>
 
                 <TabsContent value="parametres" className="mt-0 space-y-4">
@@ -645,7 +616,7 @@ export const CampaignSettings = ({
             prize={editingPrize}
             onSave={handleSavePrize}
             segments={segments}
-            gameType={gameType}
+            gameType={gameType === 'form' || gameType === 'catalog' || gameType === 'quiz' ? 'wheel' : gameType}
             symbols={symbols}
             onAddSymbol={onAddSymbol}
           />
