@@ -1647,7 +1647,7 @@ export const WheelPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={activeView === 'welcome' ? "w-full h-full relative z-10" : "w-full min-h-full relative z-10 flex flex-col"}
+              className={activeView === 'contact' ? "w-full min-h-full relative z-10 flex flex-col" : "w-full h-full relative z-10"}
               onClick={(e) => {
                 const target = e.target as HTMLElement;
                 if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
@@ -1660,28 +1660,18 @@ export const WheelPreview = ({
               }}
             >
               {(() => {
-                if (activeView === 'welcome') {
+                if (activeView !== 'contact') {
                   return renderContent();
                 }
                 
+                // Pour la vue contact uniquement
                 const getCurrentLayout = () => {
                   const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
-                  switch (activeView) {
-                    case 'contact':
-                      return config.contactForm[layoutKey];
-                    case 'wheel':
-                      return config.wheelScreen[layoutKey];
-                    case 'ending-win':
-                      return config.endingWin[layoutKey];
-                    case 'ending-lose':
-                      return config.endingLose[layoutKey];
-                    default:
-                      return viewMode === 'desktop' ? 'desktop-centered' : 'mobile-vertical';
-                  }
+                  return config.contactForm[layoutKey];
                 };
                 
                 const currentLayout = getCurrentLayout();
-                const isContactWithGrid = activeView === 'contact' && viewMode === 'desktop' && (
+                const isContactWithGrid = viewMode === 'desktop' && (
                   currentLayout === 'desktop-left-right' || 
                   currentLayout === 'desktop-right-left' || 
                   currentLayout === 'desktop-panel' || 
