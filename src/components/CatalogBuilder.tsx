@@ -21,6 +21,12 @@ import {
 } from "./campaign";
 import { TemplateLibrary } from "./templates";
 
+export interface CatalogCategory {
+  id: string;
+  title: string;
+  icon?: string;
+}
+
 export interface CatalogItem {
   id: string;
   title: string;
@@ -30,15 +36,18 @@ export interface CatalogItem {
   link: string;
   isComingSoon: boolean;
   comingSoonDate?: string;
+  categoryId?: string;
 }
 
 export interface CatalogConfig {
   catalogTitle: string;
   catalogSubtitle: string;
   items: CatalogItem[];
+  categories: CatalogCategory[];
+  showCategoryNav: boolean;
   mobileLayout: MobileLayoutType;
   desktopLayout: DesktopLayoutType;
-  containerWidth: number; // percentage 50-100
+  containerWidth: number;
   layout: {
     header: HeaderConfig;
     footer: FooterConfig;
@@ -48,6 +57,12 @@ export interface CatalogConfig {
 const defaultCatalogConfig: CatalogConfig = {
   catalogTitle: "Inspiration, astuces, concours...",
   catalogSubtitle: "...et de nombreux prix à gagner !",
+  categories: [
+    { id: 'cat-1', title: 'Recettes' },
+    { id: 'cat-2', title: 'Inspirations' },
+    { id: 'cat-3', title: 'Concours' },
+  ],
+  showCategoryNav: false,
   items: [
     {
       id: '1',
@@ -57,6 +72,7 @@ const defaultCatalogConfig: CatalogConfig = {
       buttonText: "PARTICIPER !",
       link: "",
       isComingSoon: false,
+      categoryId: 'cat-1',
     },
     {
       id: '2',
@@ -66,6 +82,7 @@ const defaultCatalogConfig: CatalogConfig = {
       buttonText: "PARTICIPER !",
       link: "",
       isComingSoon: false,
+      categoryId: 'cat-2',
     },
     {
       id: '3',
@@ -75,6 +92,7 @@ const defaultCatalogConfig: CatalogConfig = {
       buttonText: "PARTICIPER !",
       link: "",
       isComingSoon: false,
+      categoryId: 'cat-3',
     },
     {
       id: '4',
@@ -84,6 +102,7 @@ const defaultCatalogConfig: CatalogConfig = {
       buttonText: "PARTICIPER !",
       link: "",
       isComingSoon: false,
+      categoryId: 'cat-1',
     },
     {
       id: '5',
@@ -93,6 +112,7 @@ const defaultCatalogConfig: CatalogConfig = {
       buttonText: "PARTICIPER !",
       link: "",
       isComingSoon: false,
+      categoryId: 'cat-2',
     },
     {
       id: '6',
@@ -102,6 +122,7 @@ const defaultCatalogConfig: CatalogConfig = {
       buttonText: "PARTICIPER !",
       link: "",
       isComingSoon: false,
+      categoryId: 'cat-3',
     },
     {
       id: '7',
@@ -136,7 +157,7 @@ const defaultCatalogConfig: CatalogConfig = {
   ],
   mobileLayout: "mobile-vertical",
   desktopLayout: "desktop-centered",
-  containerWidth: 100,
+  containerWidth: 1200,
   layout: {
     header: { ...defaultHeaderConfig, enabled: false },
     footer: { ...defaultFooterConfig, enabled: false },

@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
 import { ImageUploadModal } from "./ImageUploadModal";
 import { ImagePlus, Trash2 } from "lucide-react";
@@ -134,6 +135,29 @@ export const CatalogSettingsPanel = ({
                     className="text-xs h-9"
                   />
                 </div>
+
+                {/* Category selector */}
+                {config.categories && config.categories.length > 0 && (
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-2 block">Catégorie</Label>
+                    <Select
+                      value={selectedItem.categoryId || "none"}
+                      onValueChange={(value) => onUpdateItem(selectedItem.id, { categoryId: value === "none" ? undefined : value })}
+                    >
+                      <SelectTrigger className="h-9 text-xs">
+                        <SelectValue placeholder="Aucune catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucune catégorie</SelectItem>
+                        {config.categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div>
                   <Label className="text-xs text-muted-foreground mb-2 block">Lien</Label>

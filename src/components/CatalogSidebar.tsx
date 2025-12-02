@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Palette, LayoutList, Gift, GripVertical, MoreVertical, Copy, Trash2, PanelTop, Maximize2 } from "lucide-react";
+import { Plus, Palette, LayoutList, GripVertical, MoreVertical, Copy, Trash2, PanelTop, Maximize2, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeStylePanel } from "@/components/ui/ThemeStylePanel";
@@ -8,13 +8,14 @@ import { LayoutSettingsPanel } from "./campaign";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
+import { CatalogConfig, CatalogItem, CatalogCategory } from "./CatalogBuilder";
 
 interface CatalogSidebarProps {
   config: CatalogConfig;
@@ -223,6 +224,77 @@ export const CatalogSidebar = ({
                     max={1920}
                     step={40}
                   />
+                </div>
+              </div>
+
+              {/* Categories */}
+              <div className="border rounded-lg p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4" />
+                    <span className="font-medium text-sm">Catégories</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newCat: CatalogCategory = {
+                        id: `cat-${Date.now()}`,
+                        title: "Nouvelle catégorie",
+                      };
+                      onUpdateConfig({ categories: [...(config.categories || []), newCat] });
+                    }}
+                    className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
+                    title="Ajouter une catégorie"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Show category nav toggle */}
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-muted-foreground">Afficher la navigation</Label>
+                  <Switch
+                    checked={config.showCategoryNav || false}
+                    onCheckedChange={(checked) => onUpdateConfig({ showCategoryNav: checked })}
+                  />
+                </div>
+
+                {/* Category list */}
+                <div className="space-y-2">
+                  {(config.categories || []).map((cat, index) => (
+                    <div
+                      key={cat.id}
+                      className="flex items-center gap-2 p-2 rounded-md bg-muted/50"
+                    >
+                      <Input
+                        value={cat.title}
+                        onChange={(e) => {
+                          const updated = [...(config.categories || [])];
+                          updated[index] = { ...cat, title: e.target.value };
+                          onUpdateConfig({ categories: updated });
+                        }}
+                        className="h-7 text-xs flex-1"
+                        placeholder="Nom de la catégorie"
+                      />
+                      <button
+                        onClick={() => {
+                          const updated = (config.categories || []).filter(c => c.id !== cat.id);
+                          // Also remove categoryId from items that had this category
+                          const updatedItems = config.items.map(item => 
+                            item.categoryId === cat.id ? { ...item, categoryId: undefined } : item
+                          );
+                          onUpdateConfig({ categories: updated, items: updatedItems });
+                        }}
+                        className="w-6 h-6 rounded hover:bg-destructive/10 flex items-center justify-center transition-colors text-destructive"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  {(!config.categories || config.categories.length === 0) && (
+                    <p className="text-xs text-muted-foreground text-center py-2">
+                      Aucune catégorie
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
