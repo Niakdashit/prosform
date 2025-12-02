@@ -32,7 +32,6 @@ export const CatalogSidebar = ({
 }: CatalogSidebarProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [dragOverCategoryId, setDragOverCategoryId] = useState<string | null>(null);
 
   const addItem = (categoryId?: string) => {
     const newItem: CatalogItem = {
@@ -108,50 +107,24 @@ export const CatalogSidebar = ({
 
   const handleDragLeave = () => {
     setDragOverIndex(null);
-    setDragOverCategoryId(null);
   };
 
-  const handleDrop = (e: React.DragEvent, dropIndex: number, targetCategoryId?: string) => {
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
-    e.stopPropagation();
     const dragIndex = parseInt(e.dataTransfer.getData('text/html'));
-    if (!isNaN(dragIndex) && dragIndex >= 0 && dragIndex < config.items.length) {
+    if (dragIndex !== dropIndex) {
       const newItems = Array.from(config.items);
       const [removed] = newItems.splice(dragIndex, 1);
-      // Assign the target category to the dropped item
-      removed.categoryId = targetCategoryId;
-      newItems.splice(dropIndex > dragIndex ? dropIndex - 1 : dropIndex, 0, removed);
+      newItems.splice(dropIndex, 0, removed);
       onUpdateConfig({ items: newItems });
     }
     setDraggedIndex(null);
     setDragOverIndex(null);
-    setDragOverCategoryId(null);
-  };
-
-  const handleCategoryDragOver = (e: React.DragEvent, categoryId: string | null) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setDragOverCategoryId(categoryId);
-  };
-
-  const handleCategoryDrop = (e: React.DragEvent, categoryId: string | undefined) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const dragIndex = parseInt(e.dataTransfer.getData('text/html'));
-    if (!isNaN(dragIndex) && dragIndex >= 0 && dragIndex < config.items.length) {
-      const newItems = [...config.items];
-      newItems[dragIndex] = { ...newItems[dragIndex], categoryId };
-      onUpdateConfig({ items: newItems });
-    }
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-    setDragOverCategoryId(null);
   };
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
     setDragOverIndex(null);
-    setDragOverCategoryId(null);
   };
 
   return (
@@ -198,16 +171,7 @@ export const CatalogSidebar = ({
               
               {/* Categories with their items */}
               {grouped.categories.map((cat) => (
-                <div 
-                  key={cat.id} 
-                  className={cn(
-                    "mb-4 rounded-lg transition-colors",
-                    dragOverCategoryId === cat.id && draggedIndex !== null && "bg-primary/10 ring-2 ring-primary/30"
-                  )}
-                  onDragOver={(e) => handleCategoryDragOver(e, cat.id)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleCategoryDrop(e, cat.id)}
-                >
+                <div key={cat.id} className="mb-4">
                   <div className="flex items-center justify-between mb-2 px-1">
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                       {cat.title}
@@ -221,7 +185,7 @@ export const CatalogSidebar = ({
                     </button>
                   </div>
                   {cat.items.length === 0 ? (
-                    <p className="text-[10px] text-muted-foreground px-2 py-2">Aucune campagne (glisser ici)</p>
+                    <p className="text-[10px] text-muted-foreground px-2 py-2">Aucune campagne</p>
                   ) : (
                     cat.items.map((item) => {
                       const index = config.items.findIndex(i => i.id === item.id);
@@ -232,7 +196,7 @@ export const CatalogSidebar = ({
                           onDragStart={(e) => handleDragStart(e, index)}
                           onDragOver={(e) => handleDragOver(e, index)}
                           onDragLeave={handleDragLeave}
-                          onDrop={(e) => handleDrop(e, index, cat.id)}
+                          onDrop={(e) => handleDrop(e, index)}
                           onDragEnd={handleDragEnd}
                           onClick={() => onSelectItem(item.id)}
                           className={cn(
@@ -274,26 +238,16 @@ export const CatalogSidebar = ({
               ))}
 
               {/* Uncategorized items */}
-              <div 
-                className={cn(
-                  "mb-4 rounded-lg transition-colors",
-                  dragOverCategoryId === 'uncategorized' && draggedIndex !== null && "bg-primary/10 ring-2 ring-primary/30"
-                )}
-                onDragOver={(e) => handleCategoryDragOver(e, 'uncategorized')}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleCategoryDrop(e, undefined)}
-              >
-                {grouped.categories.length > 0 && (
-                  <div className="flex items-center justify-between mb-2 px-1">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Sans catégorie
-                    </span>
-                  </div>
-                )}
-                {grouped.uncategorized.length === 0 && grouped.categories.length > 0 ? (
-                  <p className="text-[10px] text-muted-foreground px-2 py-2">Glisser ici pour retirer d'une catégorie</p>
-                ) : (
-                  grouped.uncategorized.map((item) => {
+              {grouped.uncategorized.length > 0 && (
+                <div className="mb-4">
+                  {grouped.categories.length > 0 && (
+                    <div className="flex items-center justify-between mb-2 px-1">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Sans catégorie
+                      </span>
+                    </div>
+                  )}
+                  {grouped.uncategorized.map((item) => {
                     const index = config.items.findIndex(i => i.id === item.id);
                     return (
                       <div
@@ -302,7 +256,7 @@ export const CatalogSidebar = ({
                         onDragStart={(e) => handleDragStart(e, index)}
                         onDragOver={(e) => handleDragOver(e, index)}
                         onDragLeave={handleDragLeave}
-                        onDrop={(e) => handleDrop(e, index, undefined)}
+                        onDrop={(e) => handleDrop(e, index)}
                         onDragEnd={handleDragEnd}
                         onClick={() => onSelectItem(item.id)}
                         className={cn(
@@ -338,9 +292,9 @@ export const CatalogSidebar = ({
                         </DropdownMenu>
                       </div>
                     );
-                  })
-                )}
-              </div>
+                  })}
+                </div>
+              )}
             </div>
           </ScrollArea>
         </TabsContent>
