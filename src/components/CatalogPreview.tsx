@@ -74,159 +74,82 @@ export const CatalogPreview = ({
           )}
 
           {/* Main Content */}
-          <div className="flex-1 flex items-start justify-center px-4 py-12 md:px-8 md:py-16">
-            <div className={containerClass}>
-              {/* Catalog Header */}
-              <div className="mb-12 text-center">
-                <h1
-                  className="text-4xl md:text-5xl font-bold mb-3 tracking-tight"
-                  style={{ 
-                    color: theme.textColor,
-                    fontFamily: theme.fontFamily 
-                  }}
-                >
-                  {config.catalogTitle}
-                </h1>
-                <p
-                  className="text-lg md:text-xl"
-                  style={{ 
-                    color: theme.textColor, 
-                    opacity: 0.85,
-                    fontFamily: theme.fontFamily 
-                  }}
-                >
-                  {config.catalogSubtitle}
-                </p>
-              </div>
-
-              {/* Active campaigns grid */}
-              <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-8 mb-16`}>
-                {config.items.filter(item => !item.isComingSoon).map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => !isReadOnly && onSelectItem(item.id)}
-                    className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 ${
-                      !isReadOnly ? "cursor-pointer hover:-translate-y-2 hover:shadow-2xl" : ""
-                    } ${
-                      selectedItemId === item.id && !isReadOnly ? "ring-4 ring-primary ring-offset-2" : "shadow-xl"
-                    }`}
+          <div className="flex-1 flex items-start justify-center p-8">
+            <div className={`${containerClass} rounded-2xl overflow-hidden`}>
+              <div className="p-8">
+                {/* Catalog Header */}
+                <div className="mb-8 text-center">
+                  <h1
+                    className="text-3xl font-bold mb-2"
+                    style={{ color: theme.textColor }}
                   >
-                    {/* Image */}
-                    <div
-                      className="w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden"
-                      style={item.image ? { 
-                        backgroundImage: `url(${item.image})`, 
-                        backgroundSize: "cover",
-                        backgroundPosition: "center"
-                      } : {}}
-                    >
-                      {!item.image && (
-                        <span className="text-gray-400 text-sm font-medium">Image de campagne</span>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-6 leading-relaxed min-h-[3rem]">
-                        {item.description}
-                      </p>
-
-                      {/* Button */}
-                      <button
-                        className="w-full py-3.5 rounded-lg font-bold text-white transition-all duration-300 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
-                        style={{
-                          ...unifiedButtonStyles,
-                          fontSize: '15px',
-                          letterSpacing: '0.5px'
-                        }}
-                      >
-                        {item.buttonText}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Coming Soon Section */}
-              {config.items.some(item => item.isComingSoon) && (
-                <div className="mt-16">
-                  <h2 
-                    className="text-3xl md:text-4xl font-bold mb-8 text-center"
-                    style={{ 
-                      color: theme.textColor,
-                      opacity: 0.7,
-                      fontFamily: theme.fontFamily 
-                    }}
+                    {config.catalogTitle}
+                  </h1>
+                  <p
+                    className="text-lg"
+                    style={{ color: theme.textColor, opacity: 0.8 }}
                   >
-                    Prochainement...
-                  </h2>
-                  
-                  <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-8`}>
-                    {config.items.filter(item => item.isComingSoon).map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => !isReadOnly && onSelectItem(item.id)}
-                        className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 opacity-60 ${
-                          !isReadOnly ? "cursor-pointer hover:opacity-75" : ""
-                        } ${
-                          selectedItemId === item.id && !isReadOnly ? "ring-4 ring-primary ring-offset-2" : "shadow-lg"
-                        }`}
-                      >
-                        {/* Image with overlay */}
-                        <div
-                          className="w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden"
-                          style={item.image ? { 
-                            backgroundImage: `url(${item.image})`, 
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                            filter: "grayscale(100%)"
-                          } : { filter: "grayscale(100%)" }}
-                        >
-                          {!item.image && (
-                            <span className="text-gray-400 text-sm font-medium">Image de campagne</span>
-                          )}
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-6">
-                          <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
-                            {item.title}
-                          </h3>
-                          <p className="text-sm text-gray-600 mb-4 leading-relaxed min-h-[3rem]">
-                            {item.description}
-                          </p>
-
-                          {/* Coming soon info */}
-                          {item.comingSoonDate && (
-                            <div className="flex items-center justify-center gap-2 mb-4 text-gray-500">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                              <span className="text-sm font-medium">Commence le {item.comingSoonDate}</span>
-                            </div>
-                          )}
-
-                          {/* Button */}
-                          <button
-                            className="w-full py-3.5 rounded-lg font-bold text-white transition-all duration-300 cursor-not-allowed"
-                            style={{
-                              background: "#9ca3af",
-                              fontSize: '15px',
-                              letterSpacing: '0.5px'
-                            }}
-                            disabled
-                          >
-                            {item.buttonText}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                    {config.catalogSubtitle}
+                  </p>
                 </div>
-              )}
+
+                {/* Grid of items */}
+                <div className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} gap-6`}>
+                  {config.items.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => !isReadOnly && onSelectItem(item.id)}
+                      className={`bg-white rounded-xl overflow-hidden shadow-lg transition-all ${
+                        !isReadOnly ? "cursor-pointer hover:scale-105" : ""
+                      } ${
+                        item.isComingSoon ? "opacity-60" : ""
+                      } ${
+                        selectedItemId === item.id && !isReadOnly ? "ring-2 ring-primary" : ""
+                      }`}
+                    >
+                      {/* Image placeholder */}
+                      <div
+                        className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center"
+                        style={item.image ? { backgroundImage: `url(${item.image})`, backgroundSize: "cover" } : {}}
+                      >
+                        {!item.image && (
+                          <span className="text-gray-400 text-sm">Image</span>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-4">
+                          {item.description}
+                        </p>
+
+                        {/* Button */}
+                        <button
+                          className="w-full py-2.5 rounded-lg font-semibold text-white transition-colors"
+                          style={{
+                            ...unifiedButtonStyles,
+                            background: item.isComingSoon ? "#9ca3af" : unifiedButtonStyles.background,
+                            opacity: item.isComingSoon ? 0.7 : 1,
+                          }}
+                          disabled={item.isComingSoon}
+                        >
+                          {item.buttonText}
+                        </button>
+
+                        {/* Coming soon date */}
+                        {item.isComingSoon && item.comingSoonDate && (
+                          <p className="text-xs text-gray-500 mt-2 text-center">
+                            Commence le {item.comingSoonDate}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
