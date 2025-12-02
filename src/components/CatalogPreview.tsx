@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
 import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
 import { CampaignHeader, CampaignFooter } from "./campaign";
+import { EditableTextBlock } from "./EditableTextBlock";
 
 interface CatalogPreviewProps {
   config: CatalogConfig;
@@ -41,96 +42,6 @@ export const CatalogPreview = ({
     return `0 4px 16px rgba(0,0,0,${intensity * 0.15})`;
   };
 
-  // Inline editable text component
-  const EditableText = ({ 
-    value, 
-    fieldId, 
-    onSave,
-    style,
-    className = "",
-    multiline = false,
-  }: { 
-    value: string; 
-    fieldId: string; 
-    onSave: (value: string) => void;
-    style?: React.CSSProperties;
-    className?: string;
-    multiline?: boolean;
-  }) => {
-    const isEditing = editingField === fieldId;
-    
-    if (isReadOnly) {
-      return multiline ? (
-        <p style={style} className={className}>{value}</p>
-      ) : (
-        <span style={style} className={className}>{value}</span>
-      );
-    }
-
-    if (isEditing) {
-      return multiline ? (
-        <textarea
-          autoFocus
-          defaultValue={value}
-          className={`bg-transparent border-none outline-none resize-none w-full ${className}`}
-          style={{ ...style, minHeight: '60px' }}
-          onBlur={(e) => {
-            onSave(e.target.value);
-            setEditingField(null);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setEditingField(null);
-            }
-          }}
-        />
-      ) : (
-        <input
-          autoFocus
-          defaultValue={value}
-          className={`bg-transparent border-none outline-none w-full ${className}`}
-          style={style}
-          onBlur={(e) => {
-            onSave(e.target.value);
-            setEditingField(null);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === 'Escape') {
-              if (e.key === 'Enter') {
-                onSave((e.target as HTMLInputElement).value);
-              }
-              setEditingField(null);
-            }
-          }}
-        />
-      );
-    }
-
-    return multiline ? (
-      <p 
-        style={style} 
-        className={`${className} cursor-text hover:ring-2 hover:ring-primary/30 rounded px-1 -mx-1 transition-all`}
-        onClick={(e) => {
-          e.stopPropagation();
-          setEditingField(fieldId);
-        }}
-      >
-        {value}
-      </p>
-    ) : (
-      <span 
-        style={style} 
-        className={`${className} cursor-text hover:ring-2 hover:ring-primary/30 rounded px-1 -mx-1 transition-all inline-block`}
-        onClick={(e) => {
-          e.stopPropagation();
-          setEditingField(fieldId);
-        }}
-      >
-        {value}
-      </span>
-    );
-  };
-
   // Render catalog item card
   const renderCatalogCard = (item: CatalogItem, isComingSoon: boolean = false) => (
     <div
@@ -168,38 +79,42 @@ export const CatalogPreview = ({
 
       {/* Content */}
       <div style={{ padding: `${theme.inputPadding + 8}px` }}>
-        <h3 
-          style={{
-            fontSize: `${theme.bodySize}px`,
-            fontWeight: 700,
-            color: isComingSoon ? theme.textSecondaryColor : theme.textColor,
-            marginBottom: '8px',
-          }}
-        >
-          <EditableText
+        <div style={{ marginBottom: '8px' }}>
+          <EditableTextBlock
             value={item.title}
-            fieldId={`item-title-${item.id}`}
-            onSave={(value) => onUpdateItem(item.id, { title: value })}
+            onChange={(value) => onUpdateItem(item.id, { title: value })}
+            isEditing={editingField === `item-title-${item.id}`}
+            isReadOnly={isReadOnly}
+            onFocus={() => setEditingField(`item-title-${item.id}`)}
+            onBlur={() => setEditingField(null)}
+            fieldType="title"
+            showSparkles={false}
+            showClear={false}
             style={{
               fontSize: `${theme.bodySize}px`,
               fontWeight: 700,
               color: isComingSoon ? theme.textSecondaryColor : theme.textColor,
             }}
           />
-        </h3>
-        <EditableText
-          value={item.description}
-          fieldId={`item-desc-${item.id}`}
-          onSave={(value) => onUpdateItem(item.id, { description: value })}
-          multiline
-          style={{
-            fontSize: `${theme.captionSize}px`,
-            color: isComingSoon ? theme.textMutedColor : theme.textSecondaryColor,
-            marginBottom: '16px',
-            lineHeight: theme.lineHeight,
-            display: 'block',
-          }}
-        />
+        </div>
+        <div style={{ marginBottom: '16px' }}>
+          <EditableTextBlock
+            value={item.description}
+            onChange={(value) => onUpdateItem(item.id, { description: value })}
+            isEditing={editingField === `item-desc-${item.id}`}
+            isReadOnly={isReadOnly}
+            onFocus={() => setEditingField(`item-desc-${item.id}`)}
+            onBlur={() => setEditingField(null)}
+            fieldType="subtitle"
+            showSparkles={false}
+            showClear={false}
+            style={{
+              fontSize: `${theme.captionSize}px`,
+              color: isComingSoon ? theme.textMutedColor : theme.textSecondaryColor,
+              lineHeight: theme.lineHeight,
+            }}
+          />
+        </div>
 
         {/* Button or Coming soon date */}
         {isComingSoon && item.comingSoonDate ? (
@@ -222,10 +137,16 @@ export const CatalogPreview = ({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <EditableText
+            <EditableTextBlock
               value={item.buttonText}
-              fieldId={`item-btn-${item.id}`}
-              onSave={(value) => onUpdateItem(item.id, { buttonText: value })}
+              onChange={(value) => onUpdateItem(item.id, { buttonText: value })}
+              isEditing={editingField === `item-btn-${item.id}`}
+              isReadOnly={isReadOnly}
+              onFocus={() => setEditingField(`item-btn-${item.id}`)}
+              onBlur={() => setEditingField(null)}
+              fieldType="button"
+              showSparkles={false}
+              showClear={false}
               style={{ color: 'inherit', fontWeight: 'inherit' }}
             />
           </button>
@@ -265,21 +186,17 @@ export const CatalogPreview = ({
             <div style={{ padding: `${theme.cardPadding}px` }}>
               {/* Catalog Header */}
               <div className="mb-8">
-                <h1 
-                  style={{
-                    fontFamily: getFontFamily(theme.headingFontFamily),
-                    fontSize: `${theme.headingSize}px`,
-                    fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : theme.headingWeight === 'semibold' ? 600 : 500,
-                    color: theme.primaryColor,
-                    marginBottom: '8px',
-                    lineHeight: theme.lineHeight,
-                    letterSpacing: `${theme.letterSpacing}px`,
-                  }}
-                >
-                  <EditableText
+                <div style={{ marginBottom: '8px' }}>
+                  <EditableTextBlock
                     value={config.catalogTitle}
-                    fieldId="catalog-title"
-                    onSave={(value) => onUpdateConfig({ catalogTitle: value })}
+                    onChange={(value) => onUpdateConfig({ catalogTitle: value })}
+                    isEditing={editingField === 'catalog-title'}
+                    isReadOnly={isReadOnly}
+                    onFocus={() => setEditingField('catalog-title')}
+                    onBlur={() => setEditingField(null)}
+                    fieldType="title"
+                    showSparkles={false}
+                    showClear={false}
                     style={{
                       fontFamily: getFontFamily(theme.headingFontFamily),
                       fontSize: `${theme.headingSize}px`,
@@ -289,17 +206,21 @@ export const CatalogPreview = ({
                       letterSpacing: `${theme.letterSpacing}px`,
                     }}
                   />
-                </h1>
-                <EditableText
+                </div>
+                <EditableTextBlock
                   value={config.catalogSubtitle}
-                  fieldId="catalog-subtitle"
-                  onSave={(value) => onUpdateConfig({ catalogSubtitle: value })}
-                  multiline
+                  onChange={(value) => onUpdateConfig({ catalogSubtitle: value })}
+                  isEditing={editingField === 'catalog-subtitle'}
+                  isReadOnly={isReadOnly}
+                  onFocus={() => setEditingField('catalog-subtitle')}
+                  onBlur={() => setEditingField(null)}
+                  fieldType="subtitle"
+                  showSparkles={false}
+                  showClear={false}
                   style={{
                     fontSize: `${theme.subheadingSize}px`,
                     color: theme.textSecondaryColor,
                     lineHeight: theme.lineHeight,
-                    display: 'block',
                   }}
                 />
               </div>
