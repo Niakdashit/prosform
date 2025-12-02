@@ -190,14 +190,14 @@ export const CatalogPreview = ({
   );
 
   return (
-    <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center" : "w-full h-full overflow-auto"}>
+    <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center" : "w-full h-full flex items-start justify-center overflow-auto"}>
       <div 
         ref={previewContainerRef}
         className="relative overflow-auto transition-all duration-300 flex flex-col scrollbar-hide"
         style={{
           backgroundColor: theme.backgroundColor,
           fontFamily: getFontFamily(theme.fontFamily),
-          width: viewMode === 'desktop' ? '100%' : '375px',
+          width: viewMode === 'desktop' ? `${config.containerWidth || 100}%` : '375px',
           minWidth: viewMode === 'desktop' ? undefined : '375px',
           maxWidth: viewMode === 'desktop' ? undefined : '375px',
           height: viewMode === 'mobile' ? '667px' : undefined,
@@ -217,10 +217,7 @@ export const CatalogPreview = ({
           className="flex-1 flex items-start justify-center"
           style={{ padding: `${theme.pageMargins}px` }}
         >
-          <div 
-            className={`${containerClass} rounded-2xl overflow-hidden mx-auto`}
-            style={{ width: `${config.containerWidth || 100}%` }}
-          >
+          <div className={`${containerClass} rounded-2xl overflow-hidden`}>
             <div style={{ padding: `${theme.cardPadding}px` }}>
               {/* Catalog Header */}
               <div className="mb-8">
