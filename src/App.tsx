@@ -33,6 +33,7 @@ import ArticleJackpotPreview from "./pages/ArticleJackpotPreview";
 import Catalog from "./pages/Catalog";
 import CatalogPreview from "./pages/CatalogPreview";
 import PublicCampaign from "./pages/PublicCampaign";
+import ShortRedirect from "./pages/ShortRedirect";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -75,6 +76,8 @@ const App = () => (
             <Route path="/catalog" element={<Catalog />} />
             <Route path="/catalog-preview" element={<CatalogPreview />} />
             <Route path="/p/:slug" element={<PublicCampaign />} />
+            <Route path="/c/:shortId" element={<ShortRedirect />} />
+            <Route path="/s/:shortId" element={<ShortRedirect />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
