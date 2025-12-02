@@ -1647,7 +1647,19 @@ export const WheelPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={(() => {
+              className="w-full min-h-full relative z-10 flex flex-col"
+              onClick={(e) => {
+                const target = e.target as HTMLElement;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
+                  return;
+                }
+                setEditingField(null);
+                if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                  document.activeElement.blur();
+                }
+              }}
+            >
+              {(() => {
                 const getCurrentLayout = () => {
                   const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
                   switch (activeView) {
@@ -1672,22 +1684,16 @@ export const WheelPreview = ({
                   currentLayout === 'desktop-card'
                 );
                 
-                return isContactWithGrid
-                  ? "w-full h-full relative z-10 grid grid-cols-2" 
-                  : "w-full h-full relative z-10";
+                if (isContactWithGrid) {
+                  return (
+                    <div className="flex-1 grid grid-cols-2">
+                      {renderContent()}
+                    </div>
+                  );
+                }
+                
+                return renderContent();
               })()}
-              onClick={(e) => {
-                const target = e.target as HTMLElement;
-                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
-                  return;
-                }
-                setEditingField(null);
-                if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                  document.activeElement.blur();
-                }
-              }}
-            >
-              {renderContent()}
             </motion.div>
           </AnimatePresence>
 
