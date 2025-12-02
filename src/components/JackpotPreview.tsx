@@ -1555,15 +1555,15 @@ export const JackpotPreview = ({
           );
         })()}
 
-        {/* Header */}
-        {config.layout?.header?.enabled && (
-          <div className="relative z-20 flex-shrink-0">
-            <CampaignHeader config={config.layout.header} isPreview />
-          </div>
-        )}
-
         {/* Contenu principal */}
         <div className="flex-1 relative overflow-auto z-10 min-h-0">
+          {/* Header dans la zone scrollable pour que sticky fonctionne */}
+          {config.layout?.header?.enabled && (
+            <div className="relative z-20">
+              <CampaignHeader config={config.layout.header} isPreview />
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
@@ -1571,7 +1571,7 @@ export const JackpotPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="w-full h-full relative z-10"
+              className={activeView === 'contact' ? "w-full min-h-full relative z-10 flex flex-col" : "w-full h-full relative z-10"}
               onClick={(e) => {
                 // Ne pas blur si on clique sur un input, textarea ou button
                 const target = e.target as HTMLElement;
@@ -1584,17 +1584,45 @@ export const JackpotPreview = ({
                 }
               }}
             >
-              {renderContent()}
+              {(() => {
+                if (activeView !== 'contact') {
+                  return renderContent();
+                }
+                
+                // Pour la vue contact uniquement
+                const getCurrentLayout = () => {
+                  const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
+                  return config.contactForm[layoutKey];
+                };
+                
+                const currentLayout = getCurrentLayout();
+                const isContactWithGrid = viewMode === 'desktop' && (
+                  currentLayout === 'desktop-left-right' || 
+                  currentLayout === 'desktop-right-left' || 
+                  currentLayout === 'desktop-panel' || 
+                  currentLayout === 'desktop-card'
+                );
+                
+                if (isContactWithGrid) {
+                  return (
+                    <div className="flex-1 grid grid-cols-2">
+                      {renderContent()}
+                    </div>
+                  );
+                }
+                
+                return renderContent();
+              })()}
             </motion.div>
           </AnimatePresence>
+
+          {/* Footer dans la zone scrollable */}
+          {config.layout?.footer?.enabled && (
+            <div className="relative z-10">
+              <CampaignFooter config={config.layout.footer} isPreview />
+            </div>
+          )}
         </div>
-        
-        {/* Footer en bas, en dehors de la zone scrollable */}
-        {config.layout?.footer?.enabled && (
-          <div className="flex-shrink-0 relative z-10">
-            <CampaignFooter config={config.layout.footer} isPreview />
-          </div>
-        )}
       </div>
     </div>
   );
