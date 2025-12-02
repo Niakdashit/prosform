@@ -6,6 +6,7 @@ import { useSmartWheelRenderer } from './hooks/useSmartWheelRenderer';
 import BorderStyleSelector from './components/BorderStyleSelector';
 import ParticipationModal from './components/ParticipationModal';
 import { wheelDotationIntegration } from '../../services/WheelDotationIntegration';
+import { useTheme, getButtonStyles } from '@/contexts/ThemeContext';
 type Mode2State = 'form' | 'wheel' | 'result';
 
 const SmartWheel: React.FC<SmartWheelProps> = ({
@@ -119,6 +120,10 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
 
   // Résoudre le thème
   const resolvedTheme = getTheme(theme, brandColors);
+  
+  // Get theme context for button styles
+  const { theme: contextTheme } = useTheme();
+  const buttonStyles = getButtonStyles(contextTheme, 'desktop');
 
   // Calculate actual size respecting maxSize constraint
   const actualSize = maxSize ? Math.min(size, maxSize) : size;
@@ -485,8 +490,9 @@ const SmartWheel: React.FC<SmartWheelProps> = ({
           <button
             onClick={handleButtonClick}
             disabled={isButtonDisabled()}
-            className="px-8 py-3 font-semibold rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="font-semibold transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             style={{
+              ...buttonStyles,
               backgroundColor: buttonConfig.color,
               color: buttonConfig.textColor,
               boxShadow: `0 4px 14px ${buttonConfig.color}40`
