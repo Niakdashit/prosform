@@ -53,7 +53,7 @@ export const CatalogPreview = ({
     <div
       key={item.id}
       onClick={() => !isReadOnly && !editingField && onSelectItem(item.id)}
-      className={`overflow-hidden transition-all ${
+      className={`overflow-hidden transition-all flex flex-col ${
         !isReadOnly ? "cursor-pointer" : ""
       } ${isComingSoon ? "opacity-60" : ""}`}
       style={{
@@ -68,7 +68,7 @@ export const CatalogPreview = ({
     >
       {/* Image */}
       <div
-        className={`relative w-full h-48 flex items-center justify-center ${isComingSoon ? "grayscale" : ""}`}
+        className={`relative w-full h-48 flex items-center justify-center flex-shrink-0 ${isComingSoon ? "grayscale" : ""}`}
         style={{
           backgroundColor: theme.backgroundSecondaryColor,
           ...(item.image ? { 
@@ -112,26 +112,30 @@ export const CatalogPreview = ({
       </div>
 
       {/* Content */}
-      <div style={{ padding: `${theme.inputPadding + 8}px` }}>
-        <div style={{ marginBottom: '8px' }}>
-          <EditableTextBlock
-            value={item.title}
-            onChange={(value) => onUpdateItem(item.id, { title: value })}
-            isEditing={editingField === `item-title-${item.id}`}
-            isReadOnly={isReadOnly}
-            onFocus={() => setEditingField(`item-title-${item.id}`)}
-            onBlur={() => setEditingField(null)}
-            fieldType="title"
-            showSparkles={false}
-            showClear={false}
-            style={{
-              fontSize: `${theme.bodySize}px`,
-              fontWeight: 700,
-              color: isComingSoon ? theme.textSecondaryColor : theme.textColor,
-            }}
-          />
-        </div>
-        <div style={{ marginBottom: '16px' }}>
+      <div 
+        className="flex flex-col flex-1"
+        style={{ padding: `${theme.inputPadding + 8}px` }}
+      >
+        {/* Text area with fixed height and scroll if needed */}
+        <div className="flex-1 min-h-[100px] max-h-[120px] overflow-y-auto">
+          <div style={{ marginBottom: '8px' }}>
+            <EditableTextBlock
+              value={item.title}
+              onChange={(value) => onUpdateItem(item.id, { title: value })}
+              isEditing={editingField === `item-title-${item.id}`}
+              isReadOnly={isReadOnly}
+              onFocus={() => setEditingField(`item-title-${item.id}`)}
+              onBlur={() => setEditingField(null)}
+              fieldType="title"
+              showSparkles={false}
+              showClear={false}
+              style={{
+                fontSize: `${theme.bodySize}px`,
+                fontWeight: 700,
+                color: isComingSoon ? theme.textSecondaryColor : theme.textColor,
+              }}
+            />
+          </div>
           <EditableTextBlock
             value={item.description}
             onChange={(value) => onUpdateItem(item.id, { description: value })}
@@ -150,41 +154,43 @@ export const CatalogPreview = ({
           />
         </div>
 
-        {/* Button or Coming soon date */}
-        {isComingSoon && item.comingSoonDate ? (
-          <p 
-            className="flex items-center gap-2"
-            style={{
-              fontSize: `${theme.captionSize}px`,
-              color: theme.textSecondaryColor,
-            }}
-          >
-            <span>📅</span>
-            <span>Commence le {item.comingSoonDate}</span>
-          </p>
-        ) : !isComingSoon && (
-          <button
-            className="w-full uppercase transition-opacity hover:opacity-90"
-            style={{
-              ...buttonStyles,
-              width: '100%',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <EditableTextBlock
-              value={item.buttonText}
-              onChange={(value) => onUpdateItem(item.id, { buttonText: value })}
-              isEditing={editingField === `item-btn-${item.id}`}
-              isReadOnly={isReadOnly}
-              onFocus={() => setEditingField(`item-btn-${item.id}`)}
-              onBlur={() => setEditingField(null)}
-              fieldType="button"
-              showSparkles={false}
-              showClear={false}
-              style={{ color: 'inherit', fontWeight: 'inherit' }}
-            />
-          </button>
-        )}
+        {/* Button or Coming soon date - always at bottom */}
+        <div className="mt-4 flex-shrink-0">
+          {isComingSoon && item.comingSoonDate ? (
+            <p 
+              className="flex items-center gap-2"
+              style={{
+                fontSize: `${theme.captionSize}px`,
+                color: theme.textSecondaryColor,
+              }}
+            >
+              <span>📅</span>
+              <span>Commence le {item.comingSoonDate}</span>
+            </p>
+          ) : !isComingSoon && (
+            <button
+              className="w-full uppercase transition-opacity hover:opacity-90"
+              style={{
+                ...buttonStyles,
+                width: '100%',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <EditableTextBlock
+                value={item.buttonText}
+                onChange={(value) => onUpdateItem(item.id, { buttonText: value })}
+                isEditing={editingField === `item-btn-${item.id}`}
+                isReadOnly={isReadOnly}
+                onFocus={() => setEditingField(`item-btn-${item.id}`)}
+                onBlur={() => setEditingField(null)}
+                fieldType="button"
+                showSparkles={false}
+                showClear={false}
+                style={{ color: 'inherit', fontWeight: 'inherit' }}
+              />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
