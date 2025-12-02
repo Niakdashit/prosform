@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Monitor, Smartphone } from "lucide-react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CatalogSidebar } from "./CatalogSidebar";
 import { CatalogPreview } from "./CatalogPreview";
 import { CatalogSettingsPanel } from "./CatalogSettingsPanel";
 import { CatalogTopToolbar } from "./CatalogTopToolbar";
 import { CampaignSettings } from "./CampaignSettings";
+import { ChatToCreate } from "./ChatToCreate";
 import { Drawer, DrawerContent } from "./ui/drawer";
 import { Button } from "./ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
@@ -294,18 +294,46 @@ export const CatalogBuilder = () => {
         )}
 
         {/* Preview Area */}
-        <div className="flex-1 overflow-auto bg-muted/30 relative">
-          {activeTab === 'design' ? (
-            <CatalogPreview
-              config={config}
-              onUpdateConfig={updateConfig}
-              viewMode={viewMode}
-              onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              selectedItemId={selectedItemId}
-              onSelectItem={setSelectedItemId}
-              onUpdateItem={updateItem}
+        {activeTab === 'design' ? (
+          <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 relative">
+            {/* Top bar: view toggle on the right */}
+            <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
+              <button
+                onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105 flex-shrink-0"
+                style={{ backgroundColor: '#F5B800', color: '#3D3731' }}
+              >
+                {viewMode === 'desktop' ? (
+                  <><Monitor className="w-4 h-4" /><span className="text-xs font-medium">Desktop</span></>
+                ) : (
+                  <><Smartphone className="w-4 h-4" /><span className="text-xs font-medium">Mobile</span></>
+                )}
+              </button>
+            </div>
+            
+            {/* CatalogPreview */}
+            <div className="flex-1 flex items-center justify-center overflow-hidden">
+              <CatalogPreview
+                config={config}
+                onUpdateConfig={updateConfig}
+                viewMode={viewMode}
+                onToggleViewMode={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
+                selectedItemId={selectedItemId}
+                onSelectItem={setSelectedItemId}
+                onUpdateItem={updateItem}
+              />
+            </div>
+            
+            <ChatToCreate 
+              context={`Type: Catalogue. Titre: ${config.catalogTitle}. ${config.items.length} campagnes`}
+              onApplyActions={(actions) => {
+                // Handle AI actions for catalog
+                console.log('AI Actions:', actions);
+              }}
             />
-          ) : activeTab === 'campaign' ? (
+          </div>
+        ) : activeTab === 'campaign' ? (
+          <div className="flex-1 overflow-auto bg-muted/30">
             <CampaignSettings
               campaignName={campaignName}
               onCampaignNameChange={setName}
@@ -330,24 +358,12 @@ export const CatalogBuilder = () => {
               segments={[]}
               defaultTab={campaignDefaultTab}
             />
-          ) : (
+          </div>
+        ) : (
+          <div className="flex-1 overflow-auto bg-muted/30">
             <TemplateLibrary onSelectTemplate={() => {}} />
-          )}
-
-          {/* Mobile View Mode Toggle */}
-          {isMobile && activeTab === 'design' && (
-            <div className="absolute top-4 right-4 flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                className="bg-background/95 backdrop-blur-sm"
-                onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-              >
-                {viewMode === 'desktop' ? 'Mobile' : 'Desktop'}
-              </Button>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Right Sidebar (Desktop only) */}
         {!isMobile && activeTab === 'design' && (
