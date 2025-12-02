@@ -35,9 +35,9 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
   
   for (const [key, value] of Object.entries(campaign)) {
     if (!excludedFields.includes(key) && allowedFields.includes(key) && value !== undefined) {
-      // Map 'name' to 'app_title' for Supabase schema compatibility
+      // Map 'name' to 'title' for external Supabase schema compatibility
       if (key === 'name') {
-        result['app_title'] = value;
+        result['title'] = value;
       } else {
         result[key] = value;
       }
