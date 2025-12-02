@@ -234,6 +234,10 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
   };
 
   const renderWheel = () => {
+    // Determine if mobile based on window width
+    const isMobile = window.innerWidth < 768;
+    const wheelSize = isMobile ? theme.wheelSizeMobile : theme.wheelSizeDesktop;
+    
     return (
       <div 
         className="w-full h-full flex flex-col items-center justify-center p-8"
@@ -259,7 +263,7 @@ export const ParticipantWheelRender = ({ config, campaignId }: ParticipantWheelR
               segments={config.segments.map(s => ({ ...s, value: s.label }))}
               onSpin={() => setIsSpinning(true)}
               onResult={(segment) => handleSpinComplete(config.segments.find(s => s.id === segment.id) || config.segments[0])}
-              size={Math.min(400, window.innerWidth - 64)}
+              size={wheelSize}
             />
           </div>
         </div>
