@@ -352,8 +352,7 @@ export const ArticleQuizBuilder = () => {
               <div className="flex items-center justify-end px-4 pt-6 pb-1 bg-gray-100">
                 <button
                   onClick={() => setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop')}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105 flex-shrink-0"
-                  style={{ backgroundColor: '#F5B800', color: '#3D3731' }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105 flex-shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   {viewMode === 'desktop' ? (
                     <><Monitor className="w-4 h-4" /><span className="text-xs font-medium">Desktop</span></>
