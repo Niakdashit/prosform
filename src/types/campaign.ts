@@ -1,5 +1,5 @@
 // Types de campagnes
-export type CampaignType = 'wheel' | 'quiz' | 'scratch' | 'jackpot' | 'form';
+export type CampaignType = 'wheel' | 'quiz' | 'scratch' | 'jackpot' | 'form' | 'catalog';
 export type CampaignMode = 'fullscreen' | 'article' | 'embed' | 'popup';
 export type CampaignStatus = 'draft' | 'online' | 'paused' | 'ended';
 

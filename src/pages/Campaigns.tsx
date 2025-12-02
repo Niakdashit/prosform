@@ -81,6 +81,7 @@ const typeIcons: Record<CampaignType, React.ReactNode> = {
   quiz: <HelpCircle className="w-4 h-4" />,
   jackpot: <Dices className="w-4 h-4" />,
   scratch: <Gift className="w-4 h-4" />,
+  catalog: <LayoutGrid className="w-4 h-4" />,
 };
 
 const typeLabels: Record<CampaignType, string> = {
@@ -89,6 +90,7 @@ const typeLabels: Record<CampaignType, string> = {
   quiz: 'Quiz',
   jackpot: 'Jackpot',
   scratch: 'Scratch',
+  catalog: 'Catalogue',
 };
 
 const modeLabels: Record<CampaignMode, string> = {
@@ -184,6 +186,7 @@ const Campaigns = () => {
       quiz: '/quiz',
       jackpot: '/jackpot',
       scratch: '/scratch',
+      catalog: '/catalog',
     };
     navigate(routes[type]);
   };
@@ -222,6 +225,7 @@ const Campaigns = () => {
       quiz: '/quiz',
       jackpot: '/jackpot',
       scratch: '/scratch',
+      catalog: '/catalog',
     };
     navigate(`${routes[campaign.type]}?id=${campaign.id}`);
   };
@@ -656,6 +660,7 @@ const Campaigns = () => {
                 wheel: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
                 jackpot: 'linear-gradient(135deg, #4a4540 0%, #6a6358 50%, #8a8070 100%)',
                 scratch: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
+                catalog: 'linear-gradient(135deg, #3d3731 0%, #5a524a 50%, #7a7068 100%)',
               };
 
               return (
