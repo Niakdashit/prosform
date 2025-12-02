@@ -1647,7 +1647,35 @@ export const WheelPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="w-full h-full relative z-10"
+              className={(() => {
+                const getCurrentLayout = () => {
+                  const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
+                  switch (activeView) {
+                    case 'contact':
+                      return config.contactForm[layoutKey];
+                    case 'wheel':
+                      return config.wheelScreen[layoutKey];
+                    case 'ending-win':
+                      return config.endingWin[layoutKey];
+                    case 'ending-lose':
+                      return config.endingLose[layoutKey];
+                    default:
+                      return viewMode === 'desktop' ? 'desktop-centered' : 'mobile-vertical';
+                  }
+                };
+                
+                const currentLayout = getCurrentLayout();
+                const needsGrid = viewMode === 'desktop' && (
+                  currentLayout === 'desktop-left-right' || 
+                  currentLayout === 'desktop-right-left' || 
+                  currentLayout === 'desktop-panel' || 
+                  currentLayout === 'desktop-card'
+                );
+                
+                return needsGrid 
+                  ? "w-full h-full relative z-10 grid grid-cols-2" 
+                  : "w-full h-full relative z-10";
+              })()}
               onClick={(e) => {
                 const target = e.target as HTMLElement;
                 if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
@@ -1665,7 +1693,7 @@ export const WheelPreview = ({
 
           {/* Footer dans la zone scrollable */}
           {config.layout?.footer?.enabled && (
-            <div className="relative z-10">
+            <div className="relative z-10 col-span-full">
               <CampaignFooter config={config.layout.footer} isPreview />
             </div>
           )}
