@@ -2,11 +2,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { WheelConfig, WheelSegment } from "./WheelBuilder";
 import { useState, useEffect } from "react";
 import { useTheme, getButtonStyles, ThemeSettings } from "@/contexts/ThemeContext";
-import { SmartWheel } from "./SmartWheel";
 import { ParticipationService } from "@/services/ParticipationService";
 import { AnalyticsTrackingService } from "@/services/AnalyticsTrackingService";
 import { useStepTracking } from "@/hooks/useStepTracking";
 import { CampaignHeader, CampaignFooter } from "./campaign";
+import { WelcomeLayouts } from "./layouts/WelcomeLayouts";
+import { ContactLayouts } from "./layouts/ContactLayouts";
+import { WheelLayouts } from "./layouts/WheelLayouts";
+import { EndingLayouts } from "./layouts/EndingLayouts";
 
 interface ParticipantWheelRenderProps {
   config: WheelConfig;
@@ -24,7 +27,6 @@ export const ParticipantWheelRender = ({ config, campaignId, campaignTheme }: Pa
   
   // Use campaign theme if provided, otherwise fallback to context theme
   const theme = campaignTheme || contextTheme;
-  const buttonStyles = getButtonStyles(theme, viewMode);
 
   // Detect viewport size
   useEffect(() => {
@@ -103,10 +105,6 @@ export const ParticipantWheelRender = ({ config, campaignId, campaignTheme }: Pa
   };
 
   const currentLayout = getCurrentLayout();
-  const isSplitLayout = ['desktop-split', 'desktop-left-right', 'desktop-right-left'].includes(currentLayout);
-
-  // Wheel size based on viewport
-  const wheelSize = viewMode === 'mobile' ? (theme.wheelSizeMobile || 320) : (theme.wheelSizeDesktop || 400);
 
   // Get background style for current screen
   const getBackgroundStyle = (screenConfig: any) => {
@@ -130,259 +128,127 @@ export const ParticipantWheelRender = ({ config, campaignId, campaignTheme }: Pa
     return { backgroundColor: theme.backgroundColor };
   };
 
-  // Render welcome screen with layout
-  const renderWelcome = () => {
-    const bgStyle = getBackgroundStyle(config.welcomeScreen);
-    const hasWallpaper = config.welcomeScreen.wallpaperImage || config.welcomeScreen.backgroundImage;
-    const overlayOpacity = config.welcomeScreen.overlayOpacity ?? 40;
+  // Determine if current layout is a split layout
+  const isSplitLayout = () => {
+    const splitLayouts = ['desktop-split', 'desktop-card', 'desktop-panel', 'desktop-left-right', 'desktop-right-left'];
+    return splitLayouts.includes(currentLayout);
+  };
 
-    // Check if it's a split layout with image
-    if (isSplitLayout && config.welcomeScreen.image) {
-      const isRightLayout = currentLayout === 'desktop-right-left';
-      
-      return (
-        <div className="w-full h-full flex" style={bgStyle}>
-          {hasWallpaper && <div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity / 100 }} />}
-          
-          {/* Image side */}
-          <div 
-            className={`relative w-1/2 h-full ${isRightLayout ? 'order-2' : 'order-1'}`}
-            style={{ overflow: 'hidden' }}
-          >
-            <img 
-              src={config.welcomeScreen.image} 
-              alt="Welcome" 
-              className="w-full h-full object-cover"
-              style={{
-                borderRadius: config.welcomeScreen.imageSettings?.borderRadius || 0,
-                transform: `rotate(${config.welcomeScreen.imageSettings?.rotation || 0}deg)`,
-              }}
-            />
-          </div>
-
-          {/* Content side */}
-          <div 
-            className={`relative z-10 w-1/2 h-full flex flex-col items-center justify-center p-8 ${isRightLayout ? 'order-1' : 'order-2'}`}
-            style={{ backgroundColor: theme.backgroundColor }}
-          >
-            <div className="max-w-lg text-center space-y-6">
-              <h1 
-                className="text-4xl md:text-5xl font-bold"
-                style={{ color: theme.textColor }}
-                dangerouslySetInnerHTML={{ __html: config.welcomeScreen.titleHtml || config.welcomeScreen.title }}
-              />
-              <p 
-                className="text-lg md:text-xl opacity-80"
-                style={{ color: theme.textSecondaryColor || theme.textColor }}
-                dangerouslySetInnerHTML={{ __html: config.welcomeScreen.subtitleHtml || config.welcomeScreen.subtitle }}
-              />
-              <button
-                onClick={handleNext}
-                className="px-8 py-4 text-lg font-semibold transition-all hover:scale-105"
-                style={buttonStyles}
-              >
-                {config.welcomeScreen.buttonText || "Commencer"}
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Centered layout (default)
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8 relative" style={bgStyle}>
-        {hasWallpaper && <div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity / 100 }} />}
-        <div className="relative z-10 max-w-2xl text-center space-y-6">
-          <h1 
-            className="text-4xl md:text-5xl font-bold"
-            style={{ color: theme.textColor }}
-            dangerouslySetInnerHTML={{ __html: config.welcomeScreen.titleHtml || config.welcomeScreen.title }}
+  const renderContent = () => {
+    switch (activeView) {
+      case 'welcome':
+        return (
+          <WelcomeLayouts
+            layout={currentLayout as any}
+            viewMode={viewMode}
+            title={config.welcomeScreen.title}
+            subtitle={config.welcomeScreen.subtitle}
+            buttonText={config.welcomeScreen.buttonText || "Commencer"}
+            onButtonClick={handleNext}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+            backgroundImage={config.welcomeScreen.backgroundImage}
           />
-          <p 
-            className="text-lg md:text-xl opacity-80"
-            style={{ color: theme.textSecondaryColor || theme.textColor }}
-            dangerouslySetInnerHTML={{ __html: config.welcomeScreen.subtitleHtml || config.welcomeScreen.subtitle }}
+        );
+
+      case 'contact':
+        return (
+          <ContactLayouts
+            layout={currentLayout as any}
+            viewMode={viewMode}
+            title={config.contactForm.title || "Vos coordonnées"}
+            subtitle={config.contactForm.subtitle || "Pour recevoir votre gain"}
+            fields={config.contactForm.fields || []}
+            contactData={contactData}
+            onFieldChange={(type, value) => setContactData(prev => ({ ...prev, [type]: value }))}
+            onSubmit={handleNext}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+            isReadOnly={true}
           />
-          <button
-            onClick={handleNext}
-            className="px-8 py-4 text-lg font-semibold transition-all hover:scale-105"
-            style={buttonStyles}
-          >
-            {config.welcomeScreen.buttonText || "Commencer"}
-          </button>
-        </div>
-      </div>
-    );
-  };
+        );
 
-  // Render contact screen
-  const renderContact = () => {
-    const bgStyle = getBackgroundStyle(config.contactForm);
-    
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8" style={bgStyle}>
-        <div className="max-w-md w-full space-y-6">
-          <h2 
-            className="text-3xl font-bold text-center"
-            style={{ color: theme.textColor }}
-          >
-            {config.contactForm.title || "Vos coordonnées"}
-          </h2>
-          <p 
-            className="text-lg text-center opacity-80"
-            style={{ color: theme.textSecondaryColor || theme.textColor }}
-          >
-            {config.contactForm.subtitle || "Pour recevoir votre gain"}
-          </p>
-          
-          <div className="space-y-4">
-            {config.contactForm.fields?.map((field, index) => {
-              if (field.type === 'select' && field.options) {
-                return (
-                  <div key={index}>
-                    <label className="block mb-2" style={{ color: theme.textColor }}>{field.label}</label>
-                    <select
-                      className="w-full px-4 py-3 rounded-lg border-2"
-                      style={{ 
-                        borderColor: theme.accentColor + '40',
-                        backgroundColor: theme.backgroundColor,
-                        color: theme.textColor
-                      }}
-                      onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
-                      required={field.required}
-                    >
-                      <option value="">Sélectionnez</option>
-                      {field.options.map((opt, i) => (
-                        <option key={i} value={opt}>{opt}</option>
-                      ))}
-                    </select>
-                  </div>
-                );
+      case 'wheel':
+        return (
+          <WheelLayouts
+            layout={currentLayout as any}
+            viewMode={viewMode}
+            title={config.wheelScreen.title}
+            subtitle={config.wheelScreen.subtitle}
+            segments={config.segments}
+            isSpinning={isSpinning}
+            onSpin={() => setIsSpinning(true)}
+            onResult={(segment) => {
+              const foundSegment = config.segments.find(s => s.id === segment.id);
+              if (foundSegment) {
+                handleSpinComplete(foundSegment);
               }
-              
-              if (field.type === 'checkbox') {
-                return (
-                  <label key={index} className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="mt-1 w-5 h-5"
-                      style={{ accentColor: theme.accentColor }}
-                      onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.checked ? 'true' : 'false' }))}
-                      required={field.required}
-                    />
-                    <span style={{ color: theme.textColor }}>{field.label}</span>
-                  </label>
-                );
-              }
-              
-              return (
-                <div key={index}>
-                  <label className="block mb-2" style={{ color: theme.textColor }}>{field.label}</label>
-                  <input
-                    type={field.type === 'email' ? 'email' : field.type === 'phone' || field.type === 'tel' ? 'tel' : 'text'}
-                    className="w-full px-4 py-3 rounded-lg border-2"
-                    style={{ 
-                      borderColor: theme.accentColor + '40',
-                      backgroundColor: theme.backgroundColor,
-                      color: theme.textColor
-                    }}
-                    onChange={(e) => setContactData(prev => ({ ...prev, [field.id]: e.target.value }))}
-                    required={field.required}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          
-          <button
-            onClick={handleNext}
-            className="w-full px-8 py-4 text-lg font-semibold transition-all hover:scale-105"
-            style={buttonStyles}
-          >
-            Continuer
-          </button>
-        </div>
-      </div>
-    );
-  };
+            }}
+            onComplete={() => {}}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+          />
+        );
 
-  // Render wheel screen
-  const renderWheel = () => {
-    const bgStyle = getBackgroundStyle(config.wheelScreen);
-    
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8" style={bgStyle}>
-        <div className="max-w-2xl w-full text-center space-y-6">
-          <h2 
-            className="text-3xl md:text-4xl font-bold"
-            style={{ color: theme.textColor }}
-          >
-            {config.wheelScreen.title}
-          </h2>
-          <p 
-            className="text-lg opacity-80"
-            style={{ color: theme.textSecondaryColor || theme.textColor }}
-          >
-            {config.wheelScreen.subtitle}
-          </p>
-          
-          <div className="flex justify-center">
-            <SmartWheel
-              segments={config.segments.map(s => ({ ...s, value: s.label }))}
-              onSpin={() => setIsSpinning(true)}
-              onResult={(segment) => handleSpinComplete(config.segments.find(s => s.id === segment.id) || config.segments[0])}
-              size={wheelSize}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Render ending screen
-  const renderEnding = (isWin: boolean) => {
-    const endingConfig = isWin ? config.endingWin : config.endingLose;
-    const bgStyle = getBackgroundStyle(endingConfig);
-    
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8" style={bgStyle}>
-        <div className="max-w-lg text-center space-y-6">
-          <div 
-            className="w-24 h-24 rounded-full flex items-center justify-center mx-auto text-5xl"
-            style={{ backgroundColor: isWin ? theme.accentColor + '20' : '#f8717120' }}
-          >
-            {isWin ? '🎉' : '😢'}
-          </div>
-
-          <h2 
-            className="text-3xl md:text-4xl font-bold"
-            style={{ color: theme.textColor }}
-          >
-            {replaceVariables(endingConfig.title)}
-          </h2>
-          <p 
-            className="text-lg opacity-80"
-            style={{ color: theme.textSecondaryColor || theme.textColor }}
-          >
-            {replaceVariables(endingConfig.subtitle)}
-          </p>
-
-          <button
-            onClick={() => {
+      case 'ending-win':
+      case 'ending-lose':
+        const isWin = activeView === 'ending-win';
+        const endingConfig = isWin ? config.endingWin : config.endingLose;
+        return (
+          <EndingLayouts
+            layout={currentLayout as any}
+            viewMode={viewMode}
+            title={replaceVariables(endingConfig.title)}
+            subtitle={replaceVariables(endingConfig.subtitle)}
+            wonPrize={wonPrize}
+            backgroundColor={theme.backgroundColor}
+            textColor={theme.textColor}
+            buttonColor={theme.buttonColor}
+            onRestart={() => {
               AnalyticsTrackingService.resetSessionTracking(campaignId);
               setActiveView('welcome');
               setWonPrize(null);
               setIsSpinning(false);
             }}
-            className="px-8 py-4 text-lg font-semibold transition-all hover:scale-105"
-            style={buttonStyles}
-          >
-            Rejouer
-          </button>
-        </div>
-      </div>
-    );
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // Get background style for current view
+  const getCurrentBackgroundStyle = () => {
+    switch (activeView) {
+      case 'welcome':
+        return getBackgroundStyle(config.welcomeScreen);
+      case 'contact':
+        return getBackgroundStyle(config.contactForm);
+      case 'wheel':
+        return getBackgroundStyle(config.wheelScreen);
+      case 'ending-win':
+        return getBackgroundStyle(config.endingWin);
+      case 'ending-lose':
+        return getBackgroundStyle(config.endingLose);
+      default:
+        return { backgroundColor: theme.backgroundColor };
+    }
+  };
+
+  // Get current screen config for overlay
+  const getCurrentScreenConfig = () => {
+    switch (activeView) {
+      case 'welcome': return config.welcomeScreen;
+      case 'contact': return config.contactForm;
+      case 'wheel': return config.wheelScreen;
+      case 'ending-win': return config.endingWin;
+      case 'ending-lose': return config.endingLose;
+      default: return config.welcomeScreen;
+    }
   };
 
   // Check if header/footer should be shown
@@ -390,6 +256,8 @@ export const ParticipantWheelRender = ({ config, campaignId, campaignTheme }: Pa
   const footerConfig = config.layout?.footer;
   const showHeader = headerConfig?.enabled !== false;
   const showFooter = footerConfig?.enabled !== false;
+
+  const currentScreenConfig = getCurrentScreenConfig() as any;
 
   return (
     <div 
@@ -402,7 +270,18 @@ export const ParticipantWheelRender = ({ config, campaignId, campaignTheme }: Pa
       )}
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto">
+      <div 
+        className="flex-1 overflow-auto relative"
+        style={getCurrentBackgroundStyle()}
+      >
+        {/* Overlay for wallpaper */}
+        {currentScreenConfig?.wallpaperImage && (
+          <div 
+            className="absolute inset-0 bg-black pointer-events-none" 
+            style={{ opacity: (currentScreenConfig?.overlayOpacity ?? 40) / 100 }} 
+          />
+        )}
+        
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView}
@@ -410,13 +289,13 @@ export const ParticipantWheelRender = ({ config, campaignId, campaignTheme }: Pa
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full"
+            className={`w-full h-full relative z-10 ${
+              isSplitLayout() && viewMode === 'desktop'
+                ? 'grid grid-cols-2'
+                : 'flex items-center justify-center'
+            }`}
           >
-            {activeView === 'welcome' && renderWelcome()}
-            {activeView === 'contact' && renderContact()}
-            {activeView === 'wheel' && renderWheel()}
-            {activeView === 'ending-win' && renderEnding(true)}
-            {activeView === 'ending-lose' && renderEnding(false)}
+            {renderContent()}
           </motion.div>
         </AnimatePresence>
       </div>
