@@ -58,9 +58,8 @@ const defaultCatalogConfig: CatalogConfig = {
   catalogTitle: "Inspiration, astuces, concours...",
   catalogSubtitle: "...et de nombreux prix à gagner !",
   categories: [
-    { id: 'cat-1', title: 'Recettes' },
-    { id: 'cat-2', title: 'Inspirations' },
-    { id: 'cat-3', title: 'Concours' },
+    { id: 'cat-1', title: 'Inspiration, astuces, concours...' },
+    { id: 'cat-2', title: 'Prochainement' },
   ],
   showCategoryNav: false,
   items: [
