@@ -1631,9 +1631,9 @@ export const WheelPreview = ({
           );
         })()}
 
-        {/* Header transparent toujours au-dessus en position fixed */}
+        {/* Header transparent toujours au-dessus */}
         {config.layout?.header?.enabled && config.layout.header.style === 'transparent' && (
-          <div className="fixed top-0 left-0 right-0 z-50">
+          <div className="absolute top-0 left-0 right-0 z-50">
             <CampaignHeader config={config.layout.header} isPreview />
           </div>
         )}
