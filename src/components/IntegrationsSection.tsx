@@ -47,18 +47,24 @@ export const IntegrationsSection = ({
     return null;
   };
 
-  // Get Smart URL (shorter format)
+  // Get Smart URL - uses full campaign ID for reliability
   const getSmartUrl = () => {
+    if (publicSlug) {
+      return `${baseUrl}/p/${publicSlug}`;
+    }
     if (campaignId) {
-      return `${baseUrl}/c/${campaignId.slice(0, 8)}`;
+      return getEmbedUrl();
     }
     return null;
   };
 
-  // Get Short URL
+  // Get Short URL - uses public slug or embed URL
   const getShortUrl = () => {
+    if (publicSlug) {
+      return `${baseUrl}/p/${publicSlug}`;
+    }
     if (campaignId) {
-      return `${baseUrl}/s/${campaignId.slice(0, 6)}`;
+      return getEmbedUrl();
     }
     return null;
   };
