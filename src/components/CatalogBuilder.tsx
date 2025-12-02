@@ -275,7 +275,7 @@ export const CatalogBuilder = () => {
           </div>
         ) : activeTab === 'campaign' ? (
           <div className="flex-1 overflow-auto bg-muted/30">
-            <CampaignSettings
+          <CampaignSettings
               campaignName={campaignName}
               onCampaignNameChange={setName}
               prizes={prizes}
@@ -298,6 +298,9 @@ export const CatalogBuilder = () => {
               onEndTimeChange={setEndTime}
               segments={[]}
               defaultTab={campaignDefaultTab}
+              campaignType="catalog"
+              campaignId={campaignId || undefined}
+              campaignMode="fullscreen"
             />
           </div>
         ) : (

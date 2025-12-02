@@ -278,6 +278,9 @@ export const ArticleQuizBuilder = () => {
             onDeletePrize={() => {}}
             gameType="wheel"
             segments={[]}
+            campaignType="quiz"
+            campaignId={campaign?.id}
+            campaignMode="article"
           />
         ) : activeTab === 'templates' ? (
           <div className="flex-1 flex items-center justify-center bg-muted">
