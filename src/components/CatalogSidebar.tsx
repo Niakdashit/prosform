@@ -111,13 +111,16 @@ export const CatalogSidebar = ({
     setDragOverCategoryId(null);
   };
 
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+  const handleDrop = (e: React.DragEvent, dropIndex: number, targetCategoryId?: string) => {
     e.preventDefault();
+    e.stopPropagation();
     const dragIndex = parseInt(e.dataTransfer.getData('text/html'));
-    if (dragIndex !== dropIndex) {
+    if (!isNaN(dragIndex) && dragIndex >= 0 && dragIndex < config.items.length) {
       const newItems = Array.from(config.items);
       const [removed] = newItems.splice(dragIndex, 1);
-      newItems.splice(dropIndex, 0, removed);
+      // Assign the target category to the dropped item
+      removed.categoryId = targetCategoryId;
+      newItems.splice(dropIndex > dragIndex ? dropIndex - 1 : dropIndex, 0, removed);
       onUpdateConfig({ items: newItems });
     }
     setDraggedIndex(null);
@@ -133,6 +136,7 @@ export const CatalogSidebar = ({
 
   const handleCategoryDrop = (e: React.DragEvent, categoryId: string | undefined) => {
     e.preventDefault();
+    e.stopPropagation();
     const dragIndex = parseInt(e.dataTransfer.getData('text/html'));
     if (!isNaN(dragIndex) && dragIndex >= 0 && dragIndex < config.items.length) {
       const newItems = [...config.items];
@@ -228,7 +232,7 @@ export const CatalogSidebar = ({
                           onDragStart={(e) => handleDragStart(e, index)}
                           onDragOver={(e) => handleDragOver(e, index)}
                           onDragLeave={handleDragLeave}
-                          onDrop={(e) => handleDrop(e, index)}
+                          onDrop={(e) => handleDrop(e, index, cat.id)}
                           onDragEnd={handleDragEnd}
                           onClick={() => onSelectItem(item.id)}
                           className={cn(
@@ -298,7 +302,7 @@ export const CatalogSidebar = ({
                         onDragStart={(e) => handleDragStart(e, index)}
                         onDragOver={(e) => handleDragOver(e, index)}
                         onDragLeave={handleDragLeave}
-                        onDrop={(e) => handleDrop(e, index)}
+                        onDrop={(e) => handleDrop(e, index, undefined)}
                         onDragEnd={handleDragEnd}
                         onClick={() => onSelectItem(item.id)}
                         className={cn(
