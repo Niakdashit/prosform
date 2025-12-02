@@ -149,21 +149,19 @@ export const CatalogSidebar = ({
           <ScrollArea className="h-[calc(100vh-140px)]">
             <div className="p-3 pb-3">
               {/* Header with add buttons */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="mb-3">
                 <span className="text-sm font-semibold text-foreground">Campagnes</span>
-                <div className="flex items-center gap-1">
+                <div className="flex gap-1 mt-2">
                   <button 
                     onClick={() => addItem()}
-                    className="h-6 px-2 rounded hover:bg-muted flex items-center gap-1 transition-colors text-xs"
-                    title="Ajouter une campagne"
+                    className="h-6 px-2 rounded hover:bg-muted flex items-center gap-1 transition-colors text-xs border border-border"
                   >
                     <Plus className="w-3 h-3" />
                     Campagne
                   </button>
                   <button 
                     onClick={addCategory}
-                    className="h-6 px-2 rounded hover:bg-muted flex items-center gap-1 transition-colors text-xs"
-                    title="Ajouter une catégorie"
+                    className="h-6 px-2 rounded hover:bg-muted flex items-center gap-1 transition-colors text-xs border border-border"
                   >
                     <Plus className="w-3 h-3" />
                     Catégorie
