@@ -38,6 +38,7 @@ export interface CatalogConfig {
   items: CatalogItem[];
   mobileLayout: MobileLayoutType;
   desktopLayout: DesktopLayoutType;
+  containerWidth: number; // percentage 50-100
   layout: {
     header: HeaderConfig;
     footer: FooterConfig;
@@ -135,6 +136,7 @@ const defaultCatalogConfig: CatalogConfig = {
   ],
   mobileLayout: "mobile-vertical",
   desktopLayout: "desktop-centered",
+  containerWidth: 100,
   layout: {
     header: { ...defaultHeaderConfig, enabled: false },
     footer: { ...defaultFooterConfig, enabled: false },

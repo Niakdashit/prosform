@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Palette, LayoutList, Gift, GripVertical, MoreVertical, Copy, Trash2, PanelTop } from "lucide-react";
+import { Plus, Palette, LayoutList, Gift, GripVertical, MoreVertical, Copy, Trash2, PanelTop, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeStylePanel } from "@/components/ui/ThemeStylePanel";
 import { LayoutSettingsPanel } from "./campaign";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -187,10 +189,33 @@ export const CatalogSidebar = ({
         </TabsContent>
 
         <TabsContent value="structure" className="flex-1 mt-0 overflow-hidden">
-          <LayoutSettingsPanel 
-            layout={config.layout}
-            onUpdateLayout={(updates) => onUpdateConfig({ layout: { ...config.layout, ...updates } as any })}
-          />
+          <ScrollArea className="h-full">
+            <div className="p-4 space-y-4">
+              {/* Container Width */}
+              <div className="border rounded-lg p-3 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Maximize2 className="w-4 h-4" />
+                  <span className="font-medium text-sm">Conteneur</span>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">
+                    Largeur: {config.containerWidth || 100}%
+                  </Label>
+                  <Slider
+                    value={[config.containerWidth || 100]}
+                    onValueChange={([v]) => onUpdateConfig({ containerWidth: v })}
+                    min={50}
+                    max={100}
+                    step={5}
+                  />
+                </div>
+              </div>
+            </div>
+            <LayoutSettingsPanel 
+              layout={config.layout}
+              onUpdateLayout={(updates) => onUpdateConfig({ layout: { ...config.layout, ...updates } as any })}
+            />
+          </ScrollArea>
         </TabsContent>
 
         <TabsContent value="style" className="flex-1 mt-0 overflow-hidden">
