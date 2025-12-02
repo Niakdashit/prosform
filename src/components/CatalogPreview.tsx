@@ -25,9 +25,7 @@ export const CatalogPreview = ({
   const { theme } = useTheme();
   const buttonStyles = getButtonStyles(theme, viewMode);
 
-  const containerClass = viewMode === "desktop"
-    ? "w-full max-w-6xl mx-auto"
-    : "w-[375px] mx-auto";
+  const containerClass = "w-full";
 
   // Font family helper
   const getFontFamily = (fontValue: string) => {
@@ -72,9 +70,13 @@ export const CatalogPreview = ({
       )}
 
       {/* Scrollable content */}
-      <div className="w-full h-full overflow-auto">
+      <div className="w-full h-full flex items-center justify-center overflow-auto">
         <div 
-          className="min-h-full flex flex-col"
+          className={`min-h-full flex flex-col ${
+            viewMode === 'mobile' 
+              ? 'w-[375px] h-[667px] rounded-[40px] shadow-[0_0_60px_rgba(0,0,0,0.3)] border-[8px] border-gray-800 overflow-hidden flex-shrink-0' 
+              : 'w-full'
+          }`}
           style={{ 
             backgroundColor: theme.backgroundColor,
             fontFamily: getFontFamily(theme.fontFamily),
