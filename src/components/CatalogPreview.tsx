@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
+import { CatalogConfig, CatalogItem, CatalogCategory } from "./CatalogBuilder";
 import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
 import { CampaignHeader, CampaignFooter } from "./campaign";
 import { EditableTextBlock } from "./EditableTextBlock";
@@ -33,8 +33,19 @@ export const CatalogPreview = ({
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [uploadingImageForItem, setUploadingImageForItem] = useState<string | null>(null);
   const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   const containerClass = "w-full";
+
+  // Filter items by category
+  const getFilteredItems = () => {
+    if (!selectedCategoryId) {
+      return config.items;
+    }
+    return config.items.filter(item => item.categoryId === selectedCategoryId);
+  };
+
+  const filteredItems = getFilteredItems();
 
   // Font family helper
   const getFontFamily = (fontValue: string) => {
@@ -218,6 +229,43 @@ export const CatalogPreview = ({
           />
         )}
 
+        {/* Category Navigation */}
+        {config.showCategoryNav && config.categories && config.categories.length > 0 && (
+          <div 
+            className="flex items-center justify-center gap-6 py-3 border-b overflow-x-auto scrollbar-hide"
+            style={{ 
+              backgroundColor: theme.surfaceColor,
+              borderColor: theme.borderColor,
+            }}
+          >
+            <button
+              onClick={() => setSelectedCategoryId(null)}
+              className="text-sm font-medium whitespace-nowrap transition-colors"
+              style={{ 
+                color: selectedCategoryId === null ? theme.primaryColor : theme.textSecondaryColor,
+                borderBottom: selectedCategoryId === null ? `2px solid ${theme.primaryColor}` : '2px solid transparent',
+                paddingBottom: '4px',
+              }}
+            >
+              Tout
+            </button>
+            {config.categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategoryId(cat.id)}
+                className="text-sm font-medium whitespace-nowrap transition-colors"
+                style={{ 
+                  color: selectedCategoryId === cat.id ? theme.primaryColor : theme.textSecondaryColor,
+                  borderBottom: selectedCategoryId === cat.id ? `2px solid ${theme.primaryColor}` : '2px solid transparent',
+                  paddingBottom: '4px',
+                }}
+              >
+                {cat.title}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Main Content */}
         <div 
           className="flex-1 flex items-start justify-center"
@@ -271,11 +319,11 @@ export const CatalogPreview = ({
                 className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} mb-12`}
                 style={{ gap: `${theme.questionSpacing * 24}px` }}
               >
-                {config.items.filter(item => !item.isComingSoon).map((item) => renderCatalogCard(item, false))}
+                {filteredItems.filter(item => !item.isComingSoon).map((item) => renderCatalogCard(item, false))}
               </div>
 
               {/* Coming soon section */}
-              {config.items.some(item => item.isComingSoon) && (
+              {filteredItems.some(item => item.isComingSoon) && (
                 <>
                   <h2 
                     className="mb-6"
@@ -292,7 +340,7 @@ export const CatalogPreview = ({
                     className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"}`}
                     style={{ gap: `${theme.questionSpacing * 24}px` }}
                   >
-                    {config.items.filter(item => item.isComingSoon).map((item) => renderCatalogCard(item, true))}
+                    {filteredItems.filter(item => item.isComingSoon).map((item) => renderCatalogCard(item, true))}
                   </div>
                 </>
               )}
