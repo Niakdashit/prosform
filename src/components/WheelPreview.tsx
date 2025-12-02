@@ -1662,14 +1662,14 @@ export const WheelPreview = ({
               {renderContent()}
             </motion.div>
           </AnimatePresence>
+
+          {/* Footer dans la zone scrollable */}
+          {config.layout?.footer?.enabled && (
+            <div className="relative z-10">
+              <CampaignFooter config={config.layout.footer} isPreview />
+            </div>
+          )}
         </div>
-        
-        {/* Footer en bas, en dehors de la zone scrollable */}
-        {config.layout?.footer?.enabled && (
-          <div className="flex-shrink-0 relative z-10">
-            <CampaignFooter config={config.layout.footer} isPreview />
-          </div>
-        )}
       </div>
     </div>
   );
