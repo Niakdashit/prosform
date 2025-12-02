@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CatalogConfig, CatalogItem, CatalogCategory } from "./CatalogBuilder";
 import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
 import { CampaignHeader, CampaignFooter } from "./campaign";
@@ -27,13 +27,31 @@ export const CatalogPreview = ({
   onUpdateItem,
   isReadOnly = false,
 }: CatalogPreviewProps) => {
-  const { theme } = useTheme();
+  const { theme, updateTheme } = useTheme();
   const buttonStyles = getButtonStyles(theme, viewMode);
   const [editingField, setEditingField] = useState<string | null>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [uploadingImageForItem, setUploadingImageForItem] = useState<string | null>(null);
   const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+
+  // Listen for toolbar style updates
+  useEffect(() => {
+    const handleToolbarStyle = (e: CustomEvent) => {
+      const { field, updates } = e.detail;
+      
+      if (field === 'title' && updates.fontSize) {
+        updateTheme({ headingSize: updates.fontSize });
+      } else if (field === 'subtitle' && updates.fontSize) {
+        updateTheme({ subheadingSize: updates.fontSize });
+      }
+    };
+
+    document.addEventListener('floatingToolbarStyle', handleToolbarStyle as EventListener);
+    return () => {
+      document.removeEventListener('floatingToolbarStyle', handleToolbarStyle as EventListener);
+    };
+  }, [updateTheme]);
 
   // Update category title
   const updateCategoryTitle = (categoryId: string, newTitle: string) => {
@@ -215,7 +233,7 @@ export const CatalogPreview = ({
   );
 
   return (
-    <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center" : "w-full h-full flex items-start justify-center overflow-auto"}>
+    <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center" : "w-full h-full flex items-start justify-center overflow-auto scrollbar-hide"}>
       <div 
         ref={previewContainerRef}
         className="relative overflow-auto transition-all duration-300 flex flex-col scrollbar-hide"
