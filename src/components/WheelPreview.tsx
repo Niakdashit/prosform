@@ -1631,17 +1631,15 @@ export const WheelPreview = ({
           );
         })()}
 
-        {/* Header fixe en overlay au-dessus du contenu qui scroll */}
-        {config.layout?.header?.enabled && (
-          <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none">
-            <div className="pointer-events-auto">
-              <CampaignHeader config={config.layout.header} isPreview />
-            </div>
-          </div>
-        )}
-
         {/* Contenu principal avec flex-1 pour prendre l'espace restant */}
         <div className="flex-1 relative overflow-auto z-10 min-h-0">
+          {/* Header dans la zone scrollable, pas sticky */}
+          {config.layout?.header?.enabled && (
+            <div className="relative z-20">
+              <CampaignHeader config={config.layout.header} isPreview />
+            </div>
+          )}
+
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
