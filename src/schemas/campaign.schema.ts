@@ -19,7 +19,7 @@ export const prizeSchema = z.object({
 
 export const campaignCreateSchema = z.object({
   name: z.string().trim().min(1, "Le nom est requis").max(200, "Le nom ne peut pas dépasser 200 caractères"),
-  type: z.enum(['wheel', 'quiz', 'scratch', 'jackpot', 'form']),
+  type: z.enum(['wheel', 'quiz', 'scratch', 'jackpot', 'form', 'catalog']),
   mode: z.enum(['fullscreen', 'article', 'embed', 'popup']),
   status: z.enum(['draft', 'online', 'paused', 'ended']),
   config: campaignConfigSchema,
