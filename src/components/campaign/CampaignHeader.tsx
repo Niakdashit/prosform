@@ -68,7 +68,7 @@ export const CampaignHeader = ({ config, isPreview = false, onConfigChange }: Ca
 
   return (
     <header
-      className={`w-full transition-all ${config.style === 'transparent' ? 'absolute top-0 left-0 right-0 z-50' : ''} ${config.sticky && config.style !== 'transparent' ? 'sticky top-0 z-50' : ''}`}
+      className={`w-full transition-all ${config.style === 'transparent' ? 'fixed top-0 left-0 right-0 z-50' : ''} ${config.sticky && config.style !== 'transparent' ? 'sticky top-0 z-50' : ''}`}
       style={{
         ...getBackgroundStyle(),
         height: config.height || 64,

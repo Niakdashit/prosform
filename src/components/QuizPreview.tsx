@@ -1638,9 +1638,9 @@ export const QuizPreview = ({
           );
         })()}
 
-        {/* Header transparent toujours au-dessus */}
+        {/* Header transparent toujours au-dessus en position fixed */}
         {config.layout?.header?.enabled && config.layout.header.style === 'transparent' && (
-          <div className="absolute top-0 left-0 right-0 z-50">
+          <div className="fixed top-0 left-0 right-0 z-50">
             <CampaignHeader config={config.layout.header} isPreview />
           </div>
         )}
