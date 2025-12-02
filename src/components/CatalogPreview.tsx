@@ -1,6 +1,5 @@
 import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
 import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
-import { Monitor, Smartphone } from "lucide-react";
 import { CampaignHeader, CampaignFooter } from "./campaign";
 
 interface CatalogPreviewProps {
@@ -17,7 +16,6 @@ interface CatalogPreviewProps {
 export const CatalogPreview = ({
   config,
   viewMode,
-  onToggleViewMode,
   selectedItemId,
   onSelectItem,
   isReadOnly = false,
@@ -40,50 +38,20 @@ export const CatalogPreview = ({
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      {/* Preview Mode Toggle */}
-      {!isReadOnly && (
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2 bg-background/95 backdrop-blur-sm border border-border rounded-lg p-1">
-          <button
-            onClick={() => onToggleViewMode()}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-              viewMode === "desktop"
-                ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Monitor className="w-4 h-4" />
-            <span className="text-sm font-medium">Desktop</span>
-          </button>
-          <button
-            onClick={() => onToggleViewMode()}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-              viewMode === "mobile"
-                ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Smartphone className="w-4 h-4" />
-            <span className="text-sm font-medium">Mobile</span>
-          </button>
-        </div>
-      )}
-
-      {/* Scrollable content */}
-      <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center overflow-hidden" : "w-full h-full overflow-auto"}>
-        <div 
-          className="relative overflow-hidden transition-all duration-300 flex flex-col"
-          style={{ 
-            backgroundColor: theme.backgroundColor,
-            fontFamily: getFontFamily(theme.fontFamily),
-            width: viewMode === 'desktop' ? '100%' : '375px',
-            minWidth: viewMode === 'desktop' ? undefined : '375px',
-            maxWidth: viewMode === 'desktop' ? undefined : '375px',
-            height: viewMode === 'mobile' ? '667px' : undefined,
-            minHeight: viewMode === 'mobile' ? '667px' : '100%',
-            maxHeight: viewMode === 'mobile' ? '667px' : undefined,
-          }}
-        >
+    <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center overflow-hidden" : "w-full h-full overflow-auto"}>
+      <div 
+        className="relative overflow-hidden transition-all duration-300 flex flex-col"
+        style={{ 
+          backgroundColor: theme.backgroundColor,
+          fontFamily: getFontFamily(theme.fontFamily),
+          width: viewMode === 'desktop' ? '100%' : '375px',
+          minWidth: viewMode === 'desktop' ? undefined : '375px',
+          maxWidth: viewMode === 'desktop' ? undefined : '375px',
+          height: viewMode === 'mobile' ? '667px' : undefined,
+          minHeight: viewMode === 'mobile' ? '667px' : '100%',
+          maxHeight: viewMode === 'mobile' ? '667px' : undefined,
+        }}
+      >
           {/* Header */}
           {config.layout?.header?.enabled && (
             <CampaignHeader 
@@ -307,6 +275,5 @@ export const CatalogPreview = ({
           )}
         </div>
       </div>
-    </div>
   );
 };
