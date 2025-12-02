@@ -117,7 +117,7 @@ export const CatalogPreview = ({
         style={{ padding: `${theme.inputPadding + 8}px` }}
       >
         {/* Text area with fixed height and scroll if needed */}
-        <div className="flex-1 min-h-[100px] max-h-[120px] overflow-y-auto">
+        <div className="flex-1 min-h-[100px] max-h-[120px] overflow-x-hidden overflow-y-auto scrollbar-hide">
           <div style={{ marginBottom: '8px' }}>
             <EditableTextBlock
               value={item.title}
