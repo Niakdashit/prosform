@@ -70,16 +70,18 @@ export const CatalogPreview = ({
       )}
 
       {/* Scrollable content */}
-      <div className="w-full h-full flex items-center justify-center overflow-auto">
+      <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center overflow-hidden" : "w-full h-full overflow-auto"}>
         <div 
-          className={`min-h-full flex flex-col ${
-            viewMode === 'mobile' 
-              ? 'w-[375px] h-[667px] rounded-[40px] shadow-[0_0_60px_rgba(0,0,0,0.3)] border-[8px] border-gray-800 overflow-hidden flex-shrink-0' 
-              : 'w-full'
-          }`}
+          className="relative overflow-hidden transition-all duration-300 flex flex-col"
           style={{ 
             backgroundColor: theme.backgroundColor,
             fontFamily: getFontFamily(theme.fontFamily),
+            width: viewMode === 'desktop' ? '100%' : '375px',
+            minWidth: viewMode === 'desktop' ? undefined : '375px',
+            maxWidth: viewMode === 'desktop' ? undefined : '375px',
+            height: viewMode === 'mobile' ? '667px' : undefined,
+            minHeight: viewMode === 'mobile' ? '667px' : '100%',
+            maxHeight: viewMode === 'mobile' ? '667px' : undefined,
           }}
         >
           {/* Header */}
