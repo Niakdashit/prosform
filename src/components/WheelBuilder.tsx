@@ -448,7 +448,7 @@ export const WheelBuilder = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-muted overflow-hidden">
+    <div className="flex flex-col h-screen bg-background overflow-hidden">
       <WheelTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
@@ -529,7 +529,7 @@ export const WheelBuilder = () => {
           campaignUrl={campaign?.id ? `${window.location.origin}/wheel-preview?id=${campaign.id}` : ''}
         />
       ) : (
-        <div className="flex flex-1 overflow-hidden relative">
+        <div className="flex flex-1 overflow-hidden relative m-4 rounded-2xl backdrop-blur-xl bg-background/40 border border-border/20 shadow-2xl">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>

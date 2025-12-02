@@ -386,7 +386,7 @@ export const QuizBuilder = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-muted overflow-hidden">
+    <div className="flex flex-col h-screen bg-background overflow-hidden">
       <QuizTopToolbar 
         onPreview={() => {
           const targetViewMode = isMobile ? 'mobile' : 'desktop';
@@ -448,7 +448,7 @@ export const QuizBuilder = () => {
           <p className="text-muted-foreground">Templates à venir...</p>
         </div>
       ) : (
-        <div className="flex flex-1 overflow-hidden relative">
+        <div className="flex flex-1 overflow-hidden relative m-4 rounded-2xl backdrop-blur-xl bg-background/40 border border-border/20 shadow-2xl">
         {isMobile ? (
           <>
             <Drawer open={leftDrawerOpen} onOpenChange={setLeftDrawerOpen}>
