@@ -203,9 +203,9 @@ export const CatalogPreview = ({
         style={{
           backgroundColor: theme.backgroundColor,
           fontFamily: getFontFamily(theme.fontFamily),
-          width: viewMode === 'desktop' ? `${config.containerWidth || 100}%` : '375px',
+          width: viewMode === 'desktop' ? `${config.containerWidth || 1200}px` : '375px',
+          maxWidth: viewMode === 'desktop' ? '100%' : '375px',
           minWidth: viewMode === 'desktop' ? undefined : '375px',
-          maxWidth: viewMode === 'desktop' ? undefined : '375px',
           height: viewMode === 'mobile' ? '667px' : undefined,
           minHeight: viewMode === 'mobile' ? '667px' : '100%',
           maxHeight: viewMode === 'mobile' ? '667px' : undefined,
