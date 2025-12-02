@@ -35,6 +35,14 @@ export const CatalogPreview = ({
   const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
+  // Update category title
+  const updateCategoryTitle = (categoryId: string, newTitle: string) => {
+    const updatedCategories = config.categories.map(cat =>
+      cat.id === categoryId ? { ...cat, title: newTitle } : cat
+    );
+    onUpdateConfig({ categories: updatedCategories });
+  };
+
   const containerClass = "w-full";
 
   // Filter items by category
@@ -325,17 +333,25 @@ export const CatalogPreview = ({
                   
                   return (
                     <div key={category.id} className="mb-12">
-                      <h2 
-                        className="mb-6"
-                        style={{
-                          fontFamily: getFontFamily(theme.headingFontFamily),
-                          fontSize: `${theme.subheadingSize + 4}px`,
-                          fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
-                          color: theme.primaryColor,
-                        }}
-                      >
-                        {category.title}
-                      </h2>
+                      <div className="mb-6">
+                        <EditableTextBlock
+                          value={category.title}
+                          onChange={(value) => updateCategoryTitle(category.id, value)}
+                          isEditing={editingField === `category-${category.id}`}
+                          isReadOnly={isReadOnly}
+                          onFocus={() => setEditingField(`category-${category.id}`)}
+                          onBlur={() => setEditingField(null)}
+                          fieldType="title"
+                          showSparkles={false}
+                          showClear={false}
+                          style={{
+                            fontFamily: getFontFamily(theme.headingFontFamily),
+                            fontSize: `${theme.subheadingSize + 4}px`,
+                            fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
+                            color: theme.primaryColor,
+                          }}
+                        />
+                      </div>
                       <div 
                         className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"}`}
                         style={{ gap: `${theme.questionSpacing * 24}px` }}
