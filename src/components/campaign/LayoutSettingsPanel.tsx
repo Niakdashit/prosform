@@ -33,9 +33,10 @@ interface LayoutConfig {
 interface LayoutSettingsPanelProps {
   layout: LayoutConfig | undefined;
   onUpdateLayout: (updates: Partial<LayoutConfig>) => void;
+  middleContent?: React.ReactNode;
 }
 
-export const LayoutSettingsPanel = ({ layout, onUpdateLayout }: LayoutSettingsPanelProps) => {
+export const LayoutSettingsPanel = ({ layout, onUpdateLayout, middleContent }: LayoutSettingsPanelProps) => {
   const [expandedSection, setExpandedSection] = useState<string | null>("header");
   const logoInputRef = useRef<HTMLInputElement>(null);
 
@@ -312,6 +313,9 @@ export const LayoutSettingsPanel = ({ layout, onUpdateLayout }: LayoutSettingsPa
               </div>
             </AccordionContent>
           </AccordionItem>
+
+          {/* Middle Content (e.g., Categories) */}
+          {middleContent}
 
           {/* Footer */}
           <AccordionItem value="footer" className="border rounded-lg px-3 mb-2">
