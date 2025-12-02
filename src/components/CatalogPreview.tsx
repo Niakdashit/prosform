@@ -4,6 +4,8 @@ import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext
 import { CampaignHeader, CampaignFooter } from "./campaign";
 import { EditableTextBlock } from "./EditableTextBlock";
 import { FloatingToolbar } from "./FloatingToolbar";
+import { ImageUploadModal } from "./ImageUploadModal";
+import { ImagePlus, Trash2 } from "lucide-react";
 
 interface CatalogPreviewProps {
   config: CatalogConfig;
@@ -29,6 +31,8 @@ export const CatalogPreview = ({
   const buttonStyles = getButtonStyles(theme, viewMode);
   const [editingField, setEditingField] = useState<string | null>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const [uploadingImageForItem, setUploadingImageForItem] = useState<string | null>(null);
+  const [hoveredImageId, setHoveredImageId] = useState<string | null>(null);
 
   const containerClass = "w-full";
 
@@ -64,7 +68,7 @@ export const CatalogPreview = ({
     >
       {/* Image */}
       <div
-        className={`w-full h-48 flex items-center justify-center ${isComingSoon ? "grayscale" : ""}`}
+        className={`relative w-full h-48 flex items-center justify-center ${isComingSoon ? "grayscale" : ""}`}
         style={{
           backgroundColor: theme.backgroundSecondaryColor,
           ...(item.image ? { 
@@ -73,9 +77,37 @@ export const CatalogPreview = ({
             backgroundPosition: "center" 
           } : {}),
         }}
+        onMouseEnter={() => !isReadOnly && setHoveredImageId(item.id)}
+        onMouseLeave={() => setHoveredImageId(null)}
       >
         {!item.image && (
           <span style={{ color: theme.textMutedColor, fontSize: `${theme.captionSize}px` }}>Image</span>
+        )}
+        
+        {/* Image hover actions */}
+        {!isReadOnly && hoveredImageId === item.id && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setUploadingImageForItem(item.id);
+              }}
+              className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
+            >
+              <ImagePlus className="w-5 h-5 text-gray-700" />
+            </button>
+            {item.image && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpdateItem(item.id, { image: '' });
+                }}
+                className="w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
+              >
+                <Trash2 className="w-5 h-5 text-red-500" />
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -277,6 +309,18 @@ export const CatalogPreview = ({
           />
         )}
       </div>
+
+      {/* Image Upload Modal */}
+      <ImageUploadModal
+        open={uploadingImageForItem !== null}
+        onOpenChange={(open) => !open && setUploadingImageForItem(null)}
+        onImageSelect={(imageData) => {
+          if (uploadingImageForItem) {
+            onUpdateItem(uploadingImageForItem, { image: imageData });
+            setUploadingImageForItem(null);
+          }
+        }}
+      />
     </div>
   );
 };
