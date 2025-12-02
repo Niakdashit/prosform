@@ -221,19 +221,15 @@ export const WheelLayouts = ({
     switch (effectiveLayout as MobileLayoutType) {
       case 'mobile-vertical':
         return (
-          <div className="flex flex-col h-full">
-            <div className="flex-1 flex items-center justify-center px-4">
-              {renderContent()}
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-              {renderWheel()}
-            </div>
+          <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
+            {renderContent()}
+            {renderWheel()}
           </div>
         );
 
       case 'mobile-centered':
         return (
-          <div className="flex flex-col items-center justify-center px-4 space-y-8">
+          <div className="flex flex-col items-center justify-center py-6 space-y-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderContent()}
             {renderWheel()}
           </div>
@@ -241,7 +237,7 @@ export const WheelLayouts = ({
 
       case 'mobile-minimal':
         return (
-          <div className="flex flex-col items-center justify-center px-4 space-y-6">
+          <div className="flex flex-col items-center justify-center py-6 space-y-6" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
             {renderContent()}
             {renderWheel()}
           </div>
