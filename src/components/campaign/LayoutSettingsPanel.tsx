@@ -28,6 +28,7 @@ import { SocialLink, LegalLink } from "./CampaignFooter";
 interface LayoutConfig {
   header: HeaderConfig;
   footer: FooterConfig;
+  pageWidth?: number;
 }
 
 interface LayoutSettingsPanelProps {
@@ -134,6 +135,28 @@ export const LayoutSettingsPanel = ({ layout, onUpdateLayout }: LayoutSettingsPa
         <div className="flex items-center gap-2 mb-4">
           <Layout className="w-5 h-5 text-primary" />
           <h3 className="font-semibold text-lg">Structure de page</h3>
+        </div>
+
+        {/* Page Width */}
+        <div className="space-y-1.5 pb-3 border-b">
+          <Label className="text-xs text-muted-foreground">
+            Largeur de page: {layout?.pageWidth || 1200}px
+          </Label>
+          <Slider
+            value={[layout?.pageWidth || 1200]}
+            onValueChange={([v]) => onUpdateLayout({ 
+              header, 
+              footer, 
+              pageWidth: v 
+            })}
+            min={600}
+            max={1920}
+            step={20}
+          />
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>600px</span>
+            <span>1920px (pleine largeur)</span>
+          </div>
         </div>
 
         <Accordion type="single" collapsible value={expandedSection || undefined} onValueChange={setExpandedSection}>

@@ -41,6 +41,7 @@ export interface CatalogConfig {
   layout: {
     header: HeaderConfig;
     footer: FooterConfig;
+    pageWidth?: number;
   };
 }
 
