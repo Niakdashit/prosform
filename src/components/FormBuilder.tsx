@@ -393,7 +393,7 @@ export const FormBuilder = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-muted overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-900 via-purple-950 to-black overflow-hidden">
       <TopToolbar 
         onAddContent={() => setIsAddContentModalOpen(true)}
         onPreview={() => {
@@ -427,7 +427,8 @@ export const FormBuilder = () => {
         onTabChange={setActiveTab}
       />
         
-        <div className="flex flex-1 overflow-hidden relative">
+        <div className="flex flex-1 overflow-hidden relative p-6">
+          <div className="flex flex-1 overflow-hidden rounded-2xl border border-border/20 backdrop-blur-xl bg-background/30 shadow-2xl">
         {activeTab === 'templates' ? (
           <TemplateLibrary 
             onSelectTemplate={(newQuestions, meta) => {
@@ -537,6 +538,7 @@ export const FormBuilder = () => {
             />
           </>
         )}
+          </div>
         </div>
 
         <AddContentModal
