@@ -385,6 +385,34 @@ export const WheelPreview = ({
     }, 3000);
   };
 
+  // Determine if current layout is a split layout (footer should be visible, not scrollable)
+  const isSplitLayout = () => {
+    const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
+    let currentLayout: string | undefined;
+    
+    switch (activeView) {
+      case 'welcome':
+        currentLayout = config.welcomeScreen[layoutKey];
+        break;
+      case 'contact':
+        currentLayout = config.contactForm[layoutKey];
+        break;
+      case 'wheel':
+        currentLayout = config.wheelScreen[layoutKey];
+        break;
+      case 'ending-win':
+        currentLayout = config.endingWin[layoutKey];
+        break;
+      case 'ending-lose':
+        currentLayout = config.endingLose[layoutKey];
+        break;
+    }
+    
+    // Split layouts: desktop-split, desktop-card, desktop-panel
+    const splitLayouts = ['desktop-split', 'desktop-card', 'desktop-panel'];
+    return currentLayout ? splitLayouts.includes(currentLayout) : false;
+  };
+
   const renderContent = () => {
     // Calculate current layout for non-welcome views
     const getCurrentLayout = () => {
@@ -1606,43 +1634,96 @@ export const WheelPreview = ({
           );
         })()}
 
-        {/* Header - z-index élevé pour être au-dessus du background */}
-        {config.layout?.header?.enabled && (
-          <div className="relative z-20 flex-shrink-0">
-            <CampaignHeader config={config.layout.header} isPreview />
-          </div>
-        )}
-
         {/* Contenu principal avec flex-1 pour prendre l'espace restant */}
         <div className="flex-1 relative overflow-auto z-10 min-h-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeView}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="w-full h-full relative z-10"
-              onClick={(e) => {
-                // Ne pas blur si on clique sur un input, textarea ou button
-                const target = e.target as HTMLElement;
-                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
-                  return;
-                }
-                setEditingField(null);
-                if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                  document.activeElement.blur();
-                }
-              }}
+          {/* Header - toujours à l'intérieur de la zone scrollable */}
+          {config.layout?.header?.enabled && (
+            <div 
+              className={config.layout.header.sticky ? "sticky top-0 z-50" : "relative z-20"}
+              style={config.layout.header.sticky && config.layout.header.style === 'transparent' ? { 
+                backgroundColor: config.layout.header.backgroundColor || '#ffffff'
+              } : undefined}
             >
-              {renderContent()}
-            </motion.div>
-          </AnimatePresence>
+              <CampaignHeader config={{
+                ...config.layout.header,
+                // Forcer un style non-transparent quand sticky pour que le header soit visible
+                style: config.layout.header.sticky && config.layout.header.style === 'transparent' 
+                  ? 'solid' 
+                  : config.layout.header.style
+              }} isPreview />
+            </div>
+          )}
+          
+          {isSplitLayout() ? (
+            // Split layouts: contenu pleine page, footer géré séparément
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeView}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full relative z-10"
+                onClick={(e) => {
+                  const target = e.target as HTMLElement;
+                  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
+                    return;
+                  }
+                  setEditingField(null);
+                  if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    document.activeElement.blur();
+                  }
+                }}
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
+          ) : (
+            // Autres layouts: footer après le contenu, nécessite scroll
+            <div className="flex flex-col min-h-full">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeView}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full flex-1 relative z-10 flex items-center justify-center"
+                  onClick={(e) => {
+                    const target = e.target as HTMLElement;
+                    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
+                      return;
+                    }
+                    setEditingField(null);
+                    if (document.activeElement instanceof HTMLElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                      document.activeElement.blur();
+                    }
+                  }}
+                >
+                  {renderContent()}
+                </motion.div>
+              </AnimatePresence>
+              
+              {/* Footer après le contenu - nécessite scroll (non-sticky) */}
+              {config.layout?.footer?.enabled && !config.layout.footer.sticky && (
+                <div className="flex-shrink-0 relative z-10">
+                  <CampaignFooter config={config.layout.footer} isPreview />
+                </div>
+              )}
+            </div>
+          )}
         </div>
         
-        {/* Footer en bas, en dehors de la zone scrollable */}
-        {config.layout?.footer?.enabled && (
-          <div className="flex-shrink-0 relative z-10">
+        {/* Footer STICKY - en dehors de la zone scrollable, toujours visible en bas */}
+        {!isSplitLayout() && config.layout?.footer?.enabled && config.layout.footer.sticky && (
+          <div className="flex-shrink-0 relative z-20">
+            <CampaignFooter config={config.layout.footer} isPreview />
+          </div>
+        )}
+        
+        {/* Footer fixé en bas pour les layouts splits - en dehors de la zone scrollable */}
+        {isSplitLayout() && config.layout?.footer?.enabled && (
+          <div className="flex-shrink-0 relative z-20">
             <CampaignFooter config={config.layout.footer} isPreview />
           </div>
         )}

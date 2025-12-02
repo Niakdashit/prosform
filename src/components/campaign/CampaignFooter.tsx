@@ -28,6 +28,7 @@ export interface FooterConfig {
   poweredByText?: string;
   poweredByUrl?: string;
   padding?: 'small' | 'medium' | 'large';
+  sticky?: boolean;
 }
 
 export const defaultFooterConfig: FooterConfig = {

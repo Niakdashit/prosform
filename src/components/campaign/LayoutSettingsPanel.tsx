@@ -248,7 +248,6 @@ export const LayoutSettingsPanel = ({ layout, onUpdateLayout }: LayoutSettingsPa
                     <SelectContent>
                       <SelectItem value="solid">Solide</SelectItem>
                       <SelectItem value="transparent">Transparent</SelectItem>
-                      <SelectItem value="gradient">Dégradé</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -426,6 +425,17 @@ export const LayoutSettingsPanel = ({ layout, onUpdateLayout }: LayoutSettingsPa
                       className="h-8 text-xs flex-1 font-mono"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Options */}
+              <div className="space-y-2 pt-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">Sticky (fixé en bas)</Label>
+                  <Switch
+                    checked={footer.sticky || false}
+                    onCheckedChange={(checked) => updateFooter({ sticky: checked })}
+                  />
                 </div>
               </div>
 

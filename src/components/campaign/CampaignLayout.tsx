@@ -56,7 +56,7 @@ export const CampaignLayout = ({
 
   return (
     <div 
-      className={`flex flex-col min-h-screen`}
+      className="flex flex-col min-h-screen"
       style={{ 
         backgroundColor: config.backgroundColor,
         backgroundImage: config.backgroundImage ? `url(${config.backgroundImage})` : undefined,
@@ -88,7 +88,7 @@ export const CampaignLayout = ({
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer - always at the bottom, requires scroll to see */}
       <CampaignFooter 
         config={config.footer} 
         isPreview={isPreview}
