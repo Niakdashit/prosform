@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
 import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
 import { CampaignHeader, CampaignFooter } from "./campaign";
 import { EditableTextBlock } from "./EditableTextBlock";
+import { FloatingToolbar } from "./FloatingToolbar";
 
 interface CatalogPreviewProps {
   config: CatalogConfig;
@@ -27,6 +28,7 @@ export const CatalogPreview = ({
   const { theme } = useTheme();
   const buttonStyles = getButtonStyles(theme, viewMode);
   const [editingField, setEditingField] = useState<string | null>(null);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
 
   const containerClass = "w-full";
 
@@ -158,6 +160,7 @@ export const CatalogPreview = ({
   return (
     <div className={viewMode === 'mobile' ? "w-full h-full flex items-center justify-center" : "w-full h-full overflow-auto"}>
       <div 
+        ref={previewContainerRef}
         className="relative overflow-auto transition-all duration-300 flex flex-col scrollbar-hide"
         style={{
           backgroundColor: theme.backgroundColor,
@@ -263,6 +266,14 @@ export const CatalogPreview = ({
         {config.layout?.footer?.enabled && (
           <CampaignFooter 
             config={config.layout.footer}
+          />
+        )}
+
+        {/* Floating Toolbar */}
+        {!isReadOnly && (
+          <FloatingToolbar 
+            containerRef={previewContainerRef}
+            onUpdateStyle={() => {}}
           />
         )}
       </div>
