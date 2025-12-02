@@ -105,6 +105,16 @@ export const CatalogPreview = ({
     }
   };
 
+  // Get col-span class based on item size
+  const getColSpanClass = (colSpan: number = 1) => {
+    if (viewMode === 'mobile') return ''; // No col-span on mobile
+    switch (colSpan) {
+      case 2: return 'col-span-2';
+      case 3: return 'col-span-3';
+      default: return 'col-span-1';
+    }
+  };
+
   // Render catalog item card
   const renderCatalogCard = (item: CatalogItem, isComingSoon: boolean = false) => (
     <div
@@ -112,7 +122,7 @@ export const CatalogPreview = ({
       onClick={() => !isReadOnly && !editingField && onSelectItem(item.id)}
       className={`overflow-hidden transition-all flex flex-col ${
         !isReadOnly ? "cursor-pointer" : ""
-      } ${isComingSoon ? "opacity-60" : ""}`}
+      } ${isComingSoon ? "opacity-60" : ""} ${getColSpanClass(item.colSpan)}`}
       style={{
         backgroundColor: theme.surfaceColor,
         borderRadius: getCardBorderRadius(),

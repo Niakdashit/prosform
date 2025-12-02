@@ -38,6 +38,7 @@ export interface CatalogItem {
   isComingSoon: boolean;
   comingSoonDate?: string;
   categoryId?: string;
+  colSpan?: 1 | 2 | 3;
 }
 
 export interface CatalogConfig {
