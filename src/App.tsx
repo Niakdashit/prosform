@@ -30,6 +30,8 @@ import ArticleQuiz from "./pages/ArticleQuiz";
 import ArticleQuizPreview from "./pages/ArticleQuizPreview";
 import ArticleJackpot from "./pages/ArticleJackpot";
 import ArticleJackpotPreview from "./pages/ArticleJackpotPreview";
+import Catalog from "./pages/Catalog";
+import CatalogPreview from "./pages/CatalogPreview";
 import PublicCampaign from "./pages/PublicCampaign";
 import NotFound from "./pages/NotFound";
 
@@ -70,6 +72,8 @@ const App = () => (
             <Route path="/article-quiz-preview" element={<ArticleQuizPreview />} />
             <Route path="/article-jackpot" element={<ArticleJackpot />} />
             <Route path="/article-jackpot-preview" element={<ArticleJackpotPreview />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/catalog-preview" element={<CatalogPreview />} />
             <Route path="/p/:slug" element={<PublicCampaign />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

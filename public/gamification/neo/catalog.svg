@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="catalogNeoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Grille moderne 3x3 -->
+  <g transform="translate(10, 10)">
+    <!-- Ligne 1 -->
+    <rect x="0" y="0" width="22" height="22" rx="6" fill="url(#catalogNeoGrad)" opacity="1"/>
+    <rect x="29" y="0" width="22" height="22" rx="6" fill="#c7d2fe" opacity="0.8"/>
+    <rect x="58" y="0" width="22" height="22" rx="6" fill="#e5e7eb" opacity="0.6"/>
+    
+    <!-- Ligne 2 -->
+    <rect x="0" y="29" width="22" height="22" rx="6" fill="#e5e7eb" opacity="0.6"/>
+    <rect x="29" y="29" width="22" height="22" rx="6" fill="url(#catalogNeoGrad)" opacity="0.9"/>
+    <rect x="58" y="29" width="22" height="22" rx="6" fill="#c7d2fe" opacity="0.7"/>
+    
+    <!-- Ligne 3 -->
+    <rect x="0" y="58" width="22" height="22" rx="6" fill="#c7d2fe" opacity="0.7"/>
+    <rect x="29" y="58" width="22" height="22" rx="6" fill="#e5e7eb" opacity="0.6"/>
+    <rect x="58" y="58" width="22" height="22" rx="6" fill="url(#catalogNeoGrad)" opacity="1"/>
+  </g>
+</svg>
