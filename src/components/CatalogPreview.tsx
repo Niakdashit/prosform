@@ -1,6 +1,5 @@
 import { CatalogConfig, CatalogItem } from "./CatalogBuilder";
 import { useTheme, getButtonStyles, GOOGLE_FONTS } from "@/contexts/ThemeContext";
-import { Monitor, Smartphone } from "lucide-react";
 import { CampaignHeader, CampaignFooter } from "./campaign";
 
 interface CatalogPreviewProps {
@@ -42,34 +41,20 @@ export const CatalogPreview = ({
   };
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      {/* Preview Mode Toggle */}
-      {!isReadOnly && (
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2 bg-background/95 backdrop-blur-sm border border-border rounded-lg p-1">
-          <button
-            onClick={() => onToggleViewMode()}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-              viewMode === "desktop"
-                ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Monitor className="w-4 h-4" />
-            <span className="text-sm font-medium">Desktop</span>
-          </button>
-          <button
-            onClick={() => onToggleViewMode()}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors ${
-              viewMode === "mobile"
-                ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Smartphone className="w-4 h-4" />
-            <span className="text-sm font-medium">Mobile</span>
-          </button>
-        </div>
-      )}
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-muted/30">
+      {/* Bounded container like other editors */}
+      <div 
+        className="relative overflow-hidden transition-all duration-300 flex-shrink-0 flex flex-col shadow-xl rounded-lg"
+        style={{
+          backgroundColor: theme.backgroundColor,
+          width: viewMode === 'desktop' ? '1100px' : '375px',
+          minWidth: viewMode === 'desktop' ? '1100px' : '375px',
+          maxWidth: viewMode === 'desktop' ? '1100px' : '375px',
+          height: viewMode === 'desktop' ? '620px' : '667px',
+          minHeight: viewMode === 'desktop' ? '620px' : '667px',
+          maxHeight: viewMode === 'desktop' ? '620px' : '667px',
+        }}
+      >
 
       {/* Scrollable content */}
       <div className="w-full h-full overflow-auto">
@@ -302,6 +287,7 @@ export const CatalogPreview = ({
             />
           )}
         </div>
+      </div>
       </div>
     </div>
   );
