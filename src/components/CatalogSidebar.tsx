@@ -147,7 +147,7 @@ export const CatalogSidebar = ({
 
         <TabsContent value="items" className="flex-1 mt-0 overflow-hidden">
           <ScrollArea className="h-[calc(100vh-140px)]">
-            <div className="p-3 pb-3">
+            <div className="p-3 pb-3 w-[256px]">
               {/* Header with add buttons */}
               <div className="mb-3">
                 <span className="text-sm font-semibold text-foreground">Campagnes</span>
