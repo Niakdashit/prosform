@@ -1638,17 +1638,10 @@ export const QuizPreview = ({
           );
         })()}
 
-        {/* Header transparent toujours au-dessus */}
-        {config.layout?.header?.enabled && config.layout.header.style === 'transparent' && (
-          <div className="absolute top-0 left-0 right-0 z-50">
-            <CampaignHeader config={config.layout.header} isPreview />
-          </div>
-        )}
-
         {/* Contenu principal */}
         <div className="flex-1 relative overflow-auto z-10 min-h-0">
-          {/* Header non-transparent dans la zone scrollable */}
-          {config.layout?.header?.enabled && config.layout.header.style !== 'transparent' && (
+          {/* Header dans la zone scrollable */}
+          {config.layout?.header?.enabled && (
             <div className="relative z-20">
               <CampaignHeader config={config.layout.header} isPreview />
             </div>
