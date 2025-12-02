@@ -33,7 +33,7 @@ export const CatalogSidebar = ({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
-  const addItem = () => {
+  const addItem = (categoryId?: string) => {
     const newItem: CatalogItem = {
       id: `item-${Date.now()}`,
       title: "Nouvelle campagne",
@@ -42,10 +42,35 @@ export const CatalogSidebar = ({
       buttonText: "PARTICIPER !",
       link: "",
       isComingSoon: false,
+      categoryId,
     };
     onUpdateConfig({ items: [...config.items, newItem] });
     onSelectItem(newItem.id);
   };
+
+  const addCategory = () => {
+    const newCat: CatalogCategory = {
+      id: `cat-${Date.now()}`,
+      title: "Nouvelle catégorie",
+    };
+    onUpdateConfig({ categories: [...(config.categories || []), newCat] });
+  };
+
+  // Group items by category
+  const getItemsByCategory = () => {
+    const categories = config.categories || [];
+    const itemsWithoutCategory = config.items.filter(item => !item.categoryId);
+    
+    return {
+      categories: categories.map(cat => ({
+        ...cat,
+        items: config.items.filter(item => item.categoryId === cat.id)
+      })),
+      uncategorized: itemsWithoutCategory
+    };
+  };
+
+  const grouped = getItemsByCategory();
 
   const duplicateItem = (id: string) => {
     const index = config.items.findIndex(item => item.id === id);
@@ -123,69 +148,155 @@ export const CatalogSidebar = ({
         <TabsContent value="items" className="flex-1 mt-0 overflow-hidden">
           <ScrollArea className="h-[calc(100vh-140px)]">
             <div className="p-3 pb-3">
+              {/* Header with add buttons */}
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-semibold text-foreground">Campagnes</span>
-                <button 
-                  onClick={addItem}
-                  className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
-                  title="Ajouter une campagne"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button 
+                    onClick={() => addItem()}
+                    className="h-6 px-2 rounded hover:bg-muted flex items-center gap-1 transition-colors text-xs"
+                    title="Ajouter une campagne"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Campagne
+                  </button>
+                  <button 
+                    onClick={addCategory}
+                    className="h-6 px-2 rounded hover:bg-muted flex items-center gap-1 transition-colors text-xs"
+                    title="Ajouter une catégorie"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Catégorie
+                  </button>
+                </div>
               </div>
               
-              {config.items.map((item, index) => (
-                <div
-                  key={item.id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, index)}
-                  onDragEnd={handleDragEnd}
-                  onClick={() => onSelectItem(item.id)}
-                  className={cn(
-                    "group w-full px-2 py-2.5 rounded-lg mb-1 flex items-center gap-2 transition-all cursor-move",
-                    "hover:bg-muted/50",
-                    draggedIndex === index && "opacity-50",
-                    dragOverIndex === index && "bg-muted",
-                    selectedItemId === item.id && "bg-muted border border-primary"
-                  )}
-                >
-                  <GripVertical className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                  <div className="flex-1 text-left min-w-0">
-                    <p className="text-xs text-foreground truncate font-medium">
-                      {item.title}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground truncate">
-                      {item.description}
-                    </p>
+              {/* Categories with their items */}
+              {grouped.categories.map((cat) => (
+                <div key={cat.id} className="mb-4">
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                      {cat.title}
+                    </span>
+                    <button 
+                      onClick={() => addItem(cat.id)}
+                      className="w-5 h-5 rounded hover:bg-muted flex items-center justify-center transition-colors"
+                      title={`Ajouter à ${cat.title}`}
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button 
-                        onClick={(e) => e.stopPropagation()}
-                        className="opacity-0 group-hover:opacity-100 hover:bg-muted rounded p-1 transition-all"
-                      >
-                        <MoreVertical className="w-3 h-3" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => duplicateItem(item.id)}>
-                        <Copy className="w-3 h-3 mr-2" />
-                        Dupliquer
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => deleteItem(item.id)}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="w-3 h-3 mr-2" />
-                        Supprimer
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {cat.items.length === 0 ? (
+                    <p className="text-[10px] text-muted-foreground px-2 py-2">Aucune campagne</p>
+                  ) : (
+                    cat.items.map((item) => {
+                      const index = config.items.findIndex(i => i.id === item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, index)}
+                          onDragOver={(e) => handleDragOver(e, index)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, index)}
+                          onDragEnd={handleDragEnd}
+                          onClick={() => onSelectItem(item.id)}
+                          className={cn(
+                            "group w-full px-2 py-2.5 rounded-lg mb-1 flex items-center gap-2 transition-all cursor-move",
+                            "hover:bg-muted/50",
+                            draggedIndex === index && "opacity-50",
+                            dragOverIndex === index && "bg-muted",
+                            selectedItemId === item.id && "bg-muted border border-primary"
+                          )}
+                        >
+                          <GripVertical className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                          <div className="flex-1 text-left min-w-0">
+                            <p className="text-xs text-foreground truncate font-medium">{item.title}</p>
+                            <p className="text-[10px] text-muted-foreground truncate">{item.description}</p>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button 
+                                onClick={(e) => e.stopPropagation()}
+                                className="opacity-0 group-hover:opacity-100 hover:bg-muted rounded p-1 transition-all"
+                              >
+                                <MoreVertical className="w-3 h-3" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => duplicateItem(item.id)}>
+                                <Copy className="w-3 h-3 mr-2" />Dupliquer
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => deleteItem(item.id)} className="text-destructive">
+                                <Trash2 className="w-3 h-3 mr-2" />Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               ))}
+
+              {/* Uncategorized items */}
+              {grouped.uncategorized.length > 0 && (
+                <div className="mb-4">
+                  {grouped.categories.length > 0 && (
+                    <div className="flex items-center justify-between mb-2 px-1">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                        Sans catégorie
+                      </span>
+                    </div>
+                  )}
+                  {grouped.uncategorized.map((item) => {
+                    const index = config.items.findIndex(i => i.id === item.id);
+                    return (
+                      <div
+                        key={item.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, index)}
+                        onDragEnd={handleDragEnd}
+                        onClick={() => onSelectItem(item.id)}
+                        className={cn(
+                          "group w-full px-2 py-2.5 rounded-lg mb-1 flex items-center gap-2 transition-all cursor-move",
+                          "hover:bg-muted/50",
+                          draggedIndex === index && "opacity-50",
+                          dragOverIndex === index && "bg-muted",
+                          selectedItemId === item.id && "bg-muted border border-primary"
+                        )}
+                      >
+                        <GripVertical className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                        <div className="flex-1 text-left min-w-0">
+                          <p className="text-xs text-foreground truncate font-medium">{item.title}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">{item.description}</p>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button 
+                              onClick={(e) => e.stopPropagation()}
+                              className="opacity-0 group-hover:opacity-100 hover:bg-muted rounded p-1 transition-all"
+                            >
+                              <MoreVertical className="w-3 h-3" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => duplicateItem(item.id)}>
+                              <Copy className="w-3 h-3 mr-2" />Dupliquer
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => deleteItem(item.id)} className="text-destructive">
+                              <Trash2 className="w-3 h-3 mr-2" />Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </ScrollArea>
         </TabsContent>
@@ -238,13 +349,7 @@ export const CatalogSidebar = ({
                       <span className="font-medium text-sm">Catégories</span>
                     </div>
                     <button
-                      onClick={() => {
-                        const newCat: CatalogCategory = {
-                          id: `cat-${Date.now()}`,
-                          title: "Nouvelle catégorie",
-                        };
-                        onUpdateConfig({ categories: [...(config.categories || []), newCat] });
-                      }}
+                      onClick={addCategory}
                       className="w-6 h-6 rounded hover:bg-muted flex items-center justify-center transition-colors"
                       title="Ajouter une catégorie"
                     >
