@@ -314,35 +314,57 @@ export const CatalogPreview = ({
                 />
               </div>
 
-              {/* Active campaigns */}
-              <div 
-                className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} mb-12`}
-                style={{ gap: `${theme.questionSpacing * 24}px` }}
-              >
-                {filteredItems.filter(item => !item.isComingSoon).map((item) => renderCatalogCard(item, false))}
-              </div>
-
-              {/* Coming soon section */}
-              {filteredItems.some(item => item.isComingSoon) && (
-                <>
-                  <h2 
-                    className="mb-6"
-                    style={{
-                      fontFamily: getFontFamily(theme.headingFontFamily),
-                      fontSize: `${theme.subheadingSize + 8}px`,
-                      fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
-                      color: theme.primaryColor,
-                    }}
-                  >
-                    Prochainement...
-                  </h2>
+              {/* Render items grouped by category */}
+              {config.categories && config.categories.length > 0 ? (
+                config.categories.map((category) => {
+                  const categoryItems = filteredItems.filter(item => item.categoryId === category.id);
+                  if (categoryItems.length === 0) return null;
+                  
+                  // Check if this is a "coming soon" type category
+                  const isComingSoonCategory = category.title.toLowerCase().includes('prochainement');
+                  
+                  return (
+                    <div key={category.id} className="mb-12">
+                      <h2 
+                        className="mb-6"
+                        style={{
+                          fontFamily: getFontFamily(theme.headingFontFamily),
+                          fontSize: `${theme.subheadingSize + 4}px`,
+                          fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
+                          color: theme.primaryColor,
+                        }}
+                      >
+                        {category.title}
+                      </h2>
+                      <div 
+                        className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"}`}
+                        style={{ gap: `${theme.questionSpacing * 24}px` }}
+                      >
+                        {categoryItems.map((item) => renderCatalogCard(item, isComingSoonCategory || item.isComingSoon))}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                /* Fallback: render without categories */
+                <div 
+                  className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} mb-12`}
+                  style={{ gap: `${theme.questionSpacing * 24}px` }}
+                >
+                  {filteredItems.map((item) => renderCatalogCard(item, item.isComingSoon))}
+                </div>
+              )}
+              
+              {/* Items without category */}
+              {config.categories && config.categories.length > 0 && filteredItems.filter(item => !item.categoryId).length > 0 && (
+                <div className="mb-12">
                   <div 
                     className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"}`}
                     style={{ gap: `${theme.questionSpacing * 24}px` }}
                   >
-                    {filteredItems.filter(item => item.isComingSoon).map((item) => renderCatalogCard(item, true))}
+                    {filteredItems.filter(item => !item.categoryId).map((item) => renderCatalogCard(item, item.isComingSoon))}
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>
