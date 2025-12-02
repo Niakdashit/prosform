@@ -527,10 +527,6 @@ export const WheelBuilder = () => {
           endTime={endTime}
           onEndTimeChange={setEndTime}
           campaignUrl={campaign?.id ? `${window.location.origin}/wheel-preview?id=${campaign.id}` : ''}
-          campaignType="wheel"
-          campaignId={campaign?.id}
-          campaignMode="fullscreen"
-          publicSlug={campaign?.public_url_slug || undefined}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

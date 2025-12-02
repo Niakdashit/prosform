@@ -12,7 +12,6 @@ import { PrizeModal } from "./PrizeModal";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Prize } from "./WheelBuilder";
-import { IntegrationsSection } from "./IntegrationsSection";
 
 interface JackpotSymbol {
   id: string;
@@ -42,11 +41,6 @@ interface CampaignSettingsProps {
   endTime?: string;
   onEndTimeChange?: (time: string) => void;
   campaignUrl?: string;
-  // Integration props
-  campaignType?: 'wheel' | 'jackpot' | 'quiz' | 'scratch' | 'form' | 'catalog';
-  campaignId?: string;
-  campaignMode?: 'fullscreen' | 'article';
-  publicSlug?: string;
 }
 
 export const CampaignSettings = ({ 
@@ -69,10 +63,6 @@ export const CampaignSettings = ({
   endTime = '',
   onEndTimeChange,
   campaignUrl = '',
-  campaignType = 'wheel',
-  campaignId,
-  campaignMode = 'fullscreen',
-  publicSlug,
 }: CampaignSettingsProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [prizeModalOpen, setPrizeModalOpen] = useState(false);
@@ -237,12 +227,48 @@ export const CampaignSettings = ({
                     />
                   </div>
 
-                  <IntegrationsSection
-                    campaignType={campaignType}
-                    campaignId={campaignId}
-                    campaignMode={campaignMode}
-                    publicSlug={publicSlug}
-                  />
+                  <div className="space-y-4 bg-card border rounded-lg p-6">
+                    <h3 className="font-semibold text-lg">Intégrations</h3>
+                    
+                    <Tabs defaultValue="javascript" className="w-full">
+                      <TabsList>
+                        <TabsTrigger value="javascript">Javascript</TabsTrigger>
+                        <TabsTrigger value="html">HTML</TabsTrigger>
+                        <TabsTrigger value="webview">Webview</TabsTrigger>
+                        <TabsTrigger value="oembed">oEmbed</TabsTrigger>
+                        <TabsTrigger value="smarturl">Smart URL</TabsTrigger>
+                        <TabsTrigger value="shorturl">Short URL</TabsTrigger>
+                        <TabsTrigger value="qrcode">QR Code</TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="javascript" className="mt-4">
+                        <div className="relative">
+                          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
+                            <code>{`<div id="wheel-campaign"></div>
+<script type="text/javascript">
+  (function(w,d,id){
+    var el=d.getElementById(id);
+    if(!el){ return; }
+    var f=d.createElement('iframe');
+    f.src='https://wheel.lovable.app/embed';
+    f.width='100%';
+    f.height='600';
+    f.style.border='none';
+    el.appendChild(f);
+  })(window,document,'wheel-campaign');
+</script>`}</code>
+                          </pre>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="absolute top-2 right-2"
+                          >
+                            Copier
+                          </Button>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="parametres" className="mt-0 space-y-4">

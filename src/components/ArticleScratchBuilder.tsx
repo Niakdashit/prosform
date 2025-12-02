@@ -271,10 +271,6 @@ export const ArticleScratchBuilder = () => {
           onDeletePrize={handleDeletePrize}
           gameType="scratch"
           segments={config.cards.map(c => ({ id: c.id, label: c.revealText }))}
-          campaignType="scratch"
-          campaignId={campaign?.id}
-          campaignMode="article"
-          publicSlug={campaign?.public_url_slug || undefined}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

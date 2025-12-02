@@ -442,10 +442,6 @@ export const QuizBuilder = () => {
           endTime={endTime}
           onEndTimeChange={setEndTime}
           campaignUrl={campaign?.published_url || ''}
-          campaignType="quiz"
-          campaignId={campaign?.id}
-          campaignMode="fullscreen"
-          publicSlug={campaign?.public_url_slug || undefined}
         />
       ) : activeTab === 'templates' ? (
         <div className="flex items-center justify-center h-full">
