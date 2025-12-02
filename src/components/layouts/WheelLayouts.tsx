@@ -138,7 +138,7 @@ export const WheelLayouts = ({
     switch (effectiveLayout as DesktopLayoutType) {
       case 'desktop-left-right':
         return (
-          <div className="flex items-center justify-center p-12 min-h-[85vh]">
+          <div className="flex items-center justify-center p-12">
             <div className="flex flex-col items-center space-y-8">
               {renderContent()}
               {renderWheel()}
@@ -149,10 +149,10 @@ export const WheelLayouts = ({
       case 'desktop-right-left':
         return (
           <>
-            <div className="flex items-center justify-center p-12 min-h-[85vh]">
+            <div className="flex items-center justify-center p-12">
               {renderWheel()}
             </div>
-            <div className="flex items-center justify-center p-12 min-h-[85vh]">
+            <div className="flex items-center justify-center p-12">
               {renderContent()}
             </div>
           </>
@@ -160,7 +160,7 @@ export const WheelLayouts = ({
 
       case 'desktop-centered':
         return (
-          <div className="flex items-center justify-center p-12 min-h-[85vh]">
+          <div className="flex items-center justify-center p-12">
             <div className="flex flex-col items-center space-y-8">
               {renderContent()}
               {renderWheel()}
@@ -171,7 +171,7 @@ export const WheelLayouts = ({
       case 'desktop-card':
         return (
           <div 
-            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12 min-h-[85vh] flex items-center justify-center"
+            className="max-w-2xl w-full rounded-3xl shadow-2xl p-12"
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
           >
             <div className="flex flex-col items-center space-y-8">
@@ -185,12 +185,12 @@ export const WheelLayouts = ({
         return (
           <>
             <div 
-              className="flex items-center justify-center p-12 min-h-[85vh]"
+              className="flex items-center justify-center p-12"
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
             >
               {renderContent()}
             </div>
-            <div className="flex items-center justify-center p-12 min-h-[85vh]">
+            <div className="flex items-center justify-center p-12">
               {renderWheel()}
             </div>
           </>
@@ -200,7 +200,7 @@ export const WheelLayouts = ({
         return (
           <>
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm -z-10" />
-            <div className="flex items-center justify-center p-12 min-h-[85vh]">
+            <div className="flex items-center justify-center p-12">
               <div className="flex flex-col items-center space-y-8">
                 {renderContent()}
                 {renderWheel()}
@@ -211,7 +211,7 @@ export const WheelLayouts = ({
 
       default:
         return (
-          <div className="flex flex-col items-center space-y-8 min-h-[85vh] justify-center">
+          <div className="flex flex-col items-center space-y-8">
             {renderContent()}
             {renderWheel()}
           </div>
