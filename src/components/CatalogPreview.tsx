@@ -273,63 +273,141 @@ export const CatalogPreview = ({
         >
           <div className={`${containerClass} rounded-2xl overflow-hidden`}>
             <div style={{ padding: `${theme.cardPadding}px` }}>
-              {/* Catalog Header */}
-              <div className="mb-8">
-                <div style={{ marginBottom: '8px' }}>
+              {/* Catalog Header - only show if no categories or category nav is off */}
+              {(!config.categories || config.categories.length === 0 || !config.showCategoryNav) && (
+                <div className="mb-8">
+                  <div style={{ marginBottom: '8px' }}>
+                    <EditableTextBlock
+                      value={config.catalogTitle}
+                      onChange={(value) => onUpdateConfig({ catalogTitle: value })}
+                      isEditing={editingField === 'catalog-title'}
+                      isReadOnly={isReadOnly}
+                      onFocus={() => setEditingField('catalog-title')}
+                      onBlur={() => setEditingField(null)}
+                      fieldType="title"
+                      showSparkles={false}
+                      showClear={false}
+                      style={{
+                        fontFamily: getFontFamily(theme.headingFontFamily),
+                        fontSize: `${theme.headingSize}px`,
+                        fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : theme.headingWeight === 'semibold' ? 600 : 500,
+                        color: theme.primaryColor,
+                        lineHeight: theme.lineHeight,
+                        letterSpacing: `${theme.letterSpacing}px`,
+                      }}
+                    />
+                  </div>
                   <EditableTextBlock
-                    value={config.catalogTitle}
-                    onChange={(value) => onUpdateConfig({ catalogTitle: value })}
-                    isEditing={editingField === 'catalog-title'}
+                    value={config.catalogSubtitle}
+                    onChange={(value) => onUpdateConfig({ catalogSubtitle: value })}
+                    isEditing={editingField === 'catalog-subtitle'}
                     isReadOnly={isReadOnly}
-                    onFocus={() => setEditingField('catalog-title')}
+                    onFocus={() => setEditingField('catalog-subtitle')}
                     onBlur={() => setEditingField(null)}
-                    fieldType="title"
+                    fieldType="subtitle"
                     showSparkles={false}
                     showClear={false}
                     style={{
-                      fontFamily: getFontFamily(theme.headingFontFamily),
-                      fontSize: `${theme.headingSize}px`,
-                      fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : theme.headingWeight === 'semibold' ? 600 : 500,
-                      color: theme.primaryColor,
+                      fontSize: `${theme.subheadingSize}px`,
+                      color: theme.textSecondaryColor,
                       lineHeight: theme.lineHeight,
-                      letterSpacing: `${theme.letterSpacing}px`,
                     }}
                   />
                 </div>
-                <EditableTextBlock
-                  value={config.catalogSubtitle}
-                  onChange={(value) => onUpdateConfig({ catalogSubtitle: value })}
-                  isEditing={editingField === 'catalog-subtitle'}
-                  isReadOnly={isReadOnly}
-                  onFocus={() => setEditingField('catalog-subtitle')}
-                  onBlur={() => setEditingField(null)}
-                  fieldType="subtitle"
-                  showSparkles={false}
-                  showClear={false}
-                  style={{
-                    fontSize: `${theme.subheadingSize}px`,
-                    color: theme.textSecondaryColor,
-                    lineHeight: theme.lineHeight,
-                  }}
-                />
-              </div>
+              )}
 
-              {/* Active campaigns */}
-              <div 
-                className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} mb-12`}
-                style={{ gap: `${theme.questionSpacing * 24}px` }}
-              >
-                {filteredItems.filter(item => !item.isComingSoon).map((item) => renderCatalogCard(item, false))}
-              </div>
+              {/* Render by categories */}
+              {config.categories && config.categories.length > 0 ? (
+                <>
+                  {/* Render each category section */}
+                  {config.categories.map((category) => {
+                    const categoryItems = filteredItems.filter(
+                      item => item.categoryId === category.id && !item.isComingSoon
+                    );
+                    if (categoryItems.length === 0 && selectedCategoryId) return null;
+                    if (categoryItems.length === 0) return null;
+                    
+                    return (
+                      <div key={category.id} className="mb-12">
+                        <h2 
+                          className="mb-6"
+                          style={{
+                            fontFamily: getFontFamily(theme.headingFontFamily),
+                            fontSize: `${theme.headingSize}px`,
+                            fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
+                            color: theme.primaryColor,
+                          }}
+                        >
+                          {category.title}
+                        </h2>
+                        <div 
+                          className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"}`}
+                          style={{ gap: `${theme.questionSpacing * 24}px` }}
+                        >
+                          {categoryItems.map((item) => renderCatalogCard(item, false))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Items without category */}
+                  {filteredItems.filter(item => !item.categoryId && !item.isComingSoon).length > 0 && (
+                    <div className="mb-12">
+                      <h2 
+                        className="mb-6"
+                        style={{
+                          fontFamily: getFontFamily(theme.headingFontFamily),
+                          fontSize: `${theme.headingSize}px`,
+                          fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
+                          color: theme.primaryColor,
+                        }}
+                      >
+                        {config.catalogTitle}
+                      </h2>
+                      <EditableTextBlock
+                        value={config.catalogSubtitle}
+                        onChange={(value) => onUpdateConfig({ catalogSubtitle: value })}
+                        isEditing={editingField === 'catalog-subtitle'}
+                        isReadOnly={isReadOnly}
+                        onFocus={() => setEditingField('catalog-subtitle')}
+                        onBlur={() => setEditingField(null)}
+                        fieldType="subtitle"
+                        showSparkles={false}
+                        showClear={false}
+                        style={{
+                          fontSize: `${theme.subheadingSize}px`,
+                          color: theme.textSecondaryColor,
+                          lineHeight: theme.lineHeight,
+                          marginBottom: '24px',
+                        }}
+                      />
+                      <div 
+                        className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"}`}
+                        style={{ gap: `${theme.questionSpacing * 24}px` }}
+                      >
+                        {filteredItems.filter(item => !item.categoryId && !item.isComingSoon).map((item) => renderCatalogCard(item, false))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* No categories - show all active campaigns */
+                <div 
+                  className={`grid ${viewMode === "desktop" ? "grid-cols-3" : "grid-cols-1"} mb-12`}
+                  style={{ gap: `${theme.questionSpacing * 24}px` }}
+                >
+                  {filteredItems.filter(item => !item.isComingSoon).map((item) => renderCatalogCard(item, false))}
+                </div>
+              )}
 
               {/* Coming soon section */}
               {filteredItems.some(item => item.isComingSoon) && (
-                <>
+                <div className="mb-12">
                   <h2 
                     className="mb-6"
                     style={{
                       fontFamily: getFontFamily(theme.headingFontFamily),
-                      fontSize: `${theme.subheadingSize + 8}px`,
+                      fontSize: `${theme.headingSize}px`,
                       fontWeight: theme.headingWeight === 'extrabold' ? 800 : theme.headingWeight === 'bold' ? 700 : 600,
                       color: theme.primaryColor,
                     }}
@@ -342,7 +420,7 @@ export const CatalogPreview = ({
                   >
                     {filteredItems.filter(item => item.isComingSoon).map((item) => renderCatalogCard(item, true))}
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>
