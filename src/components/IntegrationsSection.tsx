@@ -135,14 +135,15 @@ webView.loadUrl("${embedUrl}")`;
     return `${publicUrl}?utm_source={source}&utm_medium={medium}&utm_campaign={campaign}`;
   };
 
-  // Short URL placeholder
+  // Short URL - utilise l'ID court pour un lien minimal
   const getShortUrl = () => {
-    // En production, cela serait généré via un service comme bit.ly ou un domaine court personnalisé
-    const publicUrl = getPublicUrl();
-    if (campaignSlug) {
-      return `${baseUrl}/c/${campaignSlug.substring(0, 8)}`;
+    if (campaignId) {
+      return `${baseUrl}/c/${campaignId.substring(0, 6)}`;
     }
-    return publicUrl;
+    if (campaignSlug) {
+      return `${baseUrl}/c/${campaignSlug.substring(0, 6)}`;
+    }
+    return getPublicUrl();
   };
 
   // QR Code URL (via API publique)
