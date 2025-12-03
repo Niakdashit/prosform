@@ -56,7 +56,7 @@ export default function Login() {
           </div>
           <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
           <CardDescription>
-            Connectez-vous à votre compte Prosform
+            Connectez-vous à votre compte Prosplay
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

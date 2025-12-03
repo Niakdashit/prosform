@@ -183,7 +183,7 @@ export const CampaignFooter = ({ config, isPreview = false }: CampaignFooterProp
             className="hover:underline"
             style={{ color: config.accentColor }}
           >
-            Prosform
+            Prosplay
           </a>
         </div>
       )}

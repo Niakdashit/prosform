@@ -48,27 +48,11 @@ test.describe('Authentication', () => {
   });
 });
 
-test.describe('Landing Page', () => {
-  test('should display landing page', async ({ page }) => {
+test.describe('Redirection', () => {
+  test('should redirect root to login', async ({ page }) => {
     await page.goto('/');
     
-    await expect(page.getByRole('heading', { name: /créez des campagnes/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /commencer gratuitement/i })).toBeVisible();
-  });
-
-  test('should navigate to signup from landing', async ({ page }) => {
-    await page.goto('/');
-    
-    await page.getByRole('link', { name: /commencer gratuitement/i }).first().click();
-    
-    await expect(page).toHaveURL('/signup');
-  });
-
-  test('should navigate to login from landing', async ({ page }) => {
-    await page.goto('/');
-    
-    await page.getByRole('link', { name: /connexion/i }).click();
-    
+    // La page d'accueil redirige vers login
     await expect(page).toHaveURL('/login');
   });
 });

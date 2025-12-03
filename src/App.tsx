@@ -12,7 +12,6 @@ import PrivateRoute from "@/components/PrivateRoute";
 import { Loader2 } from "lucide-react";
 
 // Lazy loaded pages for better performance
-const Landing = lazy(() => import("./pages/Landing"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
@@ -70,7 +69,7 @@ const App = () => (
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   {/* Public routes */}
-                  <Route path="/" element={<Landing />} />
+                  <Route path="/" element={<Navigate to="/login" replace />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />

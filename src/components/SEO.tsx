@@ -10,10 +10,10 @@ interface SEOProps {
 }
 
 const defaultMeta = {
-  title: 'Prosform - Créez des campagnes marketing interactives',
+  title: 'Prosplay - Créez des campagnes marketing interactives',
   description: 'Créez des roues de la fortune, quiz, jeux à gratter et plus encore. Transformez vos visiteurs en leads qualifiés avec des expériences gamifiées.',
   image: '/og-image.png',
-  url: 'https://prosform.com',
+  url: 'https://prosplay.com',
 };
 
 export default function SEO({
@@ -25,7 +25,7 @@ export default function SEO({
   noIndex = false,
 }: SEOProps) {
   const fullTitle = title 
-    ? `${title} | Prosform` 
+    ? `${title} | Prosplay` 
     : defaultMeta.title;
 
   return (

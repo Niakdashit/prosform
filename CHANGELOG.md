@@ -1,4 +1,4 @@
-# 📝 Changelog - Prosform
+# 📝 Changelog - Prosplay
 
 ## [2.0.0] - 2025-01-23
 

@@ -206,7 +206,7 @@ webView.loadUrl("${integrationData.embedUrl}")`;
     return `{
   "version": "1.0",
   "type": "rich",
-  "provider_name": "Prosform",
+  "provider_name": "Prosplay",
   "provider_url": "${integrationData.baseUrl}",
   "title": "${campaignName || 'Campagne'}",
   "html": "<iframe src=\\"${integrationData.embedUrl}\\" width=\\"100%\\" height=\\"600\\" frameborder=\\"0\\"></iframe>",

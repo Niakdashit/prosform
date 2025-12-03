@@ -1,8 +1,8 @@
-# ✨ Résumé des Fonctionnalités - Prosform v2.0
+# ✨ Résumé des Fonctionnalités - Prosplay v2.0
 
 ## 🎯 Vue d'Ensemble
 
-Prosform est maintenant un builder complet de funnels de roue de la fortune avec un système de layouts professionnel et une roue interactive de haute qualité.
+Prosplay est maintenant un builder complet de funnels de roue de la fortune avec un système de layouts professionnel et une roue interactive de haute qualité.
 
 ## 🎡 SmartWheel - Roue de la Fortune Professionnelle
 
