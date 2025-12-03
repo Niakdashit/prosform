@@ -1,89 +1,128 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import Index from "./pages/Index";
-import Preview from "./pages/Preview";
-import Campaigns from "./pages/Campaigns";
-import Stats from "./pages/Stats";
-import Contacts from "./pages/Contacts";
-import Media from "./pages/Media";
-import SettingsPage from "./pages/SettingsPage";
-import InstantWins from "./pages/InstantWins";
-import PrizeDraws from "./pages/PrizeDraws";
-import Wheel from "./pages/Wheel";
-import ArticleWheel from "./pages/ArticleWheel";
-import ArticleWheelPreview from "./pages/ArticleWheelPreview";
-import WheelPreview from "./pages/WheelPreview";
-import Quiz from "./pages/Quiz";
-import QuizPreview from "./pages/QuizPreview";
-import Jackpot from "./pages/Jackpot";
-import JackpotPreview from "./pages/JackpotPreview";
-import Scratch from "./pages/Scratch";
-import ScratchPreview from "./pages/ScratchPreview";
-import ArticleScratch from "./pages/ArticleScratch";
-import ArticleScratchPreview from "./pages/ArticleScratchPreview";
-import ArticleQuiz from "./pages/ArticleQuiz";
-import ArticleQuizPreview from "./pages/ArticleQuizPreview";
-import ArticleJackpot from "./pages/ArticleJackpot";
-import ArticleJackpotPreview from "./pages/ArticleJackpotPreview";
-import Catalog from "./pages/Catalog";
-import CatalogPreview from "./pages/CatalogPreview";
-import PublicCampaign from "./pages/PublicCampaign";
-import ShortUrl from "./pages/ShortUrl";
-import NotFound from "./pages/NotFound";
+import PrivateRoute from "@/components/PrivateRoute";
+import { Loader2 } from "lucide-react";
+
+// Lazy loaded pages for better performance
+const Landing = lazy(() => import("./pages/Landing"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Index = lazy(() => import("./pages/Index"));
+const Preview = lazy(() => import("./pages/Preview"));
+const Campaigns = lazy(() => import("./pages/Campaigns"));
+const Stats = lazy(() => import("./pages/Stats"));
+const Contacts = lazy(() => import("./pages/Contacts"));
+const Media = lazy(() => import("./pages/Media"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const InstantWins = lazy(() => import("./pages/InstantWins"));
+const PrizeDraws = lazy(() => import("./pages/PrizeDraws"));
+const Wheel = lazy(() => import("./pages/Wheel"));
+const ArticleWheel = lazy(() => import("./pages/ArticleWheel"));
+const ArticleWheelPreview = lazy(() => import("./pages/ArticleWheelPreview"));
+const WheelPreview = lazy(() => import("./pages/WheelPreview"));
+const Quiz = lazy(() => import("./pages/Quiz"));
+const QuizPreview = lazy(() => import("./pages/QuizPreview"));
+const Jackpot = lazy(() => import("./pages/Jackpot"));
+const JackpotPreview = lazy(() => import("./pages/JackpotPreview"));
+const Scratch = lazy(() => import("./pages/Scratch"));
+const ScratchPreview = lazy(() => import("./pages/ScratchPreview"));
+const ArticleScratch = lazy(() => import("./pages/ArticleScratch"));
+const ArticleScratchPreview = lazy(() => import("./pages/ArticleScratchPreview"));
+const ArticleQuiz = lazy(() => import("./pages/ArticleQuiz"));
+const ArticleQuizPreview = lazy(() => import("./pages/ArticleQuizPreview"));
+const ArticleJackpot = lazy(() => import("./pages/ArticleJackpot"));
+const ArticleJackpotPreview = lazy(() => import("./pages/ArticleJackpotPreview"));
+const Catalog = lazy(() => import("./pages/Catalog"));
+const CatalogPreview = lazy(() => import("./pages/CatalogPreview"));
+const PublicCampaign = lazy(() => import("./pages/PublicCampaign"));
+const ShortUrl = lazy(() => import("./pages/ShortUrl"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Navigate to="/campaigns" replace />} />
-            <Route path="/campaigns" element={<Campaigns />} />
-            <Route path="/stats" element={<Stats />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/media" element={<Media />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/instant-wins" element={<InstantWins />} />
-            <Route path="/prize-draws" element={<PrizeDraws />} />
-            <Route path="/form" element={<Index />} />
-            <Route path="/preview" element={<Preview />} />
-            <Route path="/wheel" element={<Wheel />} />
-            <Route path="/wheel-preview" element={<WheelPreview />} />
-            <Route path="/article-wheel" element={<ArticleWheel />} />
-            <Route path="/article-wheel-preview" element={<ArticleWheelPreview />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/quiz-preview" element={<QuizPreview />} />
-            <Route path="/jackpot" element={<Jackpot />} />
-            <Route path="/jackpot-preview" element={<JackpotPreview />} />
-            <Route path="/scratch" element={<Scratch />} />
-            <Route path="/scratch-preview" element={<ScratchPreview />} />
-            <Route path="/article-scratch" element={<ArticleScratch />} />
-            <Route path="/article-scratch-preview" element={<ArticleScratchPreview />} />
-            <Route path="/article-quiz" element={<ArticleQuiz />} />
-            <Route path="/article-quiz-preview" element={<ArticleQuizPreview />} />
-            <Route path="/article-jackpot" element={<ArticleJackpot />} />
-            <Route path="/article-jackpot-preview" element={<ArticleJackpotPreview />} />
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/catalog-preview" element={<CatalogPreview />} />
-            <Route path="/p/:slug" element={<PublicCampaign />} />
-            <Route path="/c/:shortId" element={<ShortUrl />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ThemeProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  
+                  {/* Protected routes */}
+                  <Route path="/campaigns" element={<PrivateRoute><Campaigns /></PrivateRoute>} />
+                  <Route path="/stats" element={<PrivateRoute><Stats /></PrivateRoute>} />
+                  <Route path="/contacts" element={<PrivateRoute><Contacts /></PrivateRoute>} />
+                  <Route path="/media" element={<PrivateRoute><Media /></PrivateRoute>} />
+                  <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
+                  <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                  <Route path="/instant-wins" element={<PrivateRoute><InstantWins /></PrivateRoute>} />
+                  <Route path="/prize-draws" element={<PrivateRoute><PrizeDraws /></PrivateRoute>} />
+                  <Route path="/form" element={<PrivateRoute><Index /></PrivateRoute>} />
+                  <Route path="/preview" element={<Preview />} />
+                  
+                  {/* Campaign builders (protected) */}
+                  <Route path="/wheel" element={<PrivateRoute><Wheel /></PrivateRoute>} />
+                  <Route path="/article-wheel" element={<PrivateRoute><ArticleWheel /></PrivateRoute>} />
+                  <Route path="/quiz" element={<PrivateRoute><Quiz /></PrivateRoute>} />
+                  <Route path="/jackpot" element={<PrivateRoute><Jackpot /></PrivateRoute>} />
+                  <Route path="/scratch" element={<PrivateRoute><Scratch /></PrivateRoute>} />
+                  <Route path="/article-scratch" element={<PrivateRoute><ArticleScratch /></PrivateRoute>} />
+                  <Route path="/article-quiz" element={<PrivateRoute><ArticleQuiz /></PrivateRoute>} />
+                  <Route path="/article-jackpot" element={<PrivateRoute><ArticleJackpot /></PrivateRoute>} />
+                  <Route path="/catalog" element={<PrivateRoute><Catalog /></PrivateRoute>} />
+                  
+                  {/* Public preview routes (for participants) */}
+                  <Route path="/wheel-preview" element={<WheelPreview />} />
+                  <Route path="/article-wheel-preview" element={<ArticleWheelPreview />} />
+                  <Route path="/quiz-preview" element={<QuizPreview />} />
+                  <Route path="/jackpot-preview" element={<JackpotPreview />} />
+                  <Route path="/scratch-preview" element={<ScratchPreview />} />
+                  <Route path="/article-scratch-preview" element={<ArticleScratchPreview />} />
+                  <Route path="/article-quiz-preview" element={<ArticleQuizPreview />} />
+                  <Route path="/article-jackpot-preview" element={<ArticleJackpotPreview />} />
+                  <Route path="/catalog-preview" element={<CatalogPreview />} />
+                  
+                  {/* Public campaign URLs */}
+                  <Route path="/p/:slug" element={<PublicCampaign />} />
+                  <Route path="/c/:shortId" element={<ShortUrl />} />
+                  
+                  {/* Catch-all */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+            </TooltipProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   </ErrorBoundary>
 );
 
