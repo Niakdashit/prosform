@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { User, Building, CreditCard, Bell, Shield, Palette, Globe, Key } from "lucide-react";
+import { User, Building, CreditCard, Bell, Shield, Palette, Globe, Key, Users } from "lucide-react";
 
 const colors = {
   dark: '#3d3731',
@@ -13,7 +14,8 @@ const colors = {
 
 const settingsSections = [
   { id: 'profile', label: 'Profil', icon: User, description: 'Informations personnelles' },
-  { id: 'company', label: 'Entreprise', icon: Building, description: 'Informations de votre organisation' },
+  { id: 'team', label: 'Équipe', icon: Users, description: 'Gérer les membres', path: '/settings/team' },
+  { id: 'company', label: 'Organisation', icon: Building, description: 'Informations de votre organisation' },
   { id: 'billing', label: 'Facturation', icon: CreditCard, description: 'Abonnement et paiements' },
   { id: 'notifications', label: 'Notifications', icon: Bell, description: 'Préférences de notifications' },
   { id: 'security', label: 'Sécurité', icon: Shield, description: 'Mot de passe et authentification' },
@@ -24,6 +26,15 @@ const settingsSections = [
 
 const SettingsPage = () => {
   const [activeSection, setActiveSection] = useState('profile');
+  const navigate = useNavigate();
+
+  const handleSectionClick = (section: typeof settingsSections[0]) => {
+    if (section.path) {
+      navigate(section.path);
+    } else {
+      setActiveSection(section.id);
+    }
+  };
 
   return (
     <AppLayout>
@@ -52,7 +63,7 @@ const SettingsPage = () => {
             {settingsSections.map((section) => (
               <button
                 key={section.id}
-                onClick={() => setActiveSection(section.id)}
+                onClick={() => handleSectionClick(section)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors"
                 style={{ 
                   backgroundColor: activeSection === section.id ? colors.background : 'transparent',

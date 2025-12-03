@@ -1,4 +1,4 @@
-project_id = "nnzmjphdodqkzclhbdyl"
+project_id = "wnnurvxtuhbjixjeuagd"
 
 [functions.get-participant-ip]
 verify_jwt = false

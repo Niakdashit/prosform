@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { OrganizationProvider } from "@/contexts/OrganizationContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PrivateRoute from "@/components/PrivateRoute";
 import { Loader2 } from "lucide-react";
@@ -47,6 +48,12 @@ const PublicCampaign = lazy(() => import("./pages/PublicCampaign"));
 const ShortUrl = lazy(() => import("./pages/ShortUrl"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+// Settings pages
+const Team = lazy(() => import("./pages/settings/Team"));
+
+// Admin pages
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
@@ -61,6 +68,7 @@ const App = () => (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <OrganizationProvider>
           <ThemeProvider>
             <TooltipProvider>
               <Toaster />
@@ -80,7 +88,11 @@ const App = () => (
                   <Route path="/contacts" element={<PrivateRoute><Contacts /></PrivateRoute>} />
                   <Route path="/media" element={<PrivateRoute><Media /></PrivateRoute>} />
                   <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
+                  <Route path="/settings/team" element={<PrivateRoute><Team /></PrivateRoute>} />
                   <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                  
+                  {/* Admin routes */}
+                  <Route path="/admin" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
                   <Route path="/instant-wins" element={<PrivateRoute><InstantWins /></PrivateRoute>} />
                   <Route path="/prize-draws" element={<PrivateRoute><PrizeDraws /></PrivateRoute>} />
                   <Route path="/form" element={<PrivateRoute><Index /></PrivateRoute>} />
@@ -119,6 +131,7 @@ const App = () => (
             </BrowserRouter>
             </TooltipProvider>
           </ThemeProvider>
+          </OrganizationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </HelmetProvider>

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutGrid, 
@@ -8,8 +8,23 @@ import {
   Settings,
   Bell,
   ChevronDown,
-  Plus
+  Plus,
+  User,
+  LogOut,
+  CreditCard,
+  Shield
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useOrganization } from "@/contexts/OrganizationContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 // Couleurs DA
 const colors = {
@@ -45,8 +60,25 @@ interface AppLayoutProps {
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  const { isSuperAdmin } = useOrganization();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const getInitials = (name: string | undefined, email: string | undefined) => {
+    if (name) {
+      return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+    }
+    return email?.slice(0, 2).toUpperCase() || 'U';
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+    toast.success('Déconnexion réussie');
+  };
+
+  const userInitials = getInitials(user?.user_metadata?.full_name, user?.email);
 
   return (
     <div
@@ -116,13 +148,52 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           ))}
         </nav>
 
-        {/* User avatar */}
-        <div 
-          className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium cursor-pointer ml-1"
-          style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: colors.white }}
-        >
-          JN
-        </div>
+        {/* User avatar - Sidebar */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button 
+              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium cursor-pointer ml-1 hover:ring-2 hover:ring-gold/50 transition-all"
+              style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: colors.white }}
+            >
+              {userInitials}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>
+              <div className="flex flex-col">
+                <span className="font-medium">{user?.user_metadata?.full_name || 'Utilisateur'}</span>
+                <span className="text-xs text-muted-foreground">{user?.email}</span>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <User className="mr-2 h-4 w-4" />
+              Mon compte
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              Paramètres
+            </DropdownMenuItem>
+            <DropdownMenuItem disabled>
+              <CreditCard className="mr-2 h-4 w-4" />
+              Abonnement
+            </DropdownMenuItem>
+            {isSuperAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/admin')} className="text-primary">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Administration
+                </DropdownMenuItem>
+              </>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+              <LogOut className="mr-2 h-4 w-4" />
+              Déconnexion
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </aside>
 
       {/* Top header - Fixed */}
@@ -161,17 +232,56 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
               />
             </button>
 
-            <button 
-              className="h-8 flex items-center gap-2 px-2 rounded-md transition-colors hover:bg-gray-100"
-            >
-              <div 
-                className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium"
-                style={{ backgroundColor: colors.dark, color: colors.white }}
-              >
-                JN
-              </div>
-              <ChevronDown className="w-3.5 h-3.5" style={{ color: colors.muted }} />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button 
+                  className="h-8 flex items-center gap-2 px-2 rounded-md transition-colors hover:bg-white/10"
+                >
+                  <div 
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium"
+                    style={{ backgroundColor: colors.gold, color: colors.dark }}
+                  >
+                    {userInitials}
+                  </div>
+                  <ChevronDown className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.6)' }} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{user?.user_metadata?.full_name || 'Utilisateur'}</span>
+                    <span className="text-xs text-muted-foreground">{user?.email}</span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  Mon compte
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Paramètres
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Abonnement
+                </DropdownMenuItem>
+                {isSuperAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate('/admin')} className="text-primary">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Administration
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Déconnexion
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
