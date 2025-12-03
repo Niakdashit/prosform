@@ -85,28 +85,31 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
         console.log('✅ isSuperAdmin:', profile.is_super_admin);
       }
       
-      // Charger les organisations de l'utilisateur
-      const { data: memberships } = await supabase
+      // Charger les memberships de l'utilisateur
+      const { data: memberships, error: membershipsError } = await supabase
         .from('organization_members')
-        .select(`
-          *,
-          organization:organizations(*)
-        `)
+        .select('*')
         .eq('user_id', user.id);
       
+      console.log('🔍 Memberships:', memberships, 'Error:', membershipsError);
+      
       if (memberships && memberships.length > 0) {
-        const orgs = memberships
-          .map(m => m.organization)
-          .filter(Boolean) as Organization[];
+        // Charger les organisations séparément
+        const orgIds = memberships.map(m => m.organization_id);
+        const { data: orgsData } = await supabase
+          .from('organizations')
+          .select('*')
+          .in('id', orgIds);
         
-        setOrganizations(orgs);
+        const orgs = orgsData || [];
+        setOrganizations(orgs as Organization[]);
         
         // Définir l'organisation courante
         const currentOrgId = profile?.current_organization_id || orgs[0]?.id;
         const currentOrg = orgs.find(o => o.id === currentOrgId) || orgs[0];
         
         if (currentOrg) {
-          setCurrentOrganization(currentOrg);
+          setCurrentOrganization(currentOrg as Organization);
           
           // Trouver le rôle de l'utilisateur dans cette organisation
           const membership = memberships.find(m => m.organization_id === currentOrg.id);
@@ -124,16 +127,29 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   };
 
   const loadOrganizationMembers = async (organizationId: string) => {
-    const { data } = await supabase
+    // Charger les membres
+    const { data: membersData } = await supabase
       .from('organization_members')
-      .select(`
-        *,
-        user:user_profiles(*)
-      `)
+      .select('*')
       .eq('organization_id', organizationId);
     
-    if (data) {
-      setMembers(data as OrganizationMember[]);
+    if (membersData && membersData.length > 0) {
+      // Charger les profils séparément
+      const userIds = membersData.map(m => m.user_id);
+      const { data: profilesData } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .in('id', userIds);
+      
+      // Combiner les données
+      const membersWithProfiles = membersData.map(member => ({
+        ...member,
+        user: profilesData?.find(p => p.id === member.user_id) || null
+      }));
+      
+      setMembers(membersWithProfiles as OrganizationMember[]);
+    } else {
+      setMembers([]);
     }
   };
 
