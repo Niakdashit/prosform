@@ -272,12 +272,17 @@ export const ArticleQuizBuilder = () => {
             onEndDateChange={setEndDate}
             endTime={endTime}
             onEndTimeChange={setEndTime}
-            campaignUrl={campaign?.published_url || ''}
+            campaignUrl={campaign?.id ? `${window.location.origin}/article-quiz-preview?id=${campaign.id}` : ''}
             prizes={[]}
             onSavePrize={() => {}}
             onDeletePrize={() => {}}
             gameType="wheel"
             segments={[]}
+            editorType="quiz"
+            editorMode="article"
+            campaignId={campaign?.id || ''}
+            publicSlug={campaign?.public_url_slug || ''}
+            publishedUrl={campaign?.published_url || ''}
           />
         ) : activeTab === 'templates' ? (
           <div className="flex-1 flex items-center justify-center bg-muted">

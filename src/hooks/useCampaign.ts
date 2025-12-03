@@ -52,6 +52,7 @@ export function useCampaign(
   const [startTime, setStartTime] = useState('');
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [shortSlug, setShortSlug] = useState('');
   // Initialiser isLoading à true si on a un campaignId pour éviter le flash du contenu par défaut
   const [isLoading, setIsLoading] = useState(!!campaignId);
   const [isSaving, setIsSaving] = useState(false);
@@ -93,6 +94,11 @@ export function useCampaign(
             const endDateTime = new Date(data.ends_at);
             setEndDate(endDateTime.toISOString().split('T')[0]);
             setEndTime(endDateTime.toTimeString().slice(0, 5));
+          }
+          
+          // Restore short slug from config
+          if ((data.config as any)?.shortSlug) {
+            setShortSlug((data.config as any).shortSlug);
           }
           
         }
@@ -167,13 +173,16 @@ export function useCampaign(
     }
 
     try {
+      // Inclure le shortSlug dans la config
+      const configWithSlug = shortSlug ? { ...config, shortSlug } : config;
+      
       const savedCampaign = await CampaignService.save({
         id: campaign?.id,
         name,
         type,
         mode: campaign?.mode || mode,
         status: campaign?.status || 'draft',
-        config,
+        config: configWithSlug,
         prizes,
         theme: themeContext?.theme || campaign?.theme || {},
         starts_at,
@@ -192,7 +201,7 @@ export function useCampaign(
     } finally {
       setIsSaving(false);
     }
-  }, [campaign, name, type, config, prizes, startDate, startTime, endDate, endTime, themeContext]);
+  }, [campaign, name, type, config, prizes, startDate, startTime, endDate, endTime, themeContext, shortSlug]);
 
   // Publier la campagne
   const publish = useCallback(async (): Promise<Campaign | null> => {
@@ -225,6 +234,7 @@ export function useCampaign(
     startTime,
     endDate,
     endTime,
+    shortSlug,
     isLoading,
     isSaving,
     error,
@@ -238,6 +248,7 @@ export function useCampaign(
     setStartTime,
     setEndDate,
     setEndTime,
+    setShortSlug,
   };
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

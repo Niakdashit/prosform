@@ -468,6 +468,12 @@ export const ScratchBuilder = () => {
           onEndDateChange={setEndDate}
           endTime={endTime}
           onEndTimeChange={setEndTime}
+          campaignUrl={campaign?.id ? `${window.location.origin}/scratch-preview?id=${campaign.id}` : ''}
+          editorType="scratch"
+          editorMode="fullscreen"
+          campaignId={campaign?.id || ''}
+          publicSlug={campaign?.public_url_slug || ''}
+          publishedUrl={campaign?.published_url || ''}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

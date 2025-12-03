@@ -81,6 +81,7 @@ export const CatalogBuilder = () => {
 
   // Hook de persistance Supabase
   const {
+    campaign,
     config,
     prizes,
     name: campaignName,
@@ -298,6 +299,12 @@ export const CatalogBuilder = () => {
               onEndTimeChange={setEndTime}
               segments={[]}
               defaultTab={campaignDefaultTab}
+              campaignUrl={campaign?.id ? `${window.location.origin}/catalog-preview?id=${campaign.id}` : ''}
+              editorType="catalog"
+              editorMode="fullscreen"
+              campaignId={campaign?.id || ''}
+              publicSlug={campaign?.public_url_slug || ''}
+              publishedUrl={campaign?.published_url || ''}
             />
           </div>
         ) : (

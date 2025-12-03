@@ -6,12 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Gift, Upload, Eye, Save, Trash2, Calendar, Percent } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Plus, Gift, Upload, Eye, Save, Trash2, Calendar, Percent, Copy, Check, QrCode, Download } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { PrizeModal } from "./PrizeModal";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Prize } from "./WheelBuilder";
+
+// Types pour les éditeurs et modes
+type EditorType = 'wheel' | 'jackpot' | 'quiz' | 'scratch' | 'form' | 'catalog';
+type EditorMode = 'fullscreen' | 'article';
 
 interface JackpotSymbol {
   id: string;
@@ -41,6 +45,15 @@ interface CampaignSettingsProps {
   endTime?: string;
   onEndTimeChange?: (time: string) => void;
   campaignUrl?: string;
+  // Nouvelles props pour les intégrations
+  editorType?: EditorType;
+  editorMode?: EditorMode;
+  campaignId?: string;
+  publicSlug?: string;
+  publishedUrl?: string;
+  // Short URL personnalisé
+  shortSlug?: string;
+  onShortSlugChange?: (slug: string) => void;
 }
 
 export const CampaignSettings = ({ 
@@ -63,10 +76,150 @@ export const CampaignSettings = ({
   endTime = '',
   onEndTimeChange,
   campaignUrl = '',
+  editorType = 'wheel',
+  editorMode = 'fullscreen',
+  campaignId = '',
+  publicSlug = '',
+  publishedUrl = '',
+  shortSlug = '',
+  onShortSlugChange,
 }: CampaignSettingsProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [prizeModalOpen, setPrizeModalOpen] = useState(false);
   const [editingPrize, setEditingPrize] = useState<Prize | null>(null);
+  const [copiedTab, setCopiedTab] = useState<string | null>(null);
+  const [customSlug, setCustomSlug] = useState(shortSlug);
+  
+  // Mettre à jour le slug personnalisé quand il change
+  const handleSlugChange = (value: string) => {
+    const sanitized = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    setCustomSlug(sanitized);
+    onShortSlugChange?.(sanitized);
+  };
+
+  // Générer les URLs et codes d'intégration basés sur le type d'éditeur et le mode
+  const integrationData = useMemo(() => {
+    const baseUrl = window.location.origin;
+    const previewPath = editorMode === 'article' 
+      ? `article-${editorType}-preview` 
+      : `${editorType}-preview`;
+    
+    // URL d'embed pour les iframes (utilise la preview avec embed=true)
+    const embedUrl = campaignId 
+      ? `${baseUrl}/${previewPath}?id=${campaignId}&embed=true`
+      : `${baseUrl}/${previewPath}?embed=true`;
+    
+    // URL de preview (pour tester et comme fallback)
+    const previewUrl = campaignId ? `${baseUrl}/${previewPath}?id=${campaignId}` : '';
+    
+    // URL publique (pour partage - utilise /p/slug si disponible, sinon l'URL de preview)
+    const publicUrl = publishedUrl || (publicSlug ? `${baseUrl}/p/${publicSlug}` : '') || campaignUrl || previewUrl;
+    
+    // Short URL - utilise le slug personnalisé ou génère un ID court (5 caractères)
+    const shortId = customSlug || (campaignId ? campaignId.replace(/-/g, '').slice(0, 5) : '');
+    const shortUrl = shortId ? `${baseUrl}/c/${shortId}` : '';
+    
+    const containerId = `${editorType}-campaign`;
+    
+    return {
+      baseUrl,
+      embedUrl,
+      previewUrl,
+      publicUrl,
+      shortUrl,
+      containerId,
+      previewPath,
+    };
+  }, [editorType, editorMode, campaignId, publicSlug, publishedUrl, campaignUrl, customSlug]);
+
+  // Fonction pour copier dans le presse-papier
+  const copyToClipboard = async (text: string, tabName: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedTab(tabName);
+      setTimeout(() => setCopiedTab(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  // Générer le code JavaScript
+  const javascriptCode = useMemo(() => {
+    return `<div id="${integrationData.containerId}"></div>
+<script type="text/javascript">
+  (function(w,d,id){
+    var el=d.getElementById(id);
+    if(!el){ return; }
+    var f=d.createElement('iframe');
+    f.src='${integrationData.embedUrl}';
+    f.width='100%';
+    f.height='600';
+    f.style.border='none';
+    el.appendChild(f);
+  })(window,document,'${integrationData.containerId}');
+</script>`;
+  }, [integrationData]);
+
+  // Générer le code HTML (iframe simple)
+  const htmlCode = useMemo(() => {
+    return `<iframe 
+  src="${integrationData.embedUrl}"
+  width="100%"
+  height="600"
+  frameborder="0"
+  style="border: none; max-width: 100%;"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen>
+</iframe>`;
+  }, [integrationData]);
+
+  // Générer le code Webview (pour apps mobiles)
+  const webviewCode = useMemo(() => {
+    return `// React Native WebView
+import { WebView } from 'react-native-webview';
+
+<WebView
+  source={{ uri: '${integrationData.embedUrl}' }}
+  style={{ flex: 1 }}
+  javaScriptEnabled={true}
+  domStorageEnabled={true}
+/>
+
+// Swift (iOS)
+import WebKit
+
+let webView = WKWebView(frame: view.bounds)
+if let url = URL(string: "${integrationData.embedUrl}") {
+    webView.load(URLRequest(url: url))
+}
+view.addSubview(webView)
+
+// Kotlin (Android)
+val webView = WebView(context)
+webView.settings.javaScriptEnabled = true
+webView.loadUrl("${integrationData.embedUrl}")`;
+  }, [integrationData]);
+
+  // Générer le code oEmbed
+  const oembedCode = useMemo(() => {
+    const oembedUrl = `${integrationData.baseUrl}/api/oembed?url=${encodeURIComponent(integrationData.publicUrl)}`;
+    return `{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Prosform",
+  "provider_url": "${integrationData.baseUrl}",
+  "title": "${campaignName || 'Campagne'}",
+  "html": "<iframe src=\\"${integrationData.embedUrl}\\" width=\\"100%\\" height=\\"600\\" frameborder=\\"0\\"></iframe>",
+  "width": 600,
+  "height": 600
+}
+
+// URL oEmbed pour auto-découverte:
+${oembedUrl}
+
+// Ajoutez cette balise dans le <head> de votre page:
+<link rel="alternate" type="application/json+oembed" href="${oembedUrl}" title="${campaignName || 'Campagne'}" />`;
+  }, [integrationData, campaignName]);
 
   useEffect(() => {
     if (defaultTab) {
@@ -241,30 +394,217 @@ export const CampaignSettings = ({
                         <TabsTrigger value="qrcode">QR Code</TabsTrigger>
                       </TabsList>
                       
+                      {/* JavaScript Integration */}
                       <TabsContent value="javascript" className="mt-4">
                         <div className="relative">
-                          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto">
-                            <code>{`<div id="wheel-campaign"></div>
-<script type="text/javascript">
-  (function(w,d,id){
-    var el=d.getElementById(id);
-    if(!el){ return; }
-    var f=d.createElement('iframe');
-    f.src='https://wheel.lovable.app/embed';
-    f.width='100%';
-    f.height='600';
-    f.style.border='none';
-    el.appendChild(f);
-  })(window,document,'wheel-campaign');
-</script>`}</code>
+                          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto whitespace-pre-wrap">
+                            <code>{javascriptCode}</code>
                           </pre>
                           <Button 
                             variant="outline" 
                             size="sm" 
                             className="absolute top-2 right-2"
+                            onClick={() => copyToClipboard(javascriptCode, 'javascript')}
                           >
-                            Copier
+                            {copiedTab === 'javascript' ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                            {copiedTab === 'javascript' ? 'Copié' : 'Copier'}
                           </Button>
+                        </div>
+                      </TabsContent>
+
+                      {/* HTML Integration */}
+                      <TabsContent value="html" className="mt-4">
+                        <div className="relative">
+                          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto whitespace-pre-wrap">
+                            <code>{htmlCode}</code>
+                          </pre>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="absolute top-2 right-2"
+                            onClick={() => copyToClipboard(htmlCode, 'html')}
+                          >
+                            {copiedTab === 'html' ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                            {copiedTab === 'html' ? 'Copié' : 'Copier'}
+                          </Button>
+                        </div>
+                      </TabsContent>
+
+                      {/* Webview Integration */}
+                      <TabsContent value="webview" className="mt-4">
+                        <div className="relative">
+                          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto whitespace-pre-wrap">
+                            <code>{webviewCode}</code>
+                          </pre>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="absolute top-2 right-2"
+                            onClick={() => copyToClipboard(webviewCode, 'webview')}
+                          >
+                            {copiedTab === 'webview' ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                            {copiedTab === 'webview' ? 'Copié' : 'Copier'}
+                          </Button>
+                        </div>
+                      </TabsContent>
+
+                      {/* oEmbed Integration */}
+                      <TabsContent value="oembed" className="mt-4">
+                        <div className="relative">
+                          <pre className="bg-muted p-4 rounded-md text-xs overflow-x-auto whitespace-pre-wrap">
+                            <code>{oembedCode}</code>
+                          </pre>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="absolute top-2 right-2"
+                            onClick={() => copyToClipboard(oembedCode, 'oembed')}
+                          >
+                            {copiedTab === 'oembed' ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                            {copiedTab === 'oembed' ? 'Copié' : 'Copier'}
+                          </Button>
+                        </div>
+                      </TabsContent>
+
+                      {/* Smart URL */}
+                      <TabsContent value="smarturl" className="mt-4">
+                        <div className="space-y-4">
+                          <p className="text-sm text-muted-foreground">
+                            Le Smart URL détecte automatiquement l'appareil de l'utilisateur et adapte l'affichage en conséquence.
+                          </p>
+                          <div className="relative">
+                            <Input 
+                              value={integrationData.publicUrl || ''}
+                              readOnly
+                              className="bg-muted pr-24"
+                            />
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="absolute top-1/2 right-2 -translate-y-1/2"
+                              onClick={() => copyToClipboard(integrationData.publicUrl, 'smarturl')}
+                              disabled={!integrationData.publicUrl}
+                            >
+                              {copiedTab === 'smarturl' ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                              {copiedTab === 'smarturl' ? 'Copié' : 'Copier'}
+                            </Button>
+                          </div>
+                          {integrationData.publicUrl && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.open(integrationData.publicUrl, '_blank')}
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              Tester l'URL
+                            </Button>
+                          )}
+                        </div>
+                      </TabsContent>
+
+                      {/* Short URL */}
+                      <TabsContent value="shorturl" className="mt-4">
+                        <div className="space-y-4">
+                          <p className="text-sm text-muted-foreground">
+                            URL courte pour faciliter le partage de votre campagne.
+                          </p>
+                          
+                          {/* Champ de personnalisation */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Personnaliser le lien</label>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground">{window.location.origin}/c/</span>
+                              <Input 
+                                value={customSlug}
+                                onChange={(e) => handleSlugChange(e.target.value)}
+                                placeholder={campaignId ? campaignId.replace(/-/g, '').slice(0, 5) : 'mon-lien'}
+                                className="flex-1 max-w-[200px]"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Lettres minuscules, chiffres et tirets uniquement
+                            </p>
+                          </div>
+
+                          {/* URL finale */}
+                          <div className="relative">
+                            <Input 
+                              value={integrationData.shortUrl || ''}
+                              readOnly
+                              className="bg-muted pr-24"
+                            />
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="absolute top-1/2 right-2 -translate-y-1/2"
+                              onClick={() => copyToClipboard(integrationData.shortUrl, 'shorturl')}
+                              disabled={!integrationData.shortUrl}
+                            >
+                              {copiedTab === 'shorturl' ? <Check className="w-4 h-4 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                              {copiedTab === 'shorturl' ? 'Copié' : 'Copier'}
+                            </Button>
+                          </div>
+                          {integrationData.shortUrl && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.open(integrationData.shortUrl, '_blank')}
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              Tester l'URL
+                            </Button>
+                          )}
+                        </div>
+                      </TabsContent>
+
+                      {/* QR Code */}
+                      <TabsContent value="qrcode" className="mt-4">
+                        <div className="space-y-4">
+                          <p className="text-sm text-muted-foreground">
+                            Téléchargez un QR Code pour permettre aux utilisateurs d'accéder à votre campagne depuis leur mobile.
+                          </p>
+                          {integrationData.publicUrl ? (
+                            <div className="flex flex-col items-center gap-4">
+                              <div className="bg-white p-4 rounded-lg border">
+                                <img 
+                                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(integrationData.publicUrl)}`}
+                                  alt="QR Code de la campagne"
+                                  className="w-48 h-48"
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <Button 
+                                  variant="outline"
+                                  onClick={() => {
+                                    const link = document.createElement('a');
+                                    link.href = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=${encodeURIComponent(integrationData.publicUrl)}`;
+                                    link.download = `qrcode-${campaignName || 'campagne'}.png`;
+                                    link.click();
+                                  }}
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Télécharger PNG
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  onClick={() => {
+                                    const link = document.createElement('a');
+                                    link.href = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=svg&data=${encodeURIComponent(integrationData.publicUrl)}`;
+                                    link.download = `qrcode-${campaignName || 'campagne'}.svg`;
+                                    link.click();
+                                  }}
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Télécharger SVG
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <QrCode className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                              <p>Le QR Code sera disponible après la publication de la campagne.</p>
+                            </div>
+                          )}
                         </div>
                       </TabsContent>
                     </Tabs>

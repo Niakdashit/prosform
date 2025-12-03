@@ -521,6 +521,12 @@ export const JackpotBuilder = () => {
               symbols: [...prev.symbols, newSymbol]
             }));
           }}
+          campaignUrl={campaign?.id ? `${window.location.origin}/jackpot-preview?id=${campaign.id}` : ''}
+          editorType="jackpot"
+          editorMode="fullscreen"
+          campaignId={campaign?.id || ''}
+          publicSlug={campaign?.public_url_slug || ''}
+          publishedUrl={campaign?.published_url || ''}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

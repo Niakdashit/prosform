@@ -23,8 +23,10 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
     'updated_at',
   ];
 
-  // Pour compatibilité avec l'ancien schéma, on ne met à jour que ces colonnes
-  const allowedFields = ['name', 'type', 'mode', 'status', 'config', 'theme', 'prizes', 'starts_at', 'ends_at', 'is_published', 'published_at', 'public_url_slug', 'published_url', 'thumbnail_url', 'participation_count', 'participation_limit'];
+  // Colonnes réelles dans Supabase
+  // Note: 'mode', 'theme', 'prizes' n'existent pas comme colonnes séparées - ils sont dans 'config'
+  // Exclure 'name' car on ne sait pas quelle colonne utiliser (app_title ou title)
+  const allowedFields = ['type', 'status', 'config', 'starts_at', 'ends_at', 'is_published', 'published_at', 'public_url_slug', 'published_url', 'thumbnail_url', 'participation_count', 'participation_limit'];
   
   // Si c'est une mise à jour, ne pas modifier user_id
   if (isUpdate) {
@@ -35,12 +37,7 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
   
   for (const [key, value] of Object.entries(campaign)) {
     if (!excludedFields.includes(key) && allowedFields.includes(key) && value !== undefined) {
-      // Map 'name' to 'title' for external Supabase schema compatibility
-      if (key === 'name') {
-        result['title'] = value;
-      } else {
-        result[key] = value;
-      }
+      result[key] = value;
     }
   }
   

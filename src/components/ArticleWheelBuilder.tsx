@@ -337,6 +337,22 @@ export const ArticleWheelBuilder = () => {
           onDeletePrize={handleDeletePrize}
           gameType="wheel"
           segments={(config as any).segments?.map((s: any) => ({ id: s.id, label: s.label })) || []}
+          campaignName={campaignName}
+          onCampaignNameChange={setName}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          startTime={startTime}
+          onStartTimeChange={setStartTime}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          endTime={endTime}
+          onEndTimeChange={setEndTime}
+          campaignUrl={campaign?.id ? `${window.location.origin}/article-wheel-preview?id=${campaign.id}` : ''}
+          editorType="wheel"
+          editorMode="article"
+          campaignId={campaign?.id || ''}
+          publicSlug={campaign?.public_url_slug || ''}
+          publishedUrl={campaign?.published_url || ''}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

@@ -269,6 +269,7 @@ export const WheelBuilder = () => {
     startTime,
     endDate,
     endTime,
+    shortSlug,
     isLoading,
     isSaving,
     hasUnsavedChanges,
@@ -281,6 +282,7 @@ export const WheelBuilder = () => {
     setStartTime,
     setEndDate,
     setEndTime,
+    setShortSlug,
   } = useCampaign(
     { campaignId, type: 'wheel', defaultName: 'Nouvelle campagne roue' },
     defaultWheelConfig,
@@ -527,6 +529,13 @@ export const WheelBuilder = () => {
           endTime={endTime}
           onEndTimeChange={setEndTime}
           campaignUrl={campaign?.id ? `${window.location.origin}/wheel-preview?id=${campaign.id}` : ''}
+          editorType="wheel"
+          editorMode="fullscreen"
+          campaignId={campaign?.id || ''}
+          publicSlug={campaign?.public_url_slug || ''}
+          publishedUrl={campaign?.published_url || ''}
+          shortSlug={shortSlug}
+          onShortSlugChange={setShortSlug}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
