@@ -1,5 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { Upload, X } from "lucide-react";
 
 interface BackgroundUploaderProps {
@@ -12,6 +13,13 @@ interface BackgroundUploaderProps {
   showApplyToAll?: boolean;
   applyToAll?: boolean;
   onApplyToAllChange?: (value: boolean) => void;
+  // Overlay options
+  overlayEnabled?: boolean;
+  onOverlayEnabledChange?: (value: boolean) => void;
+  overlayColor?: string;
+  onOverlayColorChange?: (color: string) => void;
+  overlayOpacity?: number;
+  onOverlayOpacityChange?: (opacity: number) => void;
 }
 
 export const BackgroundUploader = ({ 
@@ -23,8 +31,17 @@ export const BackgroundUploader = ({
   onMobileImageRemove,
   showApplyToAll = false,
   applyToAll = false,
-  onApplyToAllChange
-}: BackgroundUploaderProps) => (
+  onApplyToAllChange,
+  overlayEnabled = false,
+  onOverlayEnabledChange,
+  overlayColor = '#000000',
+  onOverlayColorChange,
+  overlayOpacity = 50,
+  onOverlayOpacityChange
+}: BackgroundUploaderProps) => {
+  const hasBackground = desktopImage || mobileImage;
+  
+  return (
   <div className="space-y-3">
     <Label className="text-xs text-muted-foreground">Background</Label>
     
@@ -117,5 +134,53 @@ export const BackgroundUploader = ({
         />
       </div>
     )}
+
+    {/* Overlay options - only show when there's a background */}
+    {hasBackground && onOverlayEnabledChange && (
+      <div className="space-y-3 pt-2 border-t border-border">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs text-muted-foreground">Masque sur le fond</Label>
+          <Switch 
+            checked={overlayEnabled} 
+            onCheckedChange={onOverlayEnabledChange}
+          />
+        </div>
+        
+        {overlayEnabled && (
+          <div className="space-y-3 pl-2">
+            {/* Overlay Color */}
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">Couleur</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={overlayColor}
+                  onChange={(e) => onOverlayColorChange?.(e.target.value)}
+                  className="w-8 h-8 rounded cursor-pointer border border-border"
+                />
+                <span className="text-xs text-muted-foreground font-mono">{overlayColor}</span>
+              </div>
+            </div>
+            
+            {/* Overlay Opacity */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Opacité</Label>
+                <span className="text-xs text-muted-foreground">{overlayOpacity}%</span>
+              </div>
+              <Slider
+                value={[overlayOpacity]}
+                onValueChange={(value) => onOverlayOpacityChange?.(value[0])}
+                min={0}
+                max={100}
+                step={5}
+                className="w-full"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    )}
   </div>
-);
+  );
+};

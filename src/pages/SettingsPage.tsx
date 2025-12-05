@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
-import { User, Building, CreditCard, Bell, Shield, Palette, Globe, Key, Users } from "lucide-react";
+import { User, Building, CreditCard, Bell, Shield, Palette, Globe, Key, Users, Plug } from "lucide-react";
+import { IntegrationsPanel } from "@/components/integrations";
+import { integrationsService, Integration } from "@/services/integrations";
+import { useOrganization } from "@/contexts/OrganizationContext";
 
 const colors = {
   dark: '#3d3731',
@@ -16,16 +19,35 @@ const settingsSections = [
   { id: 'profile', label: 'Profil', icon: User, description: 'Informations personnelles' },
   { id: 'team', label: 'Équipe', icon: Users, description: 'Gérer les membres', path: '/settings/team' },
   { id: 'company', label: 'Organisation', icon: Building, description: 'Informations de votre organisation' },
+  { id: 'integrations', label: 'Intégrations', icon: Plug, description: 'CRM, Marketing, Webhooks' },
   { id: 'billing', label: 'Facturation', icon: CreditCard, description: 'Abonnement et paiements' },
   { id: 'notifications', label: 'Notifications', icon: Bell, description: 'Préférences de notifications' },
   { id: 'security', label: 'Sécurité', icon: Shield, description: 'Mot de passe et authentification' },
   { id: 'branding', label: 'Personnalisation', icon: Palette, description: 'Logo et couleurs par défaut' },
   { id: 'domains', label: 'Domaines', icon: Globe, description: 'Domaines personnalisés' },
-  { id: 'api', label: 'API', icon: Key, description: 'Clés API et intégrations' },
+  { id: 'api', label: 'API', icon: Key, description: 'Clés API et webhooks' },
 ];
 
 const SettingsPage = () => {
+  const { currentOrganization } = useOrganization();
   const [activeSection, setActiveSection] = useState('profile');
+  const [connectedIntegrations, setConnectedIntegrations] = useState<Integration[]>([]);
+
+  const loadIntegrations = useCallback(async () => {
+    if (!currentOrganization?.id) return;
+    try {
+      const integrations = await integrationsService.getOrganizationIntegrations(currentOrganization.id);
+      setConnectedIntegrations(integrations);
+    } catch (error) {
+      console.error("Error loading integrations:", error);
+    }
+  }, [currentOrganization?.id]);
+
+  useEffect(() => {
+    if (activeSection === 'integrations') {
+      loadIntegrations();
+    }
+  }, [activeSection, loadIntegrations]);
   const navigate = useNavigate();
 
   const handleSectionClick = (section: typeof settingsSections[0]) => {
@@ -177,7 +199,37 @@ const SettingsPage = () => {
               </div>
             )}
 
-            {activeSection !== 'profile' && (
+            {activeSection === 'integrations' && (
+              <div className="h-[600px] -m-6">
+                <IntegrationsPanel 
+                  connectedIntegrations={connectedIntegrations}
+                  onConnect={(provider) => {
+                    console.log('Connected:', provider);
+                    loadIntegrations();
+                  }}
+                  onDisconnect={async (id) => {
+                    console.log('Disconnecting:', id);
+                    try {
+                      await integrationsService.disconnectIntegration(id);
+                      loadIntegrations();
+                    } catch (err) {
+                      console.error('Disconnect error:', err);
+                    }
+                  }}
+                  onConfigure={(integration) => {
+                    console.log('Configure:', integration);
+                    // TODO: Ouvrir modal de configuration
+                  }}
+                  onSync={async (id) => {
+                    console.log('Syncing:', id);
+                    // TODO: Déclencher une synchronisation manuelle
+                    alert('Synchronisation lancée !');
+                  }}
+                />
+              </div>
+            )}
+
+            {activeSection !== 'profile' && activeSection !== 'integrations' && (
               <div className="flex flex-col items-center justify-center py-12">
                 <div 
                   className="w-12 h-12 rounded-full flex items-center justify-center mb-4"

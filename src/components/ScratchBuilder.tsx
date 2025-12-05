@@ -22,6 +22,7 @@ import {
   defaultHeaderConfig, 
   defaultFooterConfig,
 } from "./campaign";
+import { TemplateLibraryPanel } from "./templates/TemplateLibraryPanel";
 
 export interface ScratchPrize {
   id: string;
@@ -89,6 +90,8 @@ export interface ScratchConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -98,10 +101,13 @@ export interface ScratchConfig {
     alignment?: 'left' | 'center' | 'right';
     image?: string;
     imageSettings?: {
+      size: number;
       borderRadius: number;
       borderWidth: number;
       borderColor: string;
       rotation: number;
+      flipH: boolean;
+      flipV: boolean;
     };
   };
   contactForm: {
@@ -119,9 +125,13 @@ export interface ScratchConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
+    image?: string;
+    imageMobile?: string;
   };
   scratchScreen: {
     title: string;
@@ -136,6 +146,8 @@ export interface ScratchConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -163,6 +175,8 @@ export interface ScratchConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -180,6 +194,8 @@ export interface ScratchConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -198,7 +214,17 @@ const defaultScratchConfig: ScratchConfig = {
     buttonText: "Commencer à gratter",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-left-right"
+    desktopLayout: "desktop-right-left",
+    showImage: true,
+    imageSettings: {
+      size: 150,
+      borderRadius: 5,
+      borderWidth: 0,
+      borderColor: '#F5B800',
+      rotation: 0,
+      flipH: false,
+      flipV: false
+    }
   },
   contactForm: {
     enabled: true,
@@ -211,14 +237,14 @@ const defaultScratchConfig: ScratchConfig = {
       { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   scratchScreen: {
     title: "Grattez pour gagner !",
     subtitle: "Découvrez votre lot en grattant la carte",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered",
+    desktopLayout: "desktop-right-left",
     scratchColor: "#C0C0C0",
     cardWidth: 200,
     cardHeight: 220,
@@ -237,14 +263,14 @@ const defaultScratchConfig: ScratchConfig = {
     subtitle: "Vous avez gagné {{prize}}",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   endingLose: {
     title: "Dommage !",
     subtitle: "Vous n'avez pas gagné cette fois-ci",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   layout: {
     header: { ...defaultHeaderConfig, enabled: false },
@@ -474,6 +500,35 @@ export const ScratchBuilder = () => {
           campaignId={campaign?.id || ''}
           publicSlug={campaign?.public_url_slug || ''}
           publishedUrl={campaign?.published_url || ''}
+        />
+      ) : activeTab === 'templates' ? (
+        <TemplateLibraryPanel 
+          onSelectTemplate={(templateConfig, templateMeta) => {
+            // Appliquer la config du template (welcomeScreen, etc.)
+            if (templateConfig.welcomeScreen) {
+              updateConfig({
+                welcomeScreen: {
+                  ...config.welcomeScreen,
+                  ...templateConfig.welcomeScreen,
+                  backgroundImage: templateMeta.backgroundImage || templateConfig.welcomeScreen?.backgroundImage,
+                },
+              });
+            }
+            
+            // Appliquer le thème (couleurs + typo) via le contexte
+            themeContext.updateTheme({
+              primaryColor: templateMeta.colorPalette.secondary,
+              buttonColor: templateMeta.colorPalette.secondary,
+              buttonTextColor: templateMeta.colorPalette.primary,
+              backgroundColor: templateMeta.colorPalette.primary,
+              textColor: templateMeta.colorPalette.tertiary,
+              fontFamily: templateMeta.typography.body.toLowerCase().replace(/\s+/g, '-'),
+              headingFontFamily: templateMeta.typography.heading.toLowerCase().replace(/\s+/g, '-'),
+            });
+            
+            toast.success("Template appliqué avec succès !");
+            setActiveTab('design');
+          }}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

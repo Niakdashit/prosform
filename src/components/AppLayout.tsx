@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutGrid, 
@@ -12,10 +12,19 @@ import {
   User,
   LogOut,
   CreditCard,
-  Shield
+  Shield,
+  CircleDot,
+  HelpCircle,
+  Dices,
+  Ticket,
+  ShoppingBag,
+  FileText,
+  X
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrganization } from "@/contexts/OrganizationContext";
+import { useInactivityTimeout } from "@/hooks/useInactivityTimeout";
+import { InactivityWarningModal } from "@/components/InactivityWarningModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +34,68 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+
+// Types de campagnes disponibles
+const campaignTypes = [
+  { 
+    id: 'wheel', 
+    name: 'Roue', 
+    icon: CircleDot,
+    color: '#f59e0b',
+    modes: [
+      { id: 'fullscreen', name: 'Plein écran', path: '/wheel' },
+      { id: 'article', name: 'Article', path: '/article-wheel' },
+    ]
+  },
+  { 
+    id: 'quiz', 
+    name: 'Quiz', 
+    icon: HelpCircle,
+    color: '#8b5cf6',
+    modes: [
+      { id: 'fullscreen', name: 'Plein écran', path: '/quiz' },
+      { id: 'article', name: 'Article', path: '/article-quiz' },
+    ]
+  },
+  { 
+    id: 'jackpot', 
+    name: 'Jackpot', 
+    icon: Dices,
+    color: '#ef4444',
+    modes: [
+      { id: 'fullscreen', name: 'Plein écran', path: '/jackpot' },
+      { id: 'article', name: 'Article', path: '/article-jackpot' },
+    ]
+  },
+  { 
+    id: 'scratch', 
+    name: 'Scratch', 
+    icon: Ticket,
+    color: '#10b981',
+    modes: [
+      { id: 'fullscreen', name: 'Plein écran', path: '/scratch' },
+      { id: 'article', name: 'Article', path: '/article-scratch' },
+    ]
+  },
+  { 
+    id: 'catalog', 
+    name: 'Catalogue', 
+    icon: ShoppingBag,
+    color: '#3b82f6',
+    modes: [
+      { id: 'fullscreen', name: 'Plein écran', path: '/catalog' },
+    ]
+  },
+  { 
+    id: 'form', 
+    name: 'Formulaire', 
+    icon: FileText,
+    color: '#6b7280',
+    modes: [
+      { id: 'fullscreen', name: 'Plein écran', path: '/form' },
+    ]
+  },
+];
 
 // Couleurs DA
 const colors = {
@@ -62,8 +133,26 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { isSuperAdmin } = useOrganization();
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
+  const [selectedCampaignType, setSelectedCampaignType] = useState<string | null>(null);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleBubbleClick = (type: typeof campaignTypes[0]) => {
+    if (type.modes.length === 1) {
+      setShowCampaignModal(false);
+      setSelectedCampaignType(null);
+      navigate(type.modes[0].path);
+    } else {
+      setSelectedCampaignType(selectedCampaignType === type.id ? null : type.id);
+    }
+  };
+
+  const handleModeSelect = (path: string) => {
+    setShowCampaignModal(false);
+    setSelectedCampaignType(null);
+    navigate(path);
+  };
 
   const getInitials = (name: string | undefined, email: string | undefined) => {
     if (name) {
@@ -74,9 +163,28 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
   const handleSignOut = async () => {
     await signOut();
+    localStorage.removeItem('prosform_last_activity');
     navigate('/login');
     toast.success('Déconnexion réussie');
   };
+
+  // Gestion de l'inactivité
+  const handleInactivityLogout = useCallback(() => {
+    signOut();
+    localStorage.removeItem('prosform_last_activity');
+    navigate('/login');
+    toast.warning('Vous avez été déconnecté pour inactivité');
+  }, [signOut, navigate]);
+
+  const handleInactivityWarning = useCallback(() => {
+    // Le modal s'affiche automatiquement via showWarning
+  }, []);
+
+  const { showWarning, resetTimer } = useInactivityTimeout({
+    onWarning: handleInactivityWarning,
+    onLogout: handleInactivityLogout,
+    enabled: !!user, // Actif seulement si connecté
+  });
 
   const userInitials = getInitials(user?.user_metadata?.full_name, user?.email);
 
@@ -198,25 +306,99 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Top header - Fixed */}
       <header
-        className="h-[56px] flex items-center justify-between px-6 fixed top-0 left-24 right-0 z-20 backdrop-blur-4xl overflow-x-hidden"
+        className="h-[56px] flex items-center justify-between px-6 fixed top-0 left-24 right-0 z-20 backdrop-blur-4xl"
         style={{
           background:
             "linear-gradient(90deg, rgba(39, 7, 54, 0.98) 0%, rgba(30, 15, 60, 0.98) 40%, rgba(25, 20, 70, 0.98) 100%)",
           borderBottom: "none",
+          overflow: "visible",
         }}
       >
           <div />
 
           <div className="flex items-center gap-3">
+            {/* Bulles de sélection de campagne */}
+            <div className="flex items-center gap-2">
+              {showCampaignModal && campaignTypes.map((type, index) => {
+                const Icon = type.icon;
+                const reverseIndex = campaignTypes.length - 1 - index;
+                const isSelected = selectedCampaignType === type.id;
+                return (
+                  <div key={type.id} className="relative">
+                    <button
+                      onClick={() => handleBubbleClick(type)}
+                      className={`group relative w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 ${isSelected ? 'ring-2 ring-white scale-110' : ''}`}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.15)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        boxShadow: `
+                          0 8px 32px rgba(0, 0, 0, 0.1),
+                          inset 0 1px 1px rgba(255, 255, 255, 0.3),
+                          inset 0 -1px 1px rgba(0, 0, 0, 0.1)
+                        `,
+                        animation: `bubbleIn 0.3s ease-out ${reverseIndex * 0.05}s both`,
+                      }}
+                    >
+                      <Icon className="w-4 h-4" style={{ color: type.color }} />
+                      {/* Tooltip */}
+                      {!isSelected && (
+                        <div 
+                          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 rounded text-[10px] font-medium whitespace-nowrap pointer-events-none hidden group-hover:block"
+                          style={{
+                            background: 'rgba(0, 0, 0, 0.9)',
+                            color: 'white',
+                            zIndex: 99999,
+                          }}
+                        >
+                          {type.name}
+                        </div>
+                      )}
+                    </button>
+                    {/* Mini modale de sélection de mode */}
+                    {isSelected && type.modes.length > 1 && (
+                      <div 
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-2 p-1 rounded-lg flex gap-1"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.95)',
+                          backdropFilter: 'blur(20px)',
+                          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                          zIndex: 99999,
+                        }}
+                      >
+                        {type.modes.map((mode) => (
+                          <button
+                            key={mode.id}
+                            onClick={() => handleModeSelect(mode.path)}
+                            className="px-3 py-1.5 rounded-md text-[11px] font-medium transition-colors hover:bg-gray-100"
+                            style={{ color: colors.dark }}
+                          >
+                            {mode.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
             <button
-              className="h-8 px-3 flex items-center gap-2 font-medium text-xs transition-colors rounded-md"
+              className="h-8 px-3 flex items-center gap-2 font-medium text-xs transition-colors rounded-md hover:opacity-90"
               style={{ 
                 backgroundColor: colors.gold, 
                 color: colors.dark,
               }}
-              onClick={() => {}}
+              onClick={() => {
+                setShowCampaignModal(!showCampaignModal);
+                setSelectedCampaignType(null);
+              }}
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus 
+                className="w-3.5 h-3.5 transition-transform duration-300" 
+                style={{ transform: showCampaignModal ? 'rotate(45deg)' : 'rotate(0deg)' }}
+              />
               Nouvelle campagne
             </button>
 
@@ -332,6 +514,14 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </main>
       </div>
+
+      {/* Modal d'avertissement d'inactivité */}
+      <InactivityWarningModal
+        open={showWarning}
+        onStayConnected={resetTimer}
+        onLogout={handleInactivityLogout}
+      />
+
     </div>
   );
 };

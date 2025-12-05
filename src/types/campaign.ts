@@ -28,6 +28,7 @@ export interface Campaign {
   participation_count?: number;
   participation_limit?: number;
   user_id: string;
+  organization_id?: string; // ID de l'organisation propriétaire
 }
 
 // Type pour créer une nouvelle campagne (sans id ni timestamps)

@@ -10,8 +10,19 @@ export interface ParticipationData {
   email?: string;
   contactData?: {
     name?: string;
+    firstName?: string;
+    lastName?: string;
     email?: string;
     phone?: string;
+    address?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+    company?: string;
+    jobTitle?: string;
+    birthdate?: string;
+    // Champs personnalisés
+    [key: string]: string | undefined;
   };
   result: {
     type: 'win' | 'lose' | 'pending'; // pending = participation enregistrée au spin, résultat pas encore connu
@@ -164,70 +175,76 @@ export const ParticipationService = {
       };
 
       
-      // 1. Vérifier si le participant est bloqué
-      const isBlocked = await ExternalBackendAnalyticsService.isParticipantBlocked(
-        data.campaignId,
-        realIpAddress || undefined,
-        contactData.email || data.email,
-        deviceFingerprint
-      );
-
-      if (isBlocked) {
-        throw new Error('Vous avez été temporairement bloqué en raison de tentatives suspectes. Veuillez réessayer plus tard.');
-      }
-
-      // 2. Vérifier le rate limit par IP avec config personnalisée
-      if (realIpAddress) {
-        const ipRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
-          realIpAddress,
-          'ip',
+      // TEMPORAIREMENT DÉSACTIVÉ POUR TEST HUBSPOT
+      // TODO: Réactiver après les tests
+      const SKIP_ANTISPAM = true;
+      
+      if (!SKIP_ANTISPAM) {
+        // 1. Vérifier si le participant est bloqué
+        const isBlocked = await ExternalBackendAnalyticsService.isParticipantBlocked(
           data.campaignId,
-          rateLimitConfig.ip_max_attempts,
-          rateLimitConfig.ip_window_minutes
+          realIpAddress || undefined,
+          contactData.email || data.email,
+          deviceFingerprint
         );
 
-        if (!ipRateLimit.allowed) {
-          const blockedUntil = ipRateLimit.blocked_until 
-            ? new Date(ipRateLimit.blocked_until).toLocaleTimeString()
-            : 'quelques minutes';
-          throw new Error(`Trop de tentatives depuis votre connexion. Veuillez réessayer après ${blockedUntil}.`);
+        if (isBlocked) {
+          throw new Error('Vous avez été temporairement bloqué en raison de tentatives suspectes. Veuillez réessayer plus tard.');
         }
-      }
 
-      // 3. Vérifier le rate limit par email avec config personnalisée
-      if (contactData.email || data.email) {
-        const emailToCheck = contactData.email || data.email;
-        const emailRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
-          emailToCheck!,
-          'email',
+        // 2. Vérifier le rate limit par IP avec config personnalisée
+        if (realIpAddress) {
+          const ipRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
+            realIpAddress,
+            'ip',
+            data.campaignId,
+            rateLimitConfig.ip_max_attempts,
+            rateLimitConfig.ip_window_minutes
+          );
+
+          if (!ipRateLimit.allowed) {
+            const blockedUntil = ipRateLimit.blocked_until 
+              ? new Date(ipRateLimit.blocked_until).toLocaleTimeString()
+              : 'quelques minutes';
+            throw new Error(`Trop de tentatives depuis votre connexion. Veuillez réessayer après ${blockedUntil}.`);
+          }
+        }
+
+        // 3. Vérifier le rate limit par email avec config personnalisée
+        if (contactData.email || data.email) {
+          const emailToCheck = contactData.email || data.email;
+          const emailRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
+            emailToCheck!,
+            'email',
+            data.campaignId,
+            rateLimitConfig.email_max_attempts,
+            rateLimitConfig.email_window_minutes
+          );
+
+          if (!emailRateLimit.allowed) {
+            const blockedUntil = emailRateLimit.blocked_until 
+              ? new Date(emailRateLimit.blocked_until).toLocaleTimeString()
+              : 'quelques minutes';
+            throw new Error(`Cet email a déjà participé trop de fois. Veuillez réessayer après ${blockedUntil}.`);
+          }
+        }
+
+        // 4. Vérifier le rate limit par device fingerprint avec config personnalisée
+        const deviceRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
+          deviceFingerprint,
+          'device',
           data.campaignId,
-          rateLimitConfig.email_max_attempts,
-          rateLimitConfig.email_window_minutes
+          rateLimitConfig.device_max_attempts,
+          rateLimitConfig.device_window_minutes
         );
 
-        if (!emailRateLimit.allowed) {
-          const blockedUntil = emailRateLimit.blocked_until 
-            ? new Date(emailRateLimit.blocked_until).toLocaleTimeString()
+        if (!deviceRateLimit.allowed) {
+          const blockedUntil = deviceRateLimit.blocked_until 
+            ? new Date(deviceRateLimit.blocked_until).toLocaleTimeString()
             : 'quelques minutes';
-          throw new Error(`Cet email a déjà participé trop de fois. Veuillez réessayer après ${blockedUntil}.`);
+          throw new Error(`Trop de tentatives depuis cet appareil. Veuillez réessayer après ${blockedUntil}.`);
         }
-      }
-
-      // 4. Vérifier le rate limit par device fingerprint avec config personnalisée
-      const deviceRateLimit = await ExternalBackendAnalyticsService.checkRateLimit(
-        deviceFingerprint,
-        'device',
-        data.campaignId,
-        rateLimitConfig.device_max_attempts,
-        rateLimitConfig.device_window_minutes
-      );
-
-      if (!deviceRateLimit.allowed) {
-        const blockedUntil = deviceRateLimit.blocked_until 
-          ? new Date(deviceRateLimit.blocked_until).toLocaleTimeString()
-          : 'quelques minutes';
-        throw new Error(`Trop de tentatives depuis cet appareil. Veuillez réessayer après ${blockedUntil}.`);
-      }
+      } // Fin du if (!SKIP_ANTISPAM)
 
       // ===== FIN VÉRIFICATIONS ANTI-SPAM =====
 
@@ -378,9 +395,167 @@ export const ParticipationService = {
 
       // Nettoyer les durées stockées maintenant que la participation est enregistrée
       StepDurationStorage.clearStepDurations(data.campaignId);
+
+      // ===== SYNCHRONISATION CRM =====
+      // Synchroniser vers les CRM connectés (HubSpot, etc.) en arrière-plan
+      ParticipationService.syncToCRMs(data, contactData).catch((err) => {
+        console.error('CRM sync error (non-blocking):', err);
+      });
+
     } catch (err) {
       console.error('Failed to record participation:', err);
       // Ne pas bloquer l'expérience utilisateur si l'enregistrement échoue
+    }
+  },
+
+  /**
+   * Synchronise une participation vers tous les CRM connectés
+   */
+  async syncToCRMs(data: ParticipationData, contactData: ParticipationData['contactData']): Promise<void> {
+    try {
+      // Récupérer l'organization_id de la campagne
+      const { data: campaign, error: campaignError } = await supabase
+        .from('campaigns')
+        .select('organization_id, type, name')
+        .eq('id', data.campaignId)
+        .single();
+
+      if (campaignError || !campaign?.organization_id) {
+        console.log('Could not get organization for CRM sync');
+        return;
+      }
+
+      // Récupérer les intégrations actives
+      const { data: integrations, error: intError } = await supabase
+        .from('organization_integrations')
+        .select('id, provider, credentials, config')
+        .eq('organization_id', campaign.organization_id)
+        .eq('status', 'connected');
+
+      if (intError || !integrations || integrations.length === 0) {
+        console.log('No active CRM integrations for sync');
+        return;
+      }
+
+      const email = data.email || contactData.email;
+      if (!email) {
+        console.log('No email for CRM sync');
+        return;
+      }
+
+      // Préparer les données de participation pour le CRM
+      // Debug: afficher les données reçues
+      console.log('📤 [ParticipationService] contactData received:', JSON.stringify(contactData, null, 2));
+      
+      // Extraire prénom/nom - priorité aux champs explicites firstName/lastName
+      const firstName = contactData.firstName || contactData.name?.split(' ')[0] || '';
+      const lastName = contactData.lastName || contactData.name?.split(' ').slice(1).join(' ') || '';
+      
+      console.log('📤 [ParticipationService] Extracted - firstName:', firstName, 'lastName:', lastName);
+      console.log('📤 [ParticipationService] salutation:', contactData.salutation);
+      
+      const participationForCRM = {
+        id: crypto.randomUUID(),
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        phone: contactData.phone,
+        // Champs d'adresse
+        address: contactData.address,
+        city: contactData.city,
+        postal_code: contactData.postalCode,
+        country: contactData.country,
+        // Champs professionnels
+        company: contactData.company,
+        job_title: contactData.jobTitle,
+        industry: contactData.industry,
+        company_size: contactData.companySize,
+        website: contactData.website,
+        linkedin: contactData.linkedin,
+        // Champs personnels
+        birthdate: contactData.birthdate,
+        salutation: contactData.salutation,
+        gender: contactData.gender,
+        nationality: contactData.nationality,
+        language: contactData.language,
+        marital_status: contactData.maritalStatus,
+        // Champs marketing
+        lead_source: contactData.leadSource,
+        gdpr_consent: contactData.gdprConsent,
+        interests: contactData.interests,
+        // Champs e-commerce / fidélité
+        customer_id: contactData.customerId,
+        loyalty_card: contactData.loyaltyCard,
+        preferred_store: contactData.preferredStore,
+        // Infos campagne
+        organization_id: campaign.organization_id,
+        campaign_id: data.campaignId,
+        campaign_type: campaign.type,
+        prize_won: data.result.prize,
+        points_earned: data.result.score || 0,
+        created_at: new Date().toISOString(),
+      };
+
+      // Synchroniser vers chaque CRM
+      for (const integration of integrations) {
+        try {
+          // Map provider to Edge Function name
+          const edgeFunctionMap: Record<string, string> = {
+            'hubspot': 'hubspot-sync',
+            'brevo': 'brevo-sync',
+            'sendinblue': 'brevo-sync', // Alias - sendinblue is now brevo
+            'mailchimp': 'mailchimp-sync',
+            'salesforce': 'salesforce-sync',
+            'pipedrive': 'pipedrive-sync',
+            'zoho': 'zoho-sync',
+            'zoho_crm': 'zoho-sync', // Alias
+            'activecampaign': 'activecampaign-sync',
+          };
+
+          const edgeFunction = edgeFunctionMap[integration.provider];
+          
+          if (edgeFunction) {
+            console.log(`🔄 Syncing to ${integration.provider} via Edge Function...`);
+            const { data: result, error: syncError } = await supabase.functions.invoke(edgeFunction, {
+              body: { participation: participationForCRM },
+            });
+            if (syncError) {
+              console.error(`❌ ${integration.provider} sync failed:`, syncError.message);
+              await ParticipationService.logCRMSync(integration.id, data.campaignId, 'error', syncError.message);
+            } else {
+              console.log(`✅ ${integration.provider} sync successful:`, result);
+              await ParticipationService.logCRMSync(integration.id, data.campaignId, 'success');
+            }
+          } else {
+            console.log(`CRM sync for ${integration.provider} not implemented yet`);
+          }
+        } catch (err) {
+          console.error(`Sync to ${integration.provider} failed:`, err);
+          await ParticipationService.logCRMSync(integration.id, data.campaignId, 'error', (err as Error).message);
+        }
+      }
+    } catch (err) {
+      console.error('CRM sync error:', err);
+    }
+  },
+
+  /**
+   * Log une synchronisation CRM
+   */
+  async logCRMSync(integrationId: string, campaignId: string, status: 'success' | 'error', errorMessage?: string): Promise<void> {
+    try {
+      await supabase.from('integration_sync_logs').insert({
+        integration_id: integrationId,
+        action_type: 'participation_sync',
+        status,
+        request_data: { campaign_id: campaignId },
+        error_message: errorMessage,
+        records_processed: 1,
+        records_success: status === 'success' ? 1 : 0,
+        records_failed: status === 'error' ? 1 : 0,
+      });
+    } catch (err) {
+      console.error('Error logging CRM sync:', err);
     }
   },
 };

@@ -47,10 +47,10 @@ export const ScratchSettingsPanel = ({
                     desktopLayout={config.welcomeScreen.desktopLayout}
                     mobileLayout={config.welcomeScreen.mobileLayout}
                     onDesktopLayoutChange={(layout) => onUpdateConfig({
-                      welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
+                      welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout, showImage: true }
                     })}
                     onMobileLayoutChange={(layout) => onUpdateConfig({
-                      welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
+                      welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout, showImage: true }
                     })}
                   />
                 </div>
@@ -135,6 +135,18 @@ export const ScratchSettingsPanel = ({
                   applyToAll={config.welcomeScreen.applyBackgroundToAll}
                   onApplyToAllChange={(value) => onUpdateConfig({
                     welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
+                  })}
+                  overlayEnabled={config.welcomeScreen.overlayEnabled}
+                  onOverlayEnabledChange={(value) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, overlayEnabled: value }
+                  })}
+                  overlayColor={config.welcomeScreen.overlayColor || '#000000'}
+                  onOverlayColorChange={(color) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, overlayColor: color }
+                  })}
+                  overlayOpacity={config.welcomeScreen.overlayOpacity ?? 50}
+                  onOverlayOpacityChange={(opacity) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, overlayOpacity: opacity }
                   })}
                 />
               </>

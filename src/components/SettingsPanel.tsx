@@ -13,18 +13,8 @@ import { BackgroundUploader } from "@/components/ui/BackgroundUploader";
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getQuestionIcon, questionIconMap } from "@/lib/questionIcons";
-import { MOBILE_LAYOUTS, DESKTOP_LAYOUTS } from "@/types/layouts";
-import mobileVerticalIcon from "@/assets/layout-mobile-vertical.svg";
-import mobileHorizontalIcon from "@/assets/layout-mobile-horizontal.svg";
-import mobileCenteredIcon from "@/assets/layout-mobile-centered.svg";
-import mobileMinimalIcon from "@/assets/layout-mobile-minimal.svg";
-import desktopLeftRightIcon from "@/assets/layout-desktop-left-right.svg";
-import desktopRightLeftIcon from "@/assets/layout-desktop-right-left.svg";
-import desktopCenteredIcon from "@/assets/layout-desktop-centered.svg";
-import desktopSplitIcon from "@/assets/layout-desktop-split.svg";
-import desktopCardIcon from "@/assets/layout-desktop-card.svg";
-import desktopPanelIcon from "@/assets/layout-desktop-panel.svg";
-import desktopWallpaperIcon from "@/assets/layout-desktop-wallpaper.svg";
+import { LayoutSelector } from "@/components/LayoutSelector";
+import { DesktopLayoutType, MobileLayoutType } from "@/types/layouts";
 
 interface SettingsPanelProps {
   question?: Question;
@@ -32,122 +22,37 @@ interface SettingsPanelProps {
   onViewModeChange?: (mode: 'desktop' | 'mobile') => void;
 }
 
-const LayoutIcon = ({ type }: { type: string }) => {
-  const iconMap: Record<string, string> = {
-    "mobile-vertical": mobileVerticalIcon,
-    "mobile-horizontal": mobileHorizontalIcon,
-    "mobile-centered": mobileCenteredIcon,
-    "mobile-minimal": mobileMinimalIcon,
-    "desktop-left-right": desktopLeftRightIcon,
-    "desktop-right-left": desktopRightLeftIcon,
-    "desktop-centered": desktopCenteredIcon,
-    "desktop-split": desktopSplitIcon,
-    "desktop-card": desktopCardIcon,
-    "desktop-panel": desktopPanelIcon,
-    "desktop-wallpaper": desktopWallpaperIcon,
-  };
-  
-  const icon = iconMap[type];
-  if (!icon) return null;
-  
-  return <img src={icon} alt={type} className="w-full h-full" />;
-};
-
-const LayoutSelector = ({ question, onUpdateQuestion, onViewModeChange }: SettingsPanelProps) => {
+// Wrapper pour utiliser le LayoutSelector partagé avec l'interface Question
+const FormLayoutSelector = ({ question, onUpdateQuestion, onViewModeChange }: SettingsPanelProps) => {
   if (!question) return null;
 
   // Only show layout selector for question types with visual content
-  const shouldShowLayout = ['welcome', 'statement', 'picture-choice', 'file'].includes(question.type);
+  const shouldShowLayout = ['welcome', 'statement', 'picture-choice', 'file', 'ending'].includes(question.type);
   if (!shouldShowLayout) return null;
 
-  const mobileLayouts = MOBILE_LAYOUTS.map(layout => ({
-    value: layout.id,
-    label: layout.name
-  }));
-
-  const desktopLayouts = DESKTOP_LAYOUTS.map(layout => ({
-    value: layout.id,
-    label: layout.name
-  }));
-
-  const currentMobileLayout = question.mobileLayout || "mobile-vertical";
-  const currentDesktopLayout = question.desktopLayout || "desktop-left-right";
+  const currentMobileLayout = (question.mobileLayout || "mobile-vertical") as MobileLayoutType;
+  const currentDesktopLayout = (question.desktopLayout || "desktop-left-right") as DesktopLayoutType;
 
   return (
     <>
       <div className="space-y-3">
         <Label className="text-xs text-muted-foreground mb-2 block">Layout</Label>
         
-        <div className="flex items-center gap-3">
-          <Label className="text-xs font-normal text-muted-foreground w-16 flex-shrink-0">Mobile</Label>
-          <Select 
-            value={currentMobileLayout}
-            onValueChange={(value) => {
-              onUpdateQuestion?.(question.id, { mobileLayout: value });
-              onViewModeChange?.('mobile');
-            }}
-          >
-            <SelectTrigger className="h-9 text-xs flex-1">
-              <div className="flex items-center gap-2 w-full">
-                <div className="w-6 h-6 flex-shrink-0">
-                  <LayoutIcon type={currentMobileLayout} />
-                </div>
-                <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="m6 9 6 6 6-6"/>
-                </svg>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {mobileLayouts.map((layout) => (
-                <SelectItem key={layout.value} value={layout.value} className="text-xs">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-6 h-6">
-                      <LayoutIcon type={layout.value} />
-                    </div>
-                    <span>{layout.label}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Label className="text-xs font-normal text-muted-foreground w-16 flex-shrink-0">Desktop</Label>
-          <Select 
-            value={currentDesktopLayout}
-            onValueChange={(value) => {
-              onUpdateQuestion?.(question.id, { desktopLayout: value });
-              onViewModeChange?.('desktop');
-            }}
-          >
-            <SelectTrigger className="h-9 text-xs flex-1">
-              <div className="flex items-center gap-2 w-full">
-                <div className="w-6 h-6 flex-shrink-0">
-                  <LayoutIcon type={currentDesktopLayout} />
-                </div>
-                <svg className="ml-auto w-3 h-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="m6 9 6 6 6-6"/>
-                </svg>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {desktopLayouts.map((layout) => (
-                <SelectItem key={layout.value} value={layout.value} className="text-xs">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-6 h-6">
-                      <LayoutIcon type={layout.value} />
-                    </div>
-                    <span>{layout.label}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <LayoutSelector
+          desktopLayout={currentDesktopLayout}
+          mobileLayout={currentMobileLayout}
+          onDesktopLayoutChange={(layout) => {
+            onUpdateQuestion?.(question.id, { desktopLayout: layout });
+            onViewModeChange?.('desktop');
+          }}
+          onMobileLayoutChange={(layout) => {
+            onUpdateQuestion?.(question.id, { mobileLayout: layout });
+            onViewModeChange?.('mobile');
+          }}
+        />
 
         {/* Overlay opacity control for Wallpaper layouts */}
-        {(currentMobileLayout === 'mobile-minimal' || currentDesktopLayout === 'desktop-wallpaper' || currentDesktopLayout === 'desktop-split') && (
+        {(currentMobileLayout === 'mobile-minimal' || currentDesktopLayout === 'desktop-split') && (
           <div className="mt-4">
             <Label className="text-xs text-muted-foreground mb-2 block">
               Overlay opacity: {((question.overlayOpacity ?? 0.6) * 100).toFixed(0)}%
@@ -442,7 +347,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderWelcomeSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Alignment */}
       <div>
@@ -535,7 +440,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderTextSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Text Display Style */}
       <DisplayStyleSelector
@@ -602,7 +507,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderEmailSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -656,7 +561,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderPhoneSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -722,7 +627,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderNumberSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="flex items-center justify-between">
         <Label htmlFor="required-toggle" className="text-xs font-normal">Required</Label>
@@ -785,7 +690,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderDateSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Date Display Style */}
       <DisplayStyleSelector
@@ -867,7 +772,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderDropdownSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Dropdown Display Style */}
       <DisplayStyleSelector
@@ -938,7 +843,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderYesNoSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Yes/No Display Style */}
       <DisplayStyleSelector
@@ -1017,7 +922,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderFileUploadSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* File Upload Display Style */}
       <DisplayStyleSelector
@@ -1097,7 +1002,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderStatementSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div>
         <Label className="text-xs text-muted-foreground mb-2 block">Description</Label>
@@ -1169,7 +1074,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderPictureChoiceSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -1249,7 +1154,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderRatingSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Rating Display Style */}
       <DisplayStyleSelector
@@ -1352,7 +1257,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderChoiceSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Choice Display Style */}
       <div>
@@ -1458,7 +1363,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
 
   const renderEndingSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       {/* Ending Display Style */}
       <DisplayStyleSelector
@@ -1565,7 +1470,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
   // Website Settings
   const renderWebsiteSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <DisplayStyleSelector
         label="Display style"
@@ -1613,7 +1518,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
   // Video/Audio Settings
   const renderVideoSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <DisplayStyleSelector
         label="Display style"
@@ -1671,7 +1576,7 @@ export const SettingsPanel = ({ question, onUpdateQuestion, onViewModeChange }: 
   // Checkbox Settings
   const renderCheckboxSettings = () => (
     <>
-      <LayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
+      <FormLayoutSelector question={question} onUpdateQuestion={onUpdateQuestion} onViewModeChange={onViewModeChange} />
       
       <DisplayStyleSelector
         label="Display style"

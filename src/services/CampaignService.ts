@@ -9,6 +9,9 @@ function transformCampaign(data: any): Campaign {
   return {
     ...data,
     name: data.app_title || data.title || data.name,
+    // Mapping inverse: DB (start_date/end_date) -> Frontend (starts_at/ends_at)
+    starts_at: data.starts_at || data.start_date,
+    ends_at: data.ends_at || data.end_date,
   };
 }
 
@@ -23,21 +26,36 @@ function prepareCampaignData(campaign: Partial<Campaign>, isUpdate: boolean = fa
     'updated_at',
   ];
 
-  // Colonnes réelles dans Supabase
-  // Note: 'mode', 'theme', 'prizes' n'existent pas comme colonnes séparées - ils sont dans 'config'
-  // Exclure 'name' car on ne sait pas quelle colonne utiliser (app_title ou title)
-  const allowedFields = ['type', 'status', 'config', 'starts_at', 'ends_at', 'is_published', 'published_at', 'public_url_slug', 'published_url', 'thumbnail_url', 'participation_count', 'participation_limit'];
+  // Colonnes réelles dans Supabase (vérifiées dans la DB)
+  const allowedFields = [
+    'name', 'type', 'mode', 'status', 'config', 'theme', 'prizes',
+    'start_date', 'end_date', 'slug', 'thumbnail_url', 'published_at',
+    'user_id', 'organization_id', 'created_by',
+    'game_config', 'design_config', 'form_config', 'rules',
+    'max_participations_per_user', 'max_total_participations',
+    'meta_title', 'meta_description', 'og_image', 'webhook_url', 'redirect_url'
+  ];
   
-  // Si c'est une mise à jour, ne pas modifier user_id
+  // Mapping des noms de champs (frontend -> database)
+  const fieldMapping: Record<string, string> = {
+    'starts_at': 'start_date',
+    'ends_at': 'end_date',
+    'public_url_slug': 'slug',
+  };
+  
+  // Si c'est une mise à jour, ne pas modifier user_id ni organization_id
   if (isUpdate) {
-    excludedFields.push('user_id');
+    excludedFields.push('user_id', 'organization_id');
   }
   
   const result: any = {};
   
   for (const [key, value] of Object.entries(campaign)) {
-    if (!excludedFields.includes(key) && allowedFields.includes(key) && value !== undefined) {
-      result[key] = value;
+    // Appliquer le mapping si nécessaire
+    const dbKey = fieldMapping[key] || key;
+    
+    if (!excludedFields.includes(key) && allowedFields.includes(dbKey) && value !== undefined) {
+      result[dbKey] = value;
     }
   }
   

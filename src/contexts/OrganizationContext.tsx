@@ -127,22 +127,26 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   };
 
   const loadOrganizationMembers = async (organizationId: string) => {
-    // Charger les membres
-    const { data: membersData } = await supabase
-      .from('organization_members')
-      .select('*')
-      .eq('organization_id', organizationId);
+    // Charger les membres via fonction RPC (évite la récursion RLS)
+    const { data: membersData, error } = await supabase
+      .rpc('get_organization_members', { org_id: organizationId });
+    
+    if (error) {
+      console.error('Error loading members:', error);
+      setMembers([]);
+      return;
+    }
     
     if (membersData && membersData.length > 0) {
       // Charger les profils séparément
-      const userIds = membersData.map(m => m.user_id);
+      const userIds = membersData.map((m: any) => m.user_id);
       const { data: profilesData } = await supabase
         .from('user_profiles')
         .select('*')
         .in('id', userIds);
       
       // Combiner les données
-      const membersWithProfiles = membersData.map(member => ({
+      const membersWithProfiles = membersData.map((member: any) => ({
         ...member,
         user: profilesData?.find(p => p.id === member.user_id) || null
       }));

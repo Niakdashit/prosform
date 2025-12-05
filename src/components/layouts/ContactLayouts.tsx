@@ -352,36 +352,10 @@ export const ContactLayouts = ({
     </div>
   );
 
-  const renderVisual = () => (
-    <div className="flex items-center justify-center p-8">
-      <div className="w-full max-w-md aspect-square rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-        <div className="text-6xl">📝</div>
-      </div>
-    </div>
-  );
-
   if (viewMode === 'desktop') {
     switch (layout as DesktopLayoutType) {
       case 'desktop-left-right':
-        return (
-          <>
-            <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
-              {renderForm()}
-            </div>
-            {renderVisual()}
-          </>
-        );
-
       case 'desktop-right-left':
-        return (
-          <>
-            {renderVisual()}
-            <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
-              {renderForm()}
-            </div>
-          </>
-        );
-
       case 'desktop-centered':
         return (
           <div className="flex items-center justify-center p-12 overflow-y-auto min-h-full">
@@ -401,15 +375,12 @@ export const ContactLayouts = ({
 
       case 'desktop-panel':
         return (
-          <>
-            <div 
-              className="flex items-center justify-center p-12 overflow-y-auto min-h-full"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
-            >
-              {renderForm()}
-            </div>
-            {renderVisual()}
-          </>
+          <div 
+            className="flex items-center justify-center p-12 overflow-y-auto min-h-full"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
+          >
+            {renderForm()}
+          </div>
         );
 
       case 'desktop-split':

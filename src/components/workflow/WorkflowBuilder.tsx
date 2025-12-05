@@ -149,16 +149,46 @@ export const WorkflowBuilder = ({ questions = [] }: WorkflowBuilderProps) => {
 
   const handleAddAction = (type: string) => {
     const actionLabels: { [key: string]: string } = {
+      // CRM
+      'hubspot': 'HubSpot',
+      'salesforce': 'Salesforce',
+      'pipedrive': 'Pipedrive',
+      'zoho_crm': 'Zoho CRM',
+      'freshsales': 'Freshsales',
+      'copper': 'Copper',
+      'close': 'Close',
+      'insightly': 'Insightly',
+      // Marketing
+      'mailchimp': 'Mailchimp',
+      'klaviyo': 'Klaviyo',
+      'activecampaign': 'ActiveCampaign',
+      'sendinblue': 'Brevo',
+      'convertkit': 'ConvertKit',
+      'drip': 'Drip',
+      // E-commerce
+      'shopify': 'Shopify',
+      'woocommerce': 'WooCommerce',
+      // Communication
+      'intercom': 'Intercom',
+      'zendesk': 'Zendesk',
+      'crisp': 'Crisp',
+      // Connect
       'google-sheets': 'Google Sheets',
       'airtable': 'Airtable',
       'zapier': 'Zapier',
+      'make': 'Make',
+      'n8n': 'n8n',
+      // Messages
       'email': 'Email notification',
       'slack': 'Slack message',
+      // Other
       'contacts': 'Update contacts',
-      'webhooks': 'Webhook trigger'
+      'contacts-sync': 'Sync contacts',
+      'webhooks': 'Webhook trigger',
+      'webhook': 'Custom webhook'
     };
 
-    const label = actionLabels[type] || 'New action';
+    const label = actionLabels[type] || type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ');
     
     // Add to the end of the workflow
     const lastNode = nodes[nodes.length - 1];

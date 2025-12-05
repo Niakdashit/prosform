@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Monitor, Smartphone, Sparkles, Upload, ImagePlus, Edit3, Clock, X } from "lucide-react";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
+import { useTheme, getButtonStyles, getFontFamily } from "@/contexts/ThemeContext";
 import SmartWheel from "./SmartWheel/SmartWheel";
 import { resetGlobalWheelRotation } from "./SmartWheel/hooks/useWheelAnimation";
 import { determineWinningSegment, consumePrize, DrawResult } from "@/utils/prizeDrawing";
@@ -59,7 +59,15 @@ export const WheelPreview = ({
   onAssetsReady
 }: WheelPreviewProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
-  const [contactData, setContactDataInternal] = useState<Record<string, string>>({ name: '', email: '', phone: '' });
+  const [contactData, setContactDataInternal] = useState<Record<string, string>>({ 
+    firstName: '', 
+    lastName: '', 
+    email: '', 
+    phone: '',
+    address: '',
+    postalCode: '',
+    city: ''
+  });
   const [isSpinning, setIsSpinning] = useState(false);
   
   // Wrapper pour mettre à jour le contactData et notifier le parent
@@ -79,9 +87,15 @@ export const WheelPreview = ({
   
   // Fonction pour effectuer le tirage (appelée par SmartWheel via onBeforeSpin)
   const handleSpinStart = () => {
+    console.log('🎡 [WheelPreview.handleSpinStart] Called! onSpin exists:', !!onSpin);
+    
     // Notifier le parent que l'utilisateur a cliqué sur "Faire tourner"
     if (onSpin) {
+      console.log('🎡 [WheelPreview.handleSpinStart] Calling onSpin...');
       onSpin();
+      console.log('🎡 [WheelPreview.handleSpinStart] onSpin called!');
+    } else {
+      console.warn('🎡 [WheelPreview.handleSpinStart] onSpin is not defined!');
     }
     
     // Convertir les segments pour le tirage
@@ -123,6 +137,8 @@ export const WheelPreview = ({
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [hardcodedImageHidden, setHardcodedImageHidden] = useState(false);
   const [imageSettings, setImageSettings] = useState<ImageSettings>(defaultSettings);
+  // Track which view is requesting the image upload
+  const [uploadTarget, setUploadTarget] = useState<'welcome' | 'contact-banner' | 'contact-desktop'>('welcome');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme, viewMode);
@@ -136,9 +152,13 @@ export const WheelPreview = ({
       setImageRotation(config.welcomeScreen.imageSettings.rotation || 0);
       setImageSettings(prev => ({
         ...prev,
+        size: config.welcomeScreen.imageSettings?.size ?? prev.size,
         borderRadius: config.welcomeScreen.imageSettings?.borderRadius ?? prev.borderRadius,
         borderWidth: config.welcomeScreen.imageSettings?.borderWidth ?? prev.borderWidth,
         borderColor: config.welcomeScreen.imageSettings?.borderColor ?? prev.borderColor,
+        rotation: config.welcomeScreen.imageSettings?.rotation ?? prev.rotation,
+        flipH: config.welcomeScreen.imageSettings?.flipH ?? prev.flipH,
+        flipV: config.welcomeScreen.imageSettings?.flipV ?? prev.flipV,
       }));
     }
   }, [config.welcomeScreen.image, config.welcomeScreen.imageSettings]);
@@ -206,19 +226,40 @@ export const WheelPreview = ({
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageData = reader.result as string;
-        setUploadedImage(imageData);
-        setImageRotation(0);
-        // Sauvegarder dans la config
-        onUpdateConfig({ 
-          welcomeScreen: { 
-            ...config.welcomeScreen, 
-            image: imageData,
-            imageSettings: { ...imageSettings, rotation: 0 }
-          } 
-        });
+        
+        // Sauvegarder selon la cible
+        if (uploadTarget === 'welcome') {
+          setUploadedImage(imageData);
+          setImageRotation(0);
+          onUpdateConfig({ 
+            welcomeScreen: { 
+              ...config.welcomeScreen, 
+              image: imageData,
+              imageSettings: { ...imageSettings, rotation: 0 }
+            } 
+          });
+        } else if (uploadTarget === 'contact-banner') {
+          // Mobile banner pour contact (utilise imageMobile)
+          onUpdateConfig({ 
+            contactForm: { 
+              ...config.contactForm, 
+              imageMobile: imageData
+            } 
+          });
+        } else if (uploadTarget === 'contact-desktop') {
+          // Desktop image pour contact (split layouts - utilise image)
+          onUpdateConfig({ 
+            contactForm: { 
+              ...config.contactForm, 
+              image: imageData
+            } 
+          });
+        }
       };
       reader.readAsDataURL(file);
     }
+    // Reset input value to allow re-uploading same file
+    e.target.value = '';
   };
 
   const handleImageSelect = (imageData: string) => {
@@ -237,15 +278,18 @@ export const WheelPreview = ({
   const handleImageEdit = (settings: ImageSettings) => {
     setImageSettings(settings);
     setImageRotation(settings.rotation);
-    // Sauvegarder dans la config
+    // Sauvegarder TOUTES les propriétés dans la config
     onUpdateConfig({ 
       welcomeScreen: { 
         ...config.welcomeScreen, 
         imageSettings: {
+          size: settings.size,
           borderRadius: settings.borderRadius,
           borderWidth: settings.borderWidth,
           borderColor: settings.borderColor,
-          rotation: settings.rotation
+          rotation: settings.rotation,
+          flipH: settings.flipH,
+          flipV: settings.flipV
         }
       } 
     });
@@ -450,8 +494,9 @@ export const WheelPreview = ({
               const currentLayoutType = viewMode === "desktop" ? desktopLayout : mobileLayout;
 
               // Image component with upload functionality
-              const baseSize = viewMode === 'desktop' ? 320 : 280;
-              const scaledSize = baseSize * (imageSettings.size / 100);
+              // Taille augmentée de 35% en mode preview (isReadOnly)
+              const baseSize = viewMode === 'desktop' ? (isReadOnly ? 432 : 320) : 280;
+              const scaledSize = baseSize * ((imageSettings.size || 100) / 100);
               
               const ImageBlock = () => (
                 <div
@@ -477,7 +522,12 @@ export const WheelPreview = ({
                     />
                   ) : (
                     <div
-                      onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                      onClick={() => {
+                        if (!isReadOnly) {
+                          setUploadTarget('welcome');
+                          fileInputRef.current?.click();
+                        }
+                      }}
                       className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                     >
                       <Upload className="w-12 h-12 mb-3" style={{ color: theme.accentColor }} />
@@ -531,12 +581,14 @@ export const WheelPreview = ({
                       className="font-bold"
                       style={{ 
                         color: config.welcomeScreen.titleStyle?.textColor || theme.accentColor, 
-                        fontFamily: config.welcomeScreen.titleStyle?.fontFamily || 'inherit',
+                        fontFamily: config.welcomeScreen.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                         fontWeight: config.welcomeScreen.titleStyle?.isBold ? 'bold' : undefined,
                         fontStyle: config.welcomeScreen.titleStyle?.isItalic ? 'italic' : undefined,
                         textDecoration: config.welcomeScreen.titleStyle?.isUnderline ? 'underline' : undefined,
                         textAlign: config.welcomeScreen.titleStyle?.textAlign || alignment,
-                        fontSize: config.welcomeScreen.titleStyle?.fontSize ? `${config.welcomeScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
+                        fontSize: config.welcomeScreen.titleStyle?.fontSize 
+                          ? `${isReadOnly ? Math.round(config.welcomeScreen.titleStyle.fontSize * 1.35) : config.welcomeScreen.titleStyle.fontSize}px` 
+                          : (viewMode === 'desktop' ? (isReadOnly ? '57px' : '42px') : '28px'),
                         lineHeight: '1.2'
                       }}
                       isEditing={!isReadOnly && editingField === 'welcome-title'}
@@ -558,13 +610,15 @@ export const WheelPreview = ({
                       className=""
                       style={{ 
                         color: config.welcomeScreen.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                        fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || 'inherit',
+                        fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                         fontWeight: config.welcomeScreen.subtitleStyle?.isBold ? 'bold' : undefined,
                         fontStyle: config.welcomeScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
                         textDecoration: config.welcomeScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
                         textAlign: config.welcomeScreen.subtitleStyle?.textAlign || alignment,
                         opacity: 0.9, 
-                        fontSize: config.welcomeScreen.subtitleStyle?.fontSize ? `${config.welcomeScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
+                        fontSize: config.welcomeScreen.subtitleStyle?.fontSize 
+                          ? `${isReadOnly ? Math.round(config.welcomeScreen.subtitleStyle.fontSize * 1.35) : config.welcomeScreen.subtitleStyle.fontSize}px` 
+                          : (viewMode === 'desktop' ? (isReadOnly ? '24px' : '18px') : '14px'),
                         lineHeight: '1.4'
                       }}
                       isEditing={!isReadOnly && editingField === 'welcome-subtitle'}
@@ -590,6 +644,9 @@ export const WheelPreview = ({
               );
 
               // Desktop layouts
+              // Calculer le gap basé sur blockSpacing (1 = 40px, 2 = 80px, etc.)
+              const blockGap = (config.welcomeScreen.blockSpacing || 1) * 40;
+              
               if (viewMode === 'desktop') {
                 // Horizontal alignment for the whole content block
                 const horizontalAlign = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
@@ -611,7 +668,7 @@ export const WheelPreview = ({
                       : 'max-w-[700px]';
 
                   return (
-                    <div className={`w-full h-full flex flex-col ${horizontalAlign} ${justifyClass} gap-10 overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
+                    <div className={`w-full h-full flex flex-col ${horizontalAlign} ${justifyClass} overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px', gap: `${blockGap}px` }}>
                       {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                       <div className={textContainerClass}>
                         <TextContent />
@@ -619,23 +676,21 @@ export const WheelPreview = ({
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-right-left') {
-                  // Le bloc texte+image est toujours centré horizontalement
-                  // L'alignement du texte est géré par TextContent via alignmentClass
+                  // Texte à gauche, image à droite - centré
                   return (
-                    <div className="w-full h-full flex justify-center items-center gap-16 px-24">
-                      <div className="max-w-[600px] flex-shrink-0">
+                    <div className="w-full h-full flex justify-center items-center px-16" style={{ gap: `${isReadOnly ? 80 : blockGap}px` }}>
+                      <div className="max-w-[600px]">
                         <TextContent />
                       </div>
-                      <ImageBlock />
+                      {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-centered') {
-                  // Le bloc image+texte est toujours centré horizontalement
-                  // L'alignement du texte est géré par TextContent via alignmentClass
+                  // Image à gauche, texte à droite - centré
                   return (
-                    <div className="w-full h-full flex justify-center items-center gap-16 px-24">
-                      <ImageBlock />
-                      <div className="max-w-[600px] flex-shrink-0">
+                    <div className="w-full h-full flex justify-center items-center px-16" style={{ gap: `${isReadOnly ? 80 : blockGap}px` }}>
+                      {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
+                      <div className="max-w-[600px]">
                         <TextContent />
                       </div>
                     </div>
@@ -715,7 +770,12 @@ export const WheelPreview = ({
                           </>
                         ) : (
                           <div
-                            onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                            onClick={() => {
+                              if (!isReadOnly) {
+                                setUploadTarget('welcome');
+                                fileInputRef.current?.click();
+                              }
+                            }}
                             className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                           >
                             <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -778,7 +838,12 @@ export const WheelPreview = ({
                             </>
                         ) : (
                           <div
-                            onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                            onClick={() => {
+                              if (!isReadOnly) {
+                                setUploadTarget('welcome');
+                                fileInputRef.current?.click();
+                              }
+                            }}
                             className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                           >
                             <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -805,8 +870,16 @@ export const WheelPreview = ({
               if (mobileLayout === 'mobile-vertical') {
                 return (
                   <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
-                    <ImageBlock />
+                    {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                     <TextContent />
+                  </div>
+                );
+              } else if (mobileLayout === 'mobile-text-top') {
+                // Texte au-dessus, image en dessous
+                return (
+                  <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
+                    <TextContent />
+                    {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                   </div>
                 );
               } else if (mobileLayout === 'mobile-centered') {
@@ -857,7 +930,12 @@ export const WheelPreview = ({
                         </>
                       ) : (
                         <div
-                          onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                          onClick={() => {
+                            if (!isReadOnly) {
+                              setUploadTarget('welcome');
+                              fileInputRef.current?.click();
+                            }
+                          }}
                           className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                         >
                           <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
@@ -925,7 +1003,7 @@ export const WheelPreview = ({
               className="font-bold"
               style={{
                 color: config.contactForm.titleStyle?.textColor || theme.textColor,
-                fontFamily: config.contactForm.titleStyle?.fontFamily || 'inherit',
+                fontFamily: config.contactForm.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                 fontSize: viewMode === 'mobile' ? '28px' : '42px',
                 lineHeight: '1.2',
               }}
@@ -949,7 +1027,7 @@ export const WheelPreview = ({
               className=""
               style={{
                 color: config.contactForm.subtitleStyle?.textColor || theme.textColor,
-                fontFamily: config.contactForm.subtitleStyle?.fontFamily || 'inherit',
+                fontFamily: config.contactForm.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                 fontSize: viewMode === 'mobile' ? '14px' : '18px',
                 lineHeight: '1.4',
                 opacity: 0.8,
@@ -1074,10 +1152,11 @@ export const WheelPreview = ({
         
         // Mobile-centered layout avec bannière (même système que Welcome)
         if (viewMode === 'mobile' && currentLayout === 'mobile-centered') {
-          const contactBannerImage = config.contactForm.backgroundImageMobile || config.contactForm.backgroundImage;
+          const contactBannerImage = config.contactForm.imageMobile || config.contactForm.image;
           
           return (
             <div className="flex flex-col w-full h-full">
+              {/* Bannière - même taille que Welcome */}
               <div className="w-full relative group" style={{ height: '40%', minHeight: '250px' }}>
                 {contactBannerImage ? (
                   <>
@@ -1101,8 +1180,7 @@ export const WheelPreview = ({
                             onUpdateConfig({
                               contactForm: {
                                 ...config.contactForm,
-                                backgroundImageMobile: undefined,
-                                backgroundImage: undefined,
+                                imageMobile: undefined,
                               }
                             });
                           }}
@@ -1117,7 +1195,12 @@ export const WheelPreview = ({
                   </>
                 ) : (
                   <div
-                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!isReadOnly) {
+                        setUploadTarget('contact-banner');
+                        fileInputRef.current?.click();
+                      }
+                    }}
                     className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
@@ -1130,7 +1213,8 @@ export const WheelPreview = ({
                   </div>
                 )}
               </div>
-              <div className="flex-1 flex items-start justify-center pt-6 pb-24 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+              {/* Zone formulaire - même style que Welcome */}
+              <div className="flex-1 flex items-start justify-center pt-6 pb-24" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px]">
                   <ContactForm />
                 </div>
@@ -1141,15 +1225,19 @@ export const WheelPreview = ({
         
         // Desktop-card (Split right) layout avec image
         if (viewMode === 'desktop' && currentLayout === 'desktop-card') {
-          const contactImageDesktop = config.contactForm.backgroundImage;
+          const contactImageDesktop = config.contactForm.image;
           
           return (
             <div className="relative w-full h-full flex">
-              <div className="w-1/2 flex items-center justify-center px-24 z-10">
-                <div className="max-w-[500px]">
-                  <ContactForm />
+              {/* Zone formulaire scrollable */}
+              <div className="w-1/2 h-full overflow-y-auto z-10">
+                <div className="min-h-full flex items-center justify-center px-12 py-8">
+                  <div className="max-w-[500px] w-full">
+                    <ContactForm />
+                  </div>
                 </div>
               </div>
+              {/* Zone image fixe */}
               <div className="absolute right-0 top-0 w-1/2 h-full group">
                 {contactImageDesktop ? (
                   <>
@@ -1173,7 +1261,7 @@ export const WheelPreview = ({
                             onUpdateConfig({
                               contactForm: {
                                 ...config.contactForm,
-                                backgroundImage: undefined,
+                                image: undefined,
                               }
                             });
                           }}
@@ -1188,7 +1276,12 @@ export const WheelPreview = ({
                   </>
                 ) : (
                   <div
-                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!isReadOnly) {
+                        setUploadTarget('contact-desktop');
+                        fileInputRef.current?.click();
+                      }
+                    }}
                     className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -1207,7 +1300,7 @@ export const WheelPreview = ({
         
         // Desktop-panel (Split left) layout avec image
         if (viewMode === 'desktop' && currentLayout === 'desktop-panel') {
-          const contactImageDesktop = config.contactForm.backgroundImage;
+          const contactImageDesktop = config.contactForm.image;
           
           return (
             <div className="relative w-full h-full flex">
@@ -1242,7 +1335,12 @@ export const WheelPreview = ({
                   </>
                 ) : (
                   <div
-                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!isReadOnly) {
+                        setUploadTarget('contact-desktop');
+                        fileInputRef.current?.click();
+                      }
+                    }}
                     className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -1255,9 +1353,12 @@ export const WheelPreview = ({
                   </div>
                 )}
               </div>
-              <div className="w-1/2 ml-auto flex items-center justify-center px-24 z-10">
-                <div className="max-w-[500px]">
-                  <ContactForm />
+              {/* Zone formulaire scrollable */}
+              <div className="w-1/2 ml-auto h-full overflow-y-auto z-10">
+                <div className="min-h-full flex items-center justify-center px-12 py-8">
+                  <div className="max-w-[500px] w-full">
+                    <ContactForm />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1392,7 +1493,7 @@ export const WheelPreview = ({
                 className="font-bold"
                 style={{ 
                   color: config.endingWin.titleStyle?.textColor || theme.textColor,
-                  fontFamily: config.endingWin.titleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingWin.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                   fontWeight: config.endingWin.titleStyle?.isBold ? 'bold' : 700,
                   fontStyle: config.endingWin.titleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingWin.titleStyle?.isUnderline ? 'underline' : undefined,
@@ -1416,7 +1517,7 @@ export const WheelPreview = ({
                 className=""
                 style={{ 
                   color: config.endingWin.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                  fontFamily: config.endingWin.subtitleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingWin.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                   fontWeight: config.endingWin.subtitleStyle?.isBold ? 'bold' : 400,
                   fontStyle: config.endingWin.subtitleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingWin.subtitleStyle?.isUnderline ? 'underline' : undefined,
@@ -1460,7 +1561,7 @@ export const WheelPreview = ({
                 className="font-bold"
                 style={{ 
                   color: config.endingLose.titleStyle?.textColor || theme.textColor,
-                  fontFamily: config.endingLose.titleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingLose.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                   fontWeight: config.endingLose.titleStyle?.isBold ? 'bold' : 700,
                   fontStyle: config.endingLose.titleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingLose.titleStyle?.isUnderline ? 'underline' : undefined,
@@ -1484,7 +1585,7 @@ export const WheelPreview = ({
                 className=""
                 style={{ 
                   color: config.endingLose.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                  fontFamily: config.endingLose.subtitleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingLose.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                   fontWeight: config.endingLose.subtitleStyle?.isBold ? 'bold' : 400,
                   fontStyle: config.endingLose.subtitleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingLose.subtitleStyle?.isUnderline ? 'underline' : undefined,
@@ -1617,17 +1718,78 @@ export const WheelPreview = ({
           
           if (!bgImage) return null;
           
+          // Get overlay settings based on current screen
+          const getOverlaySettings = () => {
+            const applyToAll = config.welcomeScreen.applyBackgroundToAll;
+            if (applyToAll) {
+              return {
+                enabled: config.welcomeScreen.overlayEnabled,
+                color: config.welcomeScreen.overlayColor || '#000000',
+                opacity: config.welcomeScreen.overlayOpacity ?? 50,
+              };
+            }
+            
+            switch (activeView) {
+              case 'welcome':
+                return {
+                  enabled: config.welcomeScreen.overlayEnabled,
+                  color: config.welcomeScreen.overlayColor || '#000000',
+                  opacity: config.welcomeScreen.overlayOpacity ?? 50,
+                };
+              case 'contact':
+                return {
+                  enabled: config.contactForm.overlayEnabled,
+                  color: config.contactForm.overlayColor || '#000000',
+                  opacity: config.contactForm.overlayOpacity ?? 50,
+                };
+              case 'wheel':
+                return {
+                  enabled: config.wheelScreen.overlayEnabled,
+                  color: config.wheelScreen.overlayColor || '#000000',
+                  opacity: config.wheelScreen.overlayOpacity ?? 50,
+                };
+              case 'ending-win':
+                return {
+                  enabled: config.endingWin.overlayEnabled,
+                  color: config.endingWin.overlayColor || '#000000',
+                  opacity: config.endingWin.overlayOpacity ?? 50,
+                };
+              case 'ending-lose':
+                return {
+                  enabled: config.endingLose.overlayEnabled,
+                  color: config.endingLose.overlayColor || '#000000',
+                  opacity: config.endingLose.overlayOpacity ?? 50,
+                };
+              default:
+                return { enabled: false, color: '#000000', opacity: 50 };
+            }
+          };
+          
+          const overlay = getOverlaySettings();
+          
           return (
-            <div 
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `url(${bgImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                zIndex: 0,
-              }}
-            />
+            <>
+              <div 
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: `url(${bgImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  zIndex: 0,
+                }}
+              />
+              {overlay.enabled && (
+                <div 
+                  className="absolute inset-0"
+                  style={{
+                    backgroundColor: overlay.color,
+                    opacity: overlay.opacity / 100,
+                    zIndex: 1,
+                  }}
+                />
+              )}
+            </>
           );
         })()}
 
@@ -1647,7 +1809,7 @@ export const WheelPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={activeView === 'contact' ? "w-full min-h-full relative z-10 flex flex-col" : "w-full h-full relative z-10"}
+              className="w-full h-full relative z-10"
               onClick={(e) => {
                 const target = e.target as HTMLElement;
                 if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.closest('input') || target.closest('textarea') || target.closest('button')) {
@@ -1659,35 +1821,7 @@ export const WheelPreview = ({
                 }
               }}
             >
-              {(() => {
-                if (activeView !== 'contact') {
-                  return renderContent();
-                }
-                
-                // Pour la vue contact uniquement
-                const getCurrentLayout = () => {
-                  const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
-                  return config.contactForm[layoutKey];
-                };
-                
-                const currentLayout = getCurrentLayout();
-                const isContactWithGrid = viewMode === 'desktop' && (
-                  currentLayout === 'desktop-left-right' || 
-                  currentLayout === 'desktop-right-left' || 
-                  currentLayout === 'desktop-panel' || 
-                  currentLayout === 'desktop-card'
-                );
-                
-                if (isContactWithGrid) {
-                  return (
-                    <div className="flex-1 grid grid-cols-2">
-                      {renderContent()}
-                    </div>
-                  );
-                }
-                
-                return renderContent();
-              })()}
+              {renderContent()}
             </motion.div>
           </AnimatePresence>
 

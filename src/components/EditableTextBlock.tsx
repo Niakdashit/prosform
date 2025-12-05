@@ -1,4 +1,4 @@
-import { Sparkles, X } from "lucide-react";
+import { Sparkles, X, Plus } from "lucide-react";
 import { useState, useCallback } from "react";
 
 // Mini resize handle component
@@ -46,6 +46,9 @@ interface EditableTextBlockProps {
   width?: number; // percentage 20-100
   onWidthChange?: (width: number) => void;
   marginBottom?: string;
+  // Add text block
+  onAddTextBlock?: () => void;
+  showAddButton?: boolean;
 }
 
 export const EditableTextBlock = ({
@@ -56,8 +59,8 @@ export const EditableTextBlock = ({
   placeholder = "",
   className = "",
   style = {},
-  showSparkles = true,
-  showClear = true,
+  showSparkles = false,
+  showClear = false,
   isEditing = false,
   isReadOnly = false,
   onFocus,
@@ -66,6 +69,8 @@ export const EditableTextBlock = ({
   width = 100,
   onWidthChange,
   marginBottom = '0px',
+  onAddTextBlock,
+  showAddButton = false,
 }: EditableTextBlockProps) => {
   const [localValue, setLocalValue] = useState(value);
   const [isResizing, setIsResizing] = useState(false);
@@ -222,6 +227,28 @@ export const EditableTextBlock = ({
         onBlur={handleBlur}
         dangerouslySetInnerHTML={{ __html: value || placeholder }}
       />
+
+      {/* Add text block button - centered at bottom */}
+      {showAddButton && onAddTextBlock && (
+        <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-50">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddTextBlock();
+            }}
+            className="w-4 h-4 rounded-full flex items-center justify-center transition-all hover:scale-110"
+            style={{
+              backgroundColor: '#F5B800',
+              color: '#ffffff',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.16)',
+            }}
+            title="Ajouter une zone de texte"
+          >
+            <Plus className="w-2.5 h-2.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

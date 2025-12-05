@@ -227,11 +227,23 @@ export const WelcomeLayouts = ({
       case 'mobile-vertical':
         return (
           <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+              {renderContent()}
+            </div>
             <div className="flex-1 flex items-center justify-center p-6">
               {renderVisual()}
             </div>
-            <div className="flex-1 flex items-center justify-center py-8" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+          </div>
+        );
+
+      case 'mobile-text-top': // Texte au-dessus, image en dessous (variante dédiée)
+        return (
+          <div className="flex flex-col h-full">
+            <div className="flex-1 flex items-center justify-center py-10" style={{ paddingLeft: '9%', paddingRight: '9%' }}>
               {renderContent()}
+            </div>
+            <div className="flex-1 flex items-center justify-center p-6">
+              {renderVisual()}
             </div>
           </div>
         );

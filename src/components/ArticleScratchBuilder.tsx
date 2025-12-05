@@ -25,7 +25,7 @@ const defaultScratchConfig: ScratchConfig = {
     buttonText: "Commencer à gratter",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-left-right"
+    desktopLayout: "desktop-right-left"
   },
   contactForm: {
     enabled: true,
@@ -38,14 +38,14 @@ const defaultScratchConfig: ScratchConfig = {
       { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   scratchScreen: {
     title: "Grattez pour gagner !",
     subtitle: "Découvrez votre lot en grattant la carte",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered",
+    desktopLayout: "desktop-right-left",
     scratchColor: "#C0C0C0",
     cardWidth: 300,
     cardHeight: 200,
@@ -64,14 +64,14 @@ const defaultScratchConfig: ScratchConfig = {
     subtitle: "Vous avez gagné {{prize}}",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   endingLose: {
     title: "Dommage !",
     subtitle: "Vous n'avez pas gagné cette fois-ci",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   }
 };
 

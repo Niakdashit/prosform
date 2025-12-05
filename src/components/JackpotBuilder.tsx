@@ -23,6 +23,7 @@ import {
   defaultHeaderConfig, 
   defaultFooterConfig,
 } from "./campaign";
+import { TemplateLibraryPanel } from "./templates/TemplateLibraryPanel";
 
 export interface JackpotPrize {
   id: string;
@@ -75,6 +76,14 @@ export interface TextStyle {
   textAlign?: 'left' | 'center' | 'right';
 }
 
+export interface ExtraTextBlock {
+  id: string;
+  content: string;
+  contentHtml?: string;
+  style?: TextStyle;
+  width?: number;
+}
+
 export interface JackpotConfig {
   welcomeScreen: {
     title: string;
@@ -90,6 +99,8 @@ export interface JackpotConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -99,11 +110,15 @@ export interface JackpotConfig {
     alignment?: 'left' | 'center' | 'right';
     image?: string;
     imageSettings?: {
+      size: number;
       borderRadius: number;
       borderWidth: number;
       borderColor: string;
       rotation: number;
+      flipH: boolean;
+      flipV: boolean;
     };
+    extraTextBlocks?: ExtraTextBlock[];
   };
   contactForm: {
     enabled: boolean;
@@ -120,9 +135,13 @@ export interface JackpotConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
+    image?: string;
+    imageMobile?: string;
   };
   jackpotScreen: {
     title: string;
@@ -137,6 +156,8 @@ export interface JackpotConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -157,6 +178,8 @@ export interface JackpotConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -174,6 +197,8 @@ export interface JackpotConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -192,7 +217,17 @@ const defaultJackpotConfig: JackpotConfig = {
     buttonText: "Jouer au jackpot",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-left-right"
+    desktopLayout: "desktop-right-left",
+    showImage: true,
+    imageSettings: {
+      size: 150,
+      borderRadius: 5,
+      borderWidth: 0,
+      borderColor: '#F5B800',
+      rotation: 0,
+      flipH: false,
+      flipV: false
+    }
   },
   contactForm: {
     enabled: true,
@@ -205,14 +240,14 @@ const defaultJackpotConfig: JackpotConfig = {
       { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   jackpotScreen: {
     title: "Tournez le jackpot !",
     subtitle: "Alignez 3 symboles identiques pour gagner",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered",
+    desktopLayout: "desktop-right-left",
     template: "jackpot-11",
     spinDuration: 2000
   },
@@ -231,14 +266,14 @@ const defaultJackpotConfig: JackpotConfig = {
     subtitle: "Vous avez gagné {{prize}}",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   endingLose: {
     title: "Dommage !",
     subtitle: "Vous n'avez pas gagné cette fois-ci",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   layout: {
     header: { ...defaultHeaderConfig, enabled: false },
@@ -527,6 +562,53 @@ export const JackpotBuilder = () => {
           campaignId={campaign?.id || ''}
           publicSlug={campaign?.public_url_slug || ''}
           publishedUrl={campaign?.published_url || ''}
+        />
+      ) : activeTab === 'templates' ? (
+        <TemplateLibraryPanel 
+          onSelectTemplate={(templateConfig, templateMeta) => {
+            // Appliquer la config du template
+            setConfig(prev => ({
+              ...prev,
+              ...templateConfig,
+              welcomeScreen: {
+                ...prev.welcomeScreen,
+                ...templateConfig.welcomeScreen,
+                backgroundImage: templateMeta.backgroundImage || templateConfig.welcomeScreen?.backgroundImage,
+              },
+              contactForm: {
+                ...prev.contactForm,
+                ...templateConfig.contactForm,
+              },
+              jackpotScreen: {
+                ...prev.jackpotScreen,
+                ...templateConfig.jackpotScreen,
+              },
+              endingWin: {
+                ...prev.endingWin,
+                ...templateConfig.endingWin,
+              },
+              endingLose: {
+                ...prev.endingLose,
+                ...templateConfig.endingLose,
+              },
+              symbols: templateConfig.symbols || prev.symbols,
+            }));
+            
+            // Appliquer le thème (couleurs + typo) via le contexte
+            themeContext.updateTheme({
+              primaryColor: templateMeta.colorPalette.secondary,
+              buttonColor: templateMeta.colorPalette.secondary,
+              buttonTextColor: templateMeta.colorPalette.primary,
+              backgroundColor: templateMeta.colorPalette.primary,
+              textColor: templateMeta.colorPalette.tertiary,
+              fontFamily: templateMeta.typography.body.toLowerCase().replace(/\s+/g, '-'),
+              headingFontFamily: templateMeta.typography.heading.toLowerCase().replace(/\s+/g, '-'),
+            });
+            
+            toast.success("Template appliqué avec succès !");
+            setActiveTab('design');
+          }}
+          currentConfig={config}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

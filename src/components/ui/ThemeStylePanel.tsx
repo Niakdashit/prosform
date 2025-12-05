@@ -7,9 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { 
   Palette, Type, Square, Sparkles, Layout, 
-  Sun, Moon, Droplets, ChevronRight, Frame, Layers
+  Sun, Moon, Droplets, ChevronRight, Frame, Layers, Wand2
 } from "lucide-react";
 import { useTheme, GOOGLE_FONTS, COLOR_PRESETS, ThemeSettings } from "@/contexts/ThemeContext";
+import { TypographyPresetSelector } from "./TypographyPresetSelector";
+import { TypographyPreset, getPresetUI } from "@/utils/typographyPresets";
 
 // Templates prédéfinis pour les jeux
 const GAME_TEMPLATES = [
@@ -88,6 +90,162 @@ interface ThemeStylePanelProps {
 export const ThemeStylePanel = ({ hideBorders, hideJackpotSections }: ThemeStylePanelProps) => {
   const { theme, updateTheme } = useTheme();
   const [openSections, setOpenSections] = useState<string | undefined>(undefined);
+  const [selectedPresetId, setSelectedPresetId] = useState<string | undefined>(undefined);
+
+  // Helper pour convertir le nom de police en valeur compatible ThemeContext
+  const fontNameToValue = (fontName: string): string => {
+    const fontMap: Record<string, string> = {
+      // Sans-Serif
+      'Inter': 'inter',
+      'Poppins': 'poppins',
+      'Nunito': 'nunito',
+      'Montserrat': 'montserrat',
+      'Roboto': 'roboto',
+      'Open Sans': 'open-sans',
+      'Lato': 'lato',
+      'Raleway': 'raleway',
+      'Work Sans': 'work-sans',
+      'DM Sans': 'dm-sans',
+      'Space Grotesk': 'space-grotesk',
+      'Outfit': 'outfit',
+      'Plus Jakarta Sans': 'plus-jakarta-sans',
+      'Manrope': 'manrope',
+      'Sora': 'sora',
+      'Urbanist': 'urbanist',
+      'Quicksand': 'quicksand',
+      'Rubik': 'rubik',
+      'Karla': 'karla',
+      'Josefin Sans': 'josefin-sans',
+      'Cabin': 'cabin',
+      'Barlow': 'barlow',
+      'Mulish': 'mulish',
+      'Figtree': 'figtree',
+      'Albert Sans': 'albert-sans',
+      'Red Hat Display': 'red-hat-display',
+      'Lexend': 'lexend',
+      // Serif
+      'Playfair Display': 'playfair-display',
+      'Merriweather': 'merriweather',
+      'Lora': 'lora',
+      'Cormorant Garamond': 'cormorant-garamond',
+      'Libre Baskerville': 'libre-baskerville',
+      'Crimson Text': 'crimson-text',
+      'Source Serif 4': 'source-serif-4',
+      'EB Garamond': 'eb-garamond',
+      'Spectral': 'spectral',
+      'Bitter': 'bitter',
+      'Fraunces': 'fraunces',
+      'DM Serif Display': 'dm-serif-display',
+      'Bodoni Moda': 'bodoni-moda',
+      'Cardo': 'cardo',
+      'Noto Serif': 'noto-serif',
+      // Display
+      'Bebas Neue': 'bebas-neue',
+      'Anton': 'anton',
+      'Oswald': 'oswald',
+      'Archivo Black': 'archivo-black',
+      'Righteous': 'righteous',
+      'Abril Fatface': 'abril-fatface',
+      'Alfa Slab One': 'alfa-slab-one',
+      'Titan One': 'titan-one',
+      'Bungee': 'bungee',
+      'Bangers': 'bangers',
+      'Comfortaa': 'comfortaa',
+      'Fredoka': 'fredoka',
+      'Baloo 2': 'baloo-2',
+      // Handwriting
+      'Permanent Marker': 'permanent-marker',
+      'Pacifico': 'pacifico',
+      'Lobster': 'lobster',
+      'Satisfy': 'satisfy',
+      'Dancing Script': 'dancing-script',
+      'Great Vibes': 'great-vibes',
+      'Caveat': 'caveat',
+      'Kalam': 'kalam',
+      'Shadows Into Light': 'shadows-into-light',
+      'Indie Flower': 'indie-flower',
+      'Amatic SC': 'amatic-sc',
+      // Futuristic
+      'Orbitron': 'orbitron',
+      'Audiowide': 'audiowide',
+      'Russo One': 'russo-one',
+      'Black Ops One': 'black-ops-one',
+      'Press Start 2P': 'press-start-2p',
+      'Monoton': 'monoton',
+      'Fascinate Inline': 'fascinate-inline',
+      // Extra
+      'Creepster': 'creepster',
+      'Rye': 'rye',
+      'Comic Neue': 'comic-neue',
+      // Monospace
+      'JetBrains Mono': 'jetbrains-mono',
+      'Fira Code': 'fira-code',
+      'Source Code Pro': 'source-code-pro',
+      'IBM Plex Mono': 'ibm-plex-mono',
+      'Space Mono': 'space-mono',
+    };
+    return fontMap[fontName] || fontName.toLowerCase().replace(/ /g, '-');
+  };
+
+  // Appliquer un preset de typographie
+  const handleApplyPreset = (preset: TypographyPreset) => {
+    setSelectedPresetId(preset.id);
+    
+    // Obtenir les valeurs UI du preset (avec fallback sur les valeurs par défaut de la catégorie)
+    const ui = getPresetUI(preset);
+    
+    // Déterminer la couleur du texte du bouton selon le thème
+    const isDarkTheme = preset.category === 'dark';
+    const isColorfulTheme = preset.category === 'colorful';
+    // Pour les thèmes sombres et colorés, le texte du bouton est souvent noir ou blanc selon la couleur du bouton
+    const buttonTextColor = isDarkTheme || isColorfulTheme ? '#FFFFFF' : '#FFFFFF';
+    
+    // Convertir les noms de polices
+    const headingFont = fontNameToValue(preset.typography.titleFont);
+    const bodyFont = fontNameToValue(preset.typography.bodyFont);
+    
+    console.log('Applying preset:', preset.name, '| Heading font:', headingFont, '| Body font:', bodyFont);
+    
+    // Appliquer toutes les propriétés du preset
+    updateTheme({
+      // ═══════════════════════════════════════════════════════════
+      // COULEURS
+      // ═══════════════════════════════════════════════════════════
+      // Couleurs principales
+      textColor: preset.preview.titleColor,
+      textSecondaryColor: preset.preview.bodyColor,
+      accentColor: preset.preview.linkColor,
+      primaryColor: preset.preview.linkColor,
+      backgroundColor: preset.preview.background,
+      // Couleurs du bouton
+      buttonColor: preset.preview.linkColor,
+      buttonTextColor: buttonTextColor,
+      // Couleurs de surface
+      surfaceColor: preset.preview.cardBg || preset.preview.background,
+      borderColor: preset.preview.borderColor || preset.preview.bodyColor + '30',
+      
+      // ═══════════════════════════════════════════════════════════
+      // TYPOGRAPHIE
+      // ═══════════════════════════════════════════════════════════
+      headingFontFamily: headingFont,
+      fontFamily: bodyFont,
+      headingWeight: preset.typography.titleWeight >= 700 ? 'bold' : preset.typography.titleWeight >= 600 ? 'semibold' : 'medium',
+      
+      // ═══════════════════════════════════════════════════════════
+      // BOUTONS & BORDURES
+      // ═══════════════════════════════════════════════════════════
+      buttonStyle: ui.buttonStyle,
+      buttonBorderWidth: ui.buttonBorderWidth,
+      borderRadius: ui.borderRadius,
+      cardRadius: ui.cardRadius,
+      inputRadius: ui.inputRadius,
+      
+      // ═══════════════════════════════════════════════════════════
+      // EFFETS
+      // ═══════════════════════════════════════════════════════════
+      shadowIntensity: ui.shadowIntensity,
+    });
+  };
 
   return (
       <div className="p-4 space-y-2">
@@ -99,6 +257,24 @@ export const ThemeStylePanel = ({ hideBorders, hideJackpotSections }: ThemeStyle
           className="space-y-2"
         >
           
+          {/* ═══════════════════════════════════════════════════════════ */}
+          {/* THÈMES PRÉDÉFINIS (Style Gamma) */}
+          {/* ═══════════════════════════════════════════════════════════ */}
+          <AccordionItem value="themes" className="border rounded-lg px-3">
+            <AccordionTrigger className="py-3 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <Wand2 className="w-4 h-4 text-primary" />
+                <span className="text-sm font-medium">Thèmes</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <TypographyPresetSelector
+                selectedPresetId={selectedPresetId}
+                onSelectPreset={handleApplyPreset}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
           {/* ═══════════════════════════════════════════════════════════ */}
           {/* PALETTE DE COULEURS */}
           {/* ═══════════════════════════════════════════════════════════ */}

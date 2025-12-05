@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Monitor, Smartphone, Sparkles, Upload, ImagePlus, Edit3, Clock, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
+import { useTheme, getButtonStyles, getFontFamily } from "@/contexts/ThemeContext";
 import { SmartScratch } from "./SmartScratch";
 import { ImageUploadModal } from "./ImageUploadModal";
 import { ImageEditorModal, ImageSettings, defaultSettings } from "./ImageEditorModal";
@@ -74,11 +74,17 @@ export const ScratchPreview = ({
   const [imageSettings, setImageSettings] = useState<ImageSettings>(
     config.welcomeScreen.imageSettings ? {
       ...defaultSettings,
-      borderRadius: config.welcomeScreen.imageSettings.borderRadius,
-      borderWidth: config.welcomeScreen.imageSettings.borderWidth,
-      borderColor: config.welcomeScreen.imageSettings.borderColor,
+      size: config.welcomeScreen.imageSettings.size ?? defaultSettings.size,
+      borderRadius: config.welcomeScreen.imageSettings.borderRadius ?? defaultSettings.borderRadius,
+      borderWidth: config.welcomeScreen.imageSettings.borderWidth ?? defaultSettings.borderWidth,
+      borderColor: config.welcomeScreen.imageSettings.borderColor ?? defaultSettings.borderColor,
+      rotation: config.welcomeScreen.imageSettings.rotation ?? defaultSettings.rotation,
+      flipH: config.welcomeScreen.imageSettings.flipH ?? defaultSettings.flipH,
+      flipV: config.welcomeScreen.imageSettings.flipV ?? defaultSettings.flipV,
     } : defaultSettings
   );
+  // Track which view is requesting the image upload
+  const [uploadTarget, setUploadTarget] = useState<'welcome' | 'contact-banner' | 'contact-desktop'>('welcome');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { theme } = useTheme();
   const unifiedButtonStyles = getButtonStyles(theme, viewMode);
@@ -203,19 +209,38 @@ export const ScratchPreview = ({
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageData = reader.result as string;
-        setUploadedImage(imageData);
-        setImageRotation(0);
-        // Sauvegarder dans la config
-        onUpdateConfig({ 
-          welcomeScreen: { 
-            ...config.welcomeScreen, 
-            image: imageData,
-            imageSettings: { ...imageSettings, rotation: 0 }
-          } 
-        });
+        
+        // Sauvegarder selon la cible
+        if (uploadTarget === 'welcome') {
+          setUploadedImage(imageData);
+          setImageRotation(0);
+          onUpdateConfig({ 
+            welcomeScreen: { 
+              ...config.welcomeScreen, 
+              image: imageData,
+              imageSettings: { ...imageSettings, rotation: 0 }
+            } 
+          });
+        } else if (uploadTarget === 'contact-banner') {
+          onUpdateConfig({ 
+            contactForm: { 
+              ...config.contactForm, 
+              imageMobile: imageData
+            } 
+          });
+        } else if (uploadTarget === 'contact-desktop') {
+          onUpdateConfig({ 
+            contactForm: { 
+              ...config.contactForm, 
+              image: imageData
+            } 
+          });
+        }
       };
       reader.readAsDataURL(file);
     }
+    // Reset input value to allow re-uploading same file
+    e.target.value = '';
   };
 
   const handleImageSelect = (imageData: string) => {
@@ -234,15 +259,18 @@ export const ScratchPreview = ({
   const handleImageEdit = (settings: ImageSettings) => {
     setImageSettings(settings);
     setImageRotation(settings.rotation);
-    // Sauvegarder dans la config
+    // Sauvegarder TOUTES les propriétés dans la config
     onUpdateConfig({ 
       welcomeScreen: { 
         ...config.welcomeScreen, 
         imageSettings: {
+          size: settings.size,
           borderRadius: settings.borderRadius,
           borderWidth: settings.borderWidth,
           borderColor: settings.borderColor,
-          rotation: settings.rotation
+          rotation: settings.rotation,
+          flipH: settings.flipH,
+          flipV: settings.flipV
         }
       } 
     });
@@ -398,8 +426,9 @@ export const ScratchPreview = ({
               const currentLayoutType = viewMode === "desktop" ? desktopLayout : mobileLayout;
 
               // Image component with upload functionality
-              const baseSize = viewMode === 'desktop' ? 320 : 280;
-              const scaledSize = baseSize * (imageSettings.size / 100);
+              // Taille augmentée de 35% en mode preview (isReadOnly)
+              const baseSize = viewMode === 'desktop' ? (isReadOnly ? 432 : 320) : 280;
+              const scaledSize = baseSize * ((imageSettings.size || 100) / 100);
               
               const ImageBlock = () => (
                 <div
@@ -425,7 +454,7 @@ export const ScratchPreview = ({
                     />
                   ) : (
                     <div
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={() => { setUploadTarget('welcome'); fileInputRef.current?.click(); }}
                       className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                     >
                       <Upload className="w-12 h-12 mb-3" style={{ color: theme.accentColor }} />
@@ -438,28 +467,30 @@ export const ScratchPreview = ({
                     </div>
                   )}
                   
-                  {/* Boutons au survol */}
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
-                    <button
-                      onClick={() => setShowEditorModal(true)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                      style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
-                      title="Éditer l'image"
-                    >
-                      <Edit3 className="w-4 h-4 text-white" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setUploadedImage(null);
-                        setImageSettings(defaultSettings);
-                        onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, showImage: false, image: undefined, imageSettings: undefined } });
-                      }}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
-                      title="Supprimer l'image"
-                    >
-                      <X className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
+                  {/* Boutons au survol - masqués en mode lecture seule */}
+                  {!isReadOnly && (
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
+                      <button
+                        onClick={() => setShowEditorModal(true)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                        style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                        title="Éditer l'image"
+                      >
+                        <Edit3 className="w-4 h-4 text-white" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setUploadedImage(null);
+                          setImageSettings(defaultSettings);
+                          onUpdateConfig({ welcomeScreen: { ...config.welcomeScreen, showImage: false, image: undefined, imageSettings: undefined } });
+                        }}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                        title="Supprimer l'image"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
 
@@ -477,12 +508,14 @@ export const ScratchPreview = ({
                       className="font-bold"
                       style={{ 
                         color: config.welcomeScreen.titleStyle?.textColor || theme.accentColor, 
-                        fontFamily: config.welcomeScreen.titleStyle?.fontFamily || 'inherit',
+                        fontFamily: config.welcomeScreen.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                         fontWeight: config.welcomeScreen.titleStyle?.isBold ? 'bold' : undefined,
                         fontStyle: config.welcomeScreen.titleStyle?.isItalic ? 'italic' : undefined,
                         textDecoration: config.welcomeScreen.titleStyle?.isUnderline ? 'underline' : undefined,
                         textAlign: config.welcomeScreen.titleStyle?.textAlign || alignment,
-                        fontSize: config.welcomeScreen.titleStyle?.fontSize ? `${config.welcomeScreen.titleStyle.fontSize}px` : (viewMode === 'desktop' ? '42px' : '28px'),
+                        fontSize: config.welcomeScreen.titleStyle?.fontSize 
+                          ? `${isReadOnly ? Math.round(config.welcomeScreen.titleStyle.fontSize * 1.35) : config.welcomeScreen.titleStyle.fontSize}px` 
+                          : (viewMode === 'desktop' ? (isReadOnly ? '57px' : '42px') : '28px'),
                         lineHeight: '1.2'
                       }}
                       isEditing={!isReadOnly && editingField === 'welcome-title'}
@@ -504,13 +537,15 @@ export const ScratchPreview = ({
                       className=""
                       style={{ 
                         color: config.welcomeScreen.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                        fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || 'inherit',
+                        fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                         fontWeight: config.welcomeScreen.subtitleStyle?.isBold ? 'bold' : undefined,
                         fontStyle: config.welcomeScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
                         textDecoration: config.welcomeScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
                         textAlign: config.welcomeScreen.subtitleStyle?.textAlign || alignment,
                         opacity: 0.9, 
-                        fontSize: config.welcomeScreen.subtitleStyle?.fontSize ? `${config.welcomeScreen.subtitleStyle.fontSize}px` : (viewMode === 'desktop' ? '18px' : '14px'),
+                        fontSize: config.welcomeScreen.subtitleStyle?.fontSize 
+                          ? `${isReadOnly ? Math.round(config.welcomeScreen.subtitleStyle.fontSize * 1.35) : config.welcomeScreen.subtitleStyle.fontSize}px` 
+                          : (viewMode === 'desktop' ? (isReadOnly ? '24px' : '18px') : '14px'),
                         lineHeight: '1.4'
                       }}
                       isEditing={!isReadOnly && editingField === 'welcome-subtitle'}
@@ -536,6 +571,9 @@ export const ScratchPreview = ({
                 );
 
               // Desktop layouts
+              // Calculer le gap basé sur blockSpacing (1 = 40px, 2 = 80px, etc.)
+              const blockGap = (config.welcomeScreen.blockSpacing || 1) * 40;
+              
               if (viewMode === 'desktop') {
                 // Horizontal alignment for the whole content block
                 const horizontalAlign = alignment === 'center' ? 'items-center' : alignment === 'right' ? 'items-end' : 'items-start';
@@ -557,7 +595,7 @@ export const ScratchPreview = ({
                       : 'max-w-[700px]';
 
                   return (
-                    <div className={`w-full h-full flex flex-col ${horizontalAlign} ${justifyClass} gap-10 overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
+                    <div className={`w-full h-full flex flex-col ${horizontalAlign} ${justifyClass} overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px', gap: `${blockGap}px` }}>
                       {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                       <div className={textContainerClass}>
                         <TextContent />
@@ -565,20 +603,20 @@ export const ScratchPreview = ({
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-right-left') {
-                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
+                  // Texte à gauche, image à droite - centré
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
+                    <div className="w-full h-full flex justify-center items-center px-16" style={{ gap: `${isReadOnly ? 80 : blockGap}px` }}>
                       <div className="max-w-[500px]">
                         <TextContent />
                       </div>
-                      <ImageBlock />
+                      {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                     </div>
                   );
                 } else if (desktopLayout === 'desktop-centered') {
-                  const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
+                  // Image à gauche, texte à droite - centré
                   return (
-                    <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
-                      <ImageBlock />
+                    <div className="w-full h-full flex justify-center items-center px-16" style={{ gap: `${isReadOnly ? 80 : blockGap}px` }}>
+                      {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                       <div className="max-w-[500px]">
                         <TextContent />
                       </div>
@@ -656,7 +694,7 @@ export const ScratchPreview = ({
                           </>
                         ) : (
                           <div
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() => { setUploadTarget('welcome'); fileInputRef.current?.click(); }}
                             className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                           >
                             <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -717,7 +755,7 @@ export const ScratchPreview = ({
                             </>
                         ) : (
                           <div
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() => { setUploadTarget('welcome'); fileInputRef.current?.click(); }}
                             className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                           >
                             <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -744,7 +782,7 @@ export const ScratchPreview = ({
               if (mobileLayout === 'mobile-vertical') {
                 return (
                   <div className="flex flex-col gap-6 w-full max-w-[700px] overflow-y-auto" style={{ padding: '35px' }}>
-                    <ImageBlock />
+                    {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                     <TextContent />
                   </div>
                 );
@@ -794,7 +832,7 @@ export const ScratchPreview = ({
                         </>
                       ) : (
                         <div
-                          onClick={() => fileInputRef.current?.click()}
+                          onClick={() => { setUploadTarget('welcome'); fileInputRef.current?.click(); }}
                           className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                         >
                           <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
@@ -861,7 +899,7 @@ export const ScratchPreview = ({
               className="font-bold"
               style={{
                 color: config.contactForm.titleStyle?.textColor || theme.textColor,
-                fontFamily: config.contactForm.titleStyle?.fontFamily || 'inherit',
+                fontFamily: config.contactForm.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                 fontSize: viewMode === 'mobile' ? '28px' : '42px',
                 lineHeight: '1.2',
               }}
@@ -885,7 +923,7 @@ export const ScratchPreview = ({
               className=""
               style={{
                 color: config.contactForm.subtitleStyle?.textColor || theme.textColor,
-                fontFamily: config.contactForm.subtitleStyle?.fontFamily || 'inherit',
+                fontFamily: config.contactForm.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                 fontSize: viewMode === 'mobile' ? '14px' : '18px',
                 lineHeight: '1.4',
                 opacity: 0.8,
@@ -1045,7 +1083,12 @@ export const ScratchPreview = ({
                   </>
                 ) : (
                   <div
-                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!isReadOnly) {
+                        setUploadTarget('contact-banner');
+                        fileInputRef.current?.click();
+                      }
+                    }}
                     className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <Upload className="w-12 h-12 mb-3" style={{ color: '#F5B800' }} />
@@ -1058,7 +1101,7 @@ export const ScratchPreview = ({
                   </div>
                 )}
               </div>
-              <div className="flex-1 flex items-start justify-center pt-6 pb-24 overflow-y-auto" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
+              <div className="flex-1 flex items-start justify-center pt-6 pb-24" style={{ paddingLeft: '7%', paddingRight: '7%' }}>
                 <div className="w-full max-w-[700px]">
                   <ContactForm />
                 </div>
@@ -1069,7 +1112,7 @@ export const ScratchPreview = ({
         
         // Desktop-card (Split right) layout avec image
         if (viewMode === 'desktop' && currentLayout === 'desktop-card') {
-          const contactImageDesktop = config.contactForm.backgroundImage;
+          const contactImageDesktop = config.contactForm.image;
           
           return (
             <div className="relative w-full h-full flex">
@@ -1109,7 +1152,12 @@ export const ScratchPreview = ({
                   </>
                 ) : (
                   <div
-                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!isReadOnly) {
+                        setUploadTarget('contact-desktop');
+                        fileInputRef.current?.click();
+                      }
+                    }}
                     className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -1128,7 +1176,7 @@ export const ScratchPreview = ({
         
         // Desktop-panel (Split left) layout avec image
         if (viewMode === 'desktop' && currentLayout === 'desktop-panel') {
-          const contactImageDesktop = config.contactForm.backgroundImage;
+          const contactImageDesktop = config.contactForm.image;
           
           return (
             <div className="relative w-full h-full flex">
@@ -1163,7 +1211,12 @@ export const ScratchPreview = ({
                   </>
                 ) : (
                   <div
-                    onClick={() => !isReadOnly && fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!isReadOnly) {
+                        setUploadTarget('contact-desktop');
+                        fileInputRef.current?.click();
+                      }
+                    }}
                     className="w-full h-full flex flex-col items-center justify-center cursor-pointer bg-muted/50 hover:bg-muted transition-colors"
                   >
                     <Upload className="w-16 h-16 mb-4" style={{ color: '#F5B800' }} />
@@ -1380,7 +1433,7 @@ export const ScratchPreview = ({
                     className=""
                     style={{ 
                       color: config.scratchScreen.titleStyle?.textColor || theme.accentColor, 
-                      fontFamily: config.scratchScreen.titleStyle?.fontFamily || 'inherit',
+                      fontFamily: config.scratchScreen.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                       fontWeight: config.scratchScreen.titleStyle?.isBold ? 'bold' : 500,
                       fontStyle: config.scratchScreen.titleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.scratchScreen.titleStyle?.isUnderline ? 'underline' : undefined,
@@ -1431,7 +1484,7 @@ export const ScratchPreview = ({
                 className="font-bold"
                 style={{ 
                   color: config.endingWin.titleStyle?.textColor || theme.textColor,
-                  fontFamily: config.endingWin.titleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingWin.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                   fontWeight: config.endingWin.titleStyle?.isBold ? 'bold' : 700,
                   fontStyle: config.endingWin.titleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingWin.titleStyle?.isUnderline ? 'underline' : undefined,
@@ -1455,7 +1508,7 @@ export const ScratchPreview = ({
                 className=""
                 style={{ 
                   color: config.endingWin.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                  fontFamily: config.endingWin.subtitleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingWin.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                   fontWeight: config.endingWin.subtitleStyle?.isBold ? 'bold' : 400,
                   fontStyle: config.endingWin.subtitleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingWin.subtitleStyle?.isUnderline ? 'underline' : undefined,
@@ -1502,7 +1555,7 @@ export const ScratchPreview = ({
                 className="font-bold"
                 style={{ 
                   color: config.endingLose.titleStyle?.textColor || theme.textColor,
-                  fontFamily: config.endingLose.titleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingLose.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                   fontWeight: config.endingLose.titleStyle?.isBold ? 'bold' : 700,
                   fontStyle: config.endingLose.titleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingLose.titleStyle?.isUnderline ? 'underline' : undefined,
@@ -1526,7 +1579,7 @@ export const ScratchPreview = ({
                 className=""
                 style={{ 
                   color: config.endingLose.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                  fontFamily: config.endingLose.subtitleStyle?.fontFamily || 'inherit',
+                  fontFamily: config.endingLose.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                   fontWeight: config.endingLose.subtitleStyle?.isBold ? 'bold' : 400,
                   fontStyle: config.endingLose.subtitleStyle?.isItalic ? 'italic' : undefined,
                   textDecoration: config.endingLose.subtitleStyle?.isUnderline ? 'underline' : undefined,
@@ -1656,16 +1709,77 @@ export const ScratchPreview = ({
           
           if (!bgImage) return null;
           
+          // Get overlay settings based on current screen
+          const getOverlaySettings = () => {
+            const applyToAll = config.welcomeScreen.applyBackgroundToAll;
+            if (applyToAll) {
+              return {
+                enabled: config.welcomeScreen.overlayEnabled,
+                color: config.welcomeScreen.overlayColor || '#000000',
+                opacity: config.welcomeScreen.overlayOpacity ?? 50,
+              };
+            }
+            
+            switch (activeView) {
+              case 'welcome':
+                return {
+                  enabled: config.welcomeScreen.overlayEnabled,
+                  color: config.welcomeScreen.overlayColor || '#000000',
+                  opacity: config.welcomeScreen.overlayOpacity ?? 50,
+                };
+              case 'contact':
+                return {
+                  enabled: config.contactForm.overlayEnabled,
+                  color: config.contactForm.overlayColor || '#000000',
+                  opacity: config.contactForm.overlayOpacity ?? 50,
+                };
+              case 'scratch':
+                return {
+                  enabled: config.scratchScreen.overlayEnabled,
+                  color: config.scratchScreen.overlayColor || '#000000',
+                  opacity: config.scratchScreen.overlayOpacity ?? 50,
+                };
+              case 'ending-win':
+                return {
+                  enabled: config.endingWin.overlayEnabled,
+                  color: config.endingWin.overlayColor || '#000000',
+                  opacity: config.endingWin.overlayOpacity ?? 50,
+                };
+              case 'ending-lose':
+                return {
+                  enabled: config.endingLose.overlayEnabled,
+                  color: config.endingLose.overlayColor || '#000000',
+                  opacity: config.endingLose.overlayOpacity ?? 50,
+                };
+              default:
+                return { enabled: false, color: '#000000', opacity: 50 };
+            }
+          };
+          
+          const overlay = getOverlaySettings();
+          
           return (
-            <div 
-              className="absolute inset-0 z-0"
-              style={{
-                backgroundImage: `url(${bgImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
-            />
+            <>
+              <div 
+                className="absolute inset-0 z-0"
+                style={{
+                  backgroundImage: `url(${bgImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              />
+              {overlay.enabled && (
+                <div 
+                  className="absolute inset-0"
+                  style={{
+                    backgroundColor: overlay.color,
+                    opacity: overlay.opacity / 100,
+                    zIndex: 1,
+                  }}
+                />
+              )}
+            </>
           );
         })()}
 
@@ -1685,7 +1799,7 @@ export const ScratchPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={activeView === 'contact' ? "w-full min-h-full relative z-10 flex flex-col" : "w-full h-full relative z-10"}
+              className="w-full h-full relative z-10"
               onClick={(e) => {
                 // Ne pas blur si on clique sur un input, textarea ou button
                 const target = e.target as HTMLElement;
@@ -1698,35 +1812,7 @@ export const ScratchPreview = ({
                 }
               }}
             >
-              {(() => {
-                if (activeView !== 'contact') {
-                  return renderContent();
-                }
-                
-                // Pour la vue contact uniquement
-                const getCurrentLayout = () => {
-                  const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
-                  return config.contactForm[layoutKey];
-                };
-                
-                const currentLayout = getCurrentLayout();
-                const isContactWithGrid = viewMode === 'desktop' && (
-                  currentLayout === 'desktop-left-right' || 
-                  currentLayout === 'desktop-right-left' || 
-                  currentLayout === 'desktop-panel' || 
-                  currentLayout === 'desktop-card'
-                );
-                
-                if (isContactWithGrid) {
-                  return (
-                    <div className="flex-1 grid grid-cols-2">
-                      {renderContent()}
-                    </div>
-                  );
-                }
-                
-                return renderContent();
-              })()}
+              {renderContent()}
             </motion.div>
           </AnimatePresence>
 
