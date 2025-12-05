@@ -23,6 +23,7 @@ import {
   defaultHeaderConfig, 
   defaultFooterConfig,
 } from "./campaign";
+import { TemplateLibraryPanel } from "./templates/TemplateLibraryPanel";
 
 export interface Prize {
   id: string;
@@ -65,8 +66,8 @@ export interface WheelSegment {
 }
 
 export interface ContactField {
-  id: string; // Identifiant unique du champ (ex: 'civilite', 'prenom', 'nom')
-  type: 'text' | 'email' | 'phone' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'date'; // Type de champ
+  id: string; // Identifiant unique du champ (ex: 'firstName', 'lastName', 'email')
+  type: 'text' | 'email' | 'phone' | 'tel' | 'select' | 'textarea' | 'checkbox' | 'date' | 'number'; // Type de champ
   required: boolean;
   label: string;
   placeholder?: string; // Placeholder pour les champs de texte
@@ -99,6 +100,8 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -108,10 +111,13 @@ export interface WheelConfig {
     alignment?: 'left' | 'center' | 'right';
     image?: string;
     imageSettings?: {
+      size: number;
       borderRadius: number;
       borderWidth: number;
       borderColor: string;
       rotation: number;
+      flipH: boolean;
+      flipV: boolean;
     };
   };
   contactForm: {
@@ -129,9 +135,13 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
+    image?: string; // Image pour les layouts split (desktop-card, desktop-panel)
+    imageMobile?: string; // Image/bannière pour mobile-centered
   };
   wheelScreen: {
     title: string;
@@ -147,6 +157,8 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -165,6 +177,8 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -182,6 +196,8 @@ export interface WheelConfig {
     mobileLayout: MobileLayoutType;
     desktopLayout: DesktopLayoutType;
     wallpaperImage?: string;
+    overlayEnabled?: boolean;
+    overlayColor?: string;
     overlayOpacity?: number;
     backgroundImage?: string;
     backgroundImageMobile?: string;
@@ -200,7 +216,17 @@ const defaultWheelConfig: WheelConfig = {
     buttonText: "Tourner la roue",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-left-right"
+    desktopLayout: "desktop-right-left",
+    showImage: true,
+    imageSettings: {
+      size: 150,
+      borderRadius: 5,
+      borderWidth: 0,
+      borderColor: '#F5B800',
+      rotation: 0,
+      flipH: false,
+      flipV: false
+    }
   },
   contactForm: {
     enabled: true,
@@ -208,12 +234,16 @@ const defaultWheelConfig: WheelConfig = {
     subtitle: "Pour vous envoyer votre gain",
     blockSpacing: 1,
     fields: [
-      { id: 'name', type: 'text', required: true, label: 'Nom complet' },
+      { id: 'firstName', type: 'text', required: true, label: 'Prénom' },
+      { id: 'lastName', type: 'text', required: true, label: 'Nom' },
       { id: 'email', type: 'email', required: true, label: 'Email' },
-      { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
+      { id: 'phone', type: 'phone', required: false, label: 'Téléphone' },
+      { id: 'address', type: 'text', required: false, label: 'Adresse' },
+      { id: 'postalCode', type: 'text', required: false, label: 'Code postal' },
+      { id: 'city', type: 'text', required: false, label: 'Ville' },
     ],
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   wheelScreen: {
     title: "Tournez la roue !",
@@ -221,7 +251,7 @@ const defaultWheelConfig: WheelConfig = {
     blockSpacing: 1,
     wheelSize: 100,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   segments: [
     { id: '1', label: 'Segment 1', color: '#1F2937', probability: 16.67 },
@@ -236,14 +266,14 @@ const defaultWheelConfig: WheelConfig = {
     subtitle: "Vous avez gagné {{prize}}",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   endingLose: {
     title: "Dommage !",
     subtitle: "Vous n'avez pas gagné cette fois-ci",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   layout: {
     header: { ...defaultHeaderConfig, enabled: false },
@@ -459,15 +489,24 @@ export const WheelBuilder = () => {
             localStorage.removeItem('wheel-config');
             localStorage.removeItem('wheel-viewMode');
             localStorage.removeItem('wheel-theme');
+            localStorage.removeItem('wheel-campaignId');
           } catch (e) {
             // Ignore cleanup errors
           }
+          
+          // Construire l'URL avec l'ID de campagne si disponible
+          const previewUrl = campaign?.id 
+            ? `/wheel-preview?id=${campaign.id}` 
+            : '/wheel-preview';
           
           try {
             localStorage.setItem('wheel-config', JSON.stringify(config));
             localStorage.setItem('wheel-viewMode', targetViewMode);
             localStorage.setItem('wheel-theme', JSON.stringify(theme));
-            window.open('/wheel-preview', '_blank');
+            if (campaign?.id) {
+              localStorage.setItem('wheel-campaignId', campaign.id);
+            }
+            window.open(previewUrl, '_blank');
           } catch (e) {
             console.warn('localStorage full, trying without images:', e);
             // Remove all background images to reduce size
@@ -496,7 +535,10 @@ export const WheelBuilder = () => {
               localStorage.setItem('wheel-config', JSON.stringify(configWithoutImages));
               localStorage.setItem('wheel-viewMode', targetViewMode);
               localStorage.setItem('wheel-theme', JSON.stringify(theme));
-              window.open('/wheel-preview', '_blank');
+              if (campaign?.id) {
+                localStorage.setItem('wheel-campaignId', campaign.id);
+              }
+              window.open(previewUrl, '_blank');
             } catch (e2) {
               toast.error('Impossible d\'ouvrir la preview - données trop volumineuses');
             }
@@ -536,6 +578,35 @@ export const WheelBuilder = () => {
           publishedUrl={campaign?.published_url || ''}
           shortSlug={shortSlug}
           onShortSlugChange={setShortSlug}
+        />
+      ) : activeTab === 'templates' ? (
+        <TemplateLibraryPanel 
+          onSelectTemplate={(templateConfig, templateMeta) => {
+            // Appliquer la config du template (welcomeScreen, etc.)
+            if (templateConfig.welcomeScreen) {
+              updateConfig({
+                welcomeScreen: {
+                  ...config.welcomeScreen,
+                  ...templateConfig.welcomeScreen,
+                  backgroundImage: templateMeta.backgroundImage || templateConfig.welcomeScreen?.backgroundImage,
+                },
+              });
+            }
+            
+            // Appliquer le thème (couleurs + typo) via le contexte
+            themeContext.updateTheme({
+              primaryColor: templateMeta.colorPalette.secondary,
+              buttonColor: templateMeta.colorPalette.secondary,
+              buttonTextColor: templateMeta.colorPalette.primary,
+              backgroundColor: templateMeta.colorPalette.primary,
+              textColor: templateMeta.colorPalette.tertiary,
+              fontFamily: templateMeta.typography.body.toLowerCase().replace(/\s+/g, '-'),
+              headingFontFamily: templateMeta.typography.heading.toLowerCase().replace(/\s+/g, '-'),
+            });
+            
+            toast.success("Template appliqué avec succès !");
+            setActiveTab('design');
+          }}
         />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">

@@ -114,10 +114,10 @@ export const QuizSettingsPanel = ({
                 desktopLayout={config.welcomeScreen.desktopLayout}
                 mobileLayout={config.welcomeScreen.mobileLayout}
                 onDesktopLayoutChange={(layout) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
+                  welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout, showImage: true }
                 })}
                 onMobileLayoutChange={(layout) => onUpdateConfig({
-                  welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
+                  welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout, showImage: true }
                 })}
               />
             </div>

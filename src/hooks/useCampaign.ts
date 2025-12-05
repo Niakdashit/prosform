@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { CampaignService } from '@/services/CampaignService';
 import type { Campaign, CampaignType, CampaignMode } from '@/types/campaign';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 // Deep merge utility function
 function deepMerge<T extends Record<string, any>>(target: T, source: Record<string, any>): T {
@@ -173,6 +174,29 @@ export function useCampaign(
     }
 
     try {
+      // Récupérer l'organization_id et user_id pour les nouvelles campagnes
+      let organization_id = campaign?.organization_id;
+      let user_id = campaign?.user_id;
+      
+      if (!organization_id || !user_id) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          user_id = user_id || user.id;
+          
+          if (!organization_id) {
+            const { data: membership } = await supabase
+              .from('organization_members')
+              .select('organization_id')
+              .eq('user_id', user.id)
+              .limit(1)
+              .single();
+            organization_id = membership?.organization_id;
+          }
+        }
+      }
+      
+      console.log('📤 Saving campaign with:', { organization_id, user_id, name });
+
       // Inclure le shortSlug dans la config
       const configWithSlug = shortSlug ? { ...config, shortSlug } : config;
       
@@ -187,6 +211,8 @@ export function useCampaign(
         theme: themeContext?.theme || campaign?.theme || {},
         starts_at,
         ends_at,
+        organization_id,
+        user_id,
       });
 
       setCampaign(savedCampaign);

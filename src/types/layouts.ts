@@ -11,7 +11,8 @@ export type DesktopLayoutType =
 export type MobileLayoutType = 
   | 'mobile-vertical'       // Vertical classique
   | 'mobile-centered'       // Centré
-  | 'mobile-minimal';       // Minimal sans distraction
+  | 'mobile-minimal'        // Minimal sans distraction
+  | 'mobile-text-top';      // Texte au-dessus, image en dessous
 
 export interface LayoutConfig {
   desktop: DesktopLayoutType;
@@ -33,37 +34,37 @@ export const DESKTOP_LAYOUTS: Array<{
 }> = [
   {
     id: 'desktop-left-right',
-    name: 'Gauche-Droite',
+    name: 'Layout 1',
     description: 'Contenu à gauche, visuel à droite',
     preview: '/src/assets/layout-desktop-left-right.svg'
   },
   {
     id: 'desktop-right-left',
-    name: 'Droite-Gauche',
+    name: 'Layout 2',
     description: 'Visuel à gauche, contenu à droite',
     preview: '/src/assets/layout-desktop-right-left.svg'
   },
   {
     id: 'desktop-centered',
-    name: 'Centré',
+    name: 'Layout 3',
     description: 'Contenu centré au milieu',
     preview: '/src/assets/layout-desktop-centered.svg'
   },
   {
     id: 'desktop-card',
-    name: 'Split right',
-    description: 'Contenu à gauche, roue à droite',
+    name: 'Layout 4',
+    description: 'Contenu à gauche, visuel à droite (split)',
     preview: '/src/assets/layout-desktop-card.svg'
   },
   {
     id: 'desktop-panel',
-    name: 'Split left',
-    description: 'Roue à gauche, contenu à droite',
+    name: 'Layout 5',
+    description: 'Visuel à gauche, contenu à droite (split)',
     preview: '/src/assets/layout-desktop-panel.svg'
   },
   {
     id: 'desktop-split',
-    name: 'Wallpaper',
+    name: 'Layout 6',
     description: 'Fond plein écran avec overlay',
     preview: '/src/assets/layout-desktop-split.svg'
   }
@@ -77,20 +78,26 @@ export const MOBILE_LAYOUTS: Array<{
 }> = [
   {
     id: 'mobile-vertical',
-    name: 'Vertical',
+    name: 'Layout 1',
     description: 'Layout vertical classique',
     preview: '/src/assets/layout-mobile-vertical.svg'
   },
   {
     id: 'mobile-centered',
-    name: 'Bannière',
+    name: 'Layout 2',
     description: 'Contenu centré',
     preview: '/src/assets/layout-mobile-centered.svg'
   },
   {
     id: 'mobile-minimal',
-    name: 'Wallpaper',
+    name: 'Layout 3',
     description: 'Design épuré',
     preview: '/src/assets/layout-mobile-minimal.svg'
+  },
+  {
+    id: 'mobile-text-top',
+    name: 'Layout 4',
+    description: 'Texte au-dessus, image en dessous',
+    preview: '/src/assets/layout-mobile-vertical.svg'
   }
 ];

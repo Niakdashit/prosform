@@ -24,7 +24,7 @@ const defaultJackpotConfig: JackpotConfig = {
     buttonText: "Jouer au jackpot",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-left-right"
+    desktopLayout: "desktop-right-left"
   },
   contactForm: {
     enabled: true,
@@ -37,14 +37,14 @@ const defaultJackpotConfig: JackpotConfig = {
       { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   jackpotScreen: {
     title: "Tournez le jackpot !",
     subtitle: "Alignez 3 symboles identiques pour gagner",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered",
+    desktopLayout: "desktop-right-left",
     template: "jackpot-11",
     spinDuration: 2000
   },
@@ -61,14 +61,14 @@ const defaultJackpotConfig: JackpotConfig = {
     subtitle: "Vous avez gagné {{prize}}",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   },
   endingLose: {
     title: "Dommage !",
     subtitle: "Vous n'avez pas gagné cette fois-ci",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered"
+    desktopLayout: "desktop-right-left"
   }
 };
 

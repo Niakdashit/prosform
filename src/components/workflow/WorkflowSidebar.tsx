@@ -11,12 +11,50 @@ import {
   Grid3x3,
   MessageSquare,
   Users,
-  Webhook
+  Webhook,
+  Building2,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface WorkflowSidebarProps {
   onAddWorkflowElement?: (type: string) => void;
 }
+
+// CRM Integrations
+const crmIntegrations = [
+  { id: 'hubspot', name: 'HubSpot', icon: 'https://cdn.simpleicons.org/hubspot/FF7A59', color: '#FF7A59' },
+  { id: 'salesforce', name: 'Salesforce', icon: 'https://cdn.simpleicons.org/salesforce/00A1E0', color: '#00A1E0' },
+  { id: 'pipedrive', name: 'Pipedrive', icon: 'https://cdn.simpleicons.org/pipedrive/1A1A1A', color: '#1A1A1A' },
+  { id: 'zoho_crm', name: 'Zoho CRM', icon: 'https://cdn.simpleicons.org/zoho/C8202B', color: '#C8202B' },
+  { id: 'freshsales', name: 'Freshsales', icon: 'https://cdn.simpleicons.org/freshworks/F26722', color: '#F26722' },
+  { id: 'copper', name: 'Copper', icon: 'https://cdn.simpleicons.org/copper/F8A01A', color: '#F8A01A' },
+  { id: 'close', name: 'Close', icon: 'https://cdn.simpleicons.org/close/1A1A1A', color: '#1A1A1A' },
+  { id: 'insightly', name: 'Insightly', icon: 'https://cdn.simpleicons.org/insightly/5C2D91', color: '#5C2D91' },
+];
+
+// Marketing Automation
+const marketingIntegrations = [
+  { id: 'mailchimp', name: 'Mailchimp', icon: 'https://cdn.simpleicons.org/mailchimp/FFE01B', color: '#FFE01B' },
+  { id: 'klaviyo', name: 'Klaviyo', icon: 'https://cdn.simpleicons.org/klaviyo/000000', color: '#000000' },
+  { id: 'activecampaign', name: 'ActiveCampaign', icon: 'https://cdn.simpleicons.org/activecampaign/356AE6', color: '#356AE6' },
+  { id: 'sendinblue', name: 'Brevo', icon: 'https://cdn.simpleicons.org/brevo/0B996E', color: '#0B996E' },
+  { id: 'convertkit', name: 'ConvertKit', icon: 'https://cdn.simpleicons.org/convertkit/FB6970', color: '#FB6970' },
+];
+
+// E-commerce
+const ecommerceIntegrations = [
+  { id: 'shopify', name: 'Shopify', icon: 'https://cdn.simpleicons.org/shopify/7AB55C', color: '#7AB55C' },
+  { id: 'woocommerce', name: 'WooCommerce', icon: 'https://cdn.simpleicons.org/woocommerce/96588A', color: '#96588A' },
+];
+
+// Communication
+const communicationIntegrations = [
+  { id: 'intercom', name: 'Intercom', icon: 'https://cdn.simpleicons.org/intercom/6AFDEF', color: '#6AFDEF' },
+  { id: 'zendesk', name: 'Zendesk', icon: 'https://cdn.simpleicons.org/zendesk/03363D', color: '#03363D' },
+  { id: 'crisp', name: 'Crisp', icon: 'https://cdn.simpleicons.org/crisp/1972F5', color: '#1972F5' },
+];
 
 const workflowElements = [
   {
@@ -108,10 +146,116 @@ export const WorkflowSidebar = ({ onAddWorkflowElement }: WorkflowSidebarProps) 
           </button>
         </div>
 
-        {/* Integrations section (Connect / Messages / Contacts / Webhooks) */}
-        <div className="p-2 mt-2 pb-4">
+        {/* CRM Integrations */}
+        <div className="p-2 mt-2">
           <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 px-2">
-            Integrations
+            CRM
+          </div>
+
+          <div className="space-y-0.5">
+            <button
+              className="w-full flex items-center gap-2 p-2 rounded hover:bg-accent transition-colors text-left"
+              onClick={() =>
+                setExpandedIntegration((prev) => (prev === "crm" ? null : "crm"))
+              }
+            >
+              <div className="w-7 h-7 rounded bg-muted flex items-center justify-center flex-shrink-0">
+                <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-foreground flex items-center gap-1">
+                  CRM
+                  {expandedIntegration === "crm" ? (
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="text-[10px] text-muted-foreground">
+                  HubSpot, Salesforce, Pipedrive...
+                </div>
+              </div>
+            </button>
+
+            {expandedIntegration === "crm" && (
+              <div className="ml-8 mt-0.5 mb-1 space-y-0.5">
+                {crmIntegrations.map((integration) => (
+                  <button
+                    key={integration.id}
+                    className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
+                    onClick={() => onAddWorkflowElement?.(integration.id)}
+                  >
+                    <img
+                      src={integration.icon}
+                      alt={integration.name}
+                      className="w-3.5 h-3.5 rounded-[2px]"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <span>{integration.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Marketing Automation */}
+        <div className="p-2">
+          <div className="space-y-0.5">
+            <button
+              className="w-full flex items-center gap-2 p-2 rounded hover:bg-accent transition-colors text-left"
+              onClick={() =>
+                setExpandedIntegration((prev) => (prev === "marketing" ? null : "marketing"))
+              }
+            >
+              <div className="w-7 h-7 rounded bg-muted flex items-center justify-center flex-shrink-0">
+                <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-foreground flex items-center gap-1">
+                  Marketing
+                  {expandedIntegration === "marketing" ? (
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="text-[10px] text-muted-foreground">
+                  Mailchimp, Klaviyo, ActiveCampaign...
+                </div>
+              </div>
+            </button>
+
+            {expandedIntegration === "marketing" && (
+              <div className="ml-8 mt-0.5 mb-1 space-y-0.5">
+                {marketingIntegrations.map((integration) => (
+                  <button
+                    key={integration.id}
+                    className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
+                    onClick={() => onAddWorkflowElement?.(integration.id)}
+                  >
+                    <img
+                      src={integration.icon}
+                      alt={integration.name}
+                      className="w-3.5 h-3.5 rounded-[2px]"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <span>{integration.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Integrations section (Connect / Messages / Contacts / Webhooks) */}
+        <div className="p-2 pb-4">
+          <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 px-2">
+            Autres intégrations
           </div>
 
           <div className="space-y-0.5">
@@ -125,9 +269,16 @@ export const WorkflowSidebar = ({ onAddWorkflowElement }: WorkflowSidebarProps) 
                 <Grid3x3 className="h-3.5 w-3.5 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-foreground">Connect</div>
+                <div className="text-xs font-medium text-foreground flex items-center gap-1">
+                  Connect
+                  {expandedIntegration === "connect" ? (
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
                 <div className="text-[10px] text-muted-foreground">
-                  Connect Google Sheets, Airtable...
+                  Google Sheets, Airtable, Zapier...
                 </div>
               </div>
             </button>
@@ -167,28 +318,126 @@ export const WorkflowSidebar = ({ onAddWorkflowElement }: WorkflowSidebarProps) 
                   />
                   <span>Zapier</span>
                 </button>
+                <button
+                  className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
+                  onClick={() => onAddWorkflowElement?.("make")}
+                >
+                  <img
+                    src="https://cdn.simpleicons.org/integromat"
+                    alt="Make"
+                    className="w-3.5 h-3.5 rounded-[2px]"
+                  />
+                  <span>Make (Integromat)</span>
+                </button>
+                <button
+                  className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
+                  onClick={() => onAddWorkflowElement?.("n8n")}
+                >
+                  <img
+                    src="https://cdn.simpleicons.org/n8n"
+                    alt="n8n"
+                    className="w-3.5 h-3.5 rounded-[2px]"
+                  />
+                  <span>n8n</span>
+                </button>
               </div>
             )}
 
+            {/* E-commerce */}
             <button
               className="w-full flex items-center gap-2 p-2 rounded hover:bg-accent transition-colors text-left"
               onClick={() =>
-                setExpandedIntegration((prev) => (prev === "messages" ? null : "messages"))
+                setExpandedIntegration((prev) => (prev === "ecommerce" ? null : "ecommerce"))
               }
             >
               <div className="w-7 h-7 rounded bg-muted flex items-center justify-center flex-shrink-0">
-                <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                <img
+                  src="https://cdn.simpleicons.org/shopify/7AB55C"
+                  alt="E-commerce"
+                  className="w-3.5 h-3.5"
+                />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-foreground">Messages</div>
+                <div className="text-xs font-medium text-foreground flex items-center gap-1">
+                  E-commerce
+                  {expandedIntegration === "ecommerce" ? (
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
                 <div className="text-[10px] text-muted-foreground">
-                  Send email or Slack notifications
+                  Shopify, WooCommerce...
                 </div>
               </div>
             </button>
 
-            {expandedIntegration === "messages" && (
+            {expandedIntegration === "ecommerce" && (
               <div className="ml-8 mt-0.5 mb-1 space-y-0.5">
+                {ecommerceIntegrations.map((integration) => (
+                  <button
+                    key={integration.id}
+                    className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
+                    onClick={() => onAddWorkflowElement?.(integration.id)}
+                  >
+                    <img
+                      src={integration.icon}
+                      alt={integration.name}
+                      className="w-3.5 h-3.5 rounded-[2px]"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <span>{integration.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Communication */}
+            <button
+              className="w-full flex items-center gap-2 p-2 rounded hover:bg-accent transition-colors text-left"
+              onClick={() =>
+                setExpandedIntegration((prev) => (prev === "communication" ? null : "communication"))
+              }
+            >
+              <div className="w-7 h-7 rounded bg-muted flex items-center justify-center flex-shrink-0">
+                <Users className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-foreground flex items-center gap-1">
+                  Communication
+                  {expandedIntegration === "communication" ? (
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="text-[10px] text-muted-foreground">
+                  Intercom, Zendesk, Crisp...
+                </div>
+              </div>
+            </button>
+
+            {expandedIntegration === "communication" && (
+              <div className="ml-8 mt-0.5 mb-1 space-y-0.5">
+                {communicationIntegrations.map((integration) => (
+                  <button
+                    key={integration.id}
+                    className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
+                    onClick={() => onAddWorkflowElement?.(integration.id)}
+                  >
+                    <img
+                      src={integration.icon}
+                      alt={integration.name}
+                      className="w-3.5 h-3.5 rounded-[2px]"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <span>{integration.name}</span>
+                  </button>
+                ))}
                 <button
                   className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
                   onClick={() => onAddWorkflowElement?.("email")}
@@ -214,39 +463,7 @@ export const WorkflowSidebar = ({ onAddWorkflowElement }: WorkflowSidebarProps) 
               </div>
             )}
 
-            <button
-              className="w-full flex items-center gap-2 p-2 rounded hover:bg-accent transition-colors text-left"
-              onClick={() =>
-                setExpandedIntegration((prev) => (prev === "contacts" ? null : "contacts"))
-              }
-            >
-              <div className="w-7 h-7 rounded bg-muted flex items-center justify-center flex-shrink-0">
-                <Users className="h-3.5 w-3.5 text-muted-foreground" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-foreground">Contacts</div>
-                <div className="text-[10px] text-muted-foreground">
-                  Create or update your contacts
-                </div>
-              </div>
-            </button>
-
-            {expandedIntegration === "contacts" && (
-              <div className="ml-8 mt-0.5 mb-1 space-y-0.5">
-                <button
-                  className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
-                  onClick={() => onAddWorkflowElement?.("contacts-sync")}
-                >
-                  <img
-                    src="https://cdn.simpleicons.org/microsoftexcel"
-                    alt="Excel"
-                    className="w-3.5 h-3.5 rounded-[2px]"
-                  />
-                  <span>Sync contacts</span>
-                </button>
-              </div>
-            )}
-
+            {/* Webhooks */}
             <button
               className="w-full flex items-center gap-2 p-2 rounded hover:bg-accent transition-colors text-left"
               onClick={() =>
@@ -257,7 +474,14 @@ export const WorkflowSidebar = ({ onAddWorkflowElement }: WorkflowSidebarProps) 
                 <Webhook className="h-3.5 w-3.5 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-foreground">Webhooks</div>
+                <div className="text-xs font-medium text-foreground flex items-center gap-1">
+                  Webhooks
+                  {expandedIntegration === "webhooks" ? (
+                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                  )}
+                </div>
                 <div className="text-[10px] text-muted-foreground">
                   Connect with any app
                 </div>
@@ -269,6 +493,7 @@ export const WorkflowSidebar = ({ onAddWorkflowElement }: WorkflowSidebarProps) 
                   className="w-full flex items-center gap-2 text-[11px] text-foreground px-1 py-1 rounded hover:bg-accent/70"
                   onClick={() => onAddWorkflowElement?.("webhook")}
                 >
+                  <Webhook className="w-3.5 h-3.5 text-muted-foreground" />
                   <span>Custom webhook</span>
                 </button>
               </div>

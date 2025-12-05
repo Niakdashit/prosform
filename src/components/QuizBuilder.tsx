@@ -23,6 +23,7 @@ import {
   defaultHeaderConfig, 
   defaultFooterConfig,
 } from "./campaign";
+import { TemplateLibraryPanel } from "./templates/TemplateLibraryPanel";
 
 export interface QuizAnswer {
   id: string;
@@ -72,6 +73,16 @@ export interface QuizConfig {
     splitAlignment?: 'left' | 'center' | 'right';
     alignment?: 'left' | 'center' | 'right';
     showImage?: boolean;
+    image?: string;
+    imageSettings?: {
+      size: number;
+      borderRadius: number;
+      borderWidth: number;
+      borderColor: string;
+      rotation: number;
+      flipH: boolean;
+      flipV: boolean;
+    };
   };
   contactScreen: {
     enabled: boolean;
@@ -90,6 +101,8 @@ export interface QuizConfig {
     desktopLayout: DesktopLayoutType;
     backgroundImage?: string;
     backgroundImageMobile?: string;
+    image?: string;
+    imageMobile?: string;
   };
   questions: QuizQuestion[];
   resultScreen: {
@@ -139,7 +152,17 @@ const defaultQuizConfig: QuizConfig = {
     buttonText: "Commencer le quiz",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-left-right"
+    desktopLayout: "desktop-right-left",
+    showImage: true,
+    imageSettings: {
+      size: 150,
+      borderRadius: 5,
+      borderWidth: 0,
+      borderColor: '#F5B800',
+      rotation: 0,
+      flipH: false,
+      flipV: false
+    }
   },
   contactScreen: {
     enabled: true,
@@ -153,7 +176,7 @@ const defaultQuizConfig: QuizConfig = {
       { id: 'phone', type: 'phone', required: false, label: 'Téléphone' }
     ],
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered",
+    desktopLayout: "desktop-right-left",
   },
   questions: [
     {
@@ -201,7 +224,7 @@ const defaultQuizConfig: QuizConfig = {
     subtitle: "Vous avez obtenu {{score}} points sur {{total}}",
     blockSpacing: 1,
     mobileLayout: "mobile-vertical",
-    desktopLayout: "desktop-centered",
+    desktopLayout: "desktop-right-left",
     showScore: true,
     showCorrectAnswers: true
   },
@@ -449,9 +472,34 @@ export const QuizBuilder = () => {
           publishedUrl={campaign?.published_url || ''}
         />
       ) : activeTab === 'templates' ? (
-        <div className="flex items-center justify-center h-full">
-          <p className="text-muted-foreground">Templates à venir...</p>
-        </div>
+        <TemplateLibraryPanel 
+          onSelectTemplate={(templateConfig, templateMeta) => {
+            // Appliquer la config du template (welcomeScreen, etc.)
+            if (templateConfig.welcomeScreen) {
+              updateConfig({
+                welcomeScreen: {
+                  ...config.welcomeScreen,
+                  ...templateConfig.welcomeScreen,
+                  backgroundImage: templateMeta.backgroundImage || templateConfig.welcomeScreen?.backgroundImage,
+                },
+              });
+            }
+            
+            // Appliquer le thème (couleurs + typo) via le contexte
+            themeContext.updateTheme({
+              primaryColor: templateMeta.colorPalette.secondary,
+              buttonColor: templateMeta.colorPalette.secondary,
+              buttonTextColor: templateMeta.colorPalette.primary,
+              backgroundColor: templateMeta.colorPalette.primary,
+              textColor: templateMeta.colorPalette.tertiary,
+              fontFamily: templateMeta.typography.body.toLowerCase().replace(/\s+/g, '-'),
+              headingFontFamily: templateMeta.typography.heading.toLowerCase().replace(/\s+/g, '-'),
+            });
+            
+            toast.success("Template appliqué avec succès !");
+            setActiveTab('design');
+          }}
+        />
       ) : (
         <div className="flex flex-1 overflow-hidden relative">
         {isMobile ? (

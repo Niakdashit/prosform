@@ -79,10 +79,13 @@ export interface Question {
   // Image uploadée pour cette question
   image?: string;
   imageSettings?: {
+    size: number;
     borderRadius: number;
     borderWidth: number;
     borderColor: string;
     rotation: number;
+    flipH: boolean;
+    flipV: boolean;
   };
   // Overlay opacity for wallpaper layouts
   overlayOpacity?: number;

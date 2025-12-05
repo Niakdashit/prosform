@@ -110,10 +110,10 @@ export const WheelSettingsPanel = ({
                     desktopLayout={config.welcomeScreen.desktopLayout}
                     mobileLayout={config.welcomeScreen.mobileLayout}
                     onDesktopLayoutChange={(layout) => onUpdateConfig({
-                      welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout }
+                      welcomeScreen: { ...config.welcomeScreen, desktopLayout: layout, showImage: true }
                     })}
                     onMobileLayoutChange={(layout) => onUpdateConfig({
-                      welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout }
+                      welcomeScreen: { ...config.welcomeScreen, mobileLayout: layout, showImage: true }
                     })}
                   />
                 </div>
@@ -198,6 +198,18 @@ export const WheelSettingsPanel = ({
                   applyToAll={config.welcomeScreen.applyBackgroundToAll}
                   onApplyToAllChange={(value) => onUpdateConfig({
                     welcomeScreen: { ...config.welcomeScreen, applyBackgroundToAll: value }
+                  })}
+                  overlayEnabled={config.welcomeScreen.overlayEnabled}
+                  onOverlayEnabledChange={(value) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, overlayEnabled: value }
+                  })}
+                  overlayColor={config.welcomeScreen.overlayColor || '#000000'}
+                  onOverlayColorChange={(color) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, overlayColor: color }
+                  })}
+                  overlayOpacity={config.welcomeScreen.overlayOpacity ?? 50}
+                  onOverlayOpacityChange={(opacity) => onUpdateConfig({
+                    welcomeScreen: { ...config.welcomeScreen, overlayOpacity: opacity }
                   })}
                 />
               </>
@@ -421,6 +433,8 @@ export const WheelSettingsPanel = ({
                               <SelectItem value="text">Texte</SelectItem>
                               <SelectItem value="email">Email</SelectItem>
                               <SelectItem value="tel">Téléphone</SelectItem>
+                              <SelectItem value="date">Date</SelectItem>
+                              <SelectItem value="number">Nombre</SelectItem>
                               <SelectItem value="select">Liste déroulante</SelectItem>
                               <SelectItem value="textarea">Zone de texte</SelectItem>
                               <SelectItem value="checkbox">Case à cocher (opt-in)</SelectItem>
@@ -510,8 +524,53 @@ export const WheelSettingsPanel = ({
                     </div>
                   ))}
                   
-                   {/* Add Field Button */}
-                  <div className="flex flex-col gap-2 pt-2">
+                   {/* Quick Add Predefined Fields */}
+                  <div className="pt-2">
+                    <Label className="text-xs text-gray-500 mb-2 block">Ajouter un champ prédéfini</Label>
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {[
+                        { id: 'firstName', label: 'Prénom', type: 'text' as const, placeholder: 'Votre prénom' },
+                        { id: 'lastName', label: 'Nom', type: 'text' as const, placeholder: 'Votre nom' },
+                        { id: 'email', label: 'Email', type: 'email' as const, placeholder: 'votre@email.com' },
+                        { id: 'phone', label: 'Téléphone', type: 'tel' as const, placeholder: '06 12 34 56 78' },
+                        { id: 'address', label: 'Adresse', type: 'text' as const, placeholder: '123 rue Example' },
+                        { id: 'postalCode', label: 'Code postal', type: 'text' as const, placeholder: '75001' },
+                        { id: 'city', label: 'Ville', type: 'text' as const, placeholder: 'Paris' },
+                        { id: 'country', label: 'Pays', type: 'text' as const, placeholder: 'France' },
+                        { id: 'company', label: 'Entreprise', type: 'text' as const, placeholder: 'Nom de l\'entreprise' },
+                        { id: 'jobTitle', label: 'Poste', type: 'text' as const, placeholder: 'Votre fonction' },
+                        { id: 'birthdate', label: 'Date de naissance', type: 'date' as const },
+                      ].filter(preset => !config.contactForm.fields.some(f => f.id === preset.id))
+                       .map(preset => (
+                        <Button
+                          key={preset.id}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newField: ContactField = {
+                              id: preset.id,
+                              type: preset.type,
+                              label: preset.label,
+                              placeholder: preset.placeholder || '',
+                              required: false
+                            };
+                            onUpdateConfig({ 
+                              contactForm: { 
+                                ...config.contactForm, 
+                                fields: [...config.contactForm.fields, newField] 
+                              } 
+                            });
+                          }}
+                          className="h-7 text-xs px-2"
+                        >
+                          + {preset.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Add Custom Field Button */}
+                  <div className="flex flex-col gap-2 pt-2 border-t">
                     <Button
                       onClick={() => {
                         const newField: ContactField = {
@@ -530,7 +589,7 @@ export const WheelSettingsPanel = ({
                       }}
                       className="h-9 bg-[#3d3731] hover:bg-[#2d2721] text-white text-xs"
                     >
-                      + Ajouter un champ
+                      + Ajouter un champ personnalisé
                     </Button>
                     <Button
                       onClick={() => {

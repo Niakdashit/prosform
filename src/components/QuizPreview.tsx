@@ -6,7 +6,7 @@ import { Monitor, Smartphone, Clock, CheckCircle2, XCircle, X, Upload, Pencil, T
 import { useState, useRef, useEffect } from "react";
 import { ImageEditorModal, ImageSettings, defaultSettings } from "./ImageEditorModal";
 import { ImageUploadModal } from "./ImageUploadModal";
-import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
+import { useTheme, getButtonStyles, getFontFamily } from "@/contexts/ThemeContext";
 import { WelcomeLayouts } from "./layouts/WelcomeLayouts";
 import { EndingLayouts } from "./layouts/EndingLayouts";
 import { ContactLayouts } from "./layouts/ContactLayouts";
@@ -203,21 +203,19 @@ export const QuizPreview = ({
         const desktopLayout = config.welcomeScreen.desktopLayout || "desktop-left-right";
         const mobileLayout = config.welcomeScreen.mobileLayout || "mobile-vertical";
         
-        // Image component (toujours même taille, même place)
-        const baseSize = viewMode === 'desktop' ? 320 : 280;
-        const scaledSize = baseSize * (imageSettings.size / 100);
+        // Image component - utiliser flex-1 pour que l'image occupe l'espace disponible
+        const currentLayoutType = viewMode === "desktop" ? desktopLayout : mobileLayout;
         
         const ImageBlock = () => {
           const hasImage = config.welcomeScreen.wallpaperImage;
           
           return (
             <div
-              className="overflow-hidden flex-shrink-0 relative group"
+              className="overflow-hidden relative group flex-1 min-h-[200px]"
               style={{ 
                 borderRadius: `${imageSettings.borderRadius}px`,
-                width: `${scaledSize}px`,
-                height: `${scaledSize}px`,
-                maxWidth: '100%',
+                maxWidth: currentLayoutType.includes('left-right') || currentLayoutType.includes('right-left') ? '50%' : '100%',
+                aspectRatio: '1',
                 border: imageSettings.borderWidth > 0 ? `${imageSettings.borderWidth}px solid ${imageSettings.borderColor}` : 'none',
               }}
             >
@@ -246,31 +244,33 @@ export const QuizPreview = ({
                 </div>
               )}
               
-              {/* Boutons au survol */}
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
-                <button
-                  type="button"
-                  onClick={() => setShowEditorModal(true)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                  style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
-                  title="Éditer l'image"
-                >
-                  <Pencil className="w-4 h-4 text-white" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onUpdateConfig({
-                      welcomeScreen: { ...config.welcomeScreen, showImage: false, wallpaperImage: undefined },
-                    });
-                    setImageSettings(defaultSettings);
-                  }}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
-                  title="Supprimer l'image"
-                >
-                  <Trash2 className="w-4 h-4 text-white" />
-                </button>
-              </div>
+              {/* Boutons au survol - masqués en mode lecture seule */}
+              {!isReadOnly && (
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 z-10">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditorModal(true)}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                    style={{ backgroundColor: 'rgba(61, 55, 49, 0.9)' }}
+                    title="Éditer l'image"
+                  >
+                    <Pencil className="w-4 h-4 text-white" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onUpdateConfig({
+                        welcomeScreen: { ...config.welcomeScreen, showImage: false, wallpaperImage: undefined },
+                      });
+                      setImageSettings(defaultSettings);
+                    }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 bg-red-500 hover:bg-red-600"
+                    title="Supprimer l'image"
+                  >
+                    <Trash2 className="w-4 h-4 text-white" />
+                  </button>
+                </div>
+              )}
             </div>
           );
         };
@@ -293,7 +293,7 @@ export const QuizPreview = ({
                     className="font-bold"
                     style={{ 
                       color: config.welcomeScreen.titleStyle?.textColor || theme.textColor,
-                      fontFamily: config.welcomeScreen.titleStyle?.fontFamily || 'inherit',
+                      fontFamily: config.welcomeScreen.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                       fontWeight: config.welcomeScreen.titleStyle?.isBold ? 'bold' : undefined,
                       fontStyle: config.welcomeScreen.titleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.welcomeScreen.titleStyle?.isUnderline ? 'underline' : undefined,
@@ -377,7 +377,7 @@ export const QuizPreview = ({
                     className=""
                     style={{ 
                       color: config.welcomeScreen.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                      fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || 'inherit',
+                      fontFamily: config.welcomeScreen.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                       fontWeight: config.welcomeScreen.subtitleStyle?.isBold ? 'bold' : undefined,
                       fontStyle: config.welcomeScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.welcomeScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
@@ -503,14 +503,14 @@ export const QuizPreview = ({
                 <div className="max-w-[500px]">
                   <TextContent />
                 </div>
-                <ImageBlock />
+                {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
               </div>
             );
           } else if (desktopLayout === 'desktop-centered') {
             const justifyContent = alignment === 'center' ? 'justify-center' : alignment === 'right' ? 'justify-end' : 'justify-start';
             return (
               <div className={`w-full h-full flex ${justifyContent} items-center gap-16 px-24`}>
-                <ImageBlock />
+                {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                 <div className="max-w-[500px]">
                   <TextContent />
                 </div>
@@ -659,17 +659,18 @@ export const QuizPreview = ({
             return (
               <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
                 <div className="flex w-full" style={{ justifyContent: imageAlignment }}>
-                  <ImageBlock />
+                  {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
                 </div>
                 <TextContent />
               </div>
             );
+          } else if (mobileLayout === 'mobile-text-top') {
             return (
-              <div className="flex gap-4 w-full max-w-[700px]" style={{ padding: '35px' }}>
+              <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
                 <div className="flex-1">
                   <TextContent />
                 </div>
-                <ImageBlock />
+                {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
               </div>
             );
           } else if (mobileLayout === 'mobile-centered') {
@@ -753,7 +754,7 @@ export const QuizPreview = ({
         // Fallback
         return (
           <div className="w-full h-full flex flex-col items-start justify-start gap-10 px-24 py-12">
-            <ImageBlock />
+            {(config.welcomeScreen.showImage !== false) && <ImageBlock />}
             <div className="max-w-[700px]">
               <TextContent />
             </div>
@@ -779,7 +780,7 @@ export const QuizPreview = ({
               className="font-bold"
               style={{
                 color: config.contactScreen.titleStyle?.textColor || theme.textColor,
-                fontFamily: config.contactScreen.titleStyle?.fontFamily || 'inherit',
+                fontFamily: config.contactScreen.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                 fontSize: viewMode === 'mobile' ? '28px' : '42px',
                 lineHeight: '1.2',
               }}
@@ -803,7 +804,7 @@ export const QuizPreview = ({
               className=""
               style={{
                 color: config.contactScreen.subtitleStyle?.textColor || theme.textColor,
-                fontFamily: config.contactScreen.subtitleStyle?.fontFamily || 'inherit',
+                fontFamily: config.contactScreen.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                 fontSize: viewMode === 'mobile' ? '14px' : '18px',
                 lineHeight: '1.4',
                 opacity: 0.8,
@@ -1380,7 +1381,7 @@ export const QuizPreview = ({
                     className="font-bold"
                     style={{ 
                       color: config.resultScreen.titleStyle?.textColor || theme.textColor,
-                      fontFamily: config.resultScreen.titleStyle?.fontFamily || 'inherit',
+                      fontFamily: config.resultScreen.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                       fontWeight: config.resultScreen.titleStyle?.isBold ? 'bold' : 700,
                       fontStyle: config.resultScreen.titleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.resultScreen.titleStyle?.isUnderline ? 'underline' : undefined,
@@ -1464,7 +1465,7 @@ export const QuizPreview = ({
                     className=""
                     style={{ 
                       color: config.resultScreen.subtitleStyle?.textColor || theme.textSecondaryColor, 
-                      fontFamily: config.resultScreen.subtitleStyle?.fontFamily || 'inherit',
+                      fontFamily: config.resultScreen.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                       fontWeight: config.resultScreen.subtitleStyle?.isBold ? 'bold' : 400,
                       fontStyle: config.resultScreen.subtitleStyle?.isItalic ? 'italic' : undefined,
                       textDecoration: config.resultScreen.subtitleStyle?.isUnderline ? 'underline' : undefined,
@@ -1654,7 +1655,7 @@ export const QuizPreview = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className={activeView === 'contact' ? "w-full min-h-full relative z-10 flex flex-col" : "w-full h-full relative z-10"}
+              className="w-full h-full relative z-10"
               onClick={(e) => {
                 // Ne pas blur si on clique sur un input, textarea ou button
                 const target = e.target as HTMLElement;
@@ -1667,35 +1668,7 @@ export const QuizPreview = ({
                 }
               }}
             >
-              {(() => {
-                if (activeView !== 'contact') {
-                  return renderContent();
-                }
-                
-                // Pour la vue contact uniquement
-                const getCurrentLayout = () => {
-                  const layoutKey = viewMode === 'desktop' ? 'desktopLayout' : 'mobileLayout';
-                  return config.contactScreen[layoutKey];
-                };
-                
-                const currentLayout = getCurrentLayout();
-                const isContactWithGrid = viewMode === 'desktop' && (
-                  currentLayout === 'desktop-left-right' || 
-                  currentLayout === 'desktop-right-left' || 
-                  currentLayout === 'desktop-panel' || 
-                  currentLayout === 'desktop-card'
-                );
-                
-                if (isContactWithGrid) {
-                  return (
-                    <div className="flex-1 grid grid-cols-2">
-                      {renderContent()}
-                    </div>
-                  );
-                }
-                
-                return renderContent();
-              })()}
+              {renderContent()}
             </motion.div>
           </AnimatePresence>
 

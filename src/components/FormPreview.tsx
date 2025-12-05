@@ -17,7 +17,7 @@ import { ImageUploadModal } from "./ImageUploadModal";
 import { ImageEditorModal, ImageSettings, defaultSettings } from "./ImageEditorModal";
 import { BranchingModal } from "./BranchingModal";
 import { EditableTextBlock } from "./EditableTextBlock";
-import { useTheme, getButtonStyles } from "@/contexts/ThemeContext";
+import { useTheme, getButtonStyles, getFontFamily } from "@/contexts/ThemeContext";
 
 // Load Google Font dynamically
 const loadGoogleFont = (fontFamily: string) => {
@@ -123,9 +123,13 @@ export const FormPreview = ({
   const [imageSettings, setImageSettings] = useState<ImageSettings>(
     question?.imageSettings ? {
       ...defaultSettings,
-      borderRadius: question.imageSettings.borderRadius,
-      borderWidth: question.imageSettings.borderWidth,
-      borderColor: question.imageSettings.borderColor,
+      size: question.imageSettings.size ?? defaultSettings.size,
+      borderRadius: question.imageSettings.borderRadius ?? defaultSettings.borderRadius,
+      borderWidth: question.imageSettings.borderWidth ?? defaultSettings.borderWidth,
+      borderColor: question.imageSettings.borderColor ?? defaultSettings.borderColor,
+      rotation: question.imageSettings.rotation ?? defaultSettings.rotation,
+      flipH: question.imageSettings.flipH ?? defaultSettings.flipH,
+      flipV: question.imageSettings.flipV ?? defaultSettings.flipV,
     } : defaultSettings
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -268,14 +272,17 @@ export const FormPreview = ({
     if (!uploadedImage && getBackgroundImage()) {
       setUploadedImage(getBackgroundImage());
     }
-    // Sauvegarder dans la question
+    // Sauvegarder TOUTES les propriétés dans la question
     if (question) {
       onUpdateQuestion(question.id, { 
         imageSettings: {
+          size: settings.size,
           borderRadius: settings.borderRadius,
           borderWidth: settings.borderWidth,
           borderColor: settings.borderColor,
-          rotation: settings.rotation
+          rotation: settings.rotation,
+          flipH: settings.flipH,
+          flipV: settings.flipV
         }
       });
     }
@@ -603,7 +610,7 @@ export const FormPreview = ({
     const titleStyle = question?.titleStyle || {};
     const appliedStyle: React.CSSProperties = {
       color: titleStyle.textColor || textColor,
-      fontFamily: titleStyle.fontFamily || 'inherit',
+      fontFamily: titleStyle.fontFamily || getFontFamily(theme.headingFontFamily),
       fontSize: titleStyle.fontSize ? `${titleStyle.fontSize}px` : undefined,
       fontWeight: titleStyle.isBold ? 'bold' : 'normal',
       fontStyle: titleStyle.isItalic ? 'italic' : 'normal',
@@ -722,7 +729,7 @@ export const FormPreview = ({
     const subtitleStyle = question?.subtitleStyle || {};
     const appliedStyle: React.CSSProperties = {
       color: subtitleStyle.textColor || textColor,
-      fontFamily: subtitleStyle.fontFamily || 'inherit',
+      fontFamily: subtitleStyle.fontFamily || getFontFamily(theme.fontFamily),
       fontSize: subtitleStyle.fontSize ? `${subtitleStyle.fontSize}px` : undefined,
       fontWeight: subtitleStyle.isBold ? 'bold' : 'normal',
       fontStyle: subtitleStyle.isItalic ? 'italic' : 'normal',
@@ -2170,7 +2177,7 @@ export const FormPreview = ({
                           className={`${!isReadOnly ? 'cursor-text' : ''} transition-opacity`}
                           style={{ 
                             color: question.titleStyle?.textColor || theme.buttonColor,
-                            fontFamily: question.titleStyle?.fontFamily || 'inherit',
+                            fontFamily: question.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                             fontSize: question.titleStyle?.fontSize ? `${question.titleStyle.fontSize}px` : '2.25rem',
                             fontWeight: question.titleStyle?.isBold ? 'bold' : 'normal',
                             fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
@@ -2320,7 +2327,7 @@ export const FormPreview = ({
                           className={`${!isReadOnly ? 'cursor-text' : ''} transition-opacity`}
                           style={{ 
                             color: question.subtitleStyle?.textColor || theme.textSecondaryColor,
-                            fontFamily: question.subtitleStyle?.fontFamily || 'inherit',
+                            fontFamily: question.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                             fontSize: question.subtitleStyle?.fontSize ? `${question.subtitleStyle.fontSize}px` : '1.125rem',
                             fontWeight: question.subtitleStyle?.isBold ? 'bold' : 'normal',
                             fontStyle: question.subtitleStyle?.isItalic ? 'italic' : 'normal',
@@ -2393,7 +2400,7 @@ export const FormPreview = ({
                       return (
                         <div className={`w-full h-full flex ${justifyContent} justify-start overflow-y-auto scrollbar-hide`} style={{ padding: '35px 75px' }}>
                           <div className={`flex flex-col ${horizontalAlign} gap-10 max-w-[700px] overflow-visible`}>
-                            <ImageBlock />
+                            {(question.showImage !== false) && <ImageBlock />}
                             <TextContent />
                           </div>
                         </div>
@@ -2406,7 +2413,7 @@ export const FormPreview = ({
                             <div className="max-w-[500px]">
                               <TextContent />
                             </div>
-                            <ImageBlock />
+                            {(question.showImage !== false) && <ImageBlock />}
                           </div>
                         </div>
                       );
@@ -2415,7 +2422,7 @@ export const FormPreview = ({
                       return (
                         <div className={`w-full h-full flex ${justifyContent} items-center px-24`}>
                           <div className="max-w-[900px] flex items-center gap-16">
-                            <ImageBlock />
+                            {(question.showImage !== false) && <ImageBlock />}
                             <div className="max-w-[500px]">
                               <TextContent />
                             </div>
@@ -2604,18 +2611,18 @@ export const FormPreview = ({
                     return (
                       <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
                         <div className="flex w-full" style={{ justifyContent: imageAlignment }}>
-                          <ImageBlock />
+                          {(question.showImage !== false) && <ImageBlock />}
                         </div>
                         <TextContent />
                       </div>
                     );
-                  } else if (mobileLayout === 'mobile-horizontal') {
+                  } else if (mobileLayout === 'mobile-text-top') {
                     return (
-                      <div className="flex gap-4 w-full max-w-[700px]" style={{ padding: '35px' }}>
+                      <div className="flex flex-col gap-6 w-full max-w-[700px]" style={{ padding: '35px' }}>
                         <div className="flex-1">
                           <TextContent />
                         </div>
-                        <ImageBlock />
+                        {(question.showImage !== false) && <ImageBlock />}
                       </div>
                     );
                   } else if (mobileLayout === 'mobile-centered') {
@@ -2737,7 +2744,7 @@ export const FormPreview = ({
                   // Fallback
                   return (
                     <div className="w-full h-full grid grid-cols-[auto_1fr] gap-16 items-center px-12">
-                      <ImageBlock />
+                      {(question.showImage !== false) && <ImageBlock />}
                       <TextContent />
                     </div>
                   );
@@ -2848,7 +2855,7 @@ export const FormPreview = ({
                         className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                           color: question.titleStyle?.textColor || theme.buttonColor, 
-                          fontFamily: question.titleStyle?.fontFamily || 'inherit',
+                          fontFamily: question.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                           fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                           fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                           textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
@@ -3053,7 +3060,7 @@ export const FormPreview = ({
                         className="text-4xl font-bold leading-[1.1] cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                           color: question.titleStyle?.textColor || theme.buttonColor, 
-                          fontFamily: question.titleStyle?.fontFamily || 'inherit',
+                          fontFamily: question.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                           fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                           fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                           textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
@@ -3234,7 +3241,7 @@ export const FormPreview = ({
                         className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                         color: question.titleStyle?.textColor || theme.buttonColor, 
-                        fontFamily: question.titleStyle?.fontFamily || 'inherit',
+                        fontFamily: question.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                         fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                         fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                         textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
@@ -3503,7 +3510,7 @@ export const FormPreview = ({
                         className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                         color: question.titleStyle?.textColor || theme.buttonColor, 
-                        fontFamily: question.titleStyle?.fontFamily || 'inherit',
+                        fontFamily: question.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                         fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                         fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                         textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
@@ -3604,7 +3611,7 @@ export const FormPreview = ({
                       className="font-bold cursor-text hover:opacity-80 transition-opacity"
                       style={{ 
                       color: question.titleStyle?.textColor || theme.buttonColor, 
-                      fontFamily: question.titleStyle?.fontFamily || 'inherit',
+                      fontFamily: question.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                       fontWeight: question.titleStyle?.isBold ? 'bold' : 700, 
                       fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                       textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
@@ -3639,7 +3646,7 @@ export const FormPreview = ({
                         className="text-xl cursor-text hover:opacity-80 transition-opacity"
                         style={{ 
                           color: question.subtitleStyle?.textColor || '#B8A892',
-                          fontFamily: question.subtitleStyle?.fontFamily || 'inherit',
+                          fontFamily: question.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                           fontWeight: question.subtitleStyle?.isBold ? 'bold' : 'normal',
                           fontStyle: question.subtitleStyle?.isItalic ? 'italic' : 'normal',
                           textDecoration: question.subtitleStyle?.isUnderline ? 'underline' : 'none',
@@ -3759,7 +3766,7 @@ export const FormPreview = ({
                       className="font-bold cursor-text hover:opacity-80 transition-opacity" 
                       style={{ 
                       color: question.titleStyle?.textColor || '#F5B800', 
-                      fontFamily: question.titleStyle?.fontFamily || 'inherit',
+                      fontFamily: question.titleStyle?.fontFamily || getFontFamily(theme.headingFontFamily),
                       fontWeight: question.titleStyle?.isBold ? 'bold' : 700,
                       fontStyle: question.titleStyle?.isItalic ? 'italic' : 'normal',
                       textDecoration: question.titleStyle?.isUnderline ? 'underline' : 'none',
@@ -3792,7 +3799,7 @@ export const FormPreview = ({
                         className="cursor-text hover:opacity-80 transition-opacity" 
                         style={{ 
                           color: question.subtitleStyle?.textColor || '#C4B5A0',
-                          fontFamily: question.subtitleStyle?.fontFamily || 'inherit',
+                          fontFamily: question.subtitleStyle?.fontFamily || getFontFamily(theme.fontFamily),
                           fontWeight: question.subtitleStyle?.isBold ? 'bold' : 'normal',
                           fontStyle: question.subtitleStyle?.isItalic ? 'italic' : 'normal',
                           textDecoration: question.subtitleStyle?.isUnderline ? 'underline' : 'none',

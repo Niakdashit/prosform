@@ -118,17 +118,89 @@ const ScratchPreviewContent = () => {
 
     if (campaignId) {
       try {
-        // Extraire l'email du contactData
-        const email = contactData.email || Object.entries(contactData).find(([key]) => key.toLowerCase().includes('email'))?.[1];
+        // DEBUG: Afficher toutes les clés du contactData
+        console.log('🔍 [ScratchPreview] contactData keys:', Object.keys(contactData));
+        console.log('🔍 [ScratchPreview] contactData full:', JSON.stringify(contactData, null, 2));
+        
+        // Helper pour trouver une valeur par plusieurs clés possibles
+        const findValue = (...keys: string[]) => {
+          for (const key of keys) {
+            if (contactData[key]) return contactData[key];
+          }
+          // Fallback: chercher par clé partielle (insensible à la casse)
+          for (const key of keys) {
+            const found = Object.entries(contactData).find(([k]) => 
+              k.toLowerCase().replace(/[_\s-]/g, '').includes(key.toLowerCase().replace(/[_\s-]/g, ''))
+            );
+            if (found) return found[1];
+          }
+          return undefined;
+        };
+
+        // Pas de conversion - on envoie la valeur telle quelle (Homme, Femme, Non-binaire)
+        // pour matcher les valeurs internes de la propriété HubSpot
+        const convertSalutation = (value?: string) => value;
+
+        // Convertir genre français vers format standard
+        const convertGender = (value?: string) => {
+          if (!value) return undefined;
+          const lower = value.toLowerCase();
+          if (lower === 'homme' || lower === 'masculin' || lower === 'male' || lower === 'm') return 'male';
+          if (lower === 'femme' || lower === 'féminin' || lower === 'female' || lower === 'f') return 'female';
+          if (lower === 'non-binaire' || lower === 'non binaire' || lower === 'autre' || lower === 'other') return 'other';
+          return value;
+        };
+
+        const email = findValue('email');
+        // Pour la civilité, chercher aussi par 'select' (type par défaut des selects)
+        const rawSalutation = findValue('salutation', 'civilite', 'civilité', 'title', 'titre', 'Civilité', 'select');
+        const rawGender = findValue('gender', 'sexe', 'genre');
+        
+        // Debug des valeurs trouvées
+        const foundFirstName = findValue('firstName', 'prenom', 'prénom', 'first_name', 'Prénom');
+        const foundLastName = findValue('lastName', 'nom', 'last_name', 'Nom');
+        console.log('🔍 [ScratchPreview] Found firstName:', foundFirstName);
+        console.log('🔍 [ScratchPreview] Found lastName:', foundLastName);
+        console.log('🔍 [ScratchPreview] Found salutation:', rawSalutation);
         
         await ParticipationService.recordParticipation({
           campaignId,
           email,
           contactData: {
-            name: contactData.name || contactData.nom || contactData.prenom,
+            // Champs de base
+            firstName: foundFirstName,
+            lastName: foundLastName,
+            name: contactData.name || `${foundFirstName || ''} ${foundLastName || ''}`.trim(),
             email,
-            phone: contactData.phone || contactData.telephone || contactData.tel,
-            ...contactData,
+            phone: findValue('phone', 'telephone', 'téléphone', 'tel', 'mobile', 'Téléphone'),
+            // Champs d'adresse
+            address: findValue('address', 'adresse', 'rue', 'street', 'Adresse'),
+            city: findValue('city', 'ville', 'town', 'Ville'),
+            postalCode: findValue('postalCode', 'codePostal', 'code_postal', 'cp', 'zip', 'zipcode', 'Code Postal', 'Code postal'),
+            country: findValue('country', 'pays', 'Pays'),
+            // Champs professionnels
+            company: findValue('company', 'entreprise', 'societe', 'société', 'Entreprise'),
+            jobTitle: findValue('jobTitle', 'poste', 'fonction', 'job_title', 'job', 'Poste'),
+            industry: findValue('industry', 'secteur', 'secteur_activite', 'Secteur', 'Secteur d\'activité'),
+            companySize: findValue('companySize', 'company_size', 'taille_entreprise', 'Taille entreprise', 'Effectif'),
+            website: findValue('website', 'site_web', 'siteweb', 'Site web', 'URL'),
+            linkedin: findValue('linkedin', 'linkedIn', 'LinkedIn'),
+            // Champs personnels
+            birthdate: findValue('birthdate', 'dateNaissance', 'date_naissance', 'birthday', 'dob', 'Date de naissance'),
+            salutation: convertSalutation(rawSalutation),
+            gender: convertGender(rawGender),
+            nationality: findValue('nationality', 'nationalite', 'nationalité', 'Nationalité'),
+            language: findValue('language', 'langue', 'Langue', 'langue_preferee', 'Langue préférée'),
+            maritalStatus: findValue('maritalStatus', 'situation_familiale', 'Situation familiale', 'statut_marital'),
+            // Champs marketing
+            leadSource: findValue('leadSource', 'source', 'lead_source', 'Source', 'Comment nous avez-vous connu'),
+            gdprConsent: findValue('gdprConsent', 'rgpd', 'consentement', 'consent', 'newsletter', 'optin', 'opt_in'),
+            interests: findValue('interests', 'interets', 'intérêts', 'centres_interet', 'Centre d\'intérêts'),
+            // Champs e-commerce / fidélité
+            customerId: findValue('customerId', 'customer_id', 'numero_client', 'Numéro client', 'ID client'),
+            loyaltyCard: findValue('loyaltyCard', 'loyalty_card', 'carte_fidelite', 'Carte fidélité', 'Programme fidélité'),
+            preferredStore: findValue('preferredStore', 'preferred_store', 'magasin_prefere', 'Magasin préféré', 'Magasin'),
+            ...contactData, // Inclure tous les autres champs personnalisés
           },
           result: { type: isWin ? 'win' : 'lose' },
         });

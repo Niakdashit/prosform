@@ -64,12 +64,14 @@ export const AnalyticsService = {
     if (campaignError) throw campaignError;
 
     // Compter les gagnants depuis les participants (pour total_winners)
-    const { data: winners, error: winnersError } = await supabase
+    // Récupérer tous les participants et filtrer côté client
+    const { data: allParticipants, error: winnersError } = await supabase
       .from('campaign_participants')
-      .select('id')
-      .not('participation_data->result->type', 'neq', 'win');
+      .select('id, participation_data');
 
-    const totalWinners = winners?.length || 0;
+    const totalWinners = allParticipants?.filter(p => 
+      p.participation_data?.result?.type === 'win'
+    ).length || 0;
 
     // Taux de conversion = completions / vues
     const conversion_rate = globalViews > 0

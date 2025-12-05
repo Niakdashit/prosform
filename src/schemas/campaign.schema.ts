@@ -27,7 +27,12 @@ export const campaignCreateSchema = z.object({
   theme: z.record(z.unknown()).optional().default({}),
   start_date: z.string().datetime().optional(),
   end_date: z.string().datetime().optional(),
+  starts_at: z.string().datetime().optional(),
+  ends_at: z.string().datetime().optional(),
   thumbnail_url: z.string().url().optional(),
+  // Champs d'appartenance
+  organization_id: z.string().uuid().optional(),
+  user_id: z.string().uuid().optional(),
 });
 
 export const campaignUpdateSchema = campaignCreateSchema.partial().omit({
