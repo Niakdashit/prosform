@@ -44,6 +44,8 @@ const ArticleJackpot = lazy(() => import("./pages/ArticleJackpot"));
 const ArticleJackpotPreview = lazy(() => import("./pages/ArticleJackpotPreview"));
 const Catalog = lazy(() => import("./pages/Catalog"));
 const CatalogPreview = lazy(() => import("./pages/CatalogPreview"));
+const GoogleReview = lazy(() => import("./pages/GoogleReview"));
+const GoogleReviewPreview = lazy(() => import("./pages/GoogleReviewPreview"));
 const PublicCampaign = lazy(() => import("./pages/PublicCampaign"));
 const ShortUrl = lazy(() => import("./pages/ShortUrl"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -108,6 +110,7 @@ const App = () => (
                   <Route path="/article-quiz" element={<PrivateRoute><ArticleQuiz /></PrivateRoute>} />
                   <Route path="/article-jackpot" element={<PrivateRoute><ArticleJackpot /></PrivateRoute>} />
                   <Route path="/catalog" element={<PrivateRoute><Catalog /></PrivateRoute>} />
+                  <Route path="/google-review" element={<PrivateRoute><GoogleReview /></PrivateRoute>} />
                   
                   {/* Public preview routes (for participants) */}
                   <Route path="/wheel-preview" element={<WheelPreview />} />
@@ -119,6 +122,7 @@ const App = () => (
                   <Route path="/article-quiz-preview" element={<ArticleQuizPreview />} />
                   <Route path="/article-jackpot-preview" element={<ArticleJackpotPreview />} />
                   <Route path="/catalog-preview" element={<CatalogPreview />} />
+                  <Route path="/google-review-preview" element={<GoogleReviewPreview />} />
                   
                   {/* Public campaign URLs */}
                   <Route path="/p/:slug" element={<PublicCampaign />} />

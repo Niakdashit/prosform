@@ -301,6 +301,31 @@ export const BORDER_STYLES: Record<string, BorderStyle> = {
     }
   },
   
+  // Style Or avec rendu métallique
+  gold: {
+    name: 'Or',
+    type: 'metallic',
+    colors: ['#FFD700', '#DAA520', '#B8860B'],
+    width: 16,
+    effects: {
+      metallic: true,
+      glow: true,
+      shadow: true
+    }
+  },
+  
+  // Style Argent avec rendu métallique
+  silver: {
+    name: 'Argent',
+    type: 'metallic',
+    colors: ['#C0C0C0', '#A8A8A8', '#808080'],
+    width: 14,
+    effects: {
+      metallic: true,
+      shadow: true
+    }
+  },
+  
   // Image-based gold ring template (uses PNG/SVG ring asset)
   goldRing: {
     name: 'Or (Template)',
